@@ -1,0 +1,586 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 width="100%"
+		 height="100%"
+		 styleName="classicPromWeek">
+	
+	<fx:Metadata>
+	</fx:Metadata>
+		
+	<fx:Declarations>
+	</fx:Declarations>
+	
+	<!--<s:Rect id="Background" left="0" width="100%" height="100%">
+
+		<s:fill>
+			<s:SolidColor color="{getStyle('backgroundColor')}" alpha="1.0" />
+		</s:fill>
+	</s:Rect>-->
+
+	<s:Rect x="0" y="0" width="100%" height="100%" alpha="1.0">
+		<s:fill>
+			<s:LinearGradient rotation="125">
+				<s:entries>
+					<!--<s:GradientEntry color="#EEEEEE" alpha="1.0" ratio="0.0" />-->
+					<s:GradientEntry color="{getStyle('contentAreaAltColor')}" alpha="1.0" />
+					<s:GradientEntry color="{getStyle('backgroundColor')}" alpha="1.0"  />
+				</s:entries>
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+<s:HGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+<s:Group id="centeringGroup" width="760" height="600">
+	<s:VGroup width="100%" height="100%" paddingBottom="60" paddingTop="35" gap="0" horizontalAlign="center">
+		<s:RichText color="{getStyle('textColor')}" width="100%" height="10%" text="Free Play!" textAlign="center" styleName="levelEndTitleStyle" />
+		<s:VGroup width="100%" height="60%" paddingTop="20" horizontalAlign="center">
+			<s:RichText color="{getStyle('textColor')}" paddingLeft="100" width="100%" height="15%" fontSize="20" text="Select Characters:" styleName="basicFontStyle" />
+			<s:VGroup id="chooseCharactersGroup" width="400" height="85%" horizontalAlign="center" />
+			<s:RichText color="{getStyle('textColor')}" textAlign="right" width="100%" id="characterLimit" text="Character Limit Reached." visible="false" styleName="basicFontStyle" />
+		</s:VGroup>
+		<s:HGroup id="stateVizGroup" width="100%" height="30%" gap="30" paddingLeft="35" paddingRight="35" >
+			<s:Group width="70%" height="100%">
+				<prom:StateVisualizer id="stateVisualizer" width="240" height="118" />
+			</s:Group>
+			<s:VGroup width="30%" height="100%" paddingTop="25">
+				<s:RichText color="{getStyle('textColor')}" width="100%" height="18%" fontSize="16" text="Choose Setting:" styleName="basicFontStyle" />	
+				<s:HGroup paddingLeft="20" width="100%">
+					<s:DropDownList id="settingDropDownList" selectedIndex="0" width="70%" change="settingDropDownListChanged(event)" fontSize="12">
+						 <mx:ArrayCollection>
+							<fx:String>lockers</fx:String>
+							<fx:String>classroom</fx:String>
+							<fx:String>neighborhood</fx:String>
+							<fx:String>park</fx:String>
+							<fx:String>parkinglot</fx:String>
+							<fx:String>quad</fx:String>
+							<fx:String>cornerstore</fx:String>
+							<fx:String>prom</fx:String>
+						</mx:ArrayCollection>
+					</s:DropDownList>
+				</s:HGroup>
+			</s:VGroup>
+		</s:HGroup>	
+	</s:VGroup>
+	
+	<s:Group id="backButtonSpot" left="35" top="545"/>
+	<s:Group id="continueButtonSpot" left="515" top="490" />
+	<s:Group id="newGameSpot" left="515" top="545" />
+</s:Group>
+</s:HGroup>
+	<fx:Script>
+		<![CDATA[
+		import CiF.Character;
+		import CiF.CiFSingleton;
+		import CiF.Debug;
+		import CiF.Effect;
+		import CiF.Predicate;
+		import CiF.SocialGame;
+		import com.util.SmoothImage;
+		import flash.events.KeyboardEvent;
+		import flash.events.Event;
+		import flash.events.MouseEvent;
+		import flashx.textLayout.utils.CharacterUtil;
+		import PromWeek.assets.ResourceLibrary;
+		import spark.components.HGroup;
+		
+		public var statisticsManager:StatisticsManager;
+		private var gameEngine:PromWeek.GameEngine;
+		private var resourceLibrary:ResourceLibrary;
+		
+		private var MAX_CHARACTER_LIMIT:int; // This is dependent on which setting they choose.
+		//Ugly cludge for fixing spacing issues.
+		private var bufferEmptyString:String = "                                                                                                                 ";
+		private var baseCharacterLimitReachedText:String = "Character Limit Reached."
+		
+		public var cif:CiFSingleton;
+		public var jpm:JuicePointManager;
+		public var visibilityManager:VisibilityManager;
+		
+		public var selectCharButtons:Vector.<PromWeek.ToggleableContainerButton>;
+		private var mainMenuButtons:Vector.<MainMenuButton> = new Vector.<MainMenuButton>();
+		private var promWeekButtons:Vector.<PromWeekButton> = new Vector.<PromWeekButton>();
+		
+		public var currentlySelectedChars:Vector.<Character>;
+		public var populatingStateVizForFirstTime:Boolean = true;
+		
+		public var timer:Timer; 
+		public var timerIsGoing:Boolean = false;
+		
+		public var currentSetting:String;
+		
+		
+		public var continueButton:MainMenuButton;
+		
+		public function onCreationComplete():void 
+		{
+			statisticsManager = StatisticsManager.getInstance();
+			gameEngine = PromWeek.GameEngine.getInstance();
+			cif = CiFSingleton.getInstance();
+			jpm = JuicePointManager.getInstance();
+			visibilityManager = VisibilityManager.getInstance();
+			resourceLibrary = ResourceLibrary.getInstance();
+			
+			this.stateVisualizer.stateFilter.characterFilterGroup.hiderBtn.setDimentions(28, 25);
+			var randomFirstSelectedChar:Character = cif.cast.characters[Utility.randRange(0, cif.cast.characters.length - 1)];
+			var initialSelectedChars:Vector.<Character> = new Vector.<Character>();
+			initialSelectedChars.push(randomFirstSelectedChar);
+			this.stateVisualizer.updateCharacterInfoGroup(randomFirstSelectedChar, initialSelectedChars);
+			this.stateVisualizer.stateFilter.characterFilterGroup.filterButtonGroup.visible = false;
+			
+			selectCharButtons = new Vector.<ToggleableContainerButton>();
+			currentlySelectedChars = new Vector.<Character>();
+			//this.currentlySelectedChars.push(randomFirstSelectedChar);
+
+			
+			addBackButton("Return to Main Menu");
+			addContinueButton("Continue");
+			addNewGameButton("New Game");
+			
+			this.currentSetting = "lockers"; // initalize to lockers as first choice
+			MAX_CHARACTER_LIMIT = Setting.settings[this.currentSetting].maxCharacters;
+			
+			var toggleButton:ToggleableContainerButton;
+			var hGroup:HGroup;
+			var img:SmoothImage;
+			//chooseCharactersGroup.setStyle("horizontalAlign", "center");
+			for (var i:int = 0; i < cif.cast.characters.length; i++ )
+			{
+				var char:Character = cif.cast.characters[i];
+				if (i % 6 == 0)
+				{
+					hGroup = new HGroup();
+					hGroup.setStyle("horizontalAlign", "center");
+					hGroup.width = chooseCharactersGroup.width;
+					hGroup.height = chooseCharactersGroup.height / 3;
+					
+					chooseCharactersGroup.addElement(hGroup);
+				}
+
+				toggleButton = new ToggleableContainerButton();
+				toggleButton.width = 60;
+				toggleButton.height = 60;
+				toggleButton.toggleable = true;
+				toggleButton.shouldHaveSelectedBorder = true;
+				
+				if (char.characterName == randomFirstSelectedChar.characterName) {
+					Debug.debug(this, "onCreationComplete() both names match: " + randomFirstSelectedChar.characterName);
+					toggleButton.status = "up";
+					toggleButton.selected = true;
+				} else {
+					toggleButton.selected = false;
+				}
+				toggleButton.boxPadding = 0;
+				toggleButton.roundness = 8;
+				toggleButton.addEventListener(MouseEvent.CLICK, charClicked);
+				
+				img = new SmoothImage();
+				img.width = 60//toggleButton.mainContainer.width;
+				img.height = 57//toggleButton.mainContainer.height;
+				img.source = resourceLibrary.portraits[char.characterName.toLowerCase()];
+				
+				toggleButton.mainContainer.addElement(img);
+				toggleButton.toolTip = char.characterName;
+				
+				hGroup.addElement(toggleButton);
+				selectCharButtons.push(toggleButton);
+			}	
+			this.addEventListener("STATE_VIZ_CHARS_CHANGED", setToggleButtonsToStateVisualizer);
+			//this.setToggleButtonsToStateVisualizer();
+		}
+		
+		
+		public function setToggleButtonsToStateVisualizer(e:Event = null):void
+		{
+			for each (var toggleButton:ToggleableContainerButton in selectCharButtons)
+			{
+				var charInStateViz:Boolean = false;
+				var charNameInStateViz:String = "";
+				
+				for each (var char:Character in this.stateVisualizer.charactersToDisplay)
+				{
+					if (char.characterName == toggleButton.toolTip)
+					{
+						charInStateViz = true;
+						charNameInStateViz = char.characterName;
+					}
+				}
+				if (this.stateVisualizer.selectedCharacter)
+				{
+					if (this.stateVisualizer.selectedCharacter.characterName == toggleButton.toolTip)
+					{
+						charInStateViz = true;
+						charNameInStateViz = this.stateVisualizer.selectedCharacter.characterName;
+					}
+				}
+				
+				
+				
+				if (charInStateViz)
+				{
+					toggleButton.selected = true;
+					if (populatingStateVizForFirstTime) {
+						currentlySelectedChars.push(cif.cast.getCharByName(charNameInStateViz));
+						populatingStateVizForFirstTime = false;
+					}
+					
+					
+				}
+				else
+				{
+					toggleButton.selected = false;
+				}
+			}
+		}
+		
+		
+		public function settingDropDownListChanged(e:Event = null):void
+		{
+			//Check to see what they are changing to, and don't let them if they have
+			//too many characters selected already.
+			var potentialFutureSetting:String = settingDropDownList.dataProvider[settingDropDownList.selectedIndex];
+			var potentialFutureMaxCharacters:int = Setting.settings[potentialFutureSetting].maxCharacters;
+			
+			if (currentlySelectedChars.length > potentialFutureMaxCharacters) {
+				//don't let them select this level!
+				//Make the dropdown box go back to what it used to be.
+				for (var i:int = 0; i < settingDropDownList.dataProvider.length; i++) {
+					if (settingDropDownList.dataProvider[i] == this.currentSetting) {
+						if (!timerIsGoing) { //so we don't create multiple timers, only make a new one if we don't have one already.
+							characterLimit.text = bufferEmptyString + " Only " + potentialFutureMaxCharacters + " characters allowed at the " + potentialFutureSetting + ". You have " + currentlySelectedChars.length + " selected.";
+							characterLimit.visible = true;
+							timerIsGoing = true;
+							removeCharacterLimitReachedText();
+						}
+						//print out something to the screen that tells them that they can't select this level yet.
+						//And also go back to what used to be selected
+						settingDropDownList.selectedIndex = i;
+						return;
+					}
+				}
+			}
+			
+			
+			this.currentSetting = settingDropDownList.dataProvider[settingDropDownList.selectedIndex];
+			this.MAX_CHARACTER_LIMIT = Setting.settings[this.currentSetting].maxCharacters;
+		}
+		
+		
+		
+		public function charClicked(e:MouseEvent = null):void
+		{
+			var currentCharacter:Character;
+			
+			//toggle the button
+			var removingCharacter:Boolean = false;
+			if ((e.currentTarget as ToggleableContainerButton).selected)
+			{
+				if (currentlySelectedChars.length >= MAX_CHARACTER_LIMIT) {
+					//oh oh! We don't want them to pick more than this!
+					e.currentTarget.selected = false; // manually set the button to not-selected.
+					Debug.debug(this, "Well, here we are, inside of picking too many characters land");
+					
+					if (!timerIsGoing) { //so we don't create multiple timers, only make a new one if we don't have one already.
+						characterLimit.text += " Only " + MAX_CHARACTER_LIMIT + " characters allowed at the " + currentSetting;
+						characterLimit.visible = true;
+						timerIsGoing = true;
+						removeCharacterLimitReachedText();
+					}
+					return; // don't let them do it! Abort, abort!
+				}
+				//(e.currentTarget as ToggleableContainerButton).selected = true;
+				Debug.debug(this, "character used to NOT be selected, now they ARE selected!");
+				currentlySelectedChars.push(cif.cast.getCharByName(e.currentTarget.toolTip));
+				Debug.debug(this, "adding this tool tip person: " + e.currentTarget.toolTip);
+				currentCharacter = cif.cast.getCharByName(e.currentTarget.toolTip);
+				
+				
+			}
+			else
+			{
+				if (currentlySelectedChars.length <= 1) {
+					e.currentTarget.selected = true; // we force it to remain selected.
+					return; //We don't want them to remove the last character.  Make them keep it!
+				}
+				removingCharacter = true;
+				timerIsGoing = false;
+				characterLimit.visible = false;
+				(e.currentTarget as ToggleableContainerButton).selected = false;
+				currentCharacter = cif.cast.getCharByName(e.currentTarget.toolTip);
+				Debug.debug(this, "character WAS selected, but not anymore!");
+				
+				//Find where this character used to be and remove them from the group.
+				var c:Character = new Character();
+				var index:int = 0;
+				for each (c in currentlySelectedChars) {
+					if (c.characterName.toLowerCase() == e.currentTarget.toolTip.toLowerCase()) {
+						currentlySelectedChars.splice(index, 1);
+					}
+					index++;
+				}
+				
+				Debug.debug(this, "Ok, just removed a character from the vector");
+				
+				//Check to see if the state visualizer's lead character is still in the vector.
+				//If they are, then great, leave it alone.
+				//Otherwise, pick one at random.
+				
+				var randomWasPicked:Boolean = false;
+				//for each(c in currentlySelectedChars) {
+				if ( (stateVisualizer.selectedCharacter.characterName.toLowerCase() == currentCharacter.characterName.toLowerCase()) && (removingCharacter)) {
+					//the person that got clicked was the story lead character in the state visualizer! Oh oh!
+					//Set them to a random person.
+					currentCharacter = currentlySelectedChars[Utility.randRange(0, currentlySelectedChars.length - 1)];
+					randomWasPicked = true;
+				}
+				//}
+				//If we get here, and !randomWasPicked is true, then the character that we want to be the lead character is the one who is ALREADY the lead character. 
+				
+				Debug.debug(this, "let's see if random was picked or nto");
+				
+				if (!randomWasPicked) {
+						currentCharacter = cif.cast.getCharByName(stateVisualizer.selectedCharacter.characterName);
+				}
+				
+				
+				
+				//if (stateVisualizer.selectedCharacter.characterName.toLowerCase() == e.currentTarget.toolTip.toLowerCase()) {
+					//They just deselected the person who used to be selected... select a random person now.
+					
+				//}
+			}
+			
+			//currentlySelectedChars = new Vector.<Character>();
+			
+			/*
+			for each (var toggleButton:PromWeek.ToggleableContainerButton in selectCharButtons)
+			{
+				
+				if (!toggleButton.selected)
+				{
+					currentlySelectedChars.push(cif.cast.getCharByName(toggleButton.toolTip));
+				}
+			}
+			*/
+			
+			
+			
+			/*
+			if ((e.currentTarget as PromWeek.ToggleableContainerButton).selected)
+			{
+				currentCharacter = cif.cast.getCharByName((e.currentTarget as PromWeek.ToggleableContainerButton).toolTip);
+				Debug.debug(this, "This is if the current character is selected?");
+			}
+			else
+			{
+				Debug.debug(this, "and this is some random thing that happens if the character isn't selected?");
+				currentCharacter = currentlySelectedChars[Utility.randRange(0,currentlySelectedChars.length - 1)];
+			}
+			*/
+
+			this.stateVisualizer.updateCharacterInfoGroup(currentCharacter, currentlySelectedChars);
+		}
+		
+		
+		//Adds the play button, which starts teh story
+		public function addContinueButton(buttonText:String):void {
+			var button:MainMenuButton = new MainMenuButton();
+			button.title = buttonText;
+			button.width = 200;
+			button.height = 40;
+			button.enabled = false;
+			
+			var self:Object = this;
+			button.addEventListener("click", startFromContinue);
+			continueButtonSpot.addElement(button);
+			this.continueButton = button;
+			this.mainMenuButtons.push(button);
+		}
+		
+		public function addNewGameButton(buttonText:String):void {
+			var button:MainMenuButton = new MainMenuButton();
+			button.title = buttonText;
+			button.width = 200;
+			button.height = 40;
+			
+			var self:Object = this;
+			button.addEventListener("click", startNewGame);
+			newGameSpot.addElement(button);
+			this.mainMenuButtons.push(button);
+		}
+		
+		public function startFromContinue(e:MouseEvent = null):void {
+			//create the state from the freeplay level trace
+			if (gameEngine.freeplayLevelTraceXML) {
+				//we have the trace; now valuate history
+				//append the incoming level trace's SFDB contexts and valuate it
+				cif.parseCiFState(gameEngine.freeplayLevelTraceXML);
+				cif.valuateHistory();
+			}
+			
+			this.startSandbox(e);
+		}
+		
+		public function startNewGame(e:MouseEvent = null):void {
+			jpm.setJuicePoints(50); // make sure that we always start with 50 juice points when we start a new story.
+			this.startSandbox(e);
+		}
+		
+		public function startSandbox(e:MouseEvent = null):void
+		{	
+			//construct the level
+			var level:Level = new Level();
+			level.timeLimit = 99999999;
+			//for each (var toggleButton:PromWeek.ToggleableContainerButton in selectCharButtons)
+			//{
+				//if (!toggleButton.selected)
+				//{
+					//level.cast.push(cif.cast.getCharByName(toggleButton.toolTip));
+				//}
+			//}
+			
+			level.cast.push(cif.cast.getCharByName(this.stateVisualizer.selectedCharacter.characterName));
+			for each (var char:Character in this.stateVisualizer.charactersToDisplay)
+			{
+				level.cast.push(cif.cast.getCharByName(char.characterName));
+			}
+			
+			level.settingName = this.currentSetting;
+			if (level.settingName == "" || level.settingName == "---" || level.settingName == null)
+			{
+				level.settingName = "lockers";
+			}
+			
+			if (level.settingName == "prom")
+			{
+				level.endable = true;
+			}
+			
+			level.title = "Free Play!"
+			level.description = "";
+			
+			level.isSandbox = true;
+			
+			gameEngine.tutorialAvatarName = "";
+			gameEngine.tutorial.tutorialStepCounter = 0;
+			gameEngine.tutorialFilterFollowing = null;
+			gameEngine.tutorialStopped = false;
+			
+			if (level.cast.length > 0)
+			{			
+				var story:Story = new Story();
+				story.levels.push(level);
+				story.storyLeadCharacter = level.cast[0].characterName.toLowerCase();
+				
+				this.startStory(story);
+			}
+		}
+		
+		public function startStory(selectedStory:Story):void 
+		{
+			var self:Object = this;
+			self.gameEngine.currentStory = selectedStory;
+			visibilityManager.handleNewStorySettings(selectedStory,true);
+			
+			
+			self.gameEngine.tutorialDisallowBackgroundClicks = false;
+			
+			self.gameEngine.hudGroup.skipToEndOfPromNight.storyLeadCharacter = self.gameEngine.currentStory.storyLeadCharacter;
+			self.gameEngine.hudGroup.skipToEndOfPromNight.updateUponNewStory();
+			
+			self.gameEngine.possibleEndings = new Vector.<Ending>();
+			
+			self.gameEngine.hudGroup.updatesGroup.visible = true;
+			
+			
+			self.gameEngine.activateLevel(0);
+			self.visible = false;
+			//self.gameEngine.setDimensions(gameEngine.APPLICATION_WIDTH, gameEngine.APPLICATION_HEIGHT);
+		
+			var cameraStartX:Number = Setting.settings[self.gameEngine.currentStory.levels[0].settingName].viewableWidth/4;
+			var cameraStartY:Number = Setting.settings[self.gameEngine.currentStory.levels[0].settingName].horizonHeight;
+			gameEngine.camera.absolutePosition(cameraStartX, cameraStartY, gameEngine.currentLevel.startZoom);
+
+			//this gets set to true after the first turn. Setting it false here is a sort of hack to make it so the
+			//tasks that are are already true don't bombard the player on the first turn
+			gameEngine.displayGoalProgressNotifications = false;
+			
+			for each (var toDoItem:ToDoItem in self.gameEngine.currentStory.todoList)
+			{
+				toDoItem.predTruthValuesPerResponderOtherPair = new Vector.<Dictionary>();
+				for each (var pred:Predicate in toDoItem.condition.predicates)
+				{
+					toDoItem.predTruthValuesPerResponderOtherPair.push(new Dictionary());
+				}
+			}
+			
+			for each(var sg:SocialGame in CiFSingleton.getInstance().socialGamesLib.games) {
+				for each(var e:Effect in sg.effects) {
+					e.lastSeenTime = -1;
+				}
+			}
+			
+			
+			self.gameEngine.hudGroup.storyGoalWindow.toDoItemAccordion.populateToDoList(selectedStory);
+			self.gameEngine.hudGroup.megaUI.clear();
+		}
+		
+		
+		
+		
+		//Adds the backbutton, uses the main menu button set up and skin and places it in the lower left corner. Goes back to main menu.
+		public function addBackButton(buttonText:String):void {
+			var button:MainMenuButton = new MainMenuButton();
+			button.title = buttonText;
+			button.width = 270;
+			button.height = 45;
+			
+			var self:Object = this;
+			button.addEventListener("click", function(event:MouseEvent):void {
+				self.gameEngine.hudGroup.sandboxMenuScreen.visible = false;
+				self.gameEngine.currentState = "MainMenu";
+			});
+			backButtonSpot.addElement(button);
+			this.mainMenuButtons.push(button);
+		}
+		
+		/**
+		 * A timer that will remove the "you have reached the maximum character limit" text.
+		 */
+		public function removeCharacterLimitReachedText():void {
+			this.timer = new Timer(2000, 1);
+			this.timer.addEventListener(TimerEvent.TIMER,function(event:TimerEvent):void {
+				characterLimit.visible = false;
+				characterLimit.text = bufferEmptyString + baseCharacterLimitReachedText;
+				timerIsGoing = false;
+			});
+			this.timer.start();
+		}
+		
+			/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			
+			for each( var mm:MainMenuButton in this.mainMenuButtons) {
+				mm.setStyleName();
+			}
+			for each( var pw:PromWeek.PromWeekButton in this.promWeekButtons) {
+				pw.setStyleName();
+			}
+			for each(var tb:PromWeek.ToggleableContainerButton in this.selectCharButtons) {
+				tb.setStyleName();
+			}
+			this.stateVisualizer.setStyleName();
+			this.invalidateProperties();
+		}
+		
+		]]>
+	</fx:Script>
+
+	
+</s:Group>

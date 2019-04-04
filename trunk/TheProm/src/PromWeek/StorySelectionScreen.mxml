@@ -1,0 +1,1100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 preinitialize="onPreinitialize()"
+		 initialize="onInitialization()"
+		 width="100%"
+		 height="100%"
+		 styleName="classicPromWeek">
+		 
+		<fx:Metadata>
+		</fx:Metadata>
+		 
+		<fx:Declarations>
+		</fx:Declarations>
+		
+		<!--<s:Rect id="background" width="100%" height="100%" alpha="1.0">
+			<s:fill>
+				<s:SolidColor id="backgroundFill" color="{getStyle('backgroundColor')}" />
+			</s:fill>
+		</s:Rect>-->
+	<s:Rect x="0" y="0" width="100%" height="100%" alpha="1.0">
+		<s:fill>
+			<s:LinearGradient rotation="125">
+				<s:entries>
+					<!--<s:GradientEntry color="#EEEEEE" alpha="1.0" ratio="0.0" />-->
+					<s:GradientEntry color="{getStyle('contentAreaAltColor')}" alpha="1.0" />
+					<s:GradientEntry color="{getStyle('backgroundColor')}" alpha="1.0"  />
+				</s:entries>
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+		
+	<s:HGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+	<s:Group id="centeringWrapperGroup" width="760" height="600">
+		
+		<!--<s:Label color="#FFFD70" fontSize="38" textAlign="center" width="760" top="50">
+			<s:text>Prom Week</s:text>
+		</s:Label>-->
+		
+			
+		<!-- The location of the giant avatar that shows up. -->
+		<s:Group id="avatarGroup" x="{centeringWrapperGroup.width*0.17}" y="290"></s:Group>
+		
+		<!-- Choose a story text right above the portraits. -->
+		<s:Label color="{getStyle('textColor')}" fontSize="28" left="{centeringWrapperGroup.width*0.45}" top="345" styleName="selectCharTitleScreenStyle">
+			<s:text>Choose a story:</s:text>
+		</s:Label>
+		
+		<!-- The frame around the description and title. -->
+		<s:Rect id="DescriptionFrame" width="400" left="{centeringWrapperGroup.width * 0.43}" top="60" height="260" radiusX="20" radiusY="20">
+			<s:stroke>
+				<s:SolidColorStroke weight="{getStyle('windowStrokeWeight')}" color="{getStyle('backgroundStroke')}" />
+			</s:stroke>
+			<s:fill>
+				<s:SolidColor color="{getStyle('backgroundColor')}" />
+			</s:fill>
+		</s:Rect>
+		
+		<!-- The box that contains the description and title of the campaign that is moused over. -->
+		<s:VGroup id="storyInfoGroup" width="400" top="60" height="265" left="{centeringWrapperGroup.width*0.43}" paddingTop="20" paddingBottom="10" paddingLeft="20" paddingRight="20">
+			<s:RichText id="storyTitle" width="100%" height="15%" fontWeight="bold" fontSize="22" color="{getStyle('textColor')}" paddingBottom="10" styleName="selectCharTitleScreenStyle"/>
+			<s:TextArea id="storyDescription" height="70%" width="100%" contentBackgroundColor="{getStyle('contentAreaColor')}" color="{getStyle('textColor')}" fontSize="14" editable="false" selectable="false" styleName="selectCharTitleScreenStyle" />
+			<s:HGroup width="100%" height="15%" horizontalAlign="right">
+				<s:Group id="endingsSeenArea" width="40%" height="100%">
+					<!--<s:Rect id="backgroundToEndings" width="100%" height="100%" radiusX="10" radiusY="10">
+						<s:stroke>
+							<s:SolidColorStroke weight="{getStyle('windowStrokeWeight')}" color="{getStyle('backgroundStroke')}" />
+						</s:stroke>
+						<s:fill>
+							<s:SolidColor color="{getStyle('backgroundColor')}" />
+						</s:fill>
+					</s:Rect>-->
+					<s:HGroup width="100%" height="100%" verticalAlign="middle">
+						<s:RichText id="endingsText" height="100%" fontSize="24" color="{getStyle('textColor')}" verticalAlign="middle" styleName="basicFontStyle" />
+						<s:VGroup width="50%" height="100%" horizontalAlign="left" paddingTop="5" paddingBottom="5">
+							<s:RichText id="endingsThingSeen" height="50%" text="Goals" fontSize="11" color="{getStyle('textColor')}" verticalAlign="bottom" styleName="basicFontStyle" />
+							<s:RichText id="endingsThing" height="50%" text="Completed" fontSize="11" color="{getStyle('textColor')}" verticalAlign="top" styleName="basicFontStyle" />
+						</s:VGroup>
+					</s:HGroup>
+				</s:Group>
+				<mx:Spacer width="30%"></mx:Spacer>
+				<s:Group id="playButtonSpot"/>
+			</s:HGroup>
+		</s:VGroup>
+		
+		<s:Group id="storyBoxArea" x="{centeringWrapperGroup.width*0.43}" y="385">
+			<!-- The frame around the story box. -->
+			<s:Rect id="storyBoxFrame" width="400" height="240">
+				<s:stroke>
+					<s:SolidColorStroke weight="{getStyle('backgroundStrokeWeight')}" color="{getStyle('backgroundStroke')}" />
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor color="{getStyle('backgroundColor')}" />
+				</s:fill>
+			</s:Rect>
+			<!-- The group that holds the portrait buttons of the characters. Each storyRow will only contain 6 portraits then go to the next row. -->
+			<s:VGroup id="storyBox" right="100" width="560" paddingLeft="5" paddingTop="5" gap="4">
+				<s:HGroup id="storyRow1" gap="4">
+				</s:HGroup>
+				<s:HGroup id="storyRow2" gap="4">
+				</s:HGroup>
+				<s:HGroup id="storyRow3" gap="4">
+				</s:HGroup>
+			</s:VGroup>
+		</s:Group>
+		
+		<s:Group id="backButtonSpot" left="{centeringWrapperGroup.width * 0.03}" top="550">
+		</s:Group>
+		 
+
+		
+		<s:Group id="endingToUnlockSpot" left="{highlightedButtonX}" top="{highlightedButtonY}">
+		</s:Group>
+		
+		<prom:CustomAlert id="progressNotifer" left="{centeringWrapperGroup.width/2 - progressNotifer.width/2}" top="{centeringWrapperGroup.height/2 - 220}" visible="false" />
+		<prom:AuthoringLibrary id="aL"/>
+		</s:Group>
+		</s:HGroup>
+		 <fx:Script>
+			 <![CDATA[
+		
+		import CiF.Debug;
+		import CiF.Effect;
+		import CiF.Predicate;
+		import CiF.SocialGame;
+		import CiF.SocialStatusUpdateEntry;
+		import flash.display.DisplayObject;
+		import flash.events.MouseEvent;
+		import flash.geom.Point;
+		import flash.geom.Vector3D;
+		import flash.utils.Dictionary;
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import CiF.CiFSingleton;
+		import PromWeek.Story;
+		import PromWeek.StoryButton;
+		import PromWeek.MainMenuButton;
+		import spark.utils.TextFlowUtil;
+		import flashx.textLayout.elements.TextFlow;
+		import PromWeek.assets.ResourceLibrary;
+		import spark.components.Group;
+		
+		private var rL:PromWeek.assets.ResourceLibrary;
+		private var cif:CiFSingleton;
+		private var gameEngine:GameEngine;
+		private var dm:DifficultyManager;
+		private var statisticsManager:StatisticsManager;
+		private var visibilityManager:VisibilityManager;
+		public var selectedStory:Story;
+		public var avatar:Avatar;
+		public var endingsCount:Number;
+		public var goalsCount:Number;
+		public var storyOrder:Vector.<int> = new Vector.<int>;
+		public var avatarAction:String;
+		public var possibleActions:Vector.<String> = new Vector.<String>;
+		
+		private var storyButtons:Vector.<StoryButton> = new Vector.<StoryButton>();
+		private var mainMenuButtons:Vector.<MainMenuButton> = new Vector.<MainMenuButton>();
+		[Bindable]
+		private var highlightedButtonX:int;
+		
+		[Bindable]
+		private var highlightedButtonY:int;
+		
+		private var tipBoxGamesToUnlock:int;
+		private var totalUnlockedSoFar:int;
+		
+		public var storyUnlockHistory:Vector.<Boolean>;
+		
+		
+		private function onPreinitialize():void {
+			Debug.debug(this, "onPreinitialize()");
+			cif = CiFSingleton.getInstance();
+			this.gameEngine = GameEngine.getInstance();
+			rL = PromWeek.assets.ResourceLibrary.getInstance();
+			statisticsManager = StatisticsManager.getInstance();
+			visibilityManager = VisibilityManager.getInstance();
+			dm = DifficultyManager.getInstance();
+		}
+		
+		//override protected function createChildren():void {
+			//Debug.debug(this, "createChildren()");
+			//
+			//super.createChildren();
+		//}
+		
+		public function onInitialization():void {
+			//The random actions they can play, select list
+			possibleActions.push("brush_hair");
+			possibleActions.push("sexy_pose");
+			possibleActions.push("shakehead");
+			possibleActions.push("toss_hands_up");
+			possibleActions.push("dance_cool");
+			possibleActions.push("dance_lame");
+			possibleActions.push("excited_talk");
+			possibleActions.push("relieved");
+			possibleActions.push("gasp");
+			possibleActions.push("texting");
+			possibleActions.push("shrug");
+			
+			setStyleName();
+			sortStories();
+			changeStoryDescription(gameEngine.stories[0].title, gameEngine.stories[0].description);
+			changeAvatar(gameEngine.stories[0].storyLeadCharacter);
+			selectedStory = gameEngine.stories[0];
+			
+			var endingString:String;
+			endingsCount = 0;
+			for each (var ends:Ending in selectedStory.endings) {
+				endingString = selectedStory.storyLeadCharacter + "-" + ends.name;
+				if (StatisticsManager.getInstance().endingsSeen[endingString]) {
+					endingsCount++;
+				}
+			}
+			
+			this.countGoalsForStory();
+			endingsText.text = this.goalsCount.toString() + "/" + selectedStory.todoList.length.toString();
+			Debug.debug(this, "onInitialize() goalscount: " + this.goalsCount + " toDoList.length: " + selectedStory.todoList.length);
+			//Utility.log(this, "onInitialize() goalscount: " + this.goalsCount + " toDoList.length: " + selectedStory.todoList.length);
+			
+			this.loadStorySelection();
+		}
+		
+		override protected function commitProperties():void {
+			super.commitProperties();
+		}
+		
+		
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			/*if(gameEngine.classicPromColors) {
+				this.setStyle("styleName", "classicPromWeek");
+			}
+			else if(gameEngine.greenPromColors) {
+				this.setStyle("styleName", "greenColor");
+			}
+			else if(gameEngine.redPromColors) {
+				this.setStyle("styleName", "redColor");
+			}*/
+			for each(var mm:MainMenuButton in this.mainMenuButtons)
+				mm.setStyleName();
+			for each(var sb:StoryButton in this.storyButtons) 
+				sb.setStyleName();
+			this.invalidateProperties();
+		}
+		
+		public function loadStorySelection():void 
+		{
+			var numButtonsAdded:Number = 0;
+			//gameEngine.stories.sort(sortStories);
+			for (var i:int = 0; i < gameEngine.stories.length; i++) {
+				if ((gameEngine.showTestLevel) && (gameEngine.stories[i].storyLeadCharacter == "Buzz")) {
+					gameEngine.stories[i].islocked = false;
+				}
+				if (numButtonsAdded < 10)
+				{//only add the first six
+					if ((gameEngine.stories[i].storyLeadCharacter != "no lead") && gameEngine.stories[i].shouldDisplay) {  // (!gameEngine.stories[i].istutorial) &&
+						this.addStoryButton(gameEngine.stories[i], numButtonsAdded);
+						numButtonsAdded++;
+					}
+				}
+			}
+			if (this.storyRow2.numElements == 0) {
+				//this.storyBoxArea.y += 50;
+				this.storyBoxFrame.height = 84;
+			}
+			else if (this.storyRow3.numElements == 0) {
+				//this.storyBoxArea.y += 50;
+				this.storyBoxFrame.height = 178;
+			}
+			
+			//this.selectedStory = gameEngine.stories[0];
+			
+			addBackButton("Return to Main Menu");
+			addPlayButton("Play!");
+		}
+		
+		
+		public function checkForProgress():void
+		{
+			var story:Story;
+			if (this.storyUnlockHistory == null)
+			{
+				//initialize this history vector
+				this.storyUnlockHistory = new Vector.<Boolean>();
+				for each (story in gameEngine.stories)
+				{
+					if (story.toUnlock <= statisticsManager.getNumberOfGoalsSeen())
+					{
+						//means its unlocked
+						storyUnlockHistory.push(true);
+					}
+					else
+					{
+						//means its locked
+						storyUnlockHistory.push(false);
+					}
+				}
+				return; //do this so the first time we call it we don't actually put a notification.
+			}
+			
+			var highestStoryIndex:int = -1;
+			var namesUnlocked:Vector.<String> = new Vector.<String>();
+			for (var i:int = 0; i < gameEngine.stories.length; i++)
+			{
+				story = gameEngine.stories[i];
+				if (story.toUnlock <= statisticsManager.getNumberOfGoalsSeen() && !storyUnlockHistory[i])
+				{
+					// this means we've made progres! YAY!
+					storyUnlockHistory[i] = true;
+					
+					highestStoryIndex = i;
+					namesUnlocked.push(story.storyLeadCharacter);
+				}
+			}
+			
+			
+			
+			this.progressNotifer.title.text = "Awesome!"
+			var namesString:String = "";
+			for (i = 0; i < namesUnlocked.length; i++ )
+			{
+				namesString += namesUnlocked[i];
+				if (namesUnlocked.length > 1)
+				{
+					if (i < namesUnlocked.length - 2)
+					{
+						namesString += ", ";
+					}
+					else if (i == namesUnlocked.length - 2)
+					{
+						namesString += " and ";
+					}
+				}
+			}
+			
+			if (namesString != "")
+			{
+				this.progressNotifer.message.text = "You've unlocked a new story! " + namesString + "'s story can now be played.\n\n"
+				if ((highestStoryIndex + 1)< gameEngine.stories.length)
+				{
+					var numTillNext:int = gameEngine.stories[highestStoryIndex + 1].toUnlock - statisticsManager.getNumberOfGoalsSeen();
+					if (numTillNext > 0)
+					{
+						this.progressNotifer.message.text += "Complete " + numTillNext + " more goal"+((numTillNext>1)?"s":"")+" to unlock " + gameEngine.stories[highestStoryIndex + 1].storyLeadCharacter + "'s story";
+					}
+					this.progressNotifer.visible = true;
+				}
+			}
+			
+		}
+		
+		/* Sorts the stories in an order based off the story lead character. The lower the number the sooner it is, probably meaning
+		 * the easier it is. Can change the case name or just change the value per case.
+		 */
+		public function sortStories():void {
+			for each (var story:Story in gameEngine.stories) {
+				if(!story.isQuickPlay) { // only sort non-quickplay stories!
+					switch(story.storyLeadCharacter) {
+						case "Chloe":
+							story.storySelectionLocation = 0;
+							break;
+						case "Zack":
+							story.storySelectionLocation = 1;
+							break;							
+						case "Doug":
+							story.storySelectionLocation = 2;
+							break;
+						case "Oswald":
+							story.storySelectionLocation = 3;
+							break;
+						case "Simon":
+							story.storySelectionLocation = 4;
+							break;
+						case "Monica":
+							story.storySelectionLocation = 5;
+							break;
+						case "Edward":
+							story.storySelectionLocation = 6;
+							break;
+						case "Lil":
+							story.storySelectionLocation = 7;
+							break;
+						case "Naomi":
+							story.storySelectionLocation = 8;
+							break;
+						case "Kate":
+							story.storySelectionLocation = 9;
+							break;
+						case "Nicholas":
+							story.storySelectionLocation = 10;
+							break;
+						case "Lucas":
+							story.storySelectionLocation = 11;
+							break;
+						case "Pheobe":
+							story.storySelectionLocation = 12;
+							break;
+						case "Cassandra":
+							story.storySelectionLocation = 13;
+							break;
+						case "Mave":
+							story.storySelectionLocation = 14;
+							break;
+						case "Gunter":
+							story.storySelectionLocation = 15;
+							break;
+						case "Buzz":
+							story.storySelectionLocation = 16;
+							break;
+						case "Jordan":
+							story.storySelectionLocation = 17;
+							break;
+						case "no lead":
+							story.storySelectionLocation = 20;
+							break;
+						default:
+							break;
+					}
+				}
+				//else {
+					//story.storySelectionLocation = 21;
+				//}
+			}
+			gameEngine.stories.sort(sortStoryLocation);
+		}
+		
+		//Used to sort the story location properly after they are each given a number
+		public function sortStoryLocation(x:Story, y:Story):Number {
+			if (x.storySelectionLocation > y.storySelectionLocation) {
+				return 1.0;
+			}
+			else if (x.storySelectionLocation < y.storySelectionLocation) {
+				return -1.0;
+			}
+			else {
+				return 0;
+			}
+		}
+		
+		//This function is called when the play mouses over the portrait. It will change which description and title show up in the box on the right.
+		public function changeStoryDescription(title:String, description:String):void {
+			storyTitle.text = title;
+			storyDescription.text = description;
+		}
+		
+		//This function is called when the player mouses over the portrait. It will change which avatar is present in the left corner and add it to the group.
+		public function changeAvatar(storyLeadCharacter:String):void {
+			this.avatarGroup.removeAllElements();
+			Debug.debug(this, "I'm interested to see how often times we go here... this is the story lead character: " + storyLeadCharacter);
+			Debug.debug(this, "hmm... ok that was educational I guess...");
+			//avatarGroup.width = 400;
+			//avatarGroup.height = 400;
+			//Debug.debug(this, "-----------------------");
+			//Debug.debug(this, "PRE-CHARACTER CHANGE");
+			//Debug.debug(this, "this.width: " + this.width + " this.height: " + this.height);
+			//Debug.debug(this, "avatar group.width: " + avatarGroup.width + " avatar group.height: " + avatarGroup.height);
+			//Debug.debug(this, "avatar group.x: " + avatarGroup.x + " avatar group.y: " + avatarGroup.y);
+			
+			
+			if(gameEngine.worldGroup)
+				gameEngine.worldGroup.avatars;
+			if(storyLeadCharacter == "no lead"){
+				avatar = new Avatar(rL.characterClips["gunter"]);
+				//avatar = new Avatar(rL.characterClips[cif.cast.getCharByID(charID).characterName.toLowerCase()]);
+			}
+			else {
+				avatar = new Avatar(rL.characterClips[storyLeadCharacter.toLowerCase()]);
+			}
+			avatar.clip.scaleX = 1.7;
+			avatar.clip.scaleY = 1.7;
+			
+			//Debug.debug(this, "avatar alpha: " + avatar.alpha);
+			
+			// really big...
+			avatar.clip.x = 0;
+			avatar.clip.y = -10;
+			avatar.alpha = 1;
+			
+			//avatar.setLocation(100, 100);
+			this.avatarGroup.addElement(avatar);
+			//Debug.debug(this, "character clip x: " + avatar.clip.x + " character clip y: " + avatar.clip.y);
+
+			//this.avatarGroup.addElement(rL.characterClips["edward"]);
+			
+			avatarAction = possibleActions[Utility.randRange(0, possibleActions.length - 1)];
+			avatar.clip.gotoAndPlay(avatarAction);
+			
+			//Debug.debug(this, "POST-CHARACTER CHANGE");
+			//Debug.debug(this, "this.width: " + this.width + " this.height: " + this.height);
+			//Debug.debug(this, "avatar group.width: " + avatarGroup.width + " avatar group.height: " + avatarGroup.height);
+			//Debug.debug(this, "-------------------");
+		}
+		
+		//Adds the backbutton, uses the main menu button set up and skin and places it in the lower left corner. Goes back to main menu.
+		public function addBackButton(buttonText:String):void {
+			var button:MainMenuButton = new MainMenuButton();
+			button.title = buttonText;
+			button.width = 270;
+			button.height = 45;
+			
+			var self:Object = this;
+			button.addEventListener("click", function(event:MouseEvent):void {
+				self.gameEngine.hudGroup.storySelectionScreen.visible = false;
+				self.gameEngine.currentState = "MainMenu";
+			});
+			backButtonSpot.addElement(button);
+			this.mainMenuButtons.push(button);
+		}
+		
+		//Adds the play button, which starts teh story
+		public function addPlayButton(buttonText:String):void {
+			var button:MainMenuButton = new MainMenuButton();
+			button.title = buttonText;
+			button.width = 90;
+			button.height = 40;
+			
+			var self:Object = this;
+			button.addEventListener("click", playButtonClicked);
+			playButtonSpot.addElement(button);
+			this.mainMenuButtons.push(button);
+		}
+		
+		/**
+		 * The click handler for the play button.
+		 * 
+		 * @param	e
+		 */
+		public function playButtonClicked(e:MouseEvent = null):void {
+			//set story as not being continued
+			gameEngine.isCurrentContinued = false;
+			this.startStory();
+		}
+		
+		/**
+		 * The start story function takes a loaded sfdb, current story, and level and cleans up the 
+		 * UI and preps the game engine to start a new story/freeplay/gameplay session.
+		 * 
+		 * This funciton has turned into more than just the click handler for the story selection screen.
+		 * It is now used whenever we start a gameplay session -- after continues, freeplay, and new games.
+		 * 
+		 * @param	event
+		 * @param	levelName
+		 */
+		public function startStory(event:MouseEvent = null, levelName:String = null):void {
+			
+			if (!selectedStory) return;
+			
+			var self:Object = this;
+			self.gameEngine.currentStory = selectedStory;
+			visibilityManager.handleNewStorySettings(selectedStory);
+			
+			//We want to actually set the game engine's initial state 
+			//to the one specified in the story file.  It is possible
+			//that there WASN'T one specified in the story file, and if that
+			//is the case, then we are fine just using the same default once 
+			//we've always used.
+			aL.loadCifStates(); // I think we might have to do this here...
+			if (selectedStory.startState != "") { // if we actually have a special unique start state specified in the story xml
+				gameEngine.intitialState = aL.cifStartStates[selectedStory.startState]
+				//Maybe we have to re-parse the CiF state again here?
+			}
+			else { // we don't have a special start state specified -- use the default start state.
+				gameEngine.intitialState = gameEngine.defaultState;
+			}
+			cif.clearProspectiveMemory();
+			gameEngine.resetGameState();
+			//cif.parseCiFState(gameEngine.intitialState, false);
+
+			
+			
+			
+			
+			self.gameEngine.tutorialDisallowBackgroundClicks = false;
+			
+			self.gameEngine.hudGroup.skipToEndOfPromNight.storyLeadCharacter = self.gameEngine.currentStory.storyLeadCharacter;
+			self.gameEngine.hudGroup.skipToEndOfPromNight.updateUponNewStory();
+			
+			self.gameEngine.possibleEndings = new Vector.<Ending>();
+			
+			self.gameEngine.hudGroup.updatesGroup.visible = true;
+			
+			//if level name is not null, find the index
+			var levelIndex:int = 0;
+			//Debug.debug(this, "startStory() incoming levelName: " + levelName);
+			if (levelName) {
+				for (var i:int = 0; i < gameEngine.currentStory.levels.length; ++i ) {
+					//Debug.debug(this, "startStory() comparing levelName to currentStory.levels[" + i + "] " + levelName + " == " + gameEngine.currentStory.levels[i].title);
+					if (gameEngine.currentStory.levels[i].title == levelName)
+						levelIndex = i;
+				}
+				
+				if (gameEngine.continueLevelTraceXML.@type == "endOfLevel") {
+					++levelIndex;
+				}
+				
+			}
+			
+			//Debug.debug(this, "startStory() incoming levelIndex: " + levelIndex);
+			
+			self.gameEngine.activateLevel(levelIndex);
+			if (levelName) {
+				//deal with time
+				gameEngine.levelTimeRemaining = gameEngine.currentLevel.timeLimit - (gameEngine.continueLevelTraceXML.@endTime - gameEngine.continueLevelTraceXML.@startTime);
+				gameEngine.levelStartedTime = cif.time;
+			}
+			self.visible = false;
+			//self.gameEngine.setDimensions(gameEngine.APPLICATION_WIDTH, gameEngine.APPLICATION_HEIGHT);
+		
+			self.gameEngine.tutorialAvatarName = "";
+			self.gameEngine.tutorial.tutorialStepCounter = 0;
+			self.gameEngine.tutorialFilterFollowing = null;
+			self.gameEngine.tutorialStopped = false;
+			
+			var cameraStartX:Number = Setting.settings[self.gameEngine.currentStory.levels[0].settingName].viewableWidth/4;
+			var cameraStartY:Number = Setting.settings[self.gameEngine.currentStory.levels[0].settingName].horizonHeight;
+			gameEngine.camera.absolutePosition(cameraStartX, cameraStartY, gameEngine.currentLevel.startZoom);
+
+			//this gets set to true after the first turn. Setting it false here is a sort of hack to make it so the
+			//tasks that are are already true don't bombard the player on the first turn
+			gameEngine.displayGoalProgressNotifications = false;
+			
+			gameEngine.hudGroup.storyGoalWindow.toDoItemAccordion.storyLeadName = selectedStory.storyLeadCharacter;
+			
+			for each (var toDoItem:ToDoItem in self.gameEngine.currentStory.todoList)
+			{
+				toDoItem.predTruthValuesPerResponderOtherPair = new Vector.<Dictionary>();
+				for each (var pred:Predicate in toDoItem.condition.predicates)
+				{
+					toDoItem.predTruthValuesPerResponderOtherPair.push(new Dictionary());
+				}
+			}
+			
+			for each(var sg:SocialGame in CiFSingleton.getInstance().socialGamesLib.games) {
+				for each(var e:Effect in sg.effects) {
+					e.lastSeenTime = -1;
+				}
+			}
+			
+			
+			gameEngine.initializeAllSSUTimes();
+			
+			//Clean out things like Juice Points and story goals.
+			gameEngine.returnToMainMenuCleanUp();
+			
+			//to make the goal button glow until clicked the first time, set the next line to true and uncomment the line thereafter
+			gameEngine.hudGroup.megaUI.goalButtonHasBeenClicked = true;
+			//gameEngine.hudGroup.megaUI.glowGoalButton.play();
+			
+			//Utility.log(this, "startStory() populating todo list with todoItems from " + this.selectedStory.storyLeadCharacter)
+			self.gameEngine.hudGroup.storyGoalWindow.toDoItemAccordion.populateToDoList(selectedStory);
+			self.gameEngine.hudGroup.storyGoalWindow.toDoItemAccordion.visible = true;
+			self.gameEngine.hudGroup.megaUI.clear();
+			
+			this.progressNotifer.visible = false;
+			
+			setStartDifficultyBasedOnStory(selectedStory);
+			
+		}
+		
+		public function setStartDifficultyBasedOnStory(currentStory:Story):void {
+			
+			if (currentStory.isQuickPlay) {
+					dm.setDifficulty(dm.HARD_ID);
+					gameEngine.hudGroup.difficultySelectionMenu.updateAdjustDifficultyText();
+			}
+			else{
+				switch (currentStory.storyLeadCharacter.toLowerCase()) {
+					case "chloe": dm.setDifficulty(dm.EASY_ID); break;
+					case "zack":  dm.setDifficulty(dm.HARD_ID); break;					
+					case "doug":  dm.setDifficulty(dm.HARD_ID); break;
+					case "oswald": dm.setDifficulty(dm.MEDIUM_ID); break;
+					case "simon": dm.setDifficulty(dm.MEDIUM_ID); break;
+					case "monica": dm.setDifficulty(dm.EASY_ID); break;
+					case "edward": dm.setDifficulty(dm.EASY_ID); break;
+					case "lil": dm.setDifficulty(dm.EASY_ID); break;
+					case "naomi": dm.setDifficulty(dm.HARD_ID); break;
+					case "kate": dm.setDifficulty(dm.EASY_ID); break;
+					case "nicholas": dm.setDifficulty(dm.EASY_ID); break;
+					//case "lucas": dm.setDifficulty(dm.EASY_ID); break;
+					//case "phoebe": dm.setDifficulty(dm.EASY_ID); break;
+					//case "cassandra": dm.setDifficulty(dm.EASY_ID); break;
+					//case "mave": dm.setDifficulty(dm.EASY_ID); break;
+					//case "gunter": dm.setDifficulty(dm.EASY_ID); break;
+					//case "buzz": dm.setDifficulty(dm.EASY_ID); break;
+					//case "jordan":  dm.setDifficulty(dm.EASY_ID); break;
+					default: dm.setDifficulty(dm.EASY_ID); break;
+				}
+			}
+			
+			gameEngine.hudGroup.difficultySelectionMenu.updateAdjustDifficultyText();
+			return;
+
+		}
+		
+		public function addStoryButton(story:Story, location:int):void {
+			
+			var button:StoryButton = new StoryButton();
+			var insideGroup:Group = new Group();
+			if (story.storyLeadCharacter == "no lead" || story.islocked) {
+				if (story.storyLeadCharacter == "no lead") {
+					button.imageData = rL.portraits["gunter"];
+					button.title = story.title;
+					button.story = story;
+				}
+				else if (story.islocked) {
+					button.imageData = rL.portraits[story.storyLeadCharacter.toLowerCase()];
+					button.title = story.title;
+					button.story = story;
+				}
+				button.width = 75;
+				button.height = 80;
+				//button.enabled = false;
+				
+				var lockedOutRect:Rect = new Rect();
+				lockedOutRect.width = button.width;
+				lockedOutRect.height = button.height;
+				
+				button.addEventListener(MouseEvent.MOUSE_OVER, lockedGameOver);
+			
+				
+				var solColor:SolidColor = new SolidColor();
+				solColor.color = 0x222222;
+				lockedOutRect.fill = solColor;
+				lockedOutRect.alpha = .9;
+				
+				
+				var lockImage:SmoothImage = new SmoothImage();
+				//lockImage.addEventListener(MouseEvent.MOUSE_OVER, lockedGameOver);
+				lockImage.source = rL.uiIcons["lock"];
+				lockImage.x = (lockedOutRect.width / 2 - 10);
+				lockImage.y = (lockedOutRect.height / 2 - 10);
+				
+				insideGroup.addElement(button);
+				insideGroup.addElement(lockedOutRect);
+				insideGroup.addElement(lockImage);
+			}
+			else {
+				button.imageData = rL.portraits[story.storyLeadCharacter.toLowerCase()];
+				button.width = 75;
+				button.height = 80;
+				button.story = story;
+				button.title = story.title;
+				insideGroup.addElement(button);
+				button.addEventListener("click", unlockedStoryButtonMouseEventHandler);
+			}
+			insideGroup.width = button.width;
+			insideGroup.height = button.height;
+			//Will add to storyRow based on charID, this will need to change when the charID implementation is parsed in
+			if(location < 5) {
+				storyRow1.addElement(insideGroup);
+			}
+			else
+			{
+				storyRow2.addElement(insideGroup);
+			}
+			//if (location >= 14) {
+				//storyRow3.addElement(insideGroup);
+			//}
+			this.storyButtons.push(button);
+		}
+		
+		private function unlockedStoryButtonMouseEventHandler(event:MouseEvent):void {
+			//Debug.debug(this, "OK, actually, clicking HERE will be the thing that REALLY takes care of the problem");
+			
+			var story:Story = (event.target as StoryButton).story
+			changeStoryDescription(story.title, story.description);
+			changeAvatar(story.storyLeadCharacter);
+			selectedStory = story;
+			var endingString:String;
+			endingsCount = 0;
+			
+			
+			for each (var ends:Ending in story.endings) {
+				endingString = story.storyLeadCharacter + "-" + ends.name;
+				if (statisticsManager.endingsSeen[endingString]) {
+					endingsCount++;
+				}
+			}
+			
+			this.countGoalsForStory();
+			endingsText.text = this.goalsCount.toString() + "/" + story.todoList.length.toString();
+		}
+			
+		
+		/**
+		 * Makes sure that the text that indicates how many endings that the player has unlocked with
+		 * that character is up to date.
+		 * @param	storyLeadCharacter the name of the character whose ending count we want to verify as being up to date.
+		 */
+		public function updateEndingsSeenText(story:Story):void {
+			var endingString:String;
+			var endingsCount:int = 0;
+			for each (var end:Ending in story.endings) {
+				endingString = story.storyLeadCharacter + "-" + end.name;
+				if (statisticsManager.endingsSeen[endingString]) {
+					endingsCount++;
+				}
+			}
+			endingsText.text = this.goalsCount.toString() + "/" + story.todoList.length.toString();
+		}
+		
+		/**
+		 * Makes sure that the text that indicates how many goals that the player has unlocked with
+		 * that character is up to date.
+		 * @param	storyLeadCharacter the name of the character whose goal count we want to verify as being up to date.
+		 */
+		public function updateGoalsSeenText(s:Story = null):void {
+			var story:Story = (s)?s:this.selectedStory
+			this.countGoalsForStory(story)
+			endingsText.text = this.goalsCount.toString() + "/" + story.todoList.length.toString()
+		}
+		
+		public function countGoalsForStory(s:Story = null):void {
+			this.goalsCount = 0;
+			var story:Story = (s)?s:this.selectedStory;
+			//Debug.debug(this, "by this point, s shouldn't be null! s should be the selected story I hope!: " + this.selectedStory.title);
+			for each (var todo:ToDoItem in story.todoList) {
+				if (statisticsManager.goalsSeen[story.storyLeadCharacter + "-" + todo.name]) {
+					this.goalsCount++
+				}
+			}
+		}
+			
+		/**
+		 * This is the event listener function that takes things into account pertaining to 
+		 * when the mouse is hovering over a social game button--it brings up a little
+		 * rectangle that teaches you about how many more endings you have to go before you
+		 * unlock the highlighted campaign.
+		 * @param	event
+		 */
+		public function lockedGameOver(event:MouseEvent):void {
+			//This is used to discern which button we are highlighting (which teaches us how many endings are needed to unlock)
+			var storyButton:StoryButton;
+			if (event.currentTarget is StoryButton) {
+				storyButton = event.currentTarget as StoryButton;
+			}else {
+				var g:Group = (event.currentTarget as SmoothImage).parent as Group;
+				for (var i:int = 0; i < g.numChildren; ++i) {
+					if(g.getChildAt(i) is StoryButton) {
+						storyButton = g.getChildAt(i) as StoryButton;
+					}
+				}
+			}
+			
+			//There is probably a better way to do this, BUT...
+			//figure out how many endings are needed to unlock by looping through all stories until we 
+			//find the one that we are hovering over.
+			for each(var tempStory:Story in gameEngine.stories) {
+					if (tempStory.title.toLowerCase() == storyButton.title.toLowerCase()) {
+						tipBoxGamesToUnlock = tempStory.toUnlock;
+					}
+			}
+			
+			//These values get used to determine where the little pop up will show up (offset by the user's current mouse location)
+			//var pt:Point = Utility.translatePoint(new Point(event.localX, event.localY), this, gameEngine);
+			//var pt:Point = Utility.translatePoint(new Point(event.localX, event.localY), event.target as DisplayObject, this);
+			var pt:Point = new Point(event.localX, event.localY);
+			this.highlightedButtonX = pt.x;
+			this.highlightedButtonY = pt.y;
+			//highlightedButtonX = event.stageX + 20;
+			//highlightedButtonY = event.stageY - 45;
+			
+			//This is how we track mouse movement--we add a "mouse move" event listener, which interestingly enough 
+			//IS this very same function.
+			storyButton.removeEventListener(MouseEvent.MOUSE_MOVE, onLockedMouseMove);
+			storyButton.removeEventListener(MouseEvent.MOUSE_OUT, onLockedMouseOut);
+			storyButton.addEventListener(MouseEvent.MOUSE_MOVE, onLockedMouseMove);
+			storyButton.addEventListener(MouseEvent.MOUSE_OUT, onLockedMouseOut);
+			
+			//Figure out how many endings have been seen in total.
+			var endingsSeen:int = 0;
+			for each(var endingStatus:Boolean in statisticsManager.endingsSeen) {
+				if (endingStatus) endingsSeen++;
+			}
+			var goalsSeen:int = 0
+			for each(var goalStatus:Boolean in statisticsManager.goalsSeen) {
+				if (goalStatus) goalsSeen++;
+			}
+			
+			totalUnlockedSoFar = goalsSeen;
+				
+			createToUnlockPopup();
+			
+		}
+		
+		/**
+		 * Update the position of the 'endings to unlock' pop up based on the
+		 * current position of the mouse cursor.
+		 * @param	event
+		 */
+		public function onLockedMouseMove(event:MouseEvent):void {
+			//These values get used to determine where the little pop up will show up (offset by the user's current mouse location)
+			//highlightedButtonX = event.stageX + 20;
+			//highlightedButtonY = event.stageY - 45;
+			var pt:Point = Utility.translatePoint(new Point(event.localX, event.localY), event.target as DisplayObject, this);
+			
+			//this.highlightedButtonX = event.localX;
+			//this.highlightedButtonY = event.localY;
+			this.highlightedButtonX = pt.x;
+			this.highlightedButtonY = pt.y;
+			
+			
+			createToUnlockPopup();
+		}
+		
+		/**
+		 * When your mouse scrolls out of a locked story box, make the popup that 
+		 * had the number of endings required to unlock go away (and clean up some
+		 * event listeners)
+		 * @param	event
+		 */
+		public function onLockedMouseOut(event:MouseEvent):void {
+			var storyButton:StoryButton = event.currentTarget as StoryButton;
+			storyButton.removeEventListener(MouseEvent.MOUSE_MOVE, lockedGameOver);
+			storyButton.removeEventListener(MouseEvent.MOUSE_OUT, onLockedMouseOut);
+			endingToUnlockSpot.removeAllElements();
+		}
+		
+
+		
+		/**
+		 * Actually creates the little rectangular pop up component
+		 * that tells you how many more endings you have to see before you
+		   can unlock the campaign in question.
+		 */
+		public function createToUnlockPopup():void {
+			//TEMP just to TESTTTT
+			statisticsManager.unlockCampaigns();
+			updateNewlyUnlockedCampaigns();
+			
+			
+			//The 'group' that we'll ultimately be adding to the display list.
+			var toUnlockGroup:Group = new Group();
+			
+			//The rectangle represents the 'heart' of the pop up that we are creating.
+			var toUnlockRectangle:Rect = new Rect();
+			toUnlockRectangle.radiusX = 10;
+			toUnlockRectangle.radiusY = 10;
+			toUnlockRectangle.width = 150;
+			toUnlockRectangle.height = 60;
+			
+			//The Color of the rectangle... should probably have information that comes from
+			//styles, but for now it is hard coded! Whee!
+			var solColor:SolidColor = new SolidColor();
+			solColor.color = 0xE0E0E0;
+			toUnlockRectangle.fill = solColor;
+			toUnlockRectangle.alpha = 1;
+			
+			//The border of the rectangle.
+			var stroke:SolidColorStroke = new SolidColorStroke();
+			stroke.color = 0x000000;
+			stroke.weight = 3;
+			toUnlockRectangle.stroke = stroke;	
+			
+			//The Rich Text element that will be the text of the popup.  Tells the user
+			//how many endings they've seen and how much further they have to go.
+			var tempRichText:RichText = new RichText();
+			tempRichText.setStyle("color", 0x000000);
+			tempRichText.setStyle("styleName","basicFontStyle");
+			tempRichText.left = 10;
+			tempRichText.top = 6;
+			if (tipBoxGamesToUnlock - totalUnlockedSoFar > 100)
+			{
+				tempRichText.text = "COMING SOON!"
+			}
+			else
+			{
+				tempRichText.text = "Goals Seen: " + totalUnlockedSoFar;
+				tempRichText.text += "\nRequired to unlock: " + tipBoxGamesToUnlock;
+				//if(tipBoxGamesToUnlock -  totalUnlockedSoFar > 0)
+				tempRichText.text += "\nOnly " + (tipBoxGamesToUnlock - totalUnlockedSoFar) +  " to go!";
+			}
+			//var translatedRichTextLocation:Point = Utility.translatePoint(new Point(toUnlockRectangle.x, toUnlockRectangle.y), this, this);
+			
+			//tempRichText.x = translatedRichTextLocation.x;
+			//tempRichText.y = translatedRichTextLocation.y;
+			tempRichText.x = toUnlockRectangle.x;
+			tempRichText.y = toUnlockRectangle.y;
+			
+			//Make the group be the size of the rectangle.
+			toUnlockGroup.width = toUnlockRectangle.width;
+			toUnlockGroup.height = toUnlockRectangle.height;
+			
+			//Add all of our final stuff to the mxml display list.
+			toUnlockGroup.addElement(toUnlockRectangle);
+			toUnlockGroup.addElement(tempRichText);
+			endingToUnlockSpot.addElement(toUnlockGroup);
+		}
+		
+		/**
+		 * This function checks to see if there are any campaigns that need to be unlocked,
+		 and will probably be called after you complete a campaign.
+		 */
+		public function updateNewlyUnlockedCampaigns():void {
+			//Figure out how many endings we've seen
+			var totalEndingsSeen:int = 0;
+			for each(var didWeSeeIt:Boolean in statisticsManager.endingsSeen) {
+				if (didWeSeeIt) totalEndingsSeen++;
+			}
+			
+			//Utility.log(this, "updateNewlyUnlockedCampaigns() reached.")
+			
+			//OK, this is how many endings we've seen, now we go through each button and see
+			//if we can now unlock it.
+			for (var storyRowCount:int = 0; storyRowCount < 3; storyRowCount++) {
+				var numElements:int = 0;
+				if (storyRowCount == 0) numElements = storyRow1.numElements;
+				else if (storyRowCount == 1) numElements = storyRow2.numElements;
+				else if (storyRowCount == 2) numElements = storyRow3.numElements;
+				for (var i:int = 0; i < numElements; i++) {
+					//I think maybe this is a group? And so I need to grab the button at the group?
+					var tempGroup:Group = new Group();
+					if(storyRowCount == 0) tempGroup = storyRow1.getElementAt(i) as Group;
+					else if(storyRowCount == 1) tempGroup = storyRow2.getElementAt(i) as Group;
+					else if(storyRowCount == 2) tempGroup = storyRow3.getElementAt(i) as Group;
+					for (var j:int = 0; j < tempGroup.numElements; j++) {
+						if (tempGroup.getElementAt(j) is StoryButton) {
+							var tempStoryButton:StoryButton = tempGroup.getElementAt(j) as StoryButton;
+							//Debug.debug(this, "we found a story button!  Here is it's title: " + tempStoryButton.title);
+							if(tempStoryButton.title){ // only locked games should have titles... I believe.
+								//OK... so now I am interested in actually grabbing the "story" associated with this button... I think.
+								for each(var story:Story in gameEngine.stories) {
+									if (story.title == tempStoryButton.title) {
+										//OK... so now we have the STORY that we care about...
+										if (story.islocked) { // we only care about this if the story is 'locked' at first. NOTE: used to restrict this to "&& !story.istutorial" until we added story tutorials.
+											if (statisticsManager.campaignsUnlocked[story.storyLeadCharacter + "-" + story.title]) { // we only care about this if it is currently unlocked.
+												//OK!  So at this point, we have the BUTTON that we need to change, and we have convinced ourselves that it 
+												//NEEDS changing!
+												//Ok.. so... what changing does it actually need?
+												//We need to... make it 'enabled', lose the black rectangle, lose the lock icon.
+												//Maybe the easiest way to do that is to remove all elements from this group, and then just re-add 
+												//the button?
+												tempGroup.removeAllElements();
+												var button:StoryButton = new StoryButton();
+												button.description = story.description;
+												button.title = story.title;
+												button.story = story;
+												//button.addEventListener(MouseEvent.CLICK, buttonEventListenerClick);
+												button.addEventListener(MouseEvent.CLICK, unlockedStoryButtonMouseEventHandler);
+												button.imageData = rL.portraits[story.storyLeadCharacter.toLowerCase()];
+												button.width = 75;
+												button.height = 80;
+												tempGroup.addElement(button);
+												//Utility.log(this, "updateNewlyUnlockedCampaigns() unlocked campaign: " + story.title)
+												break;
+											}
+										}
+									}
+								}
+							}
+						}
+					}	
+						//Debug.debug(this, "what is this? " + storyRow1.getElementAt(i));
+				}
+			}
+		}
+		
+		/**
+		 * taking the inline event listener adder and making it 
+		 * a special function of its own... maybe this will help
+		 * with debuggering purposes.  It did more than helpp with
+		 * debugging--it fixed the problem!
+		 * @param	e
+		 */
+		public function buttonEventListenerClick(e:MouseEvent):void {	
+			
+			Debug.debug(this, "clicking on the button will fix the problem (for not the right number of endings seen appearing)");
+			
+			var storyButton:StoryButton = e.currentTarget as StoryButton;
+			
+			//Figure out which story we care about
+			var story:Story;
+			for each(var storyLoop:Story in gameEngine.stories) {
+				if (storyLoop.title == storyButton.title) story = storyLoop;
+			}
+			
+			changeStoryDescription(story.title, story.description);
+			changeAvatar(story.storyLeadCharacter);
+			selectedStory = story;
+			var endingString:String;
+			endingsCount = 0;
+			for each (var ends:Ending in story.endings) {
+				endingString = story.storyLeadCharacter + "-" + ends.name;
+				if (statisticsManager.endingsSeen[endingString]) {
+					endingsCount++;
+				}
+			}
+			endingsText.text = endingsCount.toString() + "/" + story.endings.length.toString();
+		}
+			 
+			 ]]>
+		 </fx:Script>
+</s:Group>

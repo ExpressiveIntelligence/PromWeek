@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 contentBackgroundColor="#FFFFFF" 
+		 xmlns:UI="UI.*"
+		 xmlns:CiF="CiF.*"
+		 creationComplete="onCreationComplete()"
+		 >
+	<!-- TODO: Naked body animations for now. -->
+    <fx:Metadata>
+	</fx:Metadata>
+
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<UI:DialogueBubble id="initiatorDialogueBubble" width="200" height="200" left="75" top="50" visible="false" />
+	<UI:DialogueBubble id="responderDialogueBubble" width="200" height="200" left="575" top="50" visible="false" />
+	
+	<fx:Script>
+		<![CDATA[
+		import CiF.Instantiation;
+		import CiF.LineOfDialogue;
+		import flash.events.MouseEvent;
+		import mx.flash.UIMovieClip;
+		//import PromWeek.assets.ResourceLibrary;
+		
+		public var creationComplete:Boolean = false;
+		
+		public var dialogueLineNumber:Number = 0;
+		public var currentDialogueInstantiation:Instantiation;
+		
+		public var initiatorMC:UIMovieClip;
+		public var responderMC:UIMovieClip;
+		
+		public function onCreationComplete():void 
+		{
+			
+			
+			//initiatorMC = new jordan_body() as UIMovieClip;
+			initiatorMC = new monica_body() as UIMovieClip;//ResourceLibrary.getInstance().characterClips["edward"];
+			responderMC = new monica_body() as UIMovieClip;
+			responderMC.scaleX *= -1;
+			
+			this.addElement(initiatorMC);
+			this.addElement(responderMC);
+			
+			setElementIndex(initiatorDialogueBubble, this.numChildren - 1);
+			setElementIndex(responderDialogueBubble, this.numChildren - 1);
+			
+			initiatorMC.left = 300;
+			initiatorMC.top = 300;
+
+			responderMC.left = 400;
+			responderMC.top = 300;
+			
+			initiatorDialogueBubble.updateLocation();
+			responderDialogueBubble.updateLocation();
+			
+			this.creationComplete = true;
+			this.addEventListener(MouseEvent.CLICK, backgroundClickHandler);
+		}
+		
+		public function backgroundClickHandler(e:MouseEvent):void
+		{
+			updatePerformance();
+		}
+			
+		public function updatePerformance():void
+		{
+			if (creationComplete)
+			{
+				//if there are more lines of dialog
+				if (dialogueLineNumber < currentDialogueInstantiation.lines.length)
+				{
+					var line:LineOfDialogue = currentDialogueInstantiation.lines[dialogueLineNumber];
+					initiatorDialogueBubble.visible = false;
+					responderDialogueBubble.visible = false;
+
+					if (line.initiatorLine != "")
+					{
+						initiatorDialogueBubble.pointRight = true;
+						initiatorDialogueBubble.thought = line.initiatorIsThought;
+						initiatorDialogueBubble.updateLocation();
+						initiatorDialogueBubble.text = line.initiatorLine;
+						
+						this.initiatorDialogueBubble.visible = true;	
+					}
+					else
+					{
+						this.initiatorDialogueBubble.visible = false;
+					}
+					
+					if (line.initiatorBodyAnimation != "" && line.initiatorBodyAnimation != "no action")
+					{
+						initiatorMC.gotoAndPlay(line.initiatorBodyAnimation);
+					}
+					
+					if (line.initiatorFaceState != "")
+					{
+						initiatorMC.faceMC.currentState = line.initiatorFaceState;
+					}
+					
+					if (line.initiatorFaceAnimation != null && line.initiatorFaceAnimation != "null"&& line.initiatorFaceAnimation != "no action")
+					{
+						initiatorMC.faceMC.gotoAndPlay(line.initiatorFaceAnimation);
+					}
+					else
+					{
+						initiatorMC.faceMC.goToState();
+					}	
+
+					
+
+
+					if (line.responderLine != "")
+					{
+						responderDialogueBubble.pointLeft = true;
+						responderDialogueBubble.thought = line.responderIsThought;
+						responderDialogueBubble.updateLocation();
+						responderDialogueBubble.text = line.responderLine;
+						responderDialogueBubble.visible = true;
+					}
+					else
+					{
+						responderDialogueBubble.visible = false;
+					}
+						
+					if (line.responderBodyAnimation != "" && line.responderBodyAnimation != "no action")
+					{
+						responderMC.gotoAndPlay(line.responderBodyAnimation);
+					}
+					
+					if (line.responderFaceState != "")
+					{
+						responderMC.faceMC.currentState = line.responderFaceState;
+					}
+					
+					if (line.responderFaceAnimation != null && line.responderFaceAnimation != "null" && line.responderFaceAnimation != "no action")
+					{
+						responderMC.faceMC.gotoAndPlay(line.responderFaceAnimation);
+					}
+					else
+					{
+						responderMC.faceMC.goToState();
+					}	
+					
+					dialogueLineNumber++;
+				}
+			}
+		}
+		]]>
+			
+	</fx:Script>
+	
+</s:Group>

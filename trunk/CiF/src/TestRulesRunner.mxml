@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication 
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark"
+	xmlns:mx = "library://ns.adobe.com/flex/halo"
+	xmlns:flexUnitUIRunner="http://www.adobe.com/2009/flexUnitUIRunner" 
+	creationComplete="onCreationComplete()"
+	width="100%"
+	height="100%">
+	  
+ 	<fx:Declarations>
+            <fx:XML id="statexml" source="../bin/UnitTestState.xml" />
+            <fx:XML id="libraryxml" source="../bin/UnitTestLibrary.xml" />
+	</fx:Declarations>
+	
+	<flexUnitUIRunner:TestRunnerBase id="uiListener" width="100%" height="100%"/>
+
+	  
+	<fx:Script>
+	  <![CDATA[
+		import CiF.*;
+		import flash.events.TimerEvent;
+		import flash.utils.Timer;
+		import test.*;
+		  
+		import org.flexunit.listeners.UIListener;
+		import org.flexunit.runner.FlexUnitCore;
+		
+		
+		private var core:FlexUnitCore;
+		
+		  
+		
+		public function onCreationComplete():void {
+			
+			var cif:CiFSingleton = CiFSingleton.getInstance();
+			cif.parseCiFState(statexml);
+			cif.parseCiFState(libraryxml);
+			//cif.formIntentForAll();
+			cif.valuateHistory();
+			
+			var timer:Timer = new Timer(2000);
+			timer.addEventListener(TimerEvent.TIMER_COMPLETE, this.initAndRunUnitTests);
+			timer.start();
+			this.initAndRunUnitTests();
+		}
+		
+		public function initAndRunUnitTests():void {
+			this.core = new FlexUnitCore();
+			this.core.addListener(new UIListener(uiListener));
+			this.core.run(TestRulesSuite);
+			Debug.debug(this, "initAndRunUnitTests() predicate creation count: " + Predicate.creationCount);
+			Debug.debug(this, "initAndRunUnitTests() predicate evaluation count: " + Predicate.evaluationCount + " avg time: " + (Predicate.evalutionComputationTime / Predicate.evaluationCount) + "ms");
+			Debug.debug(this, "initAndRunUnitTests() predicate valuation count: " + Predicate.valuationCount);
+		}
+	  ]]>
+	</fx:Script>
+	  
+</s:WindowedApplication>

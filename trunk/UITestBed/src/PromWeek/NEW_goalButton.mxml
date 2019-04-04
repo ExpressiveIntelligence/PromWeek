@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Button xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 preinitialize="onPreinitialize()"
+		 width="100%"> 
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>	
+			 <fx:String id="charName">""</fx:String>
+		 </fx:Declarations>
+		 
+		
+		 
+	<fx:Script>
+		<![CDATA[
+		import CiF.CiFSingleton;
+		import CiF.Debug;
+		import CiF.LineOfDialogue;
+		import CiF.Predicate;
+		import flash.events.MouseEvent;
+		import PromWeek.assets.ResourceLibrary;
+
+		
+		public function onCreationComplete():void 
+		{
+			//this.update("edward");
+		}
+		
+		private function onPreinitialize():void 
+		{
+		}
+		
+		public function update(name:String):void
+		{
+			this.charName = name;
+			this.skin.invalidateDisplayList();
+		}
+		
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Button>
+

@@ -1,0 +1,1388 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+               xmlns:s="library://ns.adobe.com/flex/spark" 
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+			   creationComplete="onCreationComplete()"
+			   styleName="classicPromWeek"
+			   width="515"
+			   height="430">
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+			<fx:Number id="arrowWidth">10</fx:Number>
+			<fx:String id="storyLeadName">the character</fx:String>
+	</fx:Declarations>
+	
+	<!--<s:Rect width="100%" height="100%">
+		<s:fill>
+			<s:SolidColor color="{getStyle('backgroundColor')}" alpha="{getStyle('backgroundColorAlpha')}" />
+		</s:fill>
+		<s:stroke>
+			<s:SolidColorStroke color="{getStyle('backgroundStroke')}" weight="{getStyle('backgroundStrokeWeight')}" />
+		</s:stroke>
+	</s:Rect>-->
+	<s:VGroup id="innerGroup" width="{0.95 * this.width}" height="{0.95 * this.height}" x="{(this.width - innerGroup.width)/2}" y="{(this.height - innerGroup.height)/2}" >
+		<s:HGroup id="hGroup1" width="100%" height="7%" paddingTop="10">
+			<s:HGroup width="90%" top="5">
+				<!--<s:RichText id="todoListNameLabel" text="Story Goals:" fontSize="16" fontWeight="bold" color="{getStyle('contentAreaTextColor')}" />-->
+				<s:RichText id="todoListNameLabel" text="Story Goals" fontWeight="bold" fontSize="27" color="{getStyle('contentAreaTextColor')}" styleName="storyGoalTextStyle" filters="{[new GlowFilter(0x000000,1.0,2.0,2.0,10)]}"/>
+			</s:HGroup>
+		</s:HGroup>
+		<s:RichText width="100%" height="15%" text="Click to see goal details. Complete all the tasks in a goal to shape {this.storyLeadName}'s prom night!" fontWeight="bold" fontSize="16" color="{getStyle('contentAreaTextColor')}" styleName="storyGoalTextStyle"/>
+		<s:Scroller id="theScroller" width="100%" height="78%" contentBackgroundColor="{getStyle('contentAreaColor')}" horizontalScrollPolicy="off">
+			<s:Group id="tdContainerHolder" width="100%" height="100%">
+				<s:VGroup id="tdContainer" height="100%" width="100%" gap="0" />
+			</s:Group>
+		</s:Scroller>
+	</s:VGroup>
+	<s:Button id="closeButton" width="20" height="20" click="exitToDoList(event)" toolTip="Close Window" x="480" y="10" skinClass="PromWeek.skins.NEW_closeButtonSkin" />
+	<s:Line right="0" xFrom="{this.width}" yFrom="3" xTo="{this.width}" yTo="{this.height - 6}" visible="false">
+		<s:stroke>
+			<mx:SolidColorStroke color="#000000" weight="3" />
+		</s:stroke>
+	</s:Line>
+	<fx:Script>
+		<![CDATA[
+		import adobe.utils.CustomActions;
+		import CiF.Character;
+		import CiF.CiFSingleton;
+		import CiF.LineOfDialogue;
+		import CiF.Predicate;
+		import CiF.Trait;
+		import flash.net.Responder;
+		import flash.text.TextFieldAutoSize;
+		import flash.utils.Dictionary;
+		import flashx.textLayout.utils.CharacterUtil;
+		import mx.core.UIComponent
+		import flash.events.Event;
+		import flash.events.MouseEvent;
+		import flash.geom.Rectangle;
+		import mx.collections.ArrayCollection;
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import PromWeek.skins.NEW_listScrollSkin;
+		import spark.components.List;
+		import mx.controls.Spacer;
+		import mx.controls.Text;
+		import mx.core.ClassFactory;
+		import mx.events.ItemClickEvent;
+		import mx.events.ListEvent;
+		import spark.components.Group;
+		import spark.components.HGroup;
+		import spark.components.RichText;
+		import spark.components.VGroup;
+		import mx.graphics.SolidColor;
+		
+		import flash.filters.GlowFilter;
+		import PromWeek.assets.ResourceLibrary
+		import CiF.Debug
+		
+		public var selectedToDoItemComponent:ToDoItemComponent;
+		public var selectedList:List;
+		public var titles:Vector.<ToggleableContainerButton>
+		public var ids:Vector.<CollapsiblePanel>
+		public var toDoItemComponents:Vector.<PromWeek.ToDoItemComponent>;
+
+		public var rl:ResourceLibrary;
+		
+		
+		public var goalLists:Vector.<List>;
+		public var dropDownArrows:Vector.<Image>;
+		public var gameEngine:PromWeek.GameEngine;
+		public var percentComplete:Number;
+		public var story:Story;
+		public var conditionText:String;
+		public var cif:CiFSingleton;
+		public var statisticsManager:StatisticsManager;
+		
+		
+		
+		public function onCreationComplete():void {
+			rl = ResourceLibrary.getInstance()
+			gameEngine = PromWeek.GameEngine.getInstance();
+			statisticsManager = StatisticsManager.getInstance();
+			cif = CiFSingleton.getInstance();
+			ids = new Vector.<CollapsiblePanel>();
+			goalLists = new Vector.<List>();
+			titles = new Vector.<ToggleableContainerButton>();
+			dropDownArrows = new Vector.<Image>();
+			this.toDoItemComponents = new Vector.<ToDoItemComponent>();
+			
+			theScroller.verticalScrollBar.setStyle("skinClass", NEW_listScrollSkin);
+		}
+		
+		
+		public function getTaskNameText(pred:Predicate,initiator:Character=null,responder:Character=null,other:Character=null,seenSomeoneBefore:Boolean=false,seenSomeoneElseBefore:Boolean=false):String
+		{
+			var someoneString:String = (!seenSomeoneBefore)?"someone":"that same someone";
+			//var someoneElseString:String = (!seenSomeoneElseBefore)?"another person":"that same other person";
+			var someoneElseString:String = (!seenSomeoneElseBefore)?"someone":"that same other person";
+			
+			var primaryName:String;
+			if (pred.primary == "initiator")
+			{
+				primaryName = (initiator != null)?initiator.characterName:cif.cast.getCharByName(gameEngine.currentStory.storyLeadCharacter).characterName;
+			}
+			else if (pred.primary == "responder")
+			{
+				primaryName = (responder != null)?responder.characterName:someoneString;
+			}
+			else if (pred.primary == "other")
+			{
+				primaryName = (other != null)?other.characterName:someoneElseString;
+			}
+			else
+			{
+				primaryName = pred.primary;
+			}
+			
+			var secondaryName:String;
+			if (pred.secondary == "initiator")
+			{
+				secondaryName = (initiator != null)?initiator.characterName:cif.cast.getCharByName(gameEngine.currentStory.storyLeadCharacter).characterName;
+			}
+			else if (pred.secondary == "responder")
+			{
+				secondaryName = (responder != null)?responder.characterName:someoneString;
+			}			
+			else if (pred.secondary == "other")
+			{
+				secondaryName = (other != null)?other.characterName:someoneElseString;
+			}
+			else
+			{
+				secondaryName = pred.secondary;
+			}
+			
+			
+			var returnString:String = pred.toNaturalLanguageString(primaryName,secondaryName,"");
+
+			if (pred.numTimesUniquelyTrueFlag)
+			{
+				var dictionary:Dictionary;
+				if (pred.numTimesRoleSlot == "both")
+				{
+					dictionary = this.getBestResponderForNumTimes(primaryName,pred);
+				}
+				else
+				{
+					dictionary = pred.evalForNumberUniquelyTrueKeepChars(cif.cast.getCharByName(primaryName), cif.cast.getCharByName(secondaryName));
+				}
+				
+				
+				//var dictionary:Dictionary = pred.evalForNumberUniquelyTrueKeepChars(initiator, responder, other, null);
+				 
+				
+				if (pred.type == Predicate.SFDBLABEL)
+				{
+					returnString += " Currently " + dictionary["numTimesTrue"] + "/" + pred.numTimesUniquelyTrue;
+				}
+				else
+				{
+					if (dictionary["numTimesTrue"] > 0)
+					{
+						returnString += " Current: "
+						var foundSomeNumTimes:Boolean = false;
+						
+						var outOfString:String = "";
+						
+						for (var k:String in dictionary) 
+						{
+							var value:String=dictionary[k];
+							var key:String = k;
+							// Debug.debug(this, "key is: " + key + " and value is: " + value);
+							if (value == "true") 
+							{
+								if (foundSomeNumTimes)
+								{
+									outOfString += ", ";
+								}
+								outOfString += key;
+								foundSomeNumTimes = true;
+							}
+						}
+						//outOfString = " (" + outOfString + ")";
+						if (foundSomeNumTimes)
+						{
+							returnString += outOfString;
+						}
+					}
+				}
+			}
+			
+			return returnString;
+		}
+		
+		public function getBestResponderForNumTimes(primaryName:String, pred:Predicate):Dictionary
+		{
+			var bestDictionary:Dictionary;
+			var bestScore:int = 0;
+			for each (var char:Character in cif.cast.characters)
+			{
+				if (char.characterName != primaryName)
+				{
+					var dictionary:Dictionary = pred.evalForNumberUniquelyTrueKeepChars(cif.cast.getCharByName(primaryName), cif.cast.getCharByName(char.characterName));	
+					if (dictionary != null)
+					{
+						if (dictionary["numTimesTrue"] > bestScore)
+						{
+							bestDictionary = dictionary;
+						}
+					}
+				}
+			}
+			return dictionary;
+		}
+		
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			//this.populateToDoList(gameEngine.currentStory);
+			for each (var tb:PromWeek.ToggleableContainerButton in this.titles)
+				tb.setStyleName();
+			for each (var cp:CollapsiblePanel in this.ids) {
+				cp.styleName =  PromWeek.GameEngine.getInstance().activeStyleName;
+				cp.invalidateProperties();
+			}
+			for each (var ti:PromWeek.ToDoItemComponent in this.toDoItemComponents)
+				ti.setStyleName();
+			
+			for each (var l:List in this.goalLists) {
+				for ( var i:int=0; i< l.dataGroup.numElements; i++ ) {
+					var element:UIComponent = l.dataGroup.getElementAt( i ) as UIComponent;
+					if ( element )
+						element.invalidateProperties();
+					else
+						trace("element " + i.toString() + " wasn't there");
+
+				}
+			}
+				
+			this.invalidateProperties();
+		}
+		
+		public function populateToDoList(story:Story):void
+		{
+			this.story = story;
+			var toDoItemComponent:PromWeek.ToDoItemComponent;
+			
+			var predTrue:Boolean = false;
+			
+			var innerContainer:VGroup;
+			//<s:RichText id="todoListNameLabel" text="Story Goals:" fontSize="16" fontWeight="bold" color="yellow" />
+			var goalList:List = new List();
+			var goalListDP:ArrayCollection = new ArrayCollection();;
+			this.toDoItemComponents = new Vector.<PromWeek.ToDoItemComponent>();
+			
+			//goalList.scroller.setStyle("verticalScrollPolicy", ScrollPolicy.ON);
+            //goalList.scroller.verticalScrollBar.setStyle("skinClass", NEW_listScrollSkin);
+			
+			for each (var toDoItem:ToDoItem in story.todoList)
+			{
+				//Debug.debug(this, "populateToDoList() OK, NOW I'm frickin' populating this list!");
+				toDoItemComponent = new PromWeek.ToDoItemComponent();
+				toDoItemComponent.width = 475;//this.innerGroup.width - this.arrowWidth;
+				toDoItemComponent.height = 45;
+				toDoItemComponent.toDoItem = toDoItem;
+				toDoItemComponent.todoItemNameLabel.text = toDoItem.name;
+				
+				var object:Object;
+				
+				innerContainer = new VGroup();
+				goalList = new List();
+				//goalList.scroller.setStyle("verticalScrollPolicy", ScrollPolicy.ON);
+				//goalList.scroller.verticalScrollBar.setStyle("skinClass", NEW_listScrollSkin);
+				
+				
+				goalList.width = toDoItemComponent.width - this.arrowWidth;//this.width;
+				goalListDP = new ArrayCollection();	
+				goalList.dataProvider = goalListDP;
+				
+				//a28cbd7bf41a6eb2dd518d23e2cf856e
+				
+				this.goalLists.push(goalList);
+				
+				//goalList.setStyle("color","yellow");
+				goalList.setStyle("variableRowHeight","true");
+				goalList.setStyle("rollOverColor", getStyle("buttonColor"));
+				goalList.setStyle("selectionColor", getStyle("buttonColor"));
+				//goalList.setStyle("rollOverColor", 0x134c94);
+				//goalList.setStyle("selectionColor", 0x134c94);
+				goalList.itemRenderer = new ClassFactory(NEW_GoalTaskItemRenderer);
+				
+				var pred:Predicate;
+
+				var needToCreateSamePersonTask:int = 0;
+				var obj:Object;
+				
+
+				var predCounter:int = 0;
+				for each (pred in toDoItem.condition.predicates)
+				{
+					if (pred.primary == "responder" || pred.secondary == "responder" || pred.tertiary == "responder"
+						|| pred.primary == "other" || pred.secondary == "other" || pred.tertiary == "other")
+					{
+						if (pred.numTimesUniquelyTrueFlag)
+						{
+							if (pred.numTimesRoleSlot == "both")
+							{
+								needToCreateSamePersonTask++;
+							}
+						}
+						else
+						{
+							needToCreateSamePersonTask++;
+						}
+					}
+					
+					//only add to the predicateList if the trait isn't about a name
+					if (!(pred.trait >= Trait.FIRST_NAME_NUMBER && pred.trait <= Trait.LAST_NAME_NUMBER))
+					{
+						obj = new Object();
+						obj.pred = pred;
+						obj.rule = toDoItem.condition;
+						obj.textToUse = toDoItem.taskNaturalLanguageWords[predCounter];//this.getTaskNameText(pred, cif.cast.getCharByName(gameEngine.currentStory.storyLeadCharacter));
+						obj.taskVGroup = VisibilityManager.getInstance().createGroupWithTextAndImages(obj.textToUse, "GoalTaskStyle", 35, 395);
+						obj.vGroupHeight = obj.taskVGroup.height;
+						goalListDP.addItem(obj);
+					}
+					
+					predCounter++;
+				}
+				
+				//this is where we are creating an extra task for the player to make them respect the binding
+				//add a "they are the same person" task
+				if (needToCreateSamePersonTask > 1)
+				{
+					toDoItem.hasNeedsToBeTheSamePerson = true;
+					
+					obj = new Object();
+					obj.isTheyAreTheSamePerson = true;
+					obj.textToUse = "They are the same \"someone.\"";
+					obj.taskVGroup = VisibilityManager.getInstance().createGroupWithTextAndImages(obj.textToUse, "GoalTaskStyle", 35, 395);
+					obj.vGroupHeight = obj.taskVGroup.height;
+					//obj.pred = pred;
+					obj.rule = toDoItem.condition;
+					goalListDP.addItem(obj);
+				}
+								
+				goalList.dataProvider = goalListDP;
+				
+				this.toDoItemComponents.push(toDoItemComponent);
+				
+				//goalList.rowCount = goalListDP.length;
+				
+				
+				//###
+				//goalList.height = goalList.dataGroup.contentHeight;
+
+				var heightOfList:Number = 0;
+				for (var itemRendIndex:int = 0; itemRendIndex < goalList.dataProvider.length; itemRendIndex++)
+				{
+					heightOfList += goalList.dataProvider[itemRendIndex].vGroupHeight;
+				}
+				goalList.height = heightOfList;
+				//goalList.height = goalList.dataProvider.length * 30 + 15;
+				
+				
+				innerContainer.width = goalList.width;
+				innerContainer.height = goalList.height;
+				innerContainer.addElement(goalList);
+				this.addContainer(toDoItemComponent, innerContainer);
+				
+				PromWeek.StoryGoalWindow.updateGoalList(goalList);
+				
+				//toDoItemComponent.setProgressWidthPercent(0);
+			}
+			
+		}
+
+		public function exitToDoList(e:MouseEvent = null):void
+		{
+			gameEngine.hudGroup.storyGoalWindow.visible = false;
+			gameEngine.hudGroup.storyGoalWindow.visible = false;
+		}
+		
+		
+		public function goalListClickedOn(e:ListEvent=null):void 
+		{
+			var pred:Predicate = (e.currentTarget as List).dataProvider[(e.currentTarget as List).selectedIndex].pred;
+			gameEngine.hudGroup.storyGoalWindow.hintComponent.setHintText(pred, PromWeek.HintComponent.FRESHMAN);
+			//gameEngine.hudGroup.storyGoalWindow.hintComponent.tipTabNav.selectedIndex = 0;
+			gameEngine.hudGroup.storyGoalWindow.updateTrueFor(pred);
+		}
+		
+		
+		public function updateProgressInfo(e:Event = null):void
+		{
+			//trace("ehhh????");
+		}
+		
+		
+		/**
+		 * This function goes through all to do items and checks to see if their conditions are met, if so, we change the color of the text
+		 */
+		public function updateToDoList(noGoalUpdatedNotifications:Boolean = false):void
+		{
+			//PromWeek.StoryGoalWindow.updateGoalList(gameEngine.hudGroup.topBar.todoListList, gameEngine.hudGroup.topBar.responder, gameEngine.hudGroup.topBar.other, false,false);
+			//if (gameEngine.hudGroup.topBar.toDoItemComponent.toDoItem != null)
+			//{
+				//update the width of the topbar's progress
+				//gameEngine.hudGroup.topBar.toDoItemComponent.progressFGRect.width = gameEngine.hudGroup.topBar.toDoItemComponent.progressBGRect.width * gameEngine.hudGroup.topBar.toDoItemComponent.toDoItem.condition.getPercentageTrueForInitiator(CiFSingleton.getInstance().cast.getCharByName(gameEngine.currentStory.storyLeadCharacter), null, gameEngine.hudGroup.topBar.responder, gameEngine.hudGroup.topBar.other)["percent"] / 100;
+			//}
+			
+			var toDoItemCompnent:ToDoItemComponent;
+			
+			var predToNaturalLanguage:String = "";
+			var primaryCharacter:Character;
+			var secondaryCharacter:Character;
+			
+			var object:Object;
+			var i:int;
+			
+			//this will be used to help make the progress bar get bigger.
+			var totalAdditionalPercentExtra:Number;
+			
+			if (!VisibilityManager.getInstance().useOldInterface)
+			{
+				gameEngine.hudGroup.goalProgressGroup.goalProgressPopUps = new Vector.<NEW_goalProgressNotification>();
+			}
+			
+			for (var iiii:int = 0; iiii < this.toDoItemComponents.length; iiii++ )
+			{
+				totalAdditionalPercentExtra = 0;
+				
+				var progressGood:Boolean = false;
+				
+				toDoItemCompnent = this.toDoItemComponents[iiii];
+				
+				var weGottaMakeAGoalProgressNotification:Boolean = false;
+				
+				var pred:Predicate;
+				
+				// This is going to be a special thing that has not only the PERCENT towards completion, but also WHO made it so close to completion!
+				var percentAndResponderAndOther:Dictionary = toDoItemCompnent.toDoItem.condition.getPercentageTrueForInitiator(CiFSingleton.getInstance().cast.getCharByName(story.storyLeadCharacter));
+				//toDoItemCompnent.setProgressWidthPercent(percentAndResponderAndOther["percent"]);
+				var initiator:Character = CiFSingleton.getInstance().cast.getCharByName(story.storyLeadCharacter);
+				var responder:Character = CiFSingleton.getInstance().cast.getCharByName(percentAndResponderAndOther["responder"]);
+				var other:Character = CiFSingleton.getInstance().cast.getCharByName(percentAndResponderAndOther["other"]);
+				
+				//create a vector of booleans that are going to store the truth values of each of the todoItem's condition
+				var predTruthValues:Vector.<Boolean> = new Vector.<Boolean>();
+				var predNumTimesValues:Vector.<Number> = new Vector.<Number>(); // this is so we can make an update when we increment (or decrement) a num time uniquely true predicate.
+				//you have to loop through each so we can index them by int, this has to do with the fact that we
+				//are skipping over things that are name type predicates.
+				for (i = 0; i < toDoItemCompnent.toDoItem.condition.predicates.length; i++ )
+				{
+					predTruthValues.push(false);
+					predNumTimesValues.push(0);
+				}
+				
+				if (toDoItemCompnent.toDoItem.predTruthValues == null)
+				{
+					toDoItemCompnent.toDoItem.predTruthValues = predTruthValues;
+					toDoItemCompnent.toDoItem.predNumTimesTrue = predNumTimesValues;
+				}
+				var shouldDisplayCheck:Boolean;
+				
+				for (i = 0;  i < toDoItemCompnent.toDoItem.condition.predicates.length; i++ )
+				{
+					//UPDATE THE TEXT (if necessary...)
+
+					PromWeek.StoryGoalWindow.updateGoalList(this.goalLists[iiii], null, null, false);
+					
+					//See if there has been any progress toward the goals
+					pred = toDoItemCompnent.toDoItem.condition.predicates[i];
+					//only add to the predicateList if the trait isn't about a name
+					if (!pred.isCharNameTrait())
+					{
+						var predicateChangeIndex:int;
+						if (pred.numTimesUniquelyTrueFlag)
+						{
+							var primChar:Character;
+							var secondChar:Character;
+							
+							if (pred.primary == "initiator")
+							{
+								primChar = initiator;
+							}
+							else if (pred.primary == "responder")
+							{
+								primChar = responder;
+							}
+							else if (pred.primary == "other")
+							{
+								primChar = other;
+							}
+							else 
+							{
+								primChar = cif.cast.getCharByName(pred.primary);
+							}
+							if (pred.secondary == "initiator")
+							{
+								secondChar = initiator;
+							}
+							else if (pred.secondary == "responder")
+							{
+								secondChar = responder;
+							}
+							else if (pred.secondary == "other")
+							{
+								secondChar = other;
+							}
+							else
+							{
+								secondChar = cif.cast.getCharByName(pred.secondary);
+							}
+							
+							
+							//Not sure if this is necessary, but I was trying to fix something with the progress notifications pictures and am tired and confused
+							var primaryToSendPicsOf:Character;
+							var secondaryToSendPicsOf:Character;
+							if (pred.numTimesRoleSlot == "first")
+							{
+								primaryToSendPicsOf = primChar;
+							}
+							else if (pred.numTimesRoleSlot == "second")
+							{
+								primaryToSendPicsOf = secondChar;
+							}
+							else if (pred.numTimesRoleSlot == "both")
+							{
+								primaryToSendPicsOf = primChar;
+								secondaryToSendPicsOf = secondChar;
+							}
+							
+							
+							//For numTimesUniquelyTrue. Refer to the predNumTimesTrue values
+							var dictionary:Dictionary = pred.evalForNumberUniquelyTrueKeepChars(primChar, secondChar);
+							var indexString:String = "";
+							if (primChar != null)
+							{
+								indexString += primChar.characterName;
+							}
+							if (secondChar != null)
+							{
+								indexString += secondChar.characterName;
+							}
+							//this variable is used to make sure we don't keep sending progress notifcations when the thing has already been marked as true or false and progress has been reported
+							var shouldEvenCheckForDisplay:Boolean;
+							
+							//this is where we make it so the progress bar increases with numTimesUniquelyTrue progress
+							if (dictionary["numTimesTrue"] < pred.numTimesUniquelyTrue)
+							{
+								//because there may be more than one numTimes pred in this todo item's pcondition, we use +=
+								//first find out how much that pred is true in itself. (between 0 and 1)
+								var percentPredTrue:Number = dictionary["numTimesTrue"] / pred.numTimesUniquelyTrue;
+								//next, find out how much significance this pred could have
+								var potentialSignificance:Number = 1.0 / toDoItemCompnent.toDoItem.condition.predicates.length;
+								//Finally, figure out what percent of that potential actuall is true
+								totalAdditionalPercentExtra += potentialSignificance * percentPredTrue;
+							}
+							
+							if (pred.negated)
+							{
+								if (dictionary["numTimesTrue"] < pred.numTimesUniquelyTrue)
+								{
+									//this is the case where we have achieved the goal!
+									predTruthValues[i] = true;
+									toDoItemCompnent.toDoItem.predNumTimesTrue[i] = dictionary["numTimesTrue"];
+									if (toDoItemCompnent.toDoItem.predTruthValues[i] == false)
+									{
+										weGottaMakeAGoalProgressNotification = true;
+										progressGood = true;
+										predToNaturalLanguage =  PromWeek.GameEngine.getInstance().hudGroup.storyGoalWindow.toDoItemAccordion.getTaskNameText(pred, initiator, responder, other, false, false);
+										gameEngine.hudGroup.updatesGroup.createGoalProgressPopUp(toDoItemCompnent.toDoItem, predToNaturalLanguage, true, i, primaryToSendPicsOf, secondaryToSendPicsOf);
+									}
+								}
+								else if (dictionary["numTimesTrue"] > toDoItemCompnent.toDoItem.predNumTimesTrue[i])
+								{
+									//this means that 
+									shouldEvenCheckForDisplay = true;
+									if (dictionary["numTimesTrue"] > pred.numTimesUniquelyTrue)
+									{
+										if (toDoItemCompnent.toDoItem.predTruthValuesPerResponderOtherPair[i][indexString] != null)
+										{
+											if (toDoItemCompnent.toDoItem.predTruthValuesPerResponderOtherPair[i][indexString] == true)
+											{
+												shouldEvenCheckForDisplay = false;
+											}
+										}
+									}
+									
+									
+									if (shouldEvenCheckForDisplay)
+									{
+										//this means we have increased the number true
+										toDoItemCompnent.toDoItem.predNumTimesTrue[i] = dictionary["numTimesTrue"];
+										progressGood = false;
+										predicateChangeIndex = i;
+										weGottaMakeAGoalProgressNotification = true;
+										toDoItemCompnent.toDoItem.predTruthValuesPerResponderOtherPair[i][indexString] = true;
+										if (gameEngine.displayGoalProgressNotifications && !noGoalUpdatedNotifications)
+										{
+											predToNaturalLanguage =  PromWeek.GameEngine.getInstance().hudGroup.storyGoalWindow.toDoItemAccordion.getTaskNameText(pred, initiator, responder, other, false, false);
+											gameEngine.hudGroup.updatesGroup.createGoalProgressPopUp(toDoItemCompnent.toDoItem, predToNaturalLanguage, progressGood, i,primaryToSendPicsOf, secondaryToSendPicsOf,"minusIcon");
+										}
+									}
+								}
+								else if (dictionary["numTimesTrue"] < toDoItemCompnent.toDoItem.predNumTimesTrue[i])
+								{
+									//this means we have less friends than we did last turn, which is GOOD if the pred is negated
+									
+									shouldEvenCheckForDisplay = true;
+
+									if (shouldEvenCheckForDisplay)
+									{
+										//this means we have decreased the number true
+										toDoItemCompnent.toDoItem.predNumTimesTrue[i] = dictionary["numTimesTrue"];
+										progressGood = true;
+										predicateChangeIndex = i;
+										weGottaMakeAGoalProgressNotification = true;
+										toDoItemCompnent.toDoItem.predTruthValuesPerResponderOtherPair[i][indexString] = false;
+										if (gameEngine.displayGoalProgressNotifications && !noGoalUpdatedNotifications)
+										{
+											predToNaturalLanguage =  PromWeek.GameEngine.getInstance().hudGroup.storyGoalWindow.toDoItemAccordion.getTaskNameText(pred, initiator, responder, other, false, false);
+											gameEngine.hudGroup.updatesGroup.createGoalProgressPopUp(toDoItemCompnent.toDoItem, predToNaturalLanguage, progressGood, i, primaryToSendPicsOf, secondaryToSendPicsOf,"plusIcon");
+										}
+									}
+								}
+							}
+							else
+							{							
+								if (dictionary["numTimesTrue"] >= pred.numTimesUniquelyTrue)
+								{
+									//this is the case where we have achieved the goal!
+									predTruthValues[i] = true;
+									toDoItemCompnent.toDoItem.predNumTimesTrue[i] = dictionary["numTimesTrue"];
+									if (toDoItemCompnent.toDoItem.predTruthValues[i] == false)
+									{
+										weGottaMakeAGoalProgressNotification = true;
+										progressGood = true;
+										predToNaturalLanguage =  PromWeek.GameEngine.getInstance().hudGroup.storyGoalWindow.toDoItemAccordion.getTaskNameText(pred, initiator, responder, other, false, false);
+										gameEngine.hudGroup.updatesGroup.createGoalProgressPopUp(toDoItemCompnent.toDoItem, predToNaturalLanguage, true, i, primaryToSendPicsOf, secondaryToSendPicsOf);
+									}
+								}
+								else if (dictionary["numTimesTrue"] > toDoItemCompnent.toDoItem.predNumTimesTrue[i])
+								{
+									//Check to make sure we haven't already reported this progress
+									shouldEvenCheckForDisplay = true;
+									if (dictionary["numTimesTrue"] > pred.numTimesUniquelyTrue)
+									{
+										if (toDoItemCompnent.toDoItem.predTruthValuesPerResponderOtherPair[i][indexString] != null)
+										{
+											if (toDoItemCompnent.toDoItem.predTruthValuesPerResponderOtherPair[i][indexString] == true)
+											{
+												shouldEvenCheckForDisplay = false;
+											}
+										}
+									}
+									
+									//if (pred.negated && shouldEvenCheckForDisplay)
+									//{
+										//shouldEvenCheckForDisplay = false;
+									//}
+									
+									if (shouldEvenCheckForDisplay)
+									{
+										//this means we have increased the number true
+										toDoItemCompnent.toDoItem.predNumTimesTrue[i] = dictionary["numTimesTrue"];
+										progressGood = true;
+										predicateChangeIndex = i;
+										weGottaMakeAGoalProgressNotification = true;
+										toDoItemCompnent.toDoItem.predTruthValuesPerResponderOtherPair[i][indexString] = true;
+										if (gameEngine.displayGoalProgressNotifications && !noGoalUpdatedNotifications)
+										{
+											predToNaturalLanguage =  PromWeek.GameEngine.getInstance().hudGroup.storyGoalWindow.toDoItemAccordion.getTaskNameText(pred, initiator, responder, other, false, false);
+											gameEngine.hudGroup.updatesGroup.createGoalProgressPopUp(toDoItemCompnent.toDoItem, predToNaturalLanguage, (pred.negated)?true:false, i,primaryToSendPicsOf, secondaryToSendPicsOf,(pred.negated)?"minusIcon":"plusIcon");
+										}
+									}
+								}
+								else if (dictionary["numTimesTrue"] < toDoItemCompnent.toDoItem.predNumTimesTrue[i])
+								{
+									shouldEvenCheckForDisplay = true;
+									
+									//if (pred.negated && shouldEvenCheckForDisplay)
+									//{
+										//shouldEvenCheckForDisplay = false;
+									//}
+									//not sure I need to check for this case...
+									
+									//if (dictionary["numTimesTrue"] > pred.numTimesUniquelyTrue)
+									//{
+										//shouldEvenCheckForDisplay = false;
+									//}
+									if (shouldEvenCheckForDisplay)
+									{
+										//this means we have decreased the number true
+										toDoItemCompnent.toDoItem.predNumTimesTrue[i] = dictionary["numTimesTrue"];
+										progressGood = false;
+										predicateChangeIndex = i;
+										weGottaMakeAGoalProgressNotification = true;
+										toDoItemCompnent.toDoItem.predTruthValuesPerResponderOtherPair[i][indexString] = false;
+										if (gameEngine.displayGoalProgressNotifications && !noGoalUpdatedNotifications)
+										{
+											predToNaturalLanguage =  PromWeek.GameEngine.getInstance().hudGroup.storyGoalWindow.toDoItemAccordion.getTaskNameText(pred, initiator, responder, other, false, false);
+											gameEngine.hudGroup.updatesGroup.createGoalProgressPopUp(toDoItemCompnent.toDoItem, predToNaturalLanguage, (pred.negated)?false:true, i, primaryToSendPicsOf, secondaryToSendPicsOf,(pred.negated)?"plusIcon":"minusIcon");
+										}
+									}
+								}
+							}
+							
+						}
+						else
+						{
+							//For normal preds, use "predTruthValues" only
+							if (pred.evaluate(CiFSingleton.getInstance().cast.getCharByName(story.storyLeadCharacter), CiFSingleton.getInstance().cast.getCharByName(percentAndResponderAndOther["responder"]), CiFSingleton.getInstance().cast.getCharByName(percentAndResponderAndOther["other"])))
+							{
+								predTruthValues[i] = true;
+								
+								//object.icon = rl.uiIcons["check"];
+								
+								if (!toDoItemCompnent.toDoItem.predTruthValues[i])
+								{
+									//this means it became true!
+									progressGood = true;
+									predicateChangeIndex = i;
+									weGottaMakeAGoalProgressNotification = true;
+								}
+							}
+							else
+							{
+								predTruthValues[i] = false;
+								if (toDoItemCompnent.toDoItem.predTruthValues[i])
+								{
+									//this means it became false!
+									progressGood = false;
+									predicateChangeIndex = i;
+									weGottaMakeAGoalProgressNotification = true;
+								}
+								//object.icon = rl.uiIcons["cross"];
+							}
+						}
+					}
+				}
+				
+				//now update the truth values of the todoItem.
+				toDoItemCompnent.toDoItem.predTruthValues = predTruthValues;
+				
+				var shouldDisplayGoalProgress:Boolean = true;
+				//Do this!
+				if (!gameEngine.displayGoalProgressNotifications || noGoalUpdatedNotifications)
+				{
+					shouldDisplayGoalProgress = false;
+				}
+				
+				this.updatePerCharacterGoalProgress(shouldDisplayGoalProgress);
+
+				this.percentComplete = Math.round(100 * percentAndResponderAndOther["percent"]);//toDoItemCompnent.toDoItem.condition.getPercentageTrueForInitiator(CiFSingleton.getInstance().cast.getCharByName(story.storyLeadCharacter), null, responder, other)["percent"]);
+				
+				//toDoItemCompnent.progressGroup.toolTip = this.percentComplete + "% Complete";
+				/*
+				if (toDoItemCompnent.toDoItem.evaluateCondition())
+				{
+					toDoItemCompnent.todoItemNameLabel.setStyle("color", "green");
+				}
+				else
+				{
+					toDoItemCompnent.todoItemNameLabel.setStyle("color", getStyle("contentAreaTextColor"));
+				}
+				*/
+						
+				var goalString:String = gameEngine.currentStory.storyLeadCharacter + "-" + toDoItemCompnent.toDoItem.name;
+				var goalComplete:Boolean = false;
+				var hasBeenSeenBefore:Boolean = false;
+				if (this.percentComplete > 95)
+				{
+					goalComplete = true;
+				}
+				if (statisticsManager.goalsSeen[goalString])
+				{
+					hasBeenSeenBefore = true;
+				}
+				toDoItemCompnent.updateProgressImage(goalComplete, hasBeenSeenBefore);
+				
+				//toDoItemCompnent.progressGroup.toolTip = Math.floor(this.percentComplete + totalAdditionalPercentExtra * 100) + "% Complete";
+				
+				//toDoItemCompnent.progressFGRect.width = toDoItemCompnent.progressBGRect.width * (this.percentComplete / 100 + totalAdditionalPercentExtra);
+				
+				//(ids[iiii] as CollapsiblePanel).removeAllElements();
+				//(ids[iiii] as CollapsiblePanel).addElement(goalVGroup);
+				
+				//if have made or lost progress on a task, display info!
+				if (weGottaMakeAGoalProgressNotification)
+				{
+					//gameEngine.hudGroup.updatesGroup.createGoalProgressPopUp(toDoItemCompnent.toDoItem, "", progressGood, predicateChangeIndex);
+					//gameEngine.hudGroup.topBar.displayProgress(goalLists[iiii],toDoItemComponents[iiii],predicateChangeIndex);
+				}
+			}
+		}
+		
+		
+		public function requiresRole(pred:Predicate,roleName:String):Boolean
+		{
+			if (pred.primary == roleName) return true;
+			if (pred.secondary == roleName) return true;
+			return false;
+		}
+		public function updatePerCharacterGoalProgress(shouldDisplay:Boolean=true):void
+		{
+			var primaryCharacter:Character;
+			var secondaryCharacter:Character;
+			
+			var predToNaturalLanguage:String = "";
+			
+			var haventShownThisPredYet:Boolean;
+			
+			
+			
+			for each (var toDoItemComponent:ToDoItemComponent in this.toDoItemComponents)
+			{
+				var predsShown:Dictionary = new Dictionary();
+				
+				var requiresThird:Boolean = toDoItemComponent.toDoItem.condition.requiresThirdCharacter();
+				var wasTrueBefore:Boolean;
+				for (var i:int = 0; i < toDoItemComponent.toDoItem.condition.length; i++ )
+				{
+					var sfdbOrderFailed:Boolean = false;
+					
+					var pred:Predicate = toDoItemComponent.toDoItem.condition.predicates[i];
+					
+					haventShownThisPredYet = true;
+					
+					primaryCharacter = null;
+					secondaryCharacter = null;
+					if (pred.type != Predicate.TRAIT && pred.type != Predicate.CKBENTRY && !pred.numTimesUniquelyTrueFlag)
+					{
+						//This stuff has to do with setting "global progress". I.e. across all characters, have you made progress?
+						var init:Character = CiFSingleton.getInstance().cast.getCharByName(story.storyLeadCharacter);
+						var resp:Character;
+						var oth:Character;
+						
+						var predTrue:Boolean;
+						
+						
+						if (pred.primary.toLowerCase() == "initiator") {
+							primaryCharacter = init;
+						}
+						if (pred.secondary.toLowerCase() == "initiator") {
+							secondaryCharacter = init;
+						}
+
+						/*
+						var charByName:Character;
+						if (pred.primary != "responder" && pred.primary != "other")
+						{
+							charByName = cif.cast.getCharByName(pred.primary);
+							primaryCharacter = cif.cast.getCharByName(pred.primary);
+						}
+						if (pred.secondary != "responder" && pred.secondary != "other")
+						{
+							charByName = cif.cast.getCharByName(pred.secondary);
+							secondaryCharacter = cif.cast.getCharByName(pred.secondary);
+						}
+						
+						
+						
+						
+						if (charByName != null)
+						{
+							if (primaryCharacter == null)
+							{
+								primaryCharacter = charByName;
+							}
+							if (secondaryCharacter == null )
+							{
+								secondaryCharacter = charByName;
+							}
+							
+							//in this case, we are dealign with a character's name, and shouldn't interate thorugh
+							predTrue = pred.evaluate(init, charByName);
+							
+							if (pred.sfdbOrder != 0)
+							{
+								if (!predTrue)
+								{
+									sfdbOrderFailed = true;
+								}
+							}
+							
+							if (sfdbOrderFailed)
+							{
+								predTrue = false;
+							}
+							
+							wasTrueBefore = (toDoItemComponent.toDoItem.predTruthValuesPerResponderOtherPair[i][charByName.characterName] != null)?toDoItemComponent.toDoItem.predTruthValuesPerResponderOtherPair[i][charByName.characterName]:false;
+							
+							if (predTrue && !wasTrueBefore)
+							{
+								//Became true!
+								predToNaturalLanguage =  PromWeek.GameEngine.getInstance().hudGroup.storyGoalWindow.toDoItemAccordion.getTaskNameText(pred, primaryCharacter, secondaryCharacter, oth, false, false);
+
+								if (toDoItemComponent.toDoItem.predTruthValuesPerResponderOtherPair[i][charByName.characterName] != true)
+								{
+									toDoItemComponent.toDoItem.predTruthValuesPerResponderOtherPair[i][charByName.characterName] = true;
+									if (haventShownThisPredYet && shouldDisplay)
+									{
+										if (secondaryCharacter == null)
+										{
+											haventShownThisPredYet = false;
+										}
+										gameEngine.hudGroup.updatesGroup.createGoalProgressPopUp(toDoItemComponent.toDoItem, predToNaturalLanguage, true, i, primaryCharacter, secondaryCharacter);
+									}
+								}
+							}
+							
+							if (!predTrue && wasTrueBefore)
+							{
+								//Became false
+								if (toDoItemComponent.toDoItem.predTruthValuesPerResponderOtherPair[i][charByName.characterName] != false)
+								{
+									toDoItemComponent.toDoItem.predTruthValuesPerResponderOtherPair[i][charByName.characterName] = false;
+									if (shouldDisplay)
+									{
+										if (haventShownThisPredYet && pred.sfdbOrder == 0)
+										{
+											if (secondaryCharacter == null)
+											{
+												haventShownThisPredYet = false;
+											}
+											predToNaturalLanguage =  PromWeek.GameEngine.getInstance().hudGroup.storyGoalWindow.toDoItemAccordion.getTaskNameText(pred, primaryCharacter, secondaryCharacter, oth, false, false);
+											gameEngine.hudGroup.updatesGroup.createGoalProgressPopUp(toDoItemComponent.toDoItem, predToNaturalLanguage, false, i, primaryCharacter,secondaryCharacter);
+										}
+									}
+								}
+							}
+						}
+						*/
+						//else
+						//{
+							//This section has to do with reporting progress per characters
+							//it means that we are not dealing with particular characters
+							for each (resp in cif.cast.characters)
+							{
+								predToNaturalLanguage = "";
+								predTrue = false;
+								wasTrueBefore = false;
+								if (init.characterName != resp.characterName)
+								{
+									if (requiresThird)
+									{
+										for each (oth in cif.cast.characters)
+										{
+											if (oth.characterName != init.characterName && oth.characterName != resp.characterName)
+											{
+												//var indexString:String = ((this.requiresRole(pred,"responder"))?resp.characterName:"") + " " + ((this.requiresRole(pred,"other"))?oth.characterName:"");
+												var indexString:String = ((this.requiresRole(pred,"responder"))?resp.characterName:"") + ((this.requiresRole(pred,"other"))?oth.characterName:"");
+												
+												predTrue = false;
+												predToNaturalLanguage = "";
+												wasTrueBefore = false;
+												if (pred.primary.toLowerCase() == "responder") {
+													primaryCharacter = resp;
+												}
+												else if (pred.primary.toLowerCase() == "other") {
+													primaryCharacter = oth;
+												}
+												else
+												{
+													primaryCharacter = cif.cast.getCharByName(pred.primary);
+												}
+												if (pred.secondary.toLowerCase() == "responder") {
+													secondaryCharacter = resp;
+												}
+												else if (pred.secondary.toLowerCase() == "other") {
+													secondaryCharacter = oth;
+												}
+												else
+												{
+													secondaryCharacter = cif.cast.getCharByName(pred.secondary);
+												}
+												
+												
+												predTrue = pred.evaluate(init,resp,oth);
+												wasTrueBefore = (toDoItemComponent.toDoItem.predTruthValuesPerResponderOtherPair[i][indexString] != null)?toDoItemComponent.toDoItem.predTruthValuesPerResponderOtherPair[i][indexString]:false;
+												
+												
+												if (pred.sfdbOrder != 0)
+												{
+													if (!predTrue)
+													{
+														sfdbOrderFailed = true;
+													}
+												}
+												if (sfdbOrderFailed)
+												{
+													predTrue = false;
+												}
+												
+												
+												if (predTrue && !wasTrueBefore)
+												{
+													//became true
+													if (toDoItemComponent.toDoItem.predTruthValuesPerResponderOtherPair[i][indexString] != true)
+													{
+														toDoItemComponent.toDoItem.predTruthValuesPerResponderOtherPair[i][indexString] = true;
+														if (shouldDisplay)
+														{
+															if (haventShownThisPredYet)
+															{
+																if (secondaryCharacter == null)
+																{
+																	haventShownThisPredYet = false;
+																}
+																predToNaturalLanguage =  PromWeek.GameEngine.getInstance().hudGroup.storyGoalWindow.toDoItemAccordion.getTaskNameText(pred, primaryCharacter, secondaryCharacter, oth, false, false);
+																gameEngine.hudGroup.updatesGroup.createGoalProgressPopUp(toDoItemComponent.toDoItem, predToNaturalLanguage, true, i, primaryCharacter,secondaryCharacter);
+															}
+														}
+													}
+												}
+												
+												if (!predTrue && wasTrueBefore)
+												{
+													//became false
+													if (toDoItemComponent.toDoItem.predTruthValuesPerResponderOtherPair[i][indexString] != false)
+													{
+														toDoItemComponent.toDoItem.predTruthValuesPerResponderOtherPair[i][indexString] = false;
+														if (shouldDisplay && pred.sfdbOrder == 0)
+														{
+															predToNaturalLanguage =  PromWeek.GameEngine.getInstance().hudGroup.storyGoalWindow.toDoItemAccordion.getTaskNameText(pred, primaryCharacter, secondaryCharacter, oth, false, false);
+															gameEngine.hudGroup.updatesGroup.createGoalProgressPopUp(toDoItemComponent.toDoItem, predToNaturalLanguage, false, i, primaryCharacter,secondaryCharacter);
+														}
+													}
+												}
+											}
+										}
+									}
+									else
+									{
+										if (pred.primary.toLowerCase() == "responder") {
+											primaryCharacter = resp;
+										}
+										else
+										{
+											primaryCharacter = cif.cast.getCharByName(pred.primary);
+										}
+										if (pred.secondary.toLowerCase() == "responder") {
+											secondaryCharacter = resp;
+										}
+										else
+										{
+											secondaryCharacter = cif.cast.getCharByName(pred.secondary);
+										}
+										
+										predTrue = pred.evaluate(init,resp,oth);
+										wasTrueBefore = (toDoItemComponent.toDoItem.predTruthValuesPerResponderOtherPair[i][resp.characterName] != null)?toDoItemComponent.toDoItem.predTruthValuesPerResponderOtherPair[i][secondaryCharacter.characterName]:false;
+										
+										if (pred.sfdbOrder != 0)
+										{
+											if (!predTrue)
+											{
+												sfdbOrderFailed = true;
+											}
+										}
+										if (sfdbOrderFailed)
+										{
+											predTrue = false;
+										}
+										
+										
+										
+										if (predTrue && !wasTrueBefore)
+										{
+											//Became true!
+											if (toDoItemComponent.toDoItem.predTruthValuesPerResponderOtherPair[i][secondaryCharacter.characterName] != true)
+											{
+												toDoItemComponent.toDoItem.predTruthValuesPerResponderOtherPair[i][secondaryCharacter.characterName] = true;
+												predToNaturalLanguage =  PromWeek.GameEngine.getInstance().hudGroup.storyGoalWindow.toDoItemAccordion.getTaskNameText(pred, primaryCharacter, secondaryCharacter, oth, false, false);
+												if (shouldDisplay)
+												{
+													if (haventShownThisPredYet)
+													{
+														if (secondaryCharacter == null)
+														{
+															haventShownThisPredYet = false;
+														}
+														gameEngine.hudGroup.updatesGroup.createGoalProgressPopUp(toDoItemComponent.toDoItem, predToNaturalLanguage, true, i, primaryCharacter,secondaryCharacter);
+													}
+												}
+											}
+										}
+										
+										if (!predTrue && wasTrueBefore)
+										{
+											//Became false
+											if (toDoItemComponent.toDoItem.predTruthValuesPerResponderOtherPair[i][resp.characterName] != false)
+											{
+												toDoItemComponent.toDoItem.predTruthValuesPerResponderOtherPair[i][resp.characterName] = false;
+												if (shouldDisplay)
+												{
+													if (haventShownThisPredYet && pred.sfdbOrder == 0)
+													{
+														if (secondaryCharacter == null)
+														{
+															haventShownThisPredYet = false;
+														}
+														predToNaturalLanguage =  PromWeek.GameEngine.getInstance().hudGroup.storyGoalWindow.toDoItemAccordion.getTaskNameText(pred, primaryCharacter, secondaryCharacter, oth, false, false);
+														gameEngine.hudGroup.updatesGroup.createGoalProgressPopUp(toDoItemComponent.toDoItem, predToNaturalLanguage, false, i, primaryCharacter,secondaryCharacter);
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						//}
+					}
+				}
+			}
+		}
+		
+		
+		
+		
+		
+		
+		/**
+		 * This is a big and hairy mess. But to try to summarize:
+		 * Step 1: Make a boxaddConta
+		 * Step 1: Make a box
+		 * Step 2: Cut a hole in the box
+		 * Step 3: Put your HGroup in the box
+		 * Step 4: Set up click handlers on the box
+		 * Step 5: Add the components to the HGroup (in this case, an image, a text, and an image)
+		 * Step 6: Push the box to the titles vector (houses the box titles!)
+		 * Step 7: Make a new CollapsiblePanel
+		 * etc....etc...
+		 * @param	title
+		 */
+		public function addContainer(titleGroup:PromWeek.ToDoItemComponent, goalListGroup:VGroup):void 
+		{
+			// make the clickable title area
+			var storyGoalButton:PromWeek.ToggleableContainerButton = new PromWeek.ToggleableContainerButton()
+			storyGoalButton.selectedRect.alpha = 0;
+			//box.name = title
+			storyGoalButton.boxPadding = 0;
+			storyGoalButton.selected = false;
+			storyGoalButton.width = this.innerGroup.width
+			storyGoalButton.height = 45//25
+			//storyGoalButton.setStyle("backgroundColor", "#1F497D")
+			// add the mouse handling!
+			storyGoalButton.addEventListener(MouseEvent.CLICK, toggler);
+			//titleGroup.addEventListener(MouseEvent.CLICK, toggler);
+			
+			//titleGroup.width = storyGoalButton.width;
+			//titleGroup.height = storyGoalButton.height;
+			
+			// new hgroup for the box (layout reasons)
+			var group:Group = new Group()
+			group.id = "container"
+			group.width = storyGoalButton.width
+			group.height = storyGoalButton.height
+			
+			//group.mouseChildren = false;
+			//group.mouseEnabled = false;
+			
+			// add the little arrow guy
+			var i:SmoothImage = new SmoothImage()
+			i.source = rl.uiIcons["arrow_right"];
+			
+			this.dropDownArrows.push(i);
+			
+			group.addElement(i);
+			
+			group.addElement(titleGroup);
+			titleGroup.x = this.arrowWidth;
+			
+			// put the group onto the box
+			storyGoalButton.mainContainer.addElement(group);
+			titles.push(storyGoalButton);
+			
+			var hGroup:HGroup = new HGroup();
+			
+			var spacer:Spacer = new Spacer();
+			spacer.width = arrowWidth;
+			
+			hGroup.addElement(spacer);
+			
+			var tmpCP:CollapsiblePanel = new CollapsiblePanel(false)
+			tmpCP.defSize = goalListGroup.height;
+			tmpCP.height = goalListGroup.height;
+			tmpCP.measuredHeight = goalListGroup.height;
+			//tmpCP.height = goalListGroup.height;
+			//tmpCP.width = this.innerGroup.width - arrowWidth;//this.width
+			tmpCP.width = goalListGroup.width;
+			//tmpCP.title = title
+			tmpCP.setStyle("headerHeight", 0)
+			ids.push(tmpCP);
+			//box.x = 0;
+			//goalListGroup.x = 0;
+			//tmpCP.x = arrowWidth;
+			
+			
+			tmpCP.addElement(goalListGroup);
+			//goalListGroup.x = arrowWidth;
+			
+			//tmpCP.addEventListener(Event.OPEN, toggler)
+			
+			hGroup.addElement(tmpCP);
+			
+			tdContainer.addElement(storyGoalButton);
+			tdContainer.addElement(hGroup)
+		}
+		
+		
+		public function closeAllButByName(dropDownName:String,predIndex:int=-1):void
+		{
+			for (var j:int = 0; j < this.ids.length; j++ )
+			{
+				var todoItemComponent:PromWeek.ToDoItemComponent = this.toDoItemComponents[j];
+				var cp:CollapsiblePanel = this.ids[j];
+				if (dropDownName == todoItemComponent.todoItemNameLabel.text)
+				{
+					if (!cp.open)
+					{
+						cp.toggleOpen();
+						
+						this.dropDownArrows[j].source = rl.uiIcons["arrow_down"];
+						
+						//here is where I would mark the predicate that became true
+						var list:List = this.goalLists[j];
+						if (predIndex != -1)
+						{
+							list.selectedIndex = predIndex;
+						}
+					}
+				}
+				else if (cp.open) 
+				{
+					cp.toggleOpen();
+					this.dropDownArrows[j].source = rl.uiIcons["arrow_right"];
+				}
+			}
+		}
+		
+		
+		/**
+		 * Handle the toggling so not all of them are open at the same time
+		 * @param	e
+		 */
+		public function toggler(e:Event=null, indexToOpenTo:int=-1,onlyOpen:Boolean=false):void
+		{
+			//if (gameEngine.hudGroup.topBar.toDoButton.enabled == false)
+			//{
+				//gameEngine.hudGroup.topBar.toDoButton.enabled = true;
+			//}
+			
+			//gameEngine.hudGroup.topBar.toDoItemComponent.responderFace.visible = false;
+			//gameEngine.hudGroup.topBar.toDoItemComponent.otherFace.visible = false;
+			
+			gameEngine.hudGroup.storyGoalWindow.firstBestGroup.toolTip = "";
+			//gameEngine.hudGroup.storyGoalWindow.secondBestGroup.toolTip = "";
+			//gameEngine.hudGroup.storyGoalWindow.thirdBestGroup.toolTip = "";
+			
+			
+			gameEngine.hudGroup.storyGoalWindow.firstBestGroup.selected = true;
+			//gameEngine.hudGroup.storyGoalWindow.secondBestGroup.selected = true;
+			//gameEngine.hudGroup.storyGoalWindow.thirdBestGroup.selected = true;
+			
+			for each(var t:PromWeek.ToggleableContainerButton in titles) 
+			{
+				var index:int = titles.indexOf(t);
+				var cp:CollapsiblePanel = ids[index]
+				
+				var eventIsGood:Boolean = false;
+				if (e != null)
+				{
+					if (e.currentTarget == t)
+					{
+						eventIsGood = true;
+					}
+				}
+				
+				if (eventIsGood || index == indexToOpenTo)
+				{
+					this.selectedToDoItemComponent = toDoItemComponents[titles.indexOf(t)];
+					this.selectedList = goalLists[titles.indexOf(t)];
+					//gameEngine.hudGroup.topBar.updateWorkingGoal(goalLists[titles.indexOf(t)], this.selectedToDoItemComponent);
+					
+					if (onlyOpen)
+					{
+						cp.setToOpen();
+						//gameEngine.hudGroup.storyGoalWindow.hintComponent.setHintText(null, PromWeek.HintComponent.FRESHMAN,selectedToDoItemComponent.toDoItem.goalHint);
+						gameEngine.hudGroup.storyGoalWindow.hintComponent.setHintText(null, PromWeek.HintComponent.FRESHMAN,selectedToDoItemComponent.toDoItem.goalHint);
+					}
+					else
+					{
+						cp.toggleOpen();
+					}
+					
+					if (!cp.open)
+					{
+						//if we just closed this bad boy, we should clear out the active quest in the top bar
+						//gameEngine.hudGroup.topBar.clearToDoItem();
+					}
+
+				}
+				else if (cp.open)
+				{
+					cp.setToClosed();
+					
+				}
+								
+				if (cp.open)
+				{
+					this.dropDownArrows[titles.indexOf(t)].source = rl.uiIcons["arrow_down"];
+					t.selected = true;
+				}
+				else
+				{
+					this.dropDownArrows[titles.indexOf(t)].source = rl.uiIcons["arrow_right"];
+					t.selected = false;
+				}
+			}
+			//}
+			gameEngine.hudGroup.storyGoalWindow.mouseOutCharacters();
+			//dispatch an event so the story window in general knows something is going on
+			this.dispatchEvent(new Event("STORY_GOAL_SELECTED",true));
+			
+		}
+		
+		public static function cloneList(theList:List):List 
+		{
+			var clonedList:List = new List();
+			//clonedList.scroller.setStyle("verticalScrollPolicy", ScrollPolicy.ON);
+            //clonedList.scroller.verticalScrollBar.setStyle("skinClass", NEW_listScrollSkin);
+			clonedList.itemRenderer = new ClassFactory(NEW_GoalTaskItemRenderer);
+			clonedList.width = theList.width;
+			clonedList.setStyle("variableRowHeight", "true");
+			
+		
+			var heightOfList:Number = 0;
+			for (var itemRendIndex:int = 0; itemRendIndex < theList.dataProvider.length; itemRendIndex++)
+			{
+				heightOfList += theList.dataProvider[itemRendIndex].vGroupHeight;
+			}
+			clonedList.height = heightOfList;
+			//clonedList.height = theList.dataGroup.contentHeight;
+			//clonedList.height = theList.theList.dataProvider.length * 45;//theList.height;
+			
+			
+			//###LIST
+			clonedList.useVirtualLayout = false;
+			
+			clonedList.dataProvider = theList.dataProvider;
+			
+			
+			//clonedList.setStyle("color", "yellow");
+			//clonedList.setStyle("contentBackgroundColor", "#1F497D");
+			//clonedList.setStyle("fontSize", 12);
+
+			return clonedList;
+		}
+
+		
+		
+		]]>
+	</fx:Script>
+	
+</s:Group>

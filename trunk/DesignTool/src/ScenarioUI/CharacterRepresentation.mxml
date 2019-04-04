@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:CiF="CiF.*"
+		 currentState="notSelected"
+		 click="onClick(event)"
+		 >
+	
+	<fx:Declarations>
+		<fx:uint id="color">0xFF0000</fx:uint>
+		<fx:uint id="borderColor">0xCC0000</fx:uint>
+		<CiF:Character id="character" />
+	</fx:Declarations>
+		 
+	<s:states>
+		<s:State name="selected" enterState="onEnterSelectedState(event)" exitState="onExitSelectedState(event)" />
+		<s:State name="notSelected" />
+	</s:states>
+	
+	<s:Rect id="backgroundRect" width="100%" height="100%" alpha.notSelected="1.0" alpha.selected="@{selectedAlpha}" >
+		<s:fill>
+			<s:LinearGradient rotation="90">
+				<s:entries>
+					<s:GradientEntry color="0xCCCCCC" ratio="0.0" alpha="1.0"/>
+					<s:GradientEntry color="{color}" ratio="1.0" alpha="1.0"/>
+					<!--<s:GradientEntry color="0x336699" ratio="1.0" alpha="0.5"/>-->
+				</s:entries>
+			</s:LinearGradient>
+		</s:fill>
+		
+		<s:stroke>
+			<s:LinearGradientStroke rotation="90" weight="5">
+				<s:entries>
+					<s:GradientEntry color="{borderColor}" ratio="0.0" alpha="1.0"/>
+					<!--<s:GradientEntry color="0x112233" ratio="0.5" alpha="@{selectedAlpha}"/>-->
+					<s:GradientEntry color="0xAAAAAA" ratio="1.0" alpha="1.0"/>
+				</s:entries>
+			</s:LinearGradientStroke>
+		</s:stroke>
+	</s:Rect>
+
+	
+	<s:RichText content="{character.characterName}" color="0xFFFFFF" fontFamily="Verdana" fontWeight="bold" />
+
+	<fx:Script>
+		<![CDATA[
+		import flash.events.Event;
+		import flash.events.MouseEvent;
+		import mx.graphics.SolidColor;
+		import mx.graphics.SolidColorStroke;
+		import spark.primitives.Line;
+		
+		[Bindable] private var selectedAlphaDelta:Number = .03;
+		[Bindable] private var selectedAlpha:Number = 0.90;
+		[Bindable] private var selectedAlphaMax:Number = 0.90;
+		[Bindable] private var selectedAlphaMin:Number = .40;
+		[Bindable] private var selectedAlphaDirection:int = 1;
+		
+		public function onEnterFrame(event:Event):void {
+			//trace("frame entered " + this.selectedAlpha);
+			this.selectedAlpha += selectedAlphaDelta * selectedAlphaDirection;
+			//too low -- reverse direction
+			if (this.selectedAlpha < selectedAlphaMin) {
+				this.selectedAlpha = selectedAlphaMin;
+				this.selectedAlphaDirection = 1;
+			}
+			if (this.selectedAlpha > selectedAlphaMax) {
+				this.selectedAlpha = selectedAlphaMax;
+				this.selectedAlphaDirection = -1;
+			}
+		}
+		
+		/**
+		 * The EnterState event handler for the "selected" state. It adds the
+		 * EnterFrame event callback for the component.
+		 * @param	event	The incoming event.
+		 */
+		private function onEnterSelectedState(event:Event):void {
+			this.addEventListener(Event.ENTER_FRAME, onEnterFrame);
+		}
+		
+		/**
+		 * The EnterState event handler for the "selected" state. It removes
+		 * the EnterFrame event callback for the component.
+		 * @param	event	The incoming event.
+		 */
+		private function onExitSelectedState(event:Event):void {
+			this.removeEventListener(Event.ENTER_FRAME, onEnterFrame);
+		}
+		
+		private function onClick(event:MouseEvent):void{
+			if ("selected" != this.currentState) {
+				this.currentState = "selected";
+				var charRepEvent:CharacterRepresentationSelectedEvent = new CharacterRepresentationSelectedEvent();
+				charRepEvent.selectedChar = this.character;
+				dispatchEvent(charRepEvent);
+			}
+		}
+		]]>
+	</fx:Script>
+	
+</s:Group>

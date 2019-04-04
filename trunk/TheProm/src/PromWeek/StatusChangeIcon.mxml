@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*" 
+		 creationComplete="onCreationComplete()"
+		 visible="false">
+	
+		 
+	<fx:Metadata>
+	</fx:Metadata>
+		
+	<fx:Declarations>
+	</fx:Declarations>
+	
+	<prom:StatusIcon id="statusIcon" width="80" height="80" visible="false" />
+	
+	<fx:Script>
+		<![CDATA[
+
+			import flash.geom.Point;
+			import mx.controls.Image;  import com.util.SmoothImage;
+			import spark.components.Group;
+			import spark.components.RichText;
+			import flash.text.engine.FontWeight;
+			import CiF.*;
+			import PromWeek.assets.ResourceLibrary;
+
+			
+			public var gameEngine:GameEngine;
+			public var resourceLibrary:PromWeek.assets.ResourceLibrary;
+			
+			/**
+			 * Name of the character who this social change is happening to
+			 */
+			public var fromWho:String;
+			public var toWho:String;
+			
+			public var status:Number;
+			
+			public var negated:Boolean = false;
+			
+			public var offsetX:Number = 0;
+			public var offsetY:Number = 65;
+			
+			public var moveSpeed:int = 0.0//35;
+			public var deltaY:Number = 0;
+			
+			public var deltaAlpha:Number = 0;
+			public var alphaSpeed:Number = 2.0;
+			
+			/**
+			 * This is how long the icon will be visible before it fades out
+			 */
+			public var timeLength:Number = 2000;
+			
+			private var startTime:Number;
+			
+			public var created:Boolean = false;
+			
+			public var fadingOut:Boolean = false;
+			
+			public function onCreationComplete():void
+			{
+				gameEngine = GameEngine.getInstance();
+				resourceLibrary = PromWeek.assets.ResourceLibrary.getInstance();
+				
+				startTime = new Date().time;
+				
+				deltaY = 0;
+				
+				this.statusIcon.loadStatusImagesToIcon(this.status, this.toWho,0, this.negated);
+				
+				created = true;
+			}
+
+			public function initializeStatusIcon():void
+			{
+
+			}
+			
+			public function update(elapsedTime:Number):void
+			{
+				if (!this.created)
+				{
+					return;
+				}
+				
+				
+				//if we should be over then go invisible
+				if (((((new Date().time) - this.startTime) > timeLength) && !this.fadingOut))
+				{
+					this.fadingOut = true;
+					this.deltaAlpha = 1;
+				}
+				
+				if (fadingOut)
+				{
+					this.deltaAlpha -= (elapsedTime / 1000.0) * alphaSpeed;
+					this.alpha = deltaAlpha;
+					//Debug.debug(this,"fading out: "+this.alpha);
+				}
+				
+					
+					
+			if ((this.fadingOut && this.alpha < .1) || gameEngine.worldGroup.avatars[fromWho] == null) //go away once you've faded enough
+				{
+					//remove this from the list of networkChangeIcons
+					gameEngine.hudGroup.statusChangeIcons.splice(gameEngine.hudGroup.statusChangeIcons.indexOf(this),1);
+					gameEngine.hudGroup.removeElement(this);
+					 
+					this.fadingOut = false;
+					
+					return;
+				}
+				
+				
+				if (this.alpha <= 1 && !this.fadingOut)
+				{
+					deltaAlpha += (elapsedTime / 1000.0) * alphaSpeed;
+					this.alpha = deltaAlpha;
+				}
+				
+				var charX:Number = gameEngine.worldGroup.avatars[this.fromWho.toLowerCase()].locX;
+				var charY:Number = gameEngine.worldGroup.avatars[this.fromWho.toLowerCase()].locY;
+				
+				this.deltaY += (elapsedTime/1000.0)*this.moveSpeed;
+				
+				//var newLoc:Point = gameEngine.worldGroup.avatars[this.fromWho.toLowerCase()].localToGlobal(new Point(charX + this.offsetX, charY + this.offsetY + this.deltaY));
+				
+				var newLoc:Point = new Point(charX, charY);
+				newLoc = Utility.translatePoint(newLoc, gameEngine.worldGroup, gameEngine.hudGroup)
+				
+				this.top = newLoc.y + deltaY + offsetY;
+				this.left = newLoc.x + offsetX;
+				
+				if (!this.visible)
+				{
+					this.visible = true;
+				}
+			}
+		
+		]]>
+	</fx:Script>
+		
+	
+</s:Group>

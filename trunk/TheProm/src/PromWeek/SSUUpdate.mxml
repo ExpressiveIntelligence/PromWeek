@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 initialize="initializeSSUUpdate()"
+		 styleName="classicPromWeek"
+		 width="{getStyle('updateWidth')}"
+		 height="{getStyle('updateHeight')}">
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+		 </fx:Declarations>
+		 
+		 <s:Group id="SSUUpdateWindow" width="100%" height="100%">
+			<s:Rect width="100%" height="100%" maxHeight="100" radiusX="8" radiusY="8">
+				<s:stroke>
+					<s:SolidColorStroke weight="{getStyle('windowStrokeWeight')}" color="{getStyle('backgroundStroke')}" />
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor color="{getStyle('backgroundColor')}" alpha="1.0"/>
+				</s:fill>
+			</s:Rect>
+			<s:VGroup id="highestGroup" width="100%" height="100%" paddingTop="5" paddingLeft="5" paddingRight="5" paddingBottom="5" gap="0">
+				<s:HGroup id="onTopGroup" width="100%" height="20">
+					<!--<prom:PlayerPortrait id="SSUportrait" width="50" height="50" />-->
+					<util:SmoothImage id="portraitImage" width="25" height="100%"></util:SmoothImage>
+					<s:RichText id="characterNameRichText" color="{getStyle('contentAreaTextColor')}" fontSize="13" width="100" height="100%" verticalAlign="middle" styleName="basicFontStyle"/>
+					<!--util:SmoothImage id="twitterIcon" click="onTwitterClick(event)" width="30" height="100%"></util:SmoothImage-->
+					<prom:ToggleableContainerButton toggleable="false" id="twitterIcon" click="onTwitterClick(event)" width="20" height="20" boxPadding="3" />
+					<prom:ToggleableContainerButton toggleable="false" id="facebookIcon" click="onFacebookClick(event)" width="20" height="20" boxPadding="3" />
+					<!--<mx:Spacer width="50"></mx:Spacer>-->
+				</s:HGroup>
+				<s:Group id="feedLine" width="100%" height="50" > <!--height="{highestGroup.height - onTopGroup.height}">-->
+					<s:RichText id="SSULine" color="{getStyle('contentAreaTextColor')}" fontSize="12" width="100%" maxDisplayedLines="3" styleName="basicFontStyle"/>
+				</s:Group>
+			</s:VGroup>
+		</s:Group>
+		
+	<fx:Script>
+		<![CDATA[
+		import CiF.Debug;
+		import flash.events.Event;
+		import flash.events.TimerEvent;
+		import flash.utils.getTimer;
+		import flash.utils.Timer;
+		import mx.containers.Box;
+		import mx.controls.List;
+		import PromWeek.assets.ResourceLibrary;
+		import flash.media.Sound;
+		import flash.media.SoundChannel;
+		import flashx.textLayout.formats.TextAlign;
+		import CiF.Debug;
+		
+		public var resourceLib:PromWeek.assets.ResourceLibrary = PromWeek.assets.ResourceLibrary.getInstance();
+		//public var soundLibrary:SoundLibrary = SoundLibrary.getInstance();
+		public var gameEngine:PromWeek.GameEngine = PromWeek.GameEngine.getInstance();
+		
+		public var beginFading:Boolean;
+		public var fadingOut:Boolean;
+		public var mouseIsOver:Boolean;
+		public var timeLength:Number;
+		public var startTime:Number;
+		public var deltaAlpha:Number = 0;
+		public var alphaSpeed:Number = 1.0;
+		
+		public var timeToDeleteMe:Boolean = false;
+		
+		public function onCreationComplete():void {
+			//this.setSocialMediaIcons();
+		}
+		
+		override protected function createChildren():void {
+			super.createChildren();
+			this.setSocialMediaIcons();
+		}
+		
+		public function initializeSSUUpdate():void {
+			//soundLibrary = SoundLibrary.getInstance();
+		}
+		
+		protected override function commitProperties():void {
+			super.commitProperties();
+			this.styleName = gameEngine.activeStyleName;
+		}
+		
+		//Closes the box when the x is clicked on.
+		public function xClickedOn():void {
+			this.visible = false;
+		}
+		
+		/**
+		 * The function that shows the update goals. Will eventually pass in the goal that needs to be updated. Right now just does defaults.
+		 * @param	
+		 */
+		public function showSSU(char:String, entry:String):void {
+			this.alpha = .05;
+			this.visible = true;
+			
+			portraitImage.source = ResourceLibrary.getInstance().charHeads[char.toLowerCase()];
+			
+			//this.setSocialMediaIcons();
+			
+			//twitterIcon.source = ResourceLibrary.getInstance().uiIcons["twitter"];
+			characterNameRichText.text = char;
+			
+			//this.SSUportrait.NameRichText.text = char;
+			//this.SSUportrait.PortraitImage.source = resourceLib.portraits[char.toLowerCase()];
+			//this.SSUportrait.NameRichText.setStyle("textAlign", TextAlign.CENTER);
+			//this.SSUportrait.figureWidth();
+			this.SSULine.text = entry;
+			
+			//var SSUUpdatedSound:Sound = SoundLibrary.getInstance().maleUtterances[Utility.randRange(0,SoundLibrary.getInstance().maleUtterances.length-1)]() as Sound;
+			//SSUUpdatedSound.play();
+			timeLength = 5000;
+			fadeIn();
+			beginFading = true;
+			startTime =  getTimer();
+			this.addEventListener("mouseOver", stopFade);
+			this.addEventListener("mouseOut", startFade);
+			this.addEventListener("click", openSSU);
+			
+			//this.x -= this.width;
+		}
+		
+		public function setSocialMediaIcons():void {
+			//Create the twitter button
+			var image:SmoothImage = new SmoothImage();
+			
+			//image.source = ResourceLibrary.getInstance().uiIcons["twitter"];
+			image.source = resourceLib.uiIcons["twitter"];
+			var group:Group = new Group();
+			image.x = 0;
+			image.y = 0;
+			this.twitterIcon.mainContainer.width = 13;
+			this.twitterIcon.mainContainer.height = 13;
+			image.width = this.twitterIcon.mainContainer.width;
+			image.height = this.twitterIcon.mainContainer.height;
+			//image.width = 30;
+			//image.height = 30;
+			group.width = this.twitterIcon.mainContainer.width;
+			group.height = this.twitterIcon.mainContainer.height;
+			//image.x = group.width / 2 - image.width / 2;
+			//image.y = group.height / 2 - image.height / 2;
+			group.addElement(image);
+			this.twitterIcon.mainContainer.addElement(group);
+			
+			//Create the Facebook button
+			image = new SmoothImage();
+			image.width = this.facebookIcon.mainContainer.width;
+			image.height = this.facebookIcon.mainContainer.height;
+			image.source = resourceLib.uiIcons["facebook"]
+			group = new Group();
+			image.x = 0;
+			image.y = 0;
+			this.facebookIcon.mainContainer.width = 13;
+			this.facebookIcon.mainContainer.height = 13;
+			image.width = this.facebookIcon.mainContainer.width;
+			image.height = this.facebookIcon.mainContainer.height;
+			group.width = this.facebookIcon.mainContainer.width;
+			group.height = this.facebookIcon.mainContainer.height;
+			//image.x = group.width / 2 - image.width / 2;
+			//image.y = group.height / 2 - image.height / 2;
+			group.addElement(image);
+			this.facebookIcon.mainContainer.addElement(group);
+		}
+		
+		/**
+		 * The new function to work with just notifications in the changed SSUvisualizer.
+		 * @param	
+		 */
+		public function notificationSSU(char:String, entry:String):void {
+			this.alpha = .05;
+			this.visible = true;
+			
+			portraitImage.source = ResourceLibrary.getInstance().charHeads[char.toLowerCase()];
+			
+			//this.setSocialMediaIcons();
+			
+			characterNameRichText.text = char;
+			
+			this.SSULine.text = entry;
+			
+			this.x -= this.width;
+			
+			timeLength = 5000;
+			notificationFadeIn();
+			beginFading = true;
+			startTime =  getTimer();
+		}
+		
+		/**
+		 * Makes the to do list visible when you click on the updated goal.
+		 * @param	event
+		 */
+		public function openSSU(e:Event):void 
+		{
+			gameEngine.hudGroup.ssuVisualizer.visible = true;
+		}
+		
+		/**
+		 * This function and increase alpha is just used for fade in. Probably the more effecient way to do it, but I couldn't find out how to do
+		 * it for fade out.
+		 */
+		public function fadeIn():void{
+			var timer:Timer = new Timer(25, 20);
+			timer.addEventListener(TimerEvent.TIMER, increaseAlpha);
+			timer.start();
+		}
+		public function increaseAlpha(e:Event):void {
+			this.alpha += 0.05;
+			SSUUpdateWindow.x -= this.width / 20;
+			//SSUUpdateWindow.y -= this.height / 20;
+			//howFarThisHasMoved += 9;
+		}
+		
+		/**
+		 * This function and increase alpha is just used for fade in. Used for the new notification window.
+		 */
+		public function notificationFadeIn():void{
+			var timer:Timer = new Timer(25, 20);
+			timer.addEventListener(TimerEvent.TIMER, justIncreaseAlpha);
+			timer.start();
+		}
+		public function justIncreaseAlpha(e:Event):void {
+			this.alpha += 0.05;
+		}
+		
+		/**
+		 * Sets a boolean that will stop the fadeout from occuring, the logic of which is inside in update.
+		 * Will stop fading and set the alpha to 1.
+		 * @param	event
+		 */
+		public function stopFade(e:Event):void {
+			this.mouseIsOver = true;
+		}
+		
+		/**
+		 * This will cancel the mouseOver logic so it can begin fading but it will fade
+		 * out quicker every time it mouses out.
+		 * @param	event
+		 */
+		public function startFade(e:Event):void {
+			this.mouseIsOver = false;
+			this.beginFading = true;
+			this.startTime = getTimer();
+			this.timeLength -= 1000;
+		}
+		
+		/**
+		 * This update logic for the achievement pop up screen. Makes it so it will fade out after so much time, with other if statements to
+		 * handle other different logics.
+		 * @param	elapsedTime
+		 */
+		public function update(elapsedTime:Number):void {
+			//This takes the current time minus the time it started living and checked if it has been long enough to start fading out.
+			if ((((getTimer() - this.startTime) > timeLength) && beginFading)){
+				this.fadingOut = true;
+				beginFading = false;
+				this.deltaAlpha = 1;
+			}
+			
+			//The logic to keep it visible and not fading out when the mouse is over it.
+			if (mouseIsOver) {
+				this.alpha = 1.0;
+				this.fadingOut = false;
+			}
+			
+			//Making it fade out when it is suppose to.
+			if (fadingOut){
+				this.deltaAlpha -= (elapsedTime / 1000.0) * alphaSpeed;
+				this.alpha = deltaAlpha;
+				//Debug.debug(this,"fading out: "+this.alpha);
+			}
+			
+				
+			//go away once you've faded enough
+			if (this.fadingOut && this.alpha < .05){ 
+				this.fadingOut = false;
+				this.visible = false;
+				this.removeEventListener("mouseOver", stopFade);
+				this.removeEventListener("mouseOut", startFade);
+				this.removeEventListener("click", openSSU);
+				this.timeToDeleteMe = true;
+			}
+		}
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			/*if(gameEngine.classicPromColors) {
+				this.setStyle("styleName", "classicPromWeek");
+			}
+			else if(gameEngine.greenPromColors) {
+				this.setStyle("styleName", "greenColor");
+			}
+			else if(gameEngine.redPromColors) {
+				this.setStyle("styleName", "redColor");
+			}*/
+			this.invalidateProperties();
+		}
+		
+		/**
+		 * Handles when the twitter button is clicked (i.e. opens up a web browser with the twitter entry window
+		 * pre populated with the text of this social status update)
+		 * @param	e the click event
+		 */
+		public function onTwitterClick(e:Event):void{
+			Debug.debug(this, "Twitter clicked!");
+			Utility.handleTweet(SSULine.text);
+		}
+		
+		public function onFacebookClick(e:flash.events.Event):void {
+			Debug.debug(this, "Facebook clicked!");
+			Utility.postToFacebookWall(SSULine.text, 
+			"A text message ripped straight from the phone of a Prom Week highschooler...",
+			"Prom Week is an interactive drama that employs Social Physics to deliver a unique style of story based gameplay. " +
+			"Click here to start shaping the lives of hapless highschoolers today!");
+		}
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

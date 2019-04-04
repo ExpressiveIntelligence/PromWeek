@@ -1,0 +1,671 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:UI="UI.*"
+		 xmlns:CiF="CiF.*"	
+		 width="800" 
+		 height="600" 
+		 creationComplete="onCreationComplete()"
+		 >
+		 
+	 <fx:Metadata>
+		
+		[Event(name="conditionChanged", type="flash.events.Event")]
+		[Event(name="changeChanged", type="flash.events.Event")]
+		
+	</fx:Metadata>
+			
+	<fx:Binding source="dte.predTypes" destination="this.predTypes" />
+	
+	
+	
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+
+	<fx:Declarations>
+		<CiF:Trigger id="trigger" />
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<s:Rect width="100%" height="105%">
+		<s:fill>
+				<s:LinearGradient rotation="90">
+				<s:entries>
+					<s:GradientEntry color="#980000" ratio="0.0" alpha="1.0"/>
+					<s:GradientEntry color="#080000" ratio="1.0" alpha="1.0"/>
+					<!--<s:GradientEntry color="0x336699" ratio="1.0" alpha="0.5"/>-->
+				</s:entries>
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+
+	
+	<s:HGroup>
+		<s:VGroup width="780">
+			<s:VGroup width="100%">
+				<s:HGroup width="100%">
+					<s:Label text="Performance Realization String" color="#ffffff" paddingTop="4" />
+					<s:TextInput width="100%" id="performanceRealizationString" text="This is the default performance realization string" focusIn="onPerformanceRealizationStringFocus()" />
+					<s:Button id="addTriggerRule" label="Add Trigger to Library" click="onAddTriggerRule(event)" />
+					<s:Button id="updateTriggerRule" label="Update" click="onUpdateTriggerRule(event)" />
+				</s:HGroup>
+				<s:HGroup width="100%">
+					<s:HGroup width="100%">
+						<s:VGroup width="12%">
+							<s:Label text="Condition type:" color="#ffffff"/>
+							<s:List id="conditionPredicateTypeList" width="100%" dataProvider="{this.predTypes}" 
+							doubleClickEnabled="true"
+							doubleClick="addSelectedConditionTypeToList()" />
+							<s:HGroup>
+								<s:Button id="removeConditionButton" label="-" click="removeSelectedConditionFromList()" />
+								<s:Button id="addConditionButton" label="→" click="addSelectedConditionTypeToList()"/>
+							</s:HGroup>
+						</s:VGroup>
+						<s:VGroup width="38%" height="100%">
+							<s:Label text="Trigger Condition:" color="#ffffff"/>
+							<s:List id="conditionPredicateList" width="100%" height="100%" dataProvider="{this.conditionStringDP}" click="clickOnConditionList();"/>
+						</s:VGroup>
+						<s:VGroup width="38%" height="100%">
+							<s:Label text="Social Change:" color="#ffffff"/>
+							<s:List id="changePredicateList" width="100%" height="100%" dataProvider="{this.changeStringDP}" click="clickOnChangeList();"/>
+						</s:VGroup>
+						<s:VGroup width="12%">
+							<s:Label text="Change type:" color="#ffffff"/>
+							<s:List id="changePredicateTypeList" width="100%" height="100%" dataProvider="{this.predTypes}"
+							doubleClick="addSelectedChangeTypeToList()"
+							doubleClickEnabled="true"/>
+							<s:HGroup>
+								<s:Button id="addChangeButton" label="←" click="addSelectedChangeTypeToList()" />
+								<s:Button id="removeChangeButton" label="-" click="removeSelectedChangeFromList()" />
+							</s:HGroup>
+						</s:VGroup>
+					</s:HGroup>
+					
+				</s:HGroup>
+			</s:VGroup>
+			<mx:HRule width="100%"/>
+			<s:HGroup>
+				<UI:PredicateEditor id="conditionEditor" />
+				<s:Button id="conditionEditorSaveUpButton" label="Save Up" click="triggerConditionSaveUpFn();" />
+				<mx:VRule height="400" />
+				<UI:PredicateEditor id="changeEditor" isEvaluation="false" />
+				<s:Button id="changeEditorSaveUpButton" label="Save Up" click="socialChangeSaveUpFn();" />
+			</s:HGroup>
+		</s:VGroup>
+		<s:VGroup>
+			<s:HGroup width="100%" height="100%">
+				<s:List id="triggerList" width="360" height="100%" doubleClickEnabled="true" doubleClick="onTriggerListDoubleClick(event);" />
+				<s:VGroup>
+					<s:Button id="triggerListDeleteButton" label="Delete" click="triggerListDelete(event);" />
+				</s:VGroup>
+			</s:HGroup>
+		</s:VGroup>
+	</s:HGroup>
+	<fx:Script>
+		<![CDATA[
+		
+		//TODO: save up button
+		//TODO: add to right button
+		
+		import CiF.*;
+		import flash.events.MouseEvent;
+		import flash.media.Microphone;
+		import tool.DesignerToolEngine;
+		import flash.events.Event;
+		import flash.events.EventDispatcher;
+		import mx.collections.ArrayCollection;
+
+		public var dte:DesignerToolEngine = DesignerToolEngine.getInstance();
+	
+		public var predTypes:ArrayCollection;
+		public var conditionStringDP:ArrayCollection;
+		public var changeStringDP:ArrayCollection;
+		
+		public var triggerListDP:ArrayCollection;
+		
+		private var newConditionAdded:Boolean = false;
+		private var newChangeAdded:Boolean = false;
+		
+		private var cif:CiFSingleton = CiFSingleton.getInstance();
+		
+		public function onCreationComplete():void {
+			//set up event handlers for dataprovider regeneration
+			addEventListener("ruleChanged", this.ruleChanged);
+			addEventListener("conditionChanged", this.onConditionChanged);
+			addEventListener("changeChanged", this.onChangeChanged);
+			
+			addEventListener("triggerListUpdate", this.onTriggerListUpdate);
+			
+			
+			//initiate local data providers
+			this.conditionStringDP = new ArrayCollection;
+			this.changeStringDP = new ArrayCollection;
+			
+			this.conditionPredicateTypeList.dataProvider = dte.generatePredListProvider();
+			this.changePredicateTypeList.dataProvider = dte.generatePredListProvider();
+			
+			//this.conditionPredicateTypeList.executeBindings();
+			//this.changePredicateTypeList.executeBindings();
+			
+			this.addEventListener(MouseEvent.CLICK, reloadDataProviders);
+		}
+		
+			public function reloadDataProviders(e:Event):void
+			{
+				this.conditionPredicateTypeList.dataProvider = dte.generatePredListProvider();
+				this.changePredicateTypeList.dataProvider = dte.generatePredListProvider();
+				
+				this.removeEventListener(MouseEvent.CLICK, reloadDataProviders);
+			}
+		
+		
+		
+		public function ruleChanged(e:Event):void {
+			dispatchEvent(new Event("conditionChanged", true, true));
+			dispatchEvent(new Event("changeChanged", true, true));
+					
+			performanceRealizationString.text = trigger.referenceAsNaturalLanguage;
+		}
+		
+		public function triggerConditionSaveUpFn():void {
+			
+			if (conditionPredicateList.selectedIndex >= 0) {
+				var previousIndex:int = conditionPredicateList.selectedIndex;
+				handleLocutionTranslation();
+				this.trigger.condition.predicates[conditionPredicateList.selectedIndex] = conditionEditor.predicate.clone();
+				dispatchEvent(new Event("conditionChanged", true, true));
+				conditionPredicateList.selectedIndex = previousIndex;
+			}
+			
+		}
+		
+		public function socialChangeSaveUpFn():void {
+			if (changePredicateList.selectedIndex >= 0) {
+				var previousIndex:int = changePredicateList.selectedIndex;
+				trigger.change.predicates[changePredicateList.selectedIndex] = changeEditor.predicate.clone();
+				dispatchEvent(new Event("changeChanged", true, true));
+				changePredicateList.selectedIndex = previousIndex;
+			}
+		}
+		
+		public function onAddTriggerRule(e:MouseEvent):void {
+			var t:Trigger = new Trigger();
+			
+			t.condition = this.trigger.condition.clone();
+			t.change = this.trigger.change.clone();
+			if (performanceRealizationString.text == "")
+				t.referenceAsNaturalLanguage = "This is the default performance realization string";
+			else
+				t.referenceAsNaturalLanguage = performanceRealizationString.text;
+			//give a and id number to this new effect
+			for each (var t1:Trigger in cif.sfdb.triggers)
+				if (t1.id >= t.id) t.id = t1.id + 1;
+			if (t.id == -1) t.id = 0;
+			
+			cif.sfdb.triggers.push(t);
+			dispatchEvent(new Event("triggerListUpdate", true, true));
+		}
+		
+		public function onUpdateTriggerRule(e:MouseEvent):void
+		{
+			var t:Trigger;
+			for (var i:int = 0; i < cif.sfdb.triggers.length; i++ )
+			{
+				t = cif.sfdb.triggers[i];
+				if (t != null)
+				{	
+					if (t.id == this.trigger.id)
+					{
+						if (performanceRealizationString.text == "")
+							 this.trigger.referenceAsNaturalLanguage = "This is the default performance realization string";
+						else
+							 this.trigger.referenceAsNaturalLanguage = performanceRealizationString.text;
+
+						dispatchEvent(new Event("triggerListUpdate", true, true));
+						return;
+					}
+				}
+			}
+		}
+		
+		
+		/**
+		 * The click event handler for the addConditionButton. It adds a new
+		 * predicate of default values of type selected in the condition
+		 * predicate type list to the working Effect.condition Rule. Then the
+		 * "conditionChanged" event is dispatched.
+		 */
+		public function addSelectedConditionTypeToList():void {
+			if (conditionPredicateTypeList.selectedItem) {
+				var pred:Predicate = new Predicate();
+				var val:Object = conditionPredicateTypeList.selectedItem
+				pred.setByTypeDefault(Predicate.getTypeByName(val as String));
+				this.trigger.condition.predicates.push(pred);
+				this.newConditionAdded = true;
+				this.conditionEditor.currentState = Predicate.getNameByType(pred.type).toLowerCase();
+				this.conditionEditor.predicate = pred.clone();
+				dispatchEvent(new Event("conditionChanged", true, true));
+			}
+		}
+		
+		/**
+		 * The click event handler for the removeConditionButton. It removes
+		 * the predicate from the local model's effect.condition rule that 
+		 * corresponds to the conditionPredicateList's selected index. Then the
+		 * "conditionChanged" event is dispatched.
+		 */
+		public function removeSelectedConditionFromList():void {
+			if(conditionPredicateList.selectedItem){
+				var i:int = conditionPredicateList.selectedIndex;
+				this.trigger.condition.predicates.splice(i, 1);
+				dispatchEvent(new Event("conditionChanged", true, true));
+			}
+		}
+		
+		/**
+		 * The click event handler for the addChangeButton. It adds a new
+		 * predicate of default values of type selected in the change
+		 * predicate type list to the working Effect.change Rule. Then the
+		 * "changeChanged" event is dispatched.
+		 */
+		public function addSelectedChangeTypeToList():void {
+			if (changePredicateTypeList.selectedItem) {
+				var pred:Predicate = new Predicate();
+				var val:Object = changePredicateTypeList.selectedItem;
+				pred.setByTypeDefault(Predicate.getTypeByName(val as String));
+				this.trigger.change.predicates.push(pred);
+				this.newChangeAdded = true;
+				this.changeEditor.currentState = Predicate.getNameByType(pred.type).toLowerCase();
+				this.changeEditor.predicate = pred.clone();
+				dispatchEvent(new Event("changeChanged", true, true));
+			}
+		}
+		
+		/**
+		 * The click event handler for the removeChangeButton. It removes
+		 * the predicate from the local model's effect.change rule that 
+		 * corresponds to the changePredicateList's selected index. Then the
+		 * "changeChanged" event is dispatched.
+		 * 
+		 */
+		public function removeSelectedChangeFromList():void {
+			if(changePredicateList.selectedItem){
+				var i:int = changePredicateList.selectedIndex;
+				this.trigger.change.predicates.splice(i, 1);
+				dispatchEvent(new Event("changeChanged", true, true));
+			}
+		}
+		
+		/**
+		 * The click event handler for the conditionPredicateList. It updates
+		 * the condition predicate editor with the currently-selected condition
+		 * predicate.
+		 */
+		public function clickOnConditionList():void {
+			if (this.conditionPredicateList.selectedItem) {
+				this.conditionEditor.setCurrentState(Predicate.getNameByType(trigger.condition.predicates[conditionPredicateList.selectedIndex].type).toLowerCase());
+				this.conditionEditor.predicate = trigger.condition.predicates[conditionPredicateList.selectedIndex].clone();
+				
+				Debug.debug(this, "clickOnConditionList() flag is set to "+conditionEditor.predicate.numTimesUniquelyTrueFlag);
+				
+				if (conditionEditor.predicate.numTimesRoleSlot == "first")
+				{
+					conditionEditor.numTimesUniquelyTrueFirstRole.selected = true;
+					conditionEditor.predicate.numTimesRoleSlot = conditionEditor.predicate.numTimesRoleSlot;
+				}
+				else if (conditionEditor.predicate.numTimesRoleSlot == "second")
+				{
+					conditionEditor.numTimesUniquelyTrueSecondRole.selected = true;
+					conditionEditor.predicate.numTimesRoleSlot = conditionEditor.predicate.numTimesRoleSlot;
+				}
+				else if (conditionEditor.predicate.numTimesRoleSlot == "third")
+				{
+					conditionEditor.numTimesUniquelyTrueThirdRole.selected = true;
+					conditionEditor.predicate.numTimesRoleSlot = conditionEditor.predicate.numTimesRoleSlot;
+				}
+				else if (conditionEditor.predicate.numTimesRoleSlot == "both")
+				{
+					conditionEditor.numTimesUniquelyTrueBothRole.selected = true;
+					conditionEditor.predicate.numTimesRoleSlot = conditionEditor.predicate.numTimesRoleSlot;
+				}
+				else
+				{
+					//default to first
+					conditionEditor.numTimesUniquelyTrueFirstRole.selected = true;
+					conditionEditor.predicate.numTimesRoleSlot = conditionEditor.predicate.numTimesRoleSlot;						
+				}
+				
+			}
+		}
+		
+		/**
+		 * The click event handler for the changePredicateList. It updates
+		 * the change predicate editor with the currently-selected condition
+		 * predicate.
+		 */
+		public function clickOnChangeList():void {
+			if (this.changePredicateList.selectedItem) {
+				this.changeEditor.setCurrentState(Predicate.getNameByType(trigger.change.predicates[changePredicateList.selectedIndex].type).toLowerCase());
+				this.changeEditor.predicate = trigger.change.predicates[changePredicateList.selectedIndex].clone();
+				
+				
+				//predicateEd.isNumTimesUniquelyTrueCheckBox.selected = predicateEd.predicate.numTimesUniquelyTrueFlag;				
+				
+				Debug.debug(this, "clickOnChangeList() flag is set to "+changeEditor.predicate.numTimesUniquelyTrueFlag);
+				
+				if (changeEditor.predicate.numTimesRoleSlot == "first")
+				{
+					changeEditor.numTimesUniquelyTrueFirstRole.selected = true;
+					changeEditor.predicate.numTimesRoleSlot = changeEditor.predicate.numTimesRoleSlot;
+				}
+				else if (changeEditor.predicate.numTimesRoleSlot == "second")
+				{
+					changeEditor.numTimesUniquelyTrueSecondRole.selected = true;
+					changeEditor.predicate.numTimesRoleSlot = changeEditor.predicate.numTimesRoleSlot;
+				}
+				else if (changeEditor.predicate.numTimesRoleSlot == "third")
+				{
+					changeEditor.numTimesUniquelyTrueThirdRole.selected = true;
+					changeEditor.predicate.numTimesRoleSlot = changeEditor.predicate.numTimesRoleSlot;
+				}
+				else if (changeEditor.predicate.numTimesRoleSlot == "both")
+				{
+					changeEditor.numTimesUniquelyTrueBothRole.selected = true;
+					changeEditor.predicate.numTimesRoleSlot = changeEditor.predicate.numTimesRoleSlot;
+				}
+				else
+				{
+					//default to first
+					changeEditor.numTimesUniquelyTrueFirstRole.selected = true;
+					changeEditor.predicate.numTimesRoleSlot = changeEditor.predicate.numTimesRoleSlot;						
+				}
+
+			}
+		}
+		
+		/**
+		 * The event handler for the conditionChanged event. It regenerates
+		 * the data provider for the string representation of the effect.condition
+		 * rule.
+		 * @param	e The event.
+		 */
+		public function onConditionChanged(e:Event):void {
+			var lastSelectedIndex:Number = this.conditionPredicateList.selectedIndex;
+			//Debug.debug(this, "onConditionChanged(): generating rule string data provider.");
+			this.conditionStringDP.removeAll();
+			
+			//this.effect.condition.sortPredicates();
+			
+			Debug.debug(this, "onConditionChanged() " + this.trigger.toString());
+			
+			for each (var pred:Predicate in this.trigger.condition.predicates) {
+				this.conditionStringDP.addItem(pred.toString());
+			}
+			this.conditionPredicateList.dataProvider = this.conditionStringDP;
+			if (this.newConditionAdded) {
+				this.conditionPredicateList.selectedIndex = this.conditionStringDP.length - 1;
+				this.newConditionAdded = false;
+			}else {
+					this.conditionPredicateList.selectedIndex = lastSelectedIndex;
+			}
+		}
+		
+		/**
+		 * The event handler for the changeChanged event. It regenerates
+		 * the data provider for the string representation of the effect.change
+		 * rule.
+		 * @param	e The event.
+		 */
+		public function onChangeChanged(e:Event):void {
+			var lastSelectedIndex:Number = this.changePredicateList.selectedIndex;
+			//Debug.debug(this, "onChangeChanged(): generating rule string data provider.");
+			this.changeStringDP.removeAll();
+			
+			//this.effect.change.sortPredicates();
+			
+			for each (var pred:Predicate in this.trigger.change.predicates) {
+				this.changeStringDP.addItem(pred.toString());
+			}
+			this.changePredicateList.dataProvider = this.changeStringDP;
+			if(this.newChangeAdded) {
+				this.changePredicateList.selectedIndex = this.changeStringDP.length - 1;
+				this.newChangeAdded = false;
+			}else{
+				this.changePredicateList.selectedIndex = lastSelectedIndex;
+			}
+		}
+		
+		/**
+		 * Callback function for the Performance Realization String's focusIn() event.
+		 * Makes it so that the default text goes away when you one clicks on
+		 * the textbox.
+		 */
+		public function onPerformanceRealizationStringFocus():void {
+			if (this.performanceRealizationString.text == "This is the default performance realization string") {
+				this.performanceRealizationString.text = "";
+				//dispatchEvent(new Event("effectListUpdate", true, true));
+			}
+		}
+		
+		/**
+		 * handleLocutionTranslation will examine what the current predicate that
+		 is being edited is.  If it is something that can be translated, it finds
+		 out what that translation is, and then stuffs it into the locution translation
+		 text box, so that it can be copied and pasted to be used in other places.
+		 */
+		public function handleLocutionTranslation():void {
+			conditionEditor.locutionTranslation.text = "You pushed the save up button! Now all of your dreams will come true!";
+			switch(conditionEditor.predicateEditorTitle.text) {
+				case "TRAIT PREDICATE EDIT":
+					handleTraitCategoryLocutionTranslation();
+				break
+				case "CKB PREDICATE EDIT":
+					handleCKBLocutionTranslation();
+				break
+				case "SFDBLABEL PREDICATE EDIT":
+					handleSFDLabelLocutionTranslation();
+				break
+				case "STATUS PREDICATE EDIT":
+					handleStatusCategoryLocutionTranslation();
+				break
+				default: Debug.debug(this, "No need to handle anything!  No translation is going to be going on!");
+			}
+		}
+		
+		/**
+		 * handleTraitCategoryLocutionTranslation is only called when we know for sure we are
+		 dealing with a trait predicate -- it checks to see if the specific trait used was a 
+		 category (e.g. "sexy") as opposed to a specific trait (e.g. "sex magnet"), and 
+		 if so, generates the corresponding locution that could be used in a line of dialogue
+		 and stores it in the predicate editors locution translation text area.
+		 */
+		public function handleTraitCategoryLocutionTranslation():void {
+			var traitName:String = "";
+			var firstRole:String = "";			
+			traitName = conditionEditor.traitValue.selectedItem;
+			if (Trait.getNumberByName(conditionEditor.traitValue.selectedItem) <= Trait.LAST_CATEGORY_COUNT) {
+				if (conditionEditor.firstRole.selectedItem == "initiator") firstRole = "i";
+				else if (conditionEditor.firstRole.selectedItem == "responder") firstRole = "r";
+				else if (conditionEditor.firstRole.selectedItem == "other") firstRole = "o";
+				traitName = traitName.slice(5);
+				conditionEditor.locutionTranslation.text = "%cat(" + firstRole + "," + traitName + ")%";		
+			}
+		}
+		
+		/**
+		 * handleCKBLocutionTranslation is only called when we know for sure we are
+		 dealing with a CKB predicate -- it checks to see what the specific CKB predicate was used
+		  (e.g. Initiator likes, Responder has, and object that is objectively cool) and 
+		 generates the corresponding locution that could be used in a line of dialogue
+		 and stores it in the predicate editors locution translation text area.
+		 */
+		public function handleCKBLocutionTranslation():void {
+			var firstRole:String = "";
+			var firstSubjective:String = "";
+			var secondRole:String = "";
+			var secondSubjective:String = "";
+			var objectiveTruth:String = "";
+			var ckbLocutionTranslation:String = "";
+			conditionEditor.locutionTranslation.text = "Dealing with CKB...";
+			
+			firstRole = conditionEditor.firstRole.selectedItem;
+			firstSubjective = conditionEditor.firstRoleSubjective.selectedItem;
+			secondRole = conditionEditor.secondRole.selectedItem;
+			secondSubjective = conditionEditor.secondRoleSubjective.selectedItem;
+			objectiveTruth = conditionEditor.ckbValue.selectedItem;
+			
+			if (firstRole == "initiator") firstRole = "i";
+			else if (firstRole == "responder") firstRole = "r";
+			else if (firstRole == "other") firstRole = "o";
+			
+			if (secondRole == "initiator") secondRole = "i";
+			else if (secondRole == "responder") secondRole = "r";
+			else if (secondRole == "other") secondRole = "o";
+			
+			ckbLocutionTranslation = "%CKB_((";
+			ckbLocutionTranslation += firstRole;
+			
+			ckbLocutionTranslation += ",";
+			if (!conditionEditor.useFirstRoleSubjective.selected) {
+				ckbLocutionTranslation += firstSubjective;
+			}
+			ckbLocutionTranslation += "),(";
+			if (!conditionEditor.useSecondRole.selected) {
+				ckbLocutionTranslation += secondRole;
+			}
+			ckbLocutionTranslation += ",";
+			if (!conditionEditor.useSecondRoleSubjective.selected) {
+				ckbLocutionTranslation += secondSubjective;
+			}
+			ckbLocutionTranslation += "),(";
+			if (!conditionEditor.useCKBTruthValue.selected) {
+				ckbLocutionTranslation += objectiveTruth;
+			}
+			ckbLocutionTranslation += "))%";
+			conditionEditor.locutionTranslation.text = ckbLocutionTranslation;
+		}
+		
+		/**
+		 * handleSFDLabelLocutionTranslation is only called when we know for sure we are
+		 dealing with a SFDBLabel predicate -- it checks to see what the SFDB Label is
+		 and generates the corresponding locution that could be used in a line of dialogue
+		 and stores it in the predicate editors locution translation text area.
+		 */
+		public function handleSFDLabelLocutionTranslation():void {
+			conditionEditor.locutionTranslation.text = "Dealing with SFDB...";
+				
+			var firstRole:String = "";
+			var secondRole:String = "";
+			var SFDBLabel:String = "";
+			var window:int = -1;
+			var SFDBTranslatedLocution:String = "";
+				
+			firstRole = conditionEditor.firstRole.selectedItem;
+			secondRole = conditionEditor.secondRole.selectedItem;
+			SFDBLabel = conditionEditor.sfdbValue.selectedItem;
+			window = conditionEditor.sfdbWindowStepper.value;
+			
+			if(SocialFactsDB.getLabelByName(conditionEditor.sfdbValue.selectedItem) <= SocialFactsDB.LAST_CATEGORY_COUNT){
+				SFDBLabel = SFDBLabel.slice(5);
+			}	
+			
+			if (firstRole == "initiator") firstRole = "i";
+			else if (firstRole == "responder") firstRole = "r";
+			else if (firstRole == "other") firstRole = "o";
+			
+			if (secondRole == "initiator") secondRole = "i";
+			else if (secondRole == "responder") secondRole = "r";
+			else if (secondRole == "other") secondRole = "o";
+			
+			SFDBTranslatedLocution = "%SFDB_(";
+			
+			if (!conditionEditor.useSFDBLabel.selected) {
+				SFDBTranslatedLocution += SFDBLabel;
+			}
+			
+			SFDBTranslatedLocution += "," + firstRole + ",";
+			
+			if (!conditionEditor.useSecondRole.selected) {
+				SFDBTranslatedLocution += secondRole
+			}
+			
+			SFDBTranslatedLocution += "," + window + ")%";
+			
+			conditionEditor.locutionTranslation.text = SFDBTranslatedLocution;
+		}
+		
+		/**
+		 * handleTraitCategoryLocutionTranslation is only called when we know for sure we are
+		 dealing with a Status predicate -- it checks to see if the specific Status used was a 
+		 category (e.g. "sexy") as opposed to a specific trait (e.g. "sex magnet"), and 
+		 if so, generates the corresponding locution that could be used in a line of dialogue
+		 and stores it in the predicate editors locution translation text area.
+		 */
+		public function handleStatusCategoryLocutionTranslation():void {
+			conditionEditor.locutionTranslation.text = "Dealing with Statuses...";
+			var statusName:String = "";
+			var firstRole:String = "";	
+			var secondRole:String = "";
+			statusName = conditionEditor.statusValue.selectedItem;
+			if (Status.getStatusNumberByName(statusName) <= Status.LAST_CATEGORY_COUNT) {
+				if (conditionEditor.firstRole.selectedItem == "initiator") firstRole = "i";
+				else if (conditionEditor.firstRole.selectedItem == "responder") firstRole = "r";
+				else if (conditionEditor.firstRole.selectedItem == "other") firstRole = "o";
+				
+				//Need to check if it is a directed Catagory!
+				if(statusName == "cat: feeling bad about someone" || statusName == "cat: feeling good about someone"){
+					if (conditionEditor.secondRole.selectedItem == "initiator") secondRole = "i";
+					else if (conditionEditor.secondRole.selectedItem == "responder") secondRole = "r";
+					else if (conditionEditor.secondRole.selectedItem == "other") secondRole = "o";
+				}
+				
+				statusName = statusName.slice(5);
+				if(secondRole == "") { // It was an undirected Catagory -- so we don't need a responder
+					conditionEditor.locutionTranslation.text = "%cat(" + firstRole + "," + statusName + ")%";		
+				}
+				else {
+					conditionEditor.locutionTranslation.text = "%cat(" + firstRole + "," + statusName + "," + secondRole + ")%";	
+				}
+			}	
+		}
+		
+		public function onTriggerListDoubleClick(e:flash.events.MouseEvent):void
+		{
+			var index:int = triggerList.selectedIndex;
+			
+			this.trigger = cif.sfdb.triggers[index].clone() as Trigger;
+			
+			for each (var t:Trigger in cif.sfdb.triggers)
+			{
+				Debug.debug(this, "trigger id: "+t.id + " " + t.toString());
+			}
+			
+			Debug.debug(this, "onTriggerListDoubleClick() numtriggers: "+cif.sfdb.triggers.length);
+			Debug.debug(this, "onTriggerListDoubleClick() index: "+index);
+			
+			this.dispatchEvent(new Event("ruleChanged", true, true));
+		}
+		
+		public function triggerListDelete(e:flash.events.MouseEvent):void
+		{
+			var index:int = triggerList.selectedIndex;
+			cif.sfdb.triggers.splice(index, 1);
+		}
+		
+		public function onTriggerListUpdate(e:Event):void
+		{
+			this.triggerListDP = new ArrayCollection;
+			
+			for each (var t:Trigger in cif.sfdb.triggers)
+			{
+				triggerListDP.addItem(t.id + ": " + t.referenceAsNaturalLanguage);
+			}
+			
+			this.triggerList.dataProvider = this.triggerListDP;
+		}
+		
+		]]>
+	</fx:Script>
+</s:Group>

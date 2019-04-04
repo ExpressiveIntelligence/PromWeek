@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+				xmlns:s="library://ns.adobe.com/flex/spark"
+				xmlns:mx="library://ns.adobe.com/flex/mx"
+				xmlns:local="*"
+				xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+				creationComplete="onCreationComplete()"
+				initialize="initializeComponents()"
+				width="600"
+				height="600">
+	<!--xmlns:prom="PromWeek.*" xmlns:util="com.util.*"-->
+	<fx:Declarations>
+		
+	</fx:Declarations>
+	
+	<fx:Style source="main.css"/>
+
+	<!--<prom:SocialGameBigButton id="test" x="25" y="50" />-->
+	<!--<prom:TriplePanel_initiator id="bob"/>-->
+<!--	<prom:JuiceBar id="test" x="25" y="25"/>
+	<s:HGroup gap="0" x="10" y="0">
+		<s:Button label="Zero" click="setZero()" />
+		<s:Button label="+5" click="add5()"/>
+		<s:Button label="+10" click="add10()" />
+		<s:Button label="-5" click="sub5()" />
+		<s:Button label="SpendSome" click="SpendSome()"/>
+		<s:Button label="Hide" click="test.phantomJuiceHide()"/>
+		<mx:TextInput id="testtext" text="5" />
+	</s:HGroup>-->
+	<s:VGroup gap="20">
+		<s:HGroup gap="15">
+			<mx:Slider id="widSlid" value="100" minimum="25" maximum="400" liveDragging="true" />
+			<mx:Slider id="heiSlid" value="50" minimum="25" maximum="400" liveDragging="true"/>
+		</s:HGroup>
+		<!--<s:HGroup gap="15" paddingTop="25">
+			<s:VGroup>
+				<s:HGroup>
+					<mx:Text text="{poop.status}" color="#000000"/>
+					<mx:Text text="{poop.selected}" color="#000000"/>
+				</s:HGroup>
+				<prom:ToggleableContainerButton id="poop" width="100" height="25" x="25" y="50" label="TESTLABELOMFG"/>
+			</s:VGroup>
+			<s:VGroup>
+				<s:HGroup>
+					<mx:Text text="This one is not toggleable!"/>
+					<mx:Text text="{poop3.status}" color="#000000"/>
+					<mx:Text text="{poop3.selected}" color="#000000"/>
+				</s:HGroup>
+				<prom:ToggleableContainerButton id="poop3" width="100" height="25" x="25" y="50" toggleable="false" />
+			</s:VGroup>
+			
+			<s:VGroup>
+				<s:HGroup>
+					<mx:Text text="{poop2.status}" color="#000000"/>
+					<mx:Text text="{poop2.selected}" color="#000000"/>
+				</s:HGroup>
+				<prom:ToggleableContainerButton id="poop2" width="{widSlid.value}" height="{heiSlid.value}" x="25" y="150" label="TESTLABELOMFG"/>
+			</s:VGroup>
+		</s:HGroup>-->
+	</s:VGroup>
+	<s:HGroup y="450">
+		<s:Button click="leclick()" label="laughBig!" />
+		<s:Button click="leclick3()" label="excited_talk!" />
+		<s:Button click="leclick5()" label="Face to shifty_action" />
+		<s:Button click="leclick2()" label="Face to laughing!" />
+		<s:Button click="leclick4()" label="Face to idle!" />
+		<s:Button click="reset()" label="Reset"/>
+	</s:HGroup>
+	<s:SpriteVisualElement id="poopy" x="150" y="200" />
+	
+	
+	<fx:Script>
+	<![CDATA[
+
+	import flash.display.DisplayObject;
+	import flash.display.DisplayObjectContainer;
+	import flash.events.Event;
+	import flash.events.MouseEvent;
+	import flash.events.TimerEvent;
+	import flash.utils.Timer;
+	import mx.controls.Button;
+	import mx.controls.Image;  import com.util.SmoothImage;
+	import mx.flash.UIMovieClip;
+	import PromWeek.CollapsiblePanel;
+	import PromWeek.assets.ResourceLibrary;
+	import CiF.Debug;
+	
+	private var rl:ResourceLibrary = ResourceLibrary.getInstance()
+	
+	public var timer:Timer = new Timer(50);
+
+	public var skel:UIMovieClip
+
+	public function onCreationComplete():void {		
+		//poopy.addChild(nao2)
+		skel = rl.characterClips["monica"] as UIMovieClip
+		poopy.addChild(skel)
+		timer.addEventListener(TimerEvent.TIMER_COMPLETE, printShit)
+		timer.start()
+	}
+	
+	public function printShit(e:TimerEvent):void {
+		trace("State: " + skel.faceMC.currentState)
+		timer.start()
+	}
+	
+	public function leclick():void {
+		skel.gotoAndPlay("laughBig")
+	}
+	
+	public function leclick3():void {
+		skel.gotoAndPlay("excited_talk")
+	}
+	
+	public function leclick5():void {
+		skel.faceMC.playAnim("shifty_action")
+	}
+	
+	public function leclick2():void {
+		skel.faceMC.playAnim("laugh_large_action")
+	}
+	
+	public function leclick4():void {
+		skel.faceMC.playAnim("idle_state")
+	}
+	
+	public function reset():void {
+		poopy.removeChild(skel)
+		skel = rl.characterClips["monica"] as UIMovieClip
+		poopy.addChild(skel)
+	}
+	
+	public function updateSizes():void {
+		
+	}
+
+	/*
+	public function SpendSome():void {
+		test.phantomJuiceBar(parseInt(testtext.text))
+	}
+	public function add1():void {
+		test.add(1)
+	}
+	
+	public function sub1():void {
+		test.subtract(1)
+	}
+	
+	public function sub5():void {
+		test.subtract(5)
+	}
+	
+	public function add5():void {
+		test.add(5);
+	}
+	
+	public function add10():void {
+		test.add(10);
+	}
+	
+	public function setZero():void {
+		test.setCursor(0);
+	}*/
+	//
+	//public function addEntry():void {
+		//test.addGoalToContainer(1,"TEST ONE")
+	//}
+	//
+	//public function modifyEntry():void {
+		//test.updateGoalInContainer(1,2,"HELLO!")
+	//}
+	//
+	public function initializeComponents():void {
+		
+	}
+	]]>
+	</fx:Script>
+</s:Application>

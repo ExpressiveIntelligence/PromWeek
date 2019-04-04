@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Skin 
+    xmlns:fx="http://ns.adobe.com/mxml/2009" 
+    xmlns:s="library://ns.adobe.com/flex/spark"  
+	creationComplete="onCreationComplete()"
+	preinitialize="onPreinitialize()"
+	xmlns:util="com.util.*"
+    alpha.disabled="0.5"> 
+ 
+     <fx:Metadata> 
+        [HostComponent("PromWeek.NEW_timeLeftButton")] 
+    </fx:Metadata> 
+ 
+	<fx:Declarations>	
+	</fx:Declarations>
+	
+    <s:states> 
+        <s:State name="up" enterState="onEnterState(event)" /> 
+        <s:State name="over" enterState="onEnterState(event)"/> 
+        <s:State name="down" enterState="onEnterState(event)"/> 
+        <s:State name="disabled" enterState="onEnterState(event)"/> 
+    </s:states>  
+
+    <!--<util:SmoothImage id="upImage" visible="false" width="{hostComponent.width}" height="{hostComponent.height}" maintainAspectRatio="false"/>
+    <util:SmoothImage id="overImage" visible="false" width="{hostComponent.width}" height="{hostComponent.height}" maintainAspectRatio="false"/>
+    <util:SmoothImage id="downImage" visible="false" width="{hostComponent.width}" height="{hostComponent.height}" maintainAspectRatio="false"/>-->
+    
+    <s:Rect id="upRect" width="100%" height="100%">
+        <!--<s:stroke>
+            <s:SolidColorStroke color="#000000" alpha="1" 
+                    weight="3" pixelHinting="true"/>
+        </s:stroke>-->
+        <s:fill>
+            <s:SolidColor color="#45A9FF" alpha="1"/>
+        </s:fill>
+    </s:Rect>
+    
+	<s:Rect id="overRect" width="100%" height="100%">
+        <!--<s:stroke>
+            <s:SolidColorStroke color="#000000" alpha="1" 
+                    weight="3" pixelHinting="true"/>
+        </s:stroke>-->
+        <s:fill>
+            <s:SolidColor color="#3c94de" alpha="1"/>
+        </s:fill>
+    </s:Rect>
+	
+	<s:Rect id="downRect" width="100%" height="100%">
+        <!--<s:stroke>
+            <s:SolidColorStroke color="#000000" alpha="1" 
+                    weight="3" pixelHinting="true"/>
+        </s:stroke>-->
+        <s:fill>
+            <s:SolidColor color="#337ebd" alpha="1"/>
+        </s:fill>
+    </s:Rect>
+	<s:HGroup width="100%" height="100%">
+		<s:HGroup id="timeLeftGroup" width="33%" height="100%">
+			<s:HGroup width="50%" height="100%" verticalAlign="middle">
+				<s:Label id="numTurnsLeftText" color="#ffffff" width="100%" height="100%"
+					 text="10"
+					 fontSize="25" fontWeight="bold"
+					 verticalAlign="middle" textAlign="right" 
+					 styleName="timeLeftStyle" />
+					 <!--filters="{[new GlowFilter(0x000000,1.0,2.0,2.0,10)]}"/>-->
+			</s:HGroup>
+			<s:VGroup width="50%" height="100%" horizontalAlign="left" gap="0" paddingBottom="3">
+				<s:Label color="#ffffff" height="50%"
+						 text="turns"
+						 fontSize="11" fontWeight="bold"
+						 verticalAlign="bottom" textAlign="left" 
+						 styleName="timeLeftStyle"/>
+						 <!--filters="{[new GlowFilter(0x000000,1.0,2.0,2.0,10)]}"/>-->
+				<s:Label color="#ffffff" height="50%"
+						 text="left"
+						 fontSize="11" fontWeight="bold"
+						 verticalAlign="top" textAlign="left" 
+						 styleName="timeLeftStyle"/>
+						 <!--filters="{[new GlowFilter(0x000000,1.0,2.0,2.0,10)]}"/>-->
+			</s:VGroup>
+		</s:HGroup>
+		
+		<s:Label id="dayOfWeekText" color="#ffffff" width="66%" height="100%"
+					 text="Friday"
+					 verticalAlign="middle" textAlign="center"
+					 styleName="dayOfWeekStyle"/>
+					 <!--filters="{[new GlowFilter(0x000000,1.0,2.0,2.0,10)]}"/>-->
+	</s:HGroup>
+    <fx:Script> 
+        <![CDATA[
+			import CiF.LineOfDialogue;
+			import flash.events.Event;
+			import flash.filters.GlowFilter;
+			import PromWeek.assets.ResourceLibrary;
+		
+			public var rL:ResourceLibrary;
+		
+			private var currentCharName:String;
+			
+			private function onPreinitialize():void 
+			{
+				rL = ResourceLibrary.getInstance();
+			}
+			
+			public function onCreationComplete():void 
+			{
+				
+				
+				//this.upPath.source = rL.uiIcons["backUp"];
+				//this.downPath.source = rL.uiIcons["backDown"];
+				//this.overPath.source = rL.uiIcons["backOver"];
+				
+			}
+			
+			override protected function updateDisplayList(w:Number, h:Number):void {
+				super.updateDisplayList(w,h);
+				
+				
+				
+				this.numTurnsLeftText.text = hostComponent.turnsLeft.toString();
+				
+				
+				if (hostComponent.turnsLeft == -1 )
+				{
+					this.timeLeftGroup.visible = false;
+				}
+				else
+				{
+					this.timeLeftGroup.visible = true;
+					this.dayOfWeekText.text = hostComponent.dayOfWeek;
+				}
+			}
+			
+			
+			public function onEnterState(e:Event):void
+			{
+				if (this.hostComponent.isFreeplay) return;
+				
+				if (e.currentTarget.name == "up")
+				{
+					this.upRect.visible = true;
+					this.downRect.visible = false;
+					this.overRect.visible = false;
+				}
+				else if (e.currentTarget.name == "down")
+				{
+					this.upRect.visible = false;
+					this.downRect.visible = true;
+					this.overRect.visible = false;
+				}
+				else if (e.currentTarget.name == "over")
+				{
+					this.upRect.visible = false;
+					this.downRect.visible = false;
+					this.overRect.visible = true;
+				}
+			}
+           
+        ]]>
+    </fx:Script> 
+	
+	
+</s:Skin >

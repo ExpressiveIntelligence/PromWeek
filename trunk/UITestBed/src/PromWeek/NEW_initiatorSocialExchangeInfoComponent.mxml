@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 preinitialize="onPreinitialize()"
+		 width="100%" height="100%">
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>					
+		 </fx:Declarations>
+		 
+		 <s:VGroup width="100%" height="100%">
+			 <s:HGroup width="100%" height="25%" verticalAlign="middle">
+				 <s:Button id="backButton" width="30" height="30" click="backButtonClickHandler(event)" skinClass="PromWeek.skins.NEW_backButtonSkin" />
+				 <s:RichText id="socialExchangeInfoTitleText" styleName="bigThoughtBubbleTitleStyle" width="100%" height="100%" verticalAlign="middle" />
+			 </s:HGroup>
+			 <s:HGroup width="100%" height="20%" verticalAlign="middle" horizontalAlign="center">
+				 <prom:NEW_bigThoughtBubToggleButton id="desireToggleButton" label="Desire" width="40%" height="100%" click="toggleButtonClicked(event)"/>
+				 <prom:NEW_bigThoughtBubToggleButton id="motivesToggleButton" label="Motives" width="40%" height="100%" click="toggleButtonClicked(event)" />
+			 </s:HGroup>
+			 <s:Group width="100%" height="55%">
+				 <s:Group id="motivesGroup" width="100%" height="100%" visible="false">
+					<!--<s:Rect radiusX="10" radiusY="10" width="100%" height="100%">
+					  <s:stroke>
+						  <s:SolidColorStroke id="iconBackground" color="#dadada"/>
+					  </s:stroke>
+					</s:Rect>-->
+					<s:HGroup width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingTop="10" paddingBottom="10">
+						<!--<s:RichText id="motivesText" width="100%" height="100%"/>-->
+						<s:TextArea id="motivesText" width="100%" height="100%" fontSize="12" editable="false" selectable="false"  />
+					</s:HGroup>
+				 </s:Group>
+				 <s:VGroup id="desireGroup" width="100%" height="100%" visible="false" paddingLeft="30">
+					<s:HGroup width="100%" height="60%" horizontalAlign="center" verticalAlign="middle">
+						<s:HGroup width="35%" height="100%" verticalAlign="middle">
+							<s:Label text="Intent:" fontSize="11" width="100%" />
+						</s:HGroup>
+						<s:HGroup id="intentImageGroup" width="65%" height="100%" verticalAlign="middle"/> <!--width="50" height="50"-->
+					</s:HGroup>
+					<s:HGroup width="100%" height="40%" horizontalAlign="center" verticalAlign="middle">
+						<s:HGroup width="35%" height="100%" verticalAlign="middle">
+							<s:Label id="initIntensityLabel" text="Intensity:" fontSize="11" width="100%" />
+						</s:HGroup>
+						<s:RichText id="intensityLabel" fontSize="20" verticalAlign="middle" width="65%" height="100%"/>
+					</s:HGroup>
+				 </s:VGroup>
+			 </s:Group>
+		 </s:VGroup>
+
+	<fx:Script>
+		<![CDATA[
+		import CiF.CiFSingleton;
+		import CiF.Predicate;
+		import flash.events.MouseEvent;
+		import PromWeek.assets.ResourceLibrary;
+
+		private var rL:ResourceLibrary;
+		private var cif:CiFSingleton;
+		
+		public function onCreationComplete():void 
+		{
+			cif = CiFSingleton.getInstance();
+		}
+		
+		public function update(sgName:String):void 
+		{
+			var initiator:String = GameEngine.getInstance().hudGroup.initiatorSelectedComponent.currentInitiator;
+			var responder:String = GameEngine.getInstance().hudGroup.initiatorSelectedComponent.currentResponder;
+			
+			var somethingSelected:Boolean = false;
+			if (this.motivesToggleButton.selected || this.desireToggleButton.selected)
+			{
+				somethingSelected = true;
+			}
+			if (!somethingSelected)
+			{
+				this.desireToggleButton.selected = true;
+				desireToggleButton.invalidateSkinState();
+				this.desireGroup.visible = true;
+			}
+			
+			
+			this.socialExchangeInfoTitleText.text = sgName + " " + responder + "?";
+			this.motivesText.text = "* She is my friend\n* She was nice to me recently\n* I am shy\n* Three negative things happened to me recently\n* She is popular";
+						
+			this.intentImageGroup.removeAllElements();
+			//this.intentImageGroup.addElement(Main.getIntentImage(cif.socialGamesLib.getByName(sgName.toLowerCase()).intents[0].predicates[0], cif.cast.getCharByName(initiator.toLowerCase()), cif.cast.getCharByName(responder.toLowerCase())));
+			var pred:Predicate = new Predicate();
+			pred.setRelationshipPredicate("initiator","responder",0);
+			this.intentImageGroup.addElement(HudGroup.getIntentImage(pred, cif.cast.getCharByName(initiator.toLowerCase()), cif.cast.getCharByName(responder.toLowerCase())));
+			
+			this.intensityLabel.text = "Strong";
+		}
+		
+		public function backButtonClickHandler(e:MouseEvent = null):void
+		{
+			GameEngine.getInstance().hudGroup.initiatorSelectedComponent.initiatorThoughtBubble.socialExchangeSelectionGroup.visible = true;
+			GameEngine.getInstance().hudGroup.initiatorSelectedComponent.initiatorThoughtBubble.socialExchangeInfoGroup.visible = false;
+		}
+		
+		private function onPreinitialize():void 
+		{
+			rL = ResourceLibrary.getInstance();
+		}
+		
+
+		public function toggleButtonClicked(e:MouseEvent):void
+		{
+			if (e.target.id == "desireToggleButton")
+			{
+				if (this.desireToggleButton.selected)
+				{
+					return;
+				}
+				else
+				{
+					this.desireToggleButton.selected = true;
+					this.motivesToggleButton.selected = false;
+					
+					this.motivesGroup.visible = false;
+					this.desireGroup.visible = true;
+				}
+				
+			}
+			else if (e.target.id == "motivesToggleButton")
+			{
+				if (this.motivesToggleButton.selected)
+				{
+					return;
+				}
+				else
+				{
+					this.motivesToggleButton.selected = true;
+					this.desireToggleButton.selected = false;
+					
+					this.motivesGroup.visible = true;
+					this.desireGroup.visible = false;
+				}
+			}
+			
+			motivesToggleButton.invalidateSkinState();
+			desireToggleButton.invalidateSkinState();
+		}
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

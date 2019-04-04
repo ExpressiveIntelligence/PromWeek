@@ -1,0 +1,1092 @@
+<CiFLibraries>
+  <SocialGameLibrary>
+    <SocialGame name="It's Over!" italic="false">
+      <PatsyRule>
+        <Rule name="Anonymous Rule" id="-1"/>
+      </PatsyRule>
+      <Intents>
+        <Rule name="Make the initiator and responder stop dating (emotionless, possible amicable,  breakup)" id="0">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </Rule>
+      </Intents>
+      <Preconditions>
+        <Rule name="Must be dating first before break-up." id="0">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </Rule>
+      </Preconditions>
+      <InitiatorInfluenceRuleSet>
+        <InfluenceRule weight="-1" name="Impulsive people are less likely to have emotionless breakups" id="0">
+          <Predicate type="trait" trait="impulsive" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="-1" name="Loyal people are less likely to have emotionless breakups" id="1">
+          <Predicate type="trait" trait="loyal" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="-2" name="Mean people are less likely to have emotionless breakups" id="2">
+          <Predicate type="trait" trait="mean" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="2" name="Humble people are more likely to have reasonable breakups" id="3">
+          <Predicate type="trait" trait="humble" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="2" name="Pacifists don't want to cause trouble" id="4">
+          <Predicate type="trait" trait="pacifist" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="-2" name="Emotional people are less likely to have emotionless breakups" id="5">
+          <Predicate type="trait" trait="emotional" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="1" name="Swingers are more casual about breaking up" id="6">
+          <Predicate type="trait" trait="swinger" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="-1" name="Jealous people are more likely to have dramatic breakups" id="7">
+          <Predicate type="trait" trait="jealous" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="-2" name="Vengeful people have more brutal breakups" id="8">
+          <Predicate type="trait" trait="vengeful" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="2" name="Honest people are more likely to have smoother breakups" id="9">
+          <Predicate type="trait" trait="honest" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="3" name="People have chill breakups withpeople they're buddies with" id="10">
+          <Predicate type="network" networkType="buddy" first="initiator" second="responder" comparator="greaterthan" value="66" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="3" name="People who are dating And friends are more likely to have an emotionless breakup" id="11">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="friends" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="4" name="If i doesn't like r and r is angry at i, they realize it's time to break up" id="12">
+          <Predicate type="network" networkType="romance" first="initiator" second="responder" comparator="lessthan" value="40" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="status" status="angry at" first="responder" second="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="4" name="If i doesn't like r and r is annoyed i, they realize it's time to break up" id="13">
+          <Predicate type="network" networkType="romance" first="initiator" second="responder" comparator="lessthan" value="40" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="status" status="annoyed with" first="responder" second="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="4" name="If i doesn't like r and r is annoyed i, they realize it's time to break up" id="14">
+          <Predicate type="network" networkType="romance" first="initiator" second="responder" comparator="lessthan" value="40" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="status" status="cheater" first="responder" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+      </InitiatorInfluenceRuleSet>
+      <ResponderInfluenceRuleSet>
+        <InfluenceRule weight="-2" name="Loving people don't take emotionless breakups" id="0">
+          <Predicate type="trait" trait="loving" first="responder" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="-1" name="Dumb people don't understand when they're being broken up with" id="1">
+          <Predicate type="trait" trait="dumb" first="responder" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="2" name="Breaking up is no big deal for sex magnets" id="2">
+          <Predicate type="trait" trait="sex magnet" first="responder" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="-1" name="Arrogant people don't like being broken up with" id="4">
+          <Predicate type="trait" trait="arrogant" first="responder" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="-1" name="People who are afraid of commitment are more willing to break up" id="5">
+          <Predicate type="trait" trait="afraid of commitment" first="responder" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="2" name="Pacifists are willing to accept emotionless breakups" id="6">
+          <Predicate type="trait" trait="pacifist" first="responder" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="1" name="Weaklings don't question getting broken up with" id="7">
+          <Predicate type="trait" trait="weakling" first="responder" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="-2" name="Loyal people don't like it when people break up with them without care" id="8">
+          <Predicate type="trait" trait="loyal" first="responder" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="-1" name="Oblivious people don't realize they're getting broken up with" id="9">
+          <Predicate type="trait" trait="oblivious" first="responder" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="-3" name="Desperate people don't let other people go, especially without drama" id="10">
+          <Predicate type="status" status="desperate" first="responder" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="-3" name="People who feel out of place and still have interest don't want to let their boyfriend go" id="11">
+          <Predicate type="network" networkType="romance" first="responder" second="initiator" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="status" status="feels out of place" first="responder" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="-3" name="People who are lonely and still have interest don't want to let their boyfriend go" id="12">
+          <Predicate type="network" networkType="romance" first="responder" second="initiator" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="status" status="lonely" first="responder" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="3" name="If r is angry at i, r is more willing to accept a breakup" id="13">
+          <Predicate type="status" status="angry at" first="responder" second="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="-2" name="If r is arrogant and angry at i, r is unwilling to accept the breakup" id="14">
+          <Predicate type="status" status="angry at" first="responder" second="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="trait" trait="arrogant" first="responder" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="2" name="r is annoyed with i and thus is more willing to break up" id="15">
+          <Predicate type="status" status="annoyed with" first="responder" second="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="2" name="r is cheating and thus doesn't care much about the relationship" id="16">
+          <Predicate type="status" status="cheating on" first="responder" second="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="-3" name="Emotional people who are being cheated on Will Not Go Down Easy" id="17">
+          <Predicate type="status" status="cheated on by" first="responder" second="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="trait" trait="emotional" first="responder" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="3" name="If r doesn't like i then get out" id="18">
+          <Predicate type="network" networkType="romance" first="responder" second="initiator" comparator="lessthan" value="40" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="4" name="If r doesn't like i but has high buddy, then emotionless breakup is good" id="19">
+          <Predicate type="network" networkType="buddy" first="responder" second="initiator" comparator="greaterthan" value="66" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="network" networkType="romance" first="responder" second="initiator" comparator="lessthan" value="40" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="4" name="if r doesn't like i but they are friends, emotionless breakup is good" id="20">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="friends" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="network" networkType="romance" first="responder" second="initiator" comparator="lessthan" value="40" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="4" name="past misunderstandings make the responder more likely to accept" id="21">
+          <Predicate type="SFDB label" first="initiator" second="responder" label="misunderstood" negated="false" intent="false" isSFDB="true" window="3" numTimesUniquelyTrueFlag="true" numTimesUniquelyTrue="1" numTimesRoleSlot="both"/>
+        </InfluenceRule>
+      </ResponderInfluenceRuleSet>
+      <Effects>
+        <Effect id="0" accept="true" instantiationID="0">
+          <PerformanceRealization>%i% broke up with %r%</PerformanceRealization>
+          <ConditionRule/>
+          <ChangeRule>
+            <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+            <Predicate type="SFDB label" first="initiator" second="responder" label="lame" negated="false" intent="false" isSFDB="true" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          </ChangeRule>
+        </Effect>
+        <Effect id="1" accept="false" instantiationID="1">
+          <PerformanceRealization>%i% tried to break up with %r%, but %prons(r,he/she)% didn't believe %pron(i,him/her)%</PerformanceRealization>
+          <ConditionRule/>
+          <ChangeRule>
+            <Predicate type="SFDB label" first="initiator" second="responder" label="misunderstood" negated="false" intent="false" isSFDB="true" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+            <Predicate type="SFDB label" first="responder" second="initiator" label="embarrassing" negated="false" intent="false" isSFDB="true" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+            <Predicate type="network" networkType="romance" first="responder" second="initiator" comparator="+" value="10" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          </ChangeRule>
+        </Effect>
+        <Effect id="2" accept="true" instantiationID="2">
+          <PerformanceRealization>%i% broke it to %r% that %prons(i,he/she)% liked %o% more than %pron(r,him/her)%</PerformanceRealization>
+          <ConditionRule>
+            <Predicate type="network" networkType="romance" first="initiator" second="other" comparator="greaterthan" value="66" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+            <Predicate type="network" networkType="romance" first="initiator" second="responder" comparator="lessthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          </ConditionRule>
+          <ChangeRule>
+            <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+            <Predicate type="SFDB label" first="initiator" second="responder" label="embarrassing" negated="false" intent="false" isSFDB="true" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+            <Predicate type="status" status="angry at" first="responder" second="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          </ChangeRule>
+        </Effect>
+        <Effect id="3" accept="true" instantiationID="3">
+          <PerformanceRealization>%list(i,r,and)% were pretty casual about breaking up</PerformanceRealization>
+          <ConditionRule>
+            <Predicate type="trait" trait="cat: introverted" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+            <Predicate type="trait" trait="cat: introverted" first="responder" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          </ConditionRule>
+          <ChangeRule>
+            <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          </ChangeRule>
+        </Effect>
+        <Effect id="4" accept="true" instantiationID="4">
+          <PerformanceRealization>%r% had been getting really sick of %pron(r,his/her)% relationship with %i% but %pron(r,was/were)%n't sure how to end up</PerformanceRealization>
+          <ConditionRule>
+            <Predicate type="trait" trait="cat: nice" first="responder" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          </ConditionRule>
+          <ChangeRule>
+            <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+            <Predicate type="status" status="lonely" first="initiator" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          </ChangeRule>
+        </Effect>
+        <Effect id="5" accept="false" instantiationID="5">
+          <PerformanceRealization>%r% %pron(r,was/were)% too into %i% for %pron(i,him/her)% to break up with %pron(r,him/her)%</PerformanceRealization>
+          <ConditionRule>
+            <Predicate type="network" networkType="romance" first="responder" second="initiator" comparator="greaterthan" value="66" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          </ConditionRule>
+          <ChangeRule>
+            <Predicate type="network" networkType="romance" first="initiator" second="responder" comparator="-" value="10" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+            <Predicate type="status" status="embarrassed" first="initiator" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+            <Predicate type="SFDB label" first="initiator" second="responder" label="misunderstood" negated="false" intent="false" isSFDB="true" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          </ChangeRule>
+        </Effect>
+        <Effect id="6" accept="true" instantiationID="6">
+          <PerformanceRealization>%list(i,r,and)% decided it just wasn't working out</PerformanceRealization>
+          <ConditionRule>
+            <Predicate type="network" networkType="romance" first="initiator" second="responder" comparator="lessthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+            <Predicate type="network" networkType="romance" first="responder" second="initiator" comparator="lessthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          </ConditionRule>
+          <ChangeRule>
+            <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+            <Predicate type="network" networkType="buddy" first="initiator" second="responder" comparator="+" value="10" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+            <Predicate type="network" networkType="buddy" first="responder" second="initiator" comparator="+" value="10" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          </ChangeRule>
+        </Effect>
+        <Effect id="7" accept="false" instantiationID="7">
+          <PerformanceRealization>%i% asked %r% how %prons(r,he/she)% would hypothetically feel if %prons(i,he/she)% hypothetically broke up with %pron(r,him/her)%</PerformanceRealization>
+          <ConditionRule>
+            <Predicate type="network" networkType="romance" first="responder" second="initiator" comparator="greaterthan" value="66" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          </ConditionRule>
+          <ChangeRule>
+            <Predicate type="network" networkType="romance" first="responder" second="initiator" comparator="-" value="10" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+            <Predicate type="status" status="embarrassed" first="initiator" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+            <Predicate type="SFDB label" first="initiator" second="responder" label="misunderstood" negated="false" intent="false" isSFDB="true" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+            <Predicate type="SFDB label" first="initiator" second="responder" label="lame" negated="false" intent="false" isSFDB="true" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          </ChangeRule>
+        </Effect>
+        <Effect id="8" accept="true" instantiationID="8">
+          <PerformanceRealization>%i% %pron(i,was/were)% way more into %pron(i,his/her)% dog than %r%</PerformanceRealization>
+          <ConditionRule>
+            <Predicate type="network" networkType="cool" first="initiator" second="responder" comparator="lessthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+            <Predicate type="trait" trait="cat: jerk" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          </ConditionRule>
+          <ChangeRule>
+            <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+            <Predicate type="status" status="embarrassed" first="initiator" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+            <Predicate type="SFDB label" first="responder" second="initiator" label="embarrassing" negated="false" intent="false" isSFDB="true" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          </ChangeRule>
+        </Effect>
+        <Effect id="9" accept="true" instantiationID="9">
+          <PerformanceRealization>%i% let down %r% with a beautiful haiku</PerformanceRealization>
+          <ConditionRule>
+            <Predicate type="trait" trait="cat: sharp" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          </ConditionRule>
+          <ChangeRule>
+            <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+            <Predicate type="SFDB label" first="initiator" second="responder" label="lame" negated="false" intent="false" isSFDB="true" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          </ChangeRule>
+        </Effect>
+        <Effect id="13" accept="false" instantiationID="10">
+          <PerformanceRealization>%i% tried to break up with %r% in the form of haiku, but %rs% overinterpreted his meaning</PerformanceRealization>
+          <ConditionRule>
+            <Predicate type="trait" trait="cat: sharp" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          </ConditionRule>
+          <ChangeRule>
+            <Predicate type="network" networkType="cool" first="responder" second="initiator" comparator="+" value="10" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+            <Predicate type="status" status="embarrassed" first="initiator" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+            <Predicate type="SFDB label" first="initiator" second="responder" label="misunderstood" negated="false" intent="false" isSFDB="true" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          </ChangeRule>
+        </Effect>
+        <Effect id="14" accept="true" instantiationID="11">
+          <PerformanceRealization>%i% turned %pron(i,his/her)% life around, starting with %r%</PerformanceRealization>
+          <ConditionRule>
+            <Predicate type="trait" trait="deep" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          </ConditionRule>
+          <ChangeRule>
+            <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+            <Predicate type="status" status="embarrassed" first="responder" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          </ChangeRule>
+        </Effect>
+        <Effect id="15" accept="true" instantiationID="12">
+          <PerformanceRealization>%i% asked %r% to visualize %pron(r,him/her)%self out of %pron(i,his/her)% life</PerformanceRealization>
+          <ConditionRule>
+            <Predicate type="trait" trait="cat: extroverted" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          </ConditionRule>
+          <ChangeRule>
+            <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+            <Predicate type="SFDB label" first="initiator" second="responder" label="lame" negated="false" intent="false" isSFDB="true" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          </ChangeRule>
+        </Effect>
+      </Effects>
+      <Instantiations>
+        <Instantiation id="0" name="It'sOver! - Generic Accept">
+          <LineOfDialogue lineNumber="0" initiatorLine="Look, %r%. %random(It's over.,I don't want to see you any more.,You were a mistake. Sorry.,I just can't do this... us... any more.)%" responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="talking_short" initiatorFaceAnimation="null" initiatorFaceState="disinterested" responderBodyAnimation="null" responderFaceAnimation="null" responderFaceState="null" otherBodyAnimation="null" otherFaceAnimation="null" otherFaceState="null" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="1" initiatorLine="" responderLine="What...!? %random(Are you serious?,How could you do this to me?,I thought you loved me!,How could you be so cruel!,After all we've been through!?,My mother warned me about people like you!)%" otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="null" responderBodyAnimation="toss_hands_up" responderFaceAnimation="surprised_action" responderFaceState="sad" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="null" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="2" initiatorLine="I just think we need %random(to see other people,to spend some time apart,to rediscover who we are)%." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="talking_medium" initiatorFaceAnimation="null" initiatorFaceState="resentful" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="3" initiatorLine="" responderLine="I always knew you were a %random(freak,jerk,loser,lame-o,space-case)%." otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="accuse" responderFaceAnimation="flinch_action" responderFaceState="angry" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1">
+                <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+              </Rule>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <ToC1/>
+          <ToC2/>
+          <ToC3/>
+          <ConditionalRules/>
+        </Instantiation>
+        <Instantiation id="1" name="It'sOver! - Generic Reject">
+          <LineOfDialogue lineNumber="4" initiatorLine="Hey, %r%. So..." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="concerned" responderBodyAnimation="flirt_wave" responderFaceAnimation="null" responderFaceState="happy" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="0" initiatorLine="" responderLine="So what? %random(So happy to see me,So am I doing anything later?)%" otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="sexy_pose" responderFaceAnimation="null" responderFaceState="happy" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="1" initiatorLine="Uhhhh no. Actually, I was thinking %random(we shouldn't be together any more.,we should probably break this off.,we should probably break up.,I should probably stop seeing you.)%" responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="talking_medium" initiatorFaceAnimation="scorned_action" initiatorFaceState="resentful" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="concerned" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="null" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="2" initiatorLine="" responderLine="Oh, stop it. You know %random(,you can't live without me,I'm the only one for you)%." otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="talking_short" responderFaceAnimation="laugh_small_action" responderFaceState="happy" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1">
+                <Predicate type="network" networkType="romance" first="responder" second="initiator" comparator="+" value="10" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+              </Rule>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="3" initiatorLine="Ugh...&#xA;" responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="" initiatorFaceAnimation="" initiatorFaceState="disinterested" responderBodyAnimation="tickling" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <ToC1/>
+          <ToC2/>
+          <ToC3/>
+          <ConditionalRules/>
+        </Instantiation>
+        <Instantiation id="2" name="It'sOver! - Met someone new Accept">
+          <LineOfDialogue lineNumber="3" initiatorLine="Look, %r%. This is hard to say, but you only get one senior prom, and I don't want to spend it with the wrong person. " responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="talking_medium" initiatorFaceAnimation="null" initiatorFaceState="resentful" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="concerned" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="3" initiatorLine="The thing is... I kind of like %o% more than you. And I don't want our relationship to get in the way of pursuing that." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="agitated_talk" initiatorFaceAnimation="null" initiatorFaceState="concerned" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="anxious" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1">
+                <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+              </Rule>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="1" initiatorLine="" responderLine="Funny, I met someone new the other day too. " otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="concerned" responderBodyAnimation="talking_medium" responderFaceAnimation="null" responderFaceState="resentful" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="4" initiatorLine="" responderLine="%gender(i,His,Her)% name is %random(SCREW YOU,GO DIE,BURN IN HELL)%!!" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="punchReaction" initiatorFaceAnimation="lying_action" initiatorFaceState="sad" responderBodyAnimation="accuse" responderFaceAnimation="null" responderFaceState="angry" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1">
+                <Predicate type="status" status="angry at" first="responder" second="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+              </Rule>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="2" initiatorLine="I'll just go." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="casual_talking" initiatorFaceAnimation="" initiatorFaceState="sad" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <ToC1/>
+          <ToC2/>
+          <ToC3/>
+          <ConditionalRules/>
+        </Instantiation>
+        <Instantiation id="3" name="It'sOver! - Accept">
+          <LineOfDialogue lineNumber="0" initiatorLine="I've been thinking." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="casual_talking" initiatorFaceAnimation="null" initiatorFaceState="anxious" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="happy" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="1" initiatorLine="" responderLine="What about?" otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="disinterested" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="2" initiatorLine="Us... I really don't think this is working." responderLine="..." otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="shrug" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="3" initiatorLine="" responderLine="No, it's really not..." otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="shakehead" responderFaceAnimation="whatever_action" responderFaceState="resentful" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="4" initiatorLine="Call it off?" responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="casual_talking" initiatorFaceAnimation="null" initiatorFaceState="resentful" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="5" initiatorLine="" responderLine="Yeah..." otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="resentful" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1">
+                <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+              </Rule>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <ToC1/>
+          <ToC2/>
+          <ToC3/>
+          <ConditionalRules/>
+        </Instantiation>
+        <Instantiation id="4" name="It'sOver! - r doesn't actually care too much Accept">
+          <LineOfDialogue lineNumber="0" initiatorLine="" responderLine="Hey, %sweetie%! I'm so glad to see you!" otherLine="" primarySpeaker="responder" initiatorBodyAnimation="" initiatorFaceAnimation="null" initiatorFaceState="disinterested" responderBodyAnimation="toss_hands_up" responderFaceAnimation="null" responderFaceState="very happy" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="1" initiatorLine="Oh.. really..?" responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="" initiatorFaceAnimation="null" initiatorFaceState="concerned" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="2" initiatorLine="" responderLine="I'm *always* really happy to see you! You're my best %gender(i,boy,girl)%!" otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="hug" responderFaceAnimation="null" responderFaceState="happy" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="3" initiatorLine="What if I told you that I was, like, thinking we stop seeing each other..." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="casual_talking" initiatorFaceAnimation="null" initiatorFaceState="anxious" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="6" initiatorLine="" responderLine="Really? Oh, well that's actually a relief. I was getting kind of sick of you but didn't really know how to bring it up." otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="excited_talk" responderFaceAnimation="null" responderFaceState="disinterested" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1">
+                <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+              </Rule>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="5" initiatorLine="....oh." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="happy" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1">
+                <Predicate type="status" status="lonely" first="initiator" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+              </Rule>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <ToC1/>
+          <ToC2/>
+          <ToC3/>
+          <ConditionalRules/>
+        </Instantiation>
+        <Instantiation id="5" name="It'sOver! - i tries to break it off easy with r but feels bad since r likes i so much Reject">
+          <LineOfDialogue lineNumber="0" initiatorLine="" responderLine="Oh hey there %sweetie%!" otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="sad" responderBodyAnimation="toss_hands_up" responderFaceAnimation="null" responderFaceState="happy" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="1" initiatorLine="Hey..." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="shrug" initiatorFaceAnimation="null" initiatorFaceState="anxious" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="2" initiatorLine="So, I was just thinking about... us." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="casual_talking" initiatorFaceAnimation="null" initiatorFaceState="anxious" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="4" initiatorLine="" responderLine="Oh, I love thinking about us! I Love it! Like me... and you... together.  Us!  I don't know what I'd do if I didn't have us!  I really don't.  I'd have nothing.  Haha.  Yayyyy us!" otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="excited_talk" responderFaceAnimation="null" responderFaceState="very happy" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="6" initiatorLine="" responderLine="So what were *you* were thinking?" otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="lying_action" initiatorFaceState="" responderBodyAnimation="console" responderFaceAnimation="null" responderFaceState="very happy" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1">
+                <Predicate type="status" status="embarrassed" first="initiator" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+              </Rule>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="7" initiatorLine="...Nothing" responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="shakehead" initiatorFaceAnimation="" initiatorFaceState="resentful" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="concerned" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1">
+                <Predicate type="network" networkType="romance" first="initiator" second="responder" comparator="-" value="10" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+              </Rule>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <ToC1/>
+          <ToC2/>
+          <ToC3/>
+          <ConditionalRules/>
+        </Instantiation>
+        <Instantiation id="6" name="It'sOver! - i and r agree, it's over Accept">
+          <LineOfDialogue lineNumber="0" initiatorLine="So, what would you do if I told you that I didn't want to see you anymore?" responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="shrug" initiatorFaceAnimation="null" initiatorFaceState="anxious" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="happy" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="1" initiatorLine="" responderLine="I would agree and walk away." otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="anxious" responderBodyAnimation="shrug" responderFaceAnimation="null" responderFaceState="resentful" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="2" initiatorLine="So how about that?" responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="casual_talking" initiatorFaceAnimation="null" initiatorFaceState="happy" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="3" initiatorLine="" responderLine="Sounds good." otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="nod" responderFaceAnimation="null" responderFaceState="happy" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1">
+                <Predicate type="network" networkType="buddy" first="initiator" second="responder" comparator="+" value="10" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+                <Predicate type="network" networkType="buddy" first="responder" second="initiator" comparator="+" value="10" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+                <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+              </Rule>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <ToC1/>
+          <ToC2/>
+          <ToC3/>
+          <ConditionalRules/>
+        </Instantiation>
+        <Instantiation id="7" name="It'sOver! - i presents a hypothetical Accept">
+          <LineOfDialogue lineNumber="0" initiatorLine="So..." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="casual_talking" initiatorFaceAnimation="lying_action" initiatorFaceState="concerned" responderBodyAnimation="flirt_wave" responderFaceAnimation="null" responderFaceState="happy" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="1" initiatorLine="" responderLine="So...?" otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="shrug" responderFaceAnimation="null" responderFaceState="happy" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="2" initiatorLine="If I told you that I didn't really want to date you any more... what would y-" responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="talking_medium" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="anxious" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="7" initiatorLine="" responderLine="I'd cry. A lot." otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="anxious" responderBodyAnimation="nod" responderFaceAnimation="null" responderFaceState="angry" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="3" initiatorLine="..." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="idle" initiatorFaceAnimation="scorned_action" initiatorFaceState="" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="resentful" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="4" initiatorLine="" responderLine="So many tears." otherLine="" primarySpeaker="responder" initiatorBodyAnimation="punchReaction" initiatorFaceAnimation="" initiatorFaceState="resentful" responderBodyAnimation="accuse" responderFaceAnimation="null" responderFaceState="resentful" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="5" initiatorLine="Good thing it was hypothetical, then!  haha..." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="toss_hands_up" initiatorFaceAnimation="laugh_large_action" initiatorFaceState="happy" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1">
+                <Predicate type="status" status="embarrassed" first="initiator" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+              </Rule>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="6" initiatorLine="" responderLine="Yeah..." otherLine="" primarySpeaker="responder" initiatorBodyAnimation="" initiatorFaceAnimation="null" initiatorFaceState="sad" responderBodyAnimation="casual_talking" responderFaceAnimation="null" responderFaceState="very sad" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1">
+                <Predicate type="network" networkType="romance" first="responder" second="initiator" comparator="-" value="10" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+              </Rule>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <ToC1/>
+          <ToC2/>
+          <ToC3/>
+          <ConditionalRules/>
+        </Instantiation>
+        <Instantiation id="8" name="It'sOver! - i Really likes his dog Accept">
+          <LineOfDialogue lineNumber="6" initiatorLine="So the other day I was with my dog, right." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="talking_medium" initiatorFaceAnimation="null" initiatorFaceState="happy" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="disinterested" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="1" initiatorLine="And we were just sitting on my bed and hanging out, right." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="talking_medium" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="resentful" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="2" initiatorLine="And he made me so happy, I kind of realized something..." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="toss_hands_up" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="" responderFaceAnimation="null" responderFaceState="concerned" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="3" initiatorLine="I like him more than you." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="disinterested" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="4" initiatorLine="" responderLine="... Well, I suppose that's only-" otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="excited_talk" responderFaceAnimation="null" responderFaceState="anxious" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="5" initiatorLine="A lot more." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="nod" initiatorFaceAnimation="null" initiatorFaceState="resentful" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="resentful" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="6" initiatorLine="He actually provides useful services. And likes it when I pet him. And doesn't smell like a-" responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="agitated_talk" initiatorFaceAnimation="null" initiatorFaceState="happy" responderBodyAnimation="" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="7" initiatorLine="" responderLine="I get it." otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="disinterested" responderBodyAnimation="accuse" responderFaceAnimation="null" responderFaceState="angry" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1">
+                <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+                <Predicate type="status" status="embarrassed" first="initiator" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+              </Rule>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <ToC1/>
+          <ToC2/>
+          <ToC3/>
+          <ConditionalRules/>
+        </Instantiation>
+        <Instantiation id="9" name="It'sOver! - i writes a haiku Accept">
+          <LineOfDialogue lineNumber="6" initiatorLine="%greeting%, I wrote you a poem." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="concerned" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="happy" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="1" initiatorLine="Yeah, I hope you like haikus..." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="handing" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="2" initiatorLine="" responderLine="'A heart devoted&#xA;Settles unwanted besides&#xA;Disinterested love'" otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="adore" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="3" initiatorLine="" responderLine="..." otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="disinterested" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="concerned" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="4" initiatorLine="..." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="5" initiatorLine="" responderLine="Are you, uh, disinterested love?" otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="shrug" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="6" initiatorLine="Yeah..." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="nod" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="7" initiatorLine="" responderLine="I suppose that's that, then..." otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="casual_talking" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1">
+                <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+              </Rule>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <ToC1/>
+          <ToC2/>
+          <ToC3/>
+          <ConditionalRules/>
+        </Instantiation>
+        <Instantiation id="10" name="It'sOver! - i writes a haiku Reject">
+          <LineOfDialogue lineNumber="1" initiatorLine="How do you feel about haiku?" responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="happy" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="7" initiatorLine="" responderLine="I love haiku, %sweetie%!" otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="toss_hands_up" responderFaceAnimation="null" responderFaceState="happy" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="8" initiatorLine="Good, I wrote one for you!" responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="handing" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="2" initiatorLine="" responderLine="'A heart devoted&#xA;Settles unwanted besides&#xA;Disinterested love'" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="adore" responderFaceAnimation="null" responderFaceState="happy" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="3" initiatorLine="" responderLine="" otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="sad" responderBodyAnimation="idle" responderFaceAnimation="lying_action" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="4" initiatorLine="" responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="concerned" responderBodyAnimation="dance_lame" responderFaceAnimation="null" responderFaceState="disinterested" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="9" initiatorLine="" responderLine="" otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="concerned" responderBodyAnimation="gasp" responderFaceAnimation="surprised_action" responderFaceState="resentful" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="7" initiatorLine="" responderLine="I love it! I had no idea you were a poet!" otherLine="" primarySpeaker="responder" initiatorBodyAnimation="punchReaction" initiatorFaceAnimation="null" initiatorFaceState="anxious" responderBodyAnimation="agitated_talk" responderFaceAnimation="null" responderFaceState="very happy" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="6" initiatorLine="" responderLine="I really love how fully it captures the sorrow and agony of unrequited love, how one's love may triumph over the apathy of another!  How one may place oneself, immovable, in another's life!  Beautiful!" otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="disinterested" responderBodyAnimation="talking_long" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1">
+                <Predicate type="network" networkType="cool" first="responder" second="initiator" comparator="+" value="10" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+              </Rule>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="7" initiatorLine="Uh, I'm glad you understand it so thoroughly..." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="shakehead" initiatorFaceAnimation="whatever_action" initiatorFaceState="sad" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1">
+                <Predicate type="status" status="embarrassed" first="initiator" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+                <Predicate type="network" networkType="cool" first="initiator" second="responder" comparator="-" value="10" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+              </Rule>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <ToC1/>
+          <ToC2/>
+          <ToC3/>
+          <ConditionalRules/>
+        </Instantiation>
+        <Instantiation id="11" name="It'sOver! - i is starting over Accept">
+          <LineOfDialogue lineNumber="7" initiatorLine="Today, I'm turning my life around!" responderLine="Hmm?" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="toss_hands_up" initiatorFaceAnimation="null" initiatorFaceState="happy" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="concerned" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="1" initiatorLine="I don't like the direction I'm headed and I'm going to change it!" responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="casual_talking" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="2" initiatorLine="And I need to start with a clean slate, so I've made a list!" responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="talking_medium" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="3" initiatorLine="" responderLine="A list?" otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="nervous" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="4" initiatorLine="A list of the things I no longer need, the things that are keeping me down!" responderLine="Oh." otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="toss_hands_up" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="true" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="5" initiatorLine="And you know what's at the top of that list?" responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="casual_talking" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="6" initiatorLine="" responderLine="What?" otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="7" initiatorLine="You." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="punch" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="punchReaction" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1">
+                <Predicate type="status" status="embarrassed" first="responder" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+              </Rule>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="8" initiatorLine="" responderLine="I suppose I should have seen that coming..." otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="shrug" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1">
+                <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+              </Rule>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <ToC1/>
+          <ToC2/>
+          <ToC3/>
+          <ConditionalRules/>
+        </Instantiation>
+        <Instantiation id="12" name="It'sOver! - i wants you to imagine Accept">
+          <LineOfDialogue lineNumber="8" initiatorLine="I want you to imagine something." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="happy" responderBodyAnimation="nod" responderFaceAnimation="null" responderFaceState="happy" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="1" initiatorLine="Picture a room." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="casual_talking" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="disinterested" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="2" initiatorLine="You're in this room, the room is named %ip% life." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="talking_medium" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="idle" responderFaceAnimation="surprised_action" responderFaceState="disinterested" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="3" initiatorLine="The room is wonderful, unique and interesting.  You're very impressed with this room." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="sexy_pose" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="shakehead" responderFaceAnimation="scorned_action" responderFaceState="disinterested" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="5" initiatorLine="Now in this room, there is a door.  Walk through the door." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="casual_talking" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="nod" responderFaceAnimation="flinch_action" responderFaceState="disinterested" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="6" initiatorLine="Just walk out the door and keep walking.  Go far, far away.  Far away.  And don't turn around." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="nervous" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="resentful" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1">
+                <Predicate type="status" status="embarrassed" first="responder" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+              </Rule>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="7" initiatorLine="" responderLine="I get it." otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="" responderFaceAnimation="null" responderFaceState="angry" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" otherApproach="false" otherExit="false" isOtherChorus="false">
+            <PartialChange>
+              <Rule name="Anonymous Rule" id="-1">
+                <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+              </Rule>
+            </PartialChange>
+            <ChorusRule>
+              <Rule name="Anonymous Rule" id="-1"/>
+            </ChorusRule>
+          </LineOfDialogue>
+          <ToC1/>
+          <ToC2/>
+          <ToC3/>
+          <ConditionalRules/>
+        </Instantiation>
+      </Instantiations>
+    </SocialGame>
+  </SocialGameLibrary>
+  <Microtheories/>
+</CiFLibraries>

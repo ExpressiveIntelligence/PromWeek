@@ -1,0 +1,474 @@
+<SocialGameLibrary>
+
+	<SocialGame name="Kick Me">
+		<Role name="White" />
+		<Role name="Black" />
+		
+		<Event id="0" start="true">
+			<Description>W asks B not to kick.</Description>
+			<ActiveRole name="White" />
+			<ActiveRole name="Black" />
+			<DecisionMaker name="Black" />
+		</Event>
+		
+		<Event id="1" end="true" antithetical="true">
+			<Description>(End 3) B informs W that it won't kick.</Description>
+			<ActiveRole name="White">
+				<SocialChange type="Status" amount="1" />
+				<SocialChange type="Acceptance" amount="1" />
+			</ActiveRole>
+			<ActiveRole name="Black"/>
+		</Event>
+
+		<Event id="2">
+			<Description>B kicks W.</Description>
+			<ActiveRole name="White" />
+			<ActiveRole name="Black" />
+		</Event>
+		
+		<Event id="3">
+			<Description>W asks why B kicked.</Description>
+			<ActiveRole name="White" />
+			<ActiveRole name="Black" />
+			<DecisionMaker name="Black" />
+		</Event>
+		
+		<Event id="4" end="true" antithetical="true">
+			<Description>(End 2) B apologizes.</Description>
+			<ActiveRole name="White">
+				<SocialChange type="Power" amount="-1"/>
+				<SocialChange type="Status" amount="1"/>
+			</ActiveRole> 
+			<ActiveRole name="Black">
+				<SocialChange type="Vengeance" amount="-1"/>
+			</ActiveRole>
+			<DecisionMaker name="Black" />
+		</Event>
+		
+		<Event id="5" end="true" antithetical="false">
+			<Description>(End 1) B tells W that it was asking for it.</Description>
+			<ActiveRole name="White">
+				<SocialChange type="Power" amount="-1" />
+				<SocialChange type="Status" amount="-1" />
+				<SocialChange type="Acceptance" amount="0"/>
+			</ActiveRole>
+
+			<ActiveRole name="Black">
+				<SocialChange type="Power" amount="1"/>
+				<SocialChange type="Status" amount="1"/>
+				<SocialChange type="Vengeance" amount="-1"/>
+			</ActiveRole>
+				
+		</Event>
+		
+		<Link start="0" end="1"/>
+		<Link start="0" end="2"/>
+		<Link start="2" end="3"/>
+		<Link start="3" end="4"/>
+		<Link start="3" end="5"/>
+		
+	</SocialGame>
+
+
+	<SocialGame name="I've got you now you son of a bitch!">
+		<Role name="White" />
+		<Role name="Black" />
+		
+		<Event id="0" start="true">
+			<Description>W contract with B</Description>
+			<ActiveRole name="White" />
+			<ActiveRole name="Black" />
+			<DecisionMaker name="Black" />
+		</Event>
+		
+		<Event id="1" end="true" antithetical="true">
+			<Description>(End 4) B keeps contract.</Description>
+			<ActiveRole name="White">
+				<SocialChange type="Status" amount="1" />
+			</ActiveRole>
+			<ActiveRole name="Black">
+				<SocialChange type="Acceptance" amount="1" />
+			</ActiveRole>
+		</Event>
+
+		<Event id="2">
+			<Description>B breaks contract.</Description>
+			<ActiveRole name="White" />
+			<ActiveRole name="Black" />
+			<DecisionMaker name="White" />
+		</Event>
+		
+		<Event id="3" end="true" antithetical="true">
+			<Description>(End 3) W forgives B.</Description>
+			<ActiveRole name="White">
+				<SocialChange type="Acceptance" amount="1" />
+			</ActiveRole>
+			<ActiveRole name="Black">
+				<SocialChange type="Power" amount="-1" />
+				<SocialChange type="Vengeance" amount="1" />
+			</ActiveRole>
+		</Event>
+		
+		<Event id="4">
+			<Description>W insists B sticks to contract.</Description>
+			<ActiveRole name="White" />
+			<ActiveRole name="Black"/>
+			<DecisionMaker name="Black" />
+		</Event>
+		
+		<Event id="5" end="true" antithetical="true">
+			<Description>(End 2) B capitulates with good grace.</Description>
+			<ActiveRole name="White">
+				<SocialChange type="Power" amount="1" />
+				<SocialChange type="Vengeance" amount="1" />
+			</ActiveRole>
+
+			<ActiveRole name="Black">
+				<SocialChange type="Power" amount="-1"/>
+			</ActiveRole>
+				
+		</Event>
+		
+		
+		<Event id="6" end="true" antithetical="false">
+			<Description>(End 1) B refuses.</Description>
+			<ActiveRole name="White">
+				<SocialChange type="Status" amount="-1" />
+				<SocialChange type="Vengeance" amount="-1" />
+			</ActiveRole>
+
+			<ActiveRole name="Black">
+				<SocialChange type="Status" amount="-1" />
+				<SocialChange type="Vengeance" amount="-1" />
+			</ActiveRole>	
+		</Event>
+		
+		<Link start="0" end="1"/>
+		<Link start="0" end="2"/>
+		<Link start="2" end="3"/>
+		<Link start="2" end="4"/>
+		<Link start="4" end="5"/>
+		<Link start="4" end="6"/>
+		
+	</SocialGame>
+
+	<SocialGame name="Look what you made me do!">
+		<Role name="White" />
+		<Role name="Black" />
+		
+		<Event id="0" start="true">
+			<Description>W engages in Activity</Description>
+			<ActiveRole name="White" />
+			<ActiveRole name="Black" />
+		</Event>
+		
+		<Event id="1">
+			<Description>B interrupts W on accident.</Description>
+			<ActiveRole name="White"/>
+			<ActiveRole name="Black"/>
+		</Event>
+
+		<Event id="2">
+			<Description>W fails at activity.</Description>
+			<ActiveRole name="White" />
+			<ActiveRole name="Black" />
+			<DecisionMaker name="White" />
+		</Event>
+		
+		<Event id="3" end="true" antithetical="true">
+			<Description>(End 3) W forgives B.</Description>
+			<ActiveRole name="White">
+				<SocialChange type="Acceptance" amount="-1" />
+				<SocialChange type="Power" amount="-1" />
+			</ActiveRole>
+			<ActiveRole name="Black"/>
+		</Event>
+		
+		<Event id="4">
+			<Description>W blames B for failure.</Description>
+			<ActiveRole name="White" />
+			<ActiveRole name="Black"/>
+			<DecisionMaker name="Black" />
+		</Event>
+		
+		<Event id="5" end="true" antithetical="true">
+			<Description>(End 2) B apologizes to W.</Description>
+			<ActiveRole name="White">
+				<SocialChange type="Vengeance" amount="1"/>
+			</ActiveRole>
+			<ActiveRole name="Black">
+				<SocialChange type="Acceptance" amount="-1"/>
+			</ActiveRole>
+		</Event>
+		
+		<Event id="6" end="true" antithetical="false">
+			<Description>(End 1) B insists on innocence.</Description>
+			<ActiveRole name="White">
+				<SocialChange type="Power" amount="-1"/>
+				<SocialChange type="Acceptance" amount="-1"/>
+			</ActiveRole>
+			<ActiveRole name="Black"/>
+			<DecisionMaker name="Black" />
+		</Event>
+		
+		<Link start="0" end="1"/>
+		<Link start="1" end="2"/>
+		<Link start="2" end="3"/>
+		<Link start="2" end="4"/>
+		<Link start="4" end="5"/>
+		<Link start="4" end="6"/>
+		
+	</SocialGame>
+	
+	
+	<SocialGame name="Sweetheart">
+		<Role name="White" />
+		<Role name="Black" />
+		
+		<Event id="0" start="true">
+			<Description>W makes derogatory comment about B.</Description>
+			<ActiveRole name="White" />
+			<ActiveRole name="Black" />
+			<DecisionMaker name="Black" />
+		</Event>
+
+		
+		<Event id="1" end="true" antithetical="false">
+			<Description>(End 2) B confronts W about remark.</Description>
+			<ActiveRole name="White">
+				<SocialChange type="Power" amount="-1"/>
+				<SocialChange type="Status" amount="-1"/>
+			</ActiveRole>
+			<ActiveRole name="Black">
+				<SocialChange type="Power" amount="1"/>
+				<SocialChange type="Vengeance" amount="1"/>
+			</ActiveRole>
+		</Event>
+		
+		<Event id="2" end="true" antithetical="true">
+			<Description>(End 1) B confirms remark (or passively does).</Description>
+			<ActiveRole name="White">
+				<SocialChange type="Acceptance" amount="1"/>
+			</ActiveRole>
+			<ActiveRole name="Black">
+				<SocialChange type="Power" amount="-1"/>
+				<SocialChange type="Status" amount="-1"/>
+				<SocialChange type="Acceptance" amount="-1"/>
+			</ActiveRole>
+		</Event>
+		
+		<Link start="0" end="1"/>
+		<Link start="0" end="2"/>
+	
+	</SocialGame>
+	
+	
+	<SocialGame name="Wooden Leg">
+		<Role name="White" />
+		<Role name="Black" />
+
+		<Event id="0" start="true">
+			<Description>W tells B about F (attribute)</Description>
+			<ActiveRole name="White" />
+			<ActiveRole name="Black" />
+			<DecisionMaker name="Black" />
+		</Event>
+
+		<Event id="1">
+			<Description>B gives W sympathy</Description>
+			<ActiveRole name="White" />
+			<ActiveRole name="Black" />
+			<DecisionMaker name="White" />
+		</Event>
+
+		<Event id="2" end="true" antithetical="true">
+			<Description>(End 3) B tells W he/she doesn't care</Description>
+			<ActiveRole name="White">
+				<SocialChange type="Power" amount="-1" />
+				<SocialChange type="Status" amount="-1" />
+				<SocialChange type="Acceptance" amount="-1" />
+			</ActiveRole>
+			<ActiveRole name="Black">
+				<SocialChange type="Power" amount="1" />
+				<SocialChange type="Vengeance" amount="-1" />
+			</ActiveRole>
+		</Event>
+
+		<Event id="3" end="true" antithetical="false">
+			<Description>(End 1) W thanks B</Description>
+			<ActiveRole name="White">
+				<SocialChange type="Status" amount="-1" />
+				<SocialChange type="Acceptance" amount="-1" />
+			</ActiveRole>
+			<ActiveRole name="Black">
+				<SocialChange type="Acceptance" amount="1" />
+			</ActiveRole>
+		</Event>
+
+		<Event id="4" end="true" antithetical="true">
+			<Description>(End 2) W tells B that he/she needs no sympathy</Description>
+			<ActiveRole name="White">
+				<SocialChange type="Power" amount="1" />
+				<SocialChange type="Status" amount="1" />
+				<SocialChange type="Acceptance" amount="1" />
+			</ActiveRole>
+			<ActiveRole name="Black" />
+		</Event>
+
+		<Link start="0" end="1"/>
+		<Link start="0" end="2"/>
+		<Link start="1" end="3"/>
+		<Link start="1" end="4"/>
+	</SocialGame>
+
+	<SocialGame name="Corner">
+		<Role name="White" />
+		<Role name="Black" />
+
+		<Event id="0" start="true">
+			<Description>W suggests that W and B do A</Description>
+			<ActiveRole name="White" />
+			<ActiveRole name="Black" />
+			<DecisionMaker name="Black" />
+		</Event>
+
+		<Event id="1">
+			<Description>B agrees to do A</Description>
+			<ActiveRole name="White" />
+			<ActiveRole name="Black" />
+		</Event>
+
+		<Event id="2" end="true" antithetical="true">
+			<Description>(End 4) B refuses to do A</Description>
+			<ActiveRole name="White">
+				<SocialChange type="Acceptance" amount="-1" />
+			</ActiveRole>
+			<ActiveRole name="Black" />
+		</Event>
+
+		<Event id="3">
+			<Description>B does A</Description>
+			<ActiveRole name="White" />
+			<ActiveRole name="Black" />
+			<DecisionMaker name="White" />
+		</Event>
+
+		<Event id="4">
+			<Description>W refuses to do A</Description>
+			<ActiveRole name="White" />
+			<ActiveRole name="Black" />
+			<DecisionMaker name="Black" />
+		</Event>
+
+		<Event id="5" end="true" antithetical="true">
+			<Description>(End 3) W does A</Description>
+			<ActiveRole name="White">
+				<SocialChange type="Status" amount="1" />
+				<SocialChange type="Acceptance" amount="1" />
+			</ActiveRole>
+			<ActiveRole name="Black">
+				<SocialChange type="Acceptance" amount="1" />
+			</ActiveRole>
+		</Event>
+
+		<Event id="6" end="true" antithetical="false">
+			<Description>(End 1) B accuses W of cornering him/her</Description>
+			<ActiveRole name="White">
+				<SocialChange type="Power" amount="1" />
+				<SocialChange type="Vengeance" amount="1" />
+			</ActiveRole>
+			<ActiveRole name="Black">
+				<SocialChange type="Power" amount="-1" />
+				<SocialChange type="Status" amount="-1" />
+				<SocialChange type="Vengeance" amount="-1" />
+				<SocialChange type="Acceptance" amount="-1" />
+			</ActiveRole>
+		</Event>
+
+		<Event id="7" end="true" antithetical="true">
+			<Description>(End 2) B is fine with doing A by him or herself</Description>
+			<ActiveRole name="White">
+				<SocialChange type="Status" amount="1" />
+				<SocialChange type="Vengeance" amount="1" />
+			</ActiveRole>
+			<ActiveRole name="Black">
+				<SocialChange type="Status" amount="-1" />
+			</ActiveRole>
+		</Event>
+
+		<Link start="0" end="1" />
+		<Link start="0" end="2" />
+		<Link start="1" end="3" />
+		<Link start="3" end="4" />
+		<Link start="3" end="5" />
+		<Link start="4" end="6" />
+		<Link start="4" end="7" />
+	</SocialGame>
+<!--	<SocialGame name="nonsensical-testGame">
+		<Role name="role1"/>
+		<Role name="role2"/>
+		<DramaturgicalPrecondition type="relation" firstRole="role1" relation="friend"  secondRole="role2" />
+		<DramatrugicalPrecondition type="fact" role="role2" fact="stigma" />
+
+		<Event id="0" start="true">
+			<ActiveRole name="role1">
+				<SocialChange type="4" amount="0.25" />	
+			</ActiveRole>
+			<ActiveRole name="role2" />
+		</Event>
+
+		<Event id="1">
+			<ActiveRole name="role1">
+				<SocialChange type="4" amount="-0.25" />
+			</ActiveRole>
+			<ActiveRole name="role2" />			
+		</Event>		
+		
+		<Event id="2">
+			<ActiveRole name="role1" />
+			<ActiveRole name="role2">
+				<SocialChange type="4" amount="0.05" />
+			</ActiveRole>
+		</Event>
+
+		<Link start="0" end="1" />
+		<Link start="1" end="2" />
+		<Link start="0" end="2" />
+	</SocialGame>
+
+	<SocialGame name="nonsensical-testgame2">
+		<Role name="role1"/>
+		<Role name="role2"/>
+		<DramaturgicalPrecondition type="relation" firstRole="role1" relation="friend"  secondRole="role2" />
+		<DramatrugicalPrecondition type="fact" role="role2" fact="stigma" />
+
+		<Event id="0" start="true">
+			<ActiveRole name="role1">
+				<SocialChange type="5" amount="0.25" />	
+			</ActiveRole>
+			<ActiveRole name="role2" />
+		</Event>
+
+		<Event id="1">
+			<ActiveRole name="role1">
+				<SocialChange type="5" amount="-0.25" />
+			</ActiveRole>
+			<ActiveRole name="role2" />			
+		</Event>		
+		
+		<Event id="2">
+			<ActiveRole name="role1" />
+			<ActiveRole name="role2">
+				<SocialChange type="4" amount="0.05" />
+			</ActiveRole>
+		</Event>
+
+		<Link start="0" end="1" />
+		<Link start="1" end="2" />
+		<Link start="0" end="2" />
+	</SocialGame>
+	
+	
+-->
+
+</SocialGameLibrary>

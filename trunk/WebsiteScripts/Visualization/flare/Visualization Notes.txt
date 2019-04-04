@@ -1,0 +1,60 @@
+Visualization tool README!
+
+Hello! And welcome to the super awesome PromWeekVisualizationTool!
+
+To use this tool: 
+1) Run it
+2) Click "Select File" 
+	Note: Your file must be formatted as such:
+			> ID
+			initiator,responder,social game,effectid
+			initiator,responder,social game,effectid
+			...
+			...
+			> ID
+			initiator,responder,social game,effectid
+			...
+	The line "> ID" is a greater than symbol followed by their facebook id as a number
+	each section is a level, and each individual social game is on it's own line.
+3) Click "Load File"
+4) Enjoy your trace! Please report any errors to the appropriate codemonkey
+
++++++++++++++++++++++++++++
+---Current Functionality---
++++++++++++++++++++++++++++
+*Move/Pan the level trace
+*View a list of Facebook ids
+*Load a new trace without having to close/open the tool
+*No error checking! So don't go around messing things up
+
+
+
+
+
+-+====+++++++++++++++====+-
+---===Developers Only===---
+-+====+++++++++++++++====+-
+If you aren't a developer, you don't have to read this. But if you are, you're
+awesome! Woot Tiger Team! (If you aren't a developer and you're reading this,
+you are still awesome :D)
+
+
+Things you should know for future development
+
+*PromWeekVisTree.drawTree() is where the tree is drawn, and it returns a 
+	Visualization object which should be used like so-
+		someVisualElement.addChild(pwvt.drawTree())
+	To use it in an MXML component- mx:SpriteVisualElement is a good start, 
+	since it can have children
+
+*Inside of drawTree, there is a group of Objects with variable names nodes, 
+	childs, and edges. These are sort of "styles" for the tree. These are
+	key to doing fancy things! I made a comment called "IMPORTANT THING TO KNOW".
+	Hopefully no one has deleted it. If they have, look in PromWeekVisTree.drawTree()
+	for lines that say "setProperties" or "setProperty". They show how to do fancy
+	things that are required for advanced functionality.
+	
+*You're awesome :D
+
+*Ben's Machine Learning project works brilliantly for generating games. Ask Ben or 
+	Ryan how to use it.

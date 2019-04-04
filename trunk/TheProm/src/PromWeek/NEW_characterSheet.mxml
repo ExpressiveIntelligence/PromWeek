@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 preinitialize="onPreinitialize()"
+		 styleName="classicPromWeek"
+		 width="100%" height="100%">
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>					
+			 <fx:Number id="contentBGColor">0xfff99a</fx:Number>
+		 </fx:Declarations>
+		 
+		<s:Rect width="100%" height="100%" radiusX="10" radiusY="10">
+			<s:stroke>
+				<s:SolidColorStroke color="#000000" alpha="1" weight="3"/>
+			</s:stroke>
+			<s:fill>
+				<!--<s:SolidColor color="#45A9FF" alpha="0.9"/>-->
+				<!--<s:LinearGradient rotation="125">-->
+				<s:LinearGradient rotation="300">
+					<s:entries>
+						<!--<s:GradientEntry color="#EEEEEE" alpha="1.0" ratio="0.0" />-->
+						<s:GradientEntry color="{getStyle('contentAreaAltColor')}" alpha="0.9" />
+						<s:GradientEntry color="{getStyle('backgroundColor')}" alpha="0.9"  />
+					</s:entries>
+				</s:LinearGradient>
+			</s:fill>
+		</s:Rect>
+		
+		<s:HGroup width="100%" height="100%" gap="20" paddingLeft="20" paddingRight="20" paddingTop="20" paddingBottom="20">
+			<!-- Left side -->
+			<s:VGroup width="25%" height="100%">
+				<s:VGroup width="100%" height="100%"> 
+					<!-- TRAITS -->
+					<s:RichText text="Traits" width="100%" height="10%" styleName="characterSheetTitleTextStyle" verticalAlign="bottom" />
+					<s:Group width="100%" height="20%">
+						<s:Rect width="100%" height="100%" radiusX="3" radiusY="3">
+							<!--<s:stroke>
+								<s:SolidColorStroke color="#000000" alpha="1" weight="3"/>
+							</s:stroke>-->
+							<s:fill>
+								<s:SolidColor color="{this.contentBGColor}" alpha="1"/>
+							</s:fill>
+						</s:Rect>
+						<s:HGroup width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingTop="10" paddingBottom="10">
+							<s:RichText id="traitsText" width="100%" height="100%" textAlign="center" fontSize="15" text="the trait 1\ndsfds\nsdfdsf\n" styleName="basicFontStyle" />
+						</s:HGroup>
+					</s:Group>
+					<!-- MOODS -->
+					<s:RichText text="Moods" width="100%" height="10%" styleName="characterSheetTitleTextStyle" verticalAlign="bottom"/>
+					<s:Group width="100%" height="55">
+						<s:Rect id="statusRect" width="100%" height="100%" radiusX="3" radiusY="3">
+							<!--<s:stroke>
+								<s:SolidColorStroke color="#000000" alpha="1" weight="3"/>
+							</s:stroke>-->
+							<s:fill>
+								<s:SolidColor color="{this.contentBGColor}" alpha="1"/>
+							</s:fill>
+						</s:Rect>
+						<s:VGroup id="statusGroup" width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingTop="10" paddingBottom="10"/>
+					</s:Group>
+				</s:VGroup>
+			</s:VGroup>
+			<!-- Right side -->
+			<s:VGroup width="75%" height="100%">
+				<!-- BIO -->
+				<s:RichText text="Bio" width="100%" height="10%" styleName="characterSheetTitleTextStyle" verticalAlign="bottom"/>
+				<s:Group width="100%" height="30%">
+					<s:Rect width="100%" height="100%" radiusX="3" radiusY="3">
+						<!--<s:stroke>
+							<s:SolidColorStroke color="#000000" alpha="1" weight="3"/>
+						</s:stroke>-->
+						<s:fill>
+							<s:SolidColor color="{this.contentBGColor}" alpha="1"/>
+						</s:fill>
+					</s:Rect>
+					<s:HGroup width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingTop="10" paddingBottom="10" verticalAlign="middle">
+						<s:RichText id="characterBio" width="100%" height="100%" fontSize="15" styleName="basicFontStyle" verticalAlign="middle" />
+					</s:HGroup>
+				</s:Group>
+				<!-- RELATIONSHIPS -->
+				<s:HGroup width="100%" height="60%" paddingLeft="10" paddingRight="10" paddingTop="10" paddingBottom="10">
+					<s:VGroup width="33%" height="100%">
+						<s:Group width="100%" height="15%" >
+							<util:SmoothImage id="friendIcon" height="100%"/>
+							<s:HGroup width="100%" height="100%" horizontalAlign="right" verticalAlign="middle" paddingRight="10">
+								<s:RichText text="Friends" fontSize="20" styleName="characterSheetTitleTextStyle"/>
+								<s:RichText id="numFriendsText" fontSize="18" styleName="basicFontStyle" />
+							</s:HGroup>
+						</s:Group>
+						<s:List id="friendList" contentBackgroundAlpha="0" width="100%" height="85%" itemRenderer="PromWeek.NEW_relationshipListItemRenderer"/>
+					</s:VGroup>
+					<s:VGroup width="33%" height="100%">
+						<s:Group width="100%" height="15%">
+							<util:SmoothImage id="datingIcon" height="100%"/>
+							<s:HGroup width="100%" height="100%" horizontalAlign="right" verticalAlign="middle" paddingRight="20">
+								<s:RichText text="Dates"  fontSize="20" styleName="characterSheetTitleTextStyle"/>
+								<s:RichText id="numDatingText" fontSize="18" styleName="basicFontStyle"/>
+							</s:HGroup>
+						</s:Group>
+						<s:List id="datingList" contentBackgroundAlpha="0" width="100%" height="85%" itemRenderer="PromWeek.NEW_relationshipListItemRenderer"/>
+					</s:VGroup>
+					<s:VGroup width="33%" height="100%">
+						<s:Group width="100%" height="15%">
+							<util:SmoothImage id="enemiesIcon" height="100%" />
+							<s:HGroup width="100%" height="100%" horizontalAlign="right" verticalAlign="middle">
+								<s:RichText text="Enemies"  fontSize="20" styleName="characterSheetTitleTextStyle" />
+								<s:RichText id="numEnemiesText" fontSize="18" styleName="basicFontStyle"/>
+							</s:HGroup>
+						</s:Group>
+						<s:List id="enemiesList" contentBackgroundAlpha="0" width="100%" height="85%" itemRenderer="PromWeek.NEW_relationshipListItemRenderer"/>
+					</s:VGroup>
+				</s:HGroup>
+			</s:VGroup>
+		</s:HGroup>
+		<s:Button id="closeButton" width="25" height="25" click="closeButtonClicked(event)" toolTip="Close Window" top="10" right="15" skinClass="PromWeek.skins.NEW_closeButtonSkin" />
+		
+	<fx:Script>
+		<![CDATA[
+		import CiF.Character;
+		import CiF.CiFSingleton;
+		import CiF.LineOfDialogue;
+		import CiF.RelationshipNetwork;
+		import CiF.Status;
+		import CiF.Trait;
+		import flash.events.MouseEvent;
+		import mx.collections.ArrayCollection;
+		import mx.core.ScrollPolicy;
+		import PromWeek.assets.ResourceLibrary;
+		import PromWeek.skins.NEW_listScrollSkin;
+		import spark.components.HGroup;
+
+		private var rL:ResourceLibrary;
+		private var cif:CiFSingleton;
+		
+		public var currentCharacter:Character;
+		public var lastTimeUpdated:int = -1;
+		
+		public function onCreationComplete():void 
+		{
+			this.friendIcon.source = rL.relationshipIcons["friends"];
+			this.datingIcon.source = rL.relationshipIcons["dating"];
+			this.enemiesIcon.source = rL.relationshipIcons["enemies"];
+			
+            //friendList.scroller.setStyle("horizontalScrollPolicy", ScrollPolicy.ON);
+            //friendList.scroller.setStyle("verticalScrollPolicy", ScrollPolicy.ON);
+            friendList.scroller.verticalScrollBar.setStyle("skinClass", NEW_listScrollSkin);
+			
+			//datingList.scroller.setStyle("verticalScrollPolicy", ScrollPolicy.ON);
+            datingList.scroller.verticalScrollBar.setStyle("skinClass", NEW_listScrollSkin);
+			
+			//enemiesList.scroller.setStyle("verticalScrollPolicy", ScrollPolicy.ON);
+            enemiesList.scroller.verticalScrollBar.setStyle("skinClass", NEW_listScrollSkin);
+		}
+		
+		private function onPreinitialize():void 
+		{
+			rL = ResourceLibrary.getInstance();
+			cif = CiFSingleton.getInstance(); 
+		}
+		
+		public function closeButtonClicked(e:MouseEvent = null):void
+		{
+			PromWeek.GameEngine.getInstance().hudGroup.initiatorSelectedComponent.turnOffCharacterSheet();
+		}
+		
+		public function updateCharacterSheet(charName:String):void
+		{
+			//don't bother updateing again if we are already updated.
+			//probably not necessary
+			if (this.currentCharacter != null)
+			{
+				if (charName.toLowerCase() == this.currentCharacter.characterName.toLowerCase() && this.lastTimeUpdated == cif.time)
+				{
+					return;
+				}
+			}
+			this.currentCharacter = cif.cast.getCharByName(charName);
+			this.lastTimeUpdated = cif.time;
+			this.updateBio();
+			this.updateStatuses();
+			this.updateRelationships();
+			this.updateTraits();
+		}
+		
+		public function updateTraits():void
+		{
+			this.traitsText.text = "";
+			var traitName:String;
+			var traits:Vector.<Number> = this.currentCharacter.traits;
+			for (var i:int; i < traits.length; i++) {
+				traitName = Trait.getNameByNumber(traits[i]);
+				if (traits[i] < Trait.FIRST_TO_IGNORE)
+				{
+					if (traits[i] == Trait.AFRAID_OF_COMMITMENT)
+					{
+						this.traitsText.text += "Timid\n";//"*Afraid of\n  commitment\n";
+					}
+					else if (traits[i] == Trait.TAKES_THINGS_SLOWLY)
+					{
+						this.traitsText.text += "Reserved\n";//"*Afraid of\n  commitment\n";
+					}
+					else
+					{
+						this.traitsText.text += LineOfDialogue.toInitialCap(traitName) + "\n";
+					}
+				}
+			}
+		}
+		
+		public function updateRelationships():void 
+		{
+			var acc:ArrayCollection;
+			var obj:Object;
+			var char:Character;
+			var count:int;
+			
+			//friends
+			acc = new ArrayCollection();
+			count = 0;
+			for each (char in cif.cast.characters)
+			{
+				if (char.characterName != this.currentCharacter.characterName)
+				{
+					if (cif.relationshipNetwork.getRelationship(RelationshipNetwork.FRIENDS, this.currentCharacter, char))
+					{
+						obj = new Object();
+						obj.charName = char.characterName;
+						acc.addItem(obj);
+						count++;
+					}
+				}
+			}
+			friendList.dataProvider = acc;
+			this.numFriendsText.text = "(" + count + ")";
+			
+			//dating
+			acc = new ArrayCollection();
+			count = 0;
+			for each (char in cif.cast.characters)
+			{
+				if (char.characterName != this.currentCharacter.characterName)
+				{
+					if (cif.relationshipNetwork.getRelationship(RelationshipNetwork.DATING, this.currentCharacter, char))
+					{
+						obj = new Object();
+						obj.charName = char.characterName;
+						acc.addItem(obj);
+						count++;
+					}
+				}
+			}
+			datingList.dataProvider = acc;
+			this.numDatingText.text = "(" + count + ")";
+			
+			//enemies
+			acc = new ArrayCollection();
+			count = 0;
+			for each (char in cif.cast.characters)
+			{
+				if (char.characterName != this.currentCharacter.characterName)
+				{
+					if (cif.relationshipNetwork.getRelationship(RelationshipNetwork.ENEMIES, this.currentCharacter, char))
+					{
+						obj = new Object();
+						obj.charName = char.characterName;
+						acc.addItem(obj);
+						count++;
+					}
+				}
+			}
+			enemiesList.dataProvider = acc;
+			this.numEnemiesText.text = "(" + count + ")";
+		}
+
+		public function updateStatuses():void
+		{
+			this.statusGroup.removeAllElements();
+			
+			var status:Status;
+			var statusIcon:StatusIcon;
+			
+			var shouldDisplayStatus:Boolean;
+			
+			var hGroup:HGroup;
+			var numAdded:int = 0;
+			var numHGroups:int = 0;
+			for each (status in this.currentCharacter.statuses)
+			{
+				shouldDisplayStatus = false;
+				if ((status.type >= Status.FIRST_NOT_DIRECTED_STATUS && status.type < Status.FIRST_TO_IGNORE_NON_DIRECTED)
+					|| (status.type >= Status.FIRST_DIRECTED_STATUS && status.type < Status.STATUS_COUNT))
+				{
+					shouldDisplayStatus = true;
+				}
+				if (shouldDisplayStatus)
+				{
+					statusIcon = new PromWeek.StatusIcon();
+					statusIcon.width = 35;
+					statusIcon.height = 35;
+					statusIcon.loadStatusImagesToIcon(status.type, status.directedToward, status.remainingDuration);
+					
+					if (numAdded % 4 == 0)
+					{
+						hGroup = new HGroup();
+						this.statusGroup.addElement(hGroup);
+						numHGroups++;
+					}
+					hGroup.addElement(statusIcon);
+					numAdded++;
+				}
+				
+				if (numHGroups > 1)
+				{
+					this.statusRect.height = 95;
+				}
+				else
+				{
+					this.statusRect.height = 55;
+				}
+			
+				
+			}
+		}
+		
+		public function updateBio():void 
+		{
+			switch(this.currentCharacter.characterName) 
+			{
+				case 'Mave': 
+					this.characterBio.text = "Mave is a big fish in the small, black-and-lace-filled pool of the high school Goths. She doesn't suffer fools (which includes most of her classmates) and will stop at nothing to get what she wants. But beneath her cynical exterior and acerbic wit lies a desire for a partner who matches her in more than just style."; 
+					break;
+				case 'Edward': 
+					this.characterBio.text = "Edward may be the best dressed Goth in school, but there's not much going on underneath his dapper black hat: he lacks the wit he thinks he has. Once one of the popular crowd before his fall to 'the dark side,' he secretly wants nothing more than to be cool again, although he's too self-defeating and naive to ever get back with the in crowd... isn't he?"; 
+					break;
+				case 'Phoebe': 
+					this.characterBio.text = "Phoebe was a spoiled rich kid who turned emo senior year, much to the annoyance of everyone except the other emos, who she drives around in her dad's swank car. She can't understand why more people don't love her winning personality. Her best quality is that she won't take no for an answer: maybe she can channel that stubbornness into a less lonely existence?"; 
+					break;
+				case 'Nicholas':
+					this.characterBio.text = "Nicholas has been described as a 'smug little punk' by some and a 'vicious heartbreaking monster' by others, and that's just what his parents think of him. Rich, good-looking, three-time student body president, Nicholas is the paradigm of perfection. He's also 'friends' with the rest of the popular crowd, and with ladies from any clique who catch his fancy."; 
+					break;
+				case 'Monica':
+					this.characterBio.text = "Monica is a manipulative machiavellian mastermind.  Boys want her, girls want the thing she has that the boys want. She rules this school with an iron fist (fashionably manicured, of course). But despite smiling out from nearly every page of the yearbook, in her darkest nights Monica can't help but wonder if she's missing something from life..."; 
+					break;
+				case 'Zack':
+					this.characterBio.text = "Zack is a geek and proud of it, flaunting his l33t skillz and pop culture references at every opportunity. If he does okay in his classes it's mostly because he copies off Simon: he'd much rather watch pirated anime than actually study. His single-minded selfishness has made him a lot of enemies, but if he wants something, he'll do whatever it takes."; 
+					break;
+				case 'Lil':
+					this.characterBio.text = "Lil has few friends, meandering through life to the beat of a drummer no one else can quite hear: sometimes awkward, sometimes a compulsive liar, other times she's graceful and can't stand posers. Although she keeps mostly to herself, who know's what she's plotting underneath all that hair?"; 
+					break;
+				case 'Doug':
+					this.characterBio.text = "Doug does his best to avoid the petty politics that consume his peers, who as a result mostly ignore him. But to his friends, he's a sweet, if awkward kid who isn't afraid to be himself. As long as he's got his board, it's all good.";
+					break;
+				case 'Simon':
+					this.characterBio.text = "Simon seems like your classic nerd on the surface, but deep down he's much nerdier than that. (As president of the lightsaber construction club, he'd viciously ban members who didn't properly complete their training.) The popular kids tolerate him because of his sometimes useful hacking skills, despite his embarrassing attempts to use their lingo.";
+					break;
+				case 'Naomi':
+					this.characterBio.text = "Naomi, head of the prom committee and determined to make it the best prom ever, would seem to have the perfect life: top-notch SAT scores, talented, and a kindness that's earned her friends across the social spectrum. But she can't stop worrying about the future, and is terrified that with one false move she might lose everything.";
+					break;
+				case 'Buzz':
+					this.characterBio.text = "Buzz is the star quarterback of the football team. He knows what he likes (mostly taking cheerleaders out for rides on his motorcycle) and likes what he knows (which isn't much). Though his angry demeanor puts the nerds of the school in a perpetual state of panic, underneath lies a heart yearning to express emotions that he just isn't articulate enough to express.";
+					break;
+				case 'Jordan':
+					this.characterBio.text = "Jordan's competitiveness often lands her in situation she regrets. She managed to work her way to Differential Calculus AP, not due to any great love of math, but due to a disgust of Naomi thinking she is better than her. She would much prefer riding on skateboards (but only if she can be the best at it).";
+					break;
+				case 'Chloe':
+					this.characterBio.text = "Something of a social butterfly, Chloe views herself as the great bridge, connecting the popular and the unpopular kids together, once and forever! Her friends list might be several miles long, but does it come from a genuine desire to befriend, or is it just a means to mask her insecurities?";
+					break;
+				case 'Gunter':
+					this.characterBio.text = "Recently transfered from Germany, Gunter is of undeterminate age and questionable intelligence. Most of his classmates are secretly terrified of his ripped body, punk outfits, and sometimes shocking European sensibilities, although Gunter himself has not seemed to notice their reactions. Can Gunter find a place at school in time to be one of the gang by the Prom?";
+					break;
+				case 'Lucas':
+					this.characterBio.text = "Lucas wears his heart on his sleeve (and on most of the rest of his shirt) and has been known to be both a fiercely loyal friend and to burst into tears when mean people talk to him. Slow to change his mind or forget a grudge, Lucas just hopes he can make it through the last week of high school without any humiliation.";
+					break;
+				case 'Oswald':
+					this.characterBio.text = "Captain of the debate team, three-time Tennis Fashion Magazine award winner, Oswald glides through high school like an infomercial spokesman: charming, obsequious, and a little sleazy. He has a love/hate relationship with the popular kids(those smarmy pretenders!) and doesn't really think much about anyone else as long as they stay out of his way";
+					break;
+				case 'Kate':
+					this.characterBio.text = "Kate's felt increasingly awkward all through high school. While her classmates have gone all goth or emo or fashion-crazy, she still likes the simple things: playing in band and riding bikes. She wouldn't ever think she'd get asked her out for the Prom. Hopefully someone will see through her frazzled hair and blushing freckles to the sweet soul underneath.";
+					break;	
+				case 'Cassandra':
+					this.characterBio.text = "Cassandra has worked hard every step of the way to be one of the popular kids, and at last she's succeeded. Though she knows sometimes you have to be vindictive, petty, or cruel to succeed, she doesn't enjoy it: she just wants to shop and gossip and date the cute boys. If she has to break a few hearts or tell a few lies to be part of that, isn't it worth it?";
+					break;
+				default: 
+					this.characterBio.text = "Err, which character are you talking about again?";
+			}	
+		}
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

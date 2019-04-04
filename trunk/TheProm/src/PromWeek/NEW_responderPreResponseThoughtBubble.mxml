@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 preinitialize="onPreinitialize()"
+		 width="260" height="260"> 
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>					
+		 </fx:Declarations>
+		 
+		 
+		<util:SmoothImage id="bigThoughtBubbleImage" x="55" y="45" width="260" height="260" />
+		<util:SmoothImage id="bigThoughtBubbleStemImage" width="120" height="80" />
+		
+		<s:VGroup x="60" y="45" width="260" height="120" paddingLeft="20" paddingRight="20" paddingBottom="5" verticalAlign="bottom" >
+			 <s:HGroup width="100%" height="50" verticalAlign="middle">
+				 <!--<s:Button id="backButton" width="30" height="30" click="backButtonClickHandler(event)" skinClass="PromWeek.skins.NEW_backButtonSkin" />-->
+				 <s:RichText id="socialExchangeResponseTitleText" styleName="bigThoughtBubbleTitleStyle" width="100%" verticalAlign="middle" />
+			 </s:HGroup>
+			 <s:HGroup width="100%" verticalAlign="middle" horizontalAlign="center">
+				<prom:NEW_socialExchangeButton id="responseButton" width="165" height="27" click="onResponseButtonClicked(event)" label="Response" isGetResponse="true" />
+			 </s:HGroup>
+		</s:VGroup>
+		
+		 
+	<fx:Script>
+		<![CDATA[
+		import CiF.CiFSingleton;
+		import CiF.LineOfDialogue;
+		import CiF.Predicate;
+		import CiF.SocialGame;
+		import CiF.SocialGameContext;
+		import flash.events.MouseEvent;
+		import flash.geom.Point;
+		import flash.utils.Dictionary;
+		import PromWeek.assets.ResourceLibrary;
+
+		private var rL:ResourceLibrary;
+		private var cif:CiFSingleton;
+		private var gameEngine:GameEngine;
+		private var dm:DifficultyManager;
+		private var jpm:JuicePointManager;
+		
+		
+		public var initiator:String;
+		public var responder:String;
+		public var sgc:SocialGameContext;
+		public var sgName:String;
+		
+		public function onCreationComplete():void 
+		{
+			cif = CiFSingleton.getInstance();
+			gameEngine = GameEngine.getInstance();
+			dm = DifficultyManager.getInstance();
+			jpm = JuicePointManager.getInstance();
+			this.bigThoughtBubbleImage.source = rL.uiIcons["preresponseInfoTBub"];
+			this.bigThoughtBubbleStemImage.source = rL.uiIcons["responderBigThoughtBubbleStem"];
+			
+		}
+		
+		private function onPreinitialize():void 
+		{
+			rL = ResourceLibrary.getInstance();
+		}
+		
+		public function update(gameName:String):void
+		{
+			initiator = GameEngine.getInstance().hudGroup.initiatorSelectedComponent.currentInitiator;
+			responder = GameEngine.getInstance().hudGroup.initiatorSelectedComponent.currentResponder;
+			
+			this.sgName = gameName;
+			if (jpm.isHintUnlocked(initiator,responder,this.sgName,jpm.HINT_RESPONDER_MOTIVE))
+			{
+				this.responseButton.locked = false;
+			}
+			else
+			{
+				this.responseButton.locked = true;
+			}
+			responseButton.invalidateSkinState();
+			
+			this.socialExchangeResponseTitleText.text = LineOfDialogue.preprocessLine(Utility.getSocialGameConsiderationPhraseForResponder(sgName, initiator));
+			this.socialExchangeResponseTitleText.text += "?";
+		}
+		
+		
+	
+		
+		
+		public function onResponseButtonClicked(e:MouseEvent = null):void
+		{
+			if (responseButton.locked)
+			{
+				var cost:Number = jpm.COST_FOR_UNLOCKING_RESPONDER_MOTIVE;
+				//if (jpm.handleResponderMotiveUnlock("","","",null))
+				if (jpm.handleResponderMotiveUnlock(gameEngine.primaryAvatarSelection.toLowerCase(),
+						gameEngine.secondaryAvatarSelection.toLowerCase(), 
+						this.sgName.toLowerCase(),
+						null))
+				{
+					responseButton.locked = false;
+					responseButton.invalidateSkinState();
+					GameEngine.getInstance().hudGroup.topBar.juiceBar.phantomJuiceHide();
+				}
+			}
+			
+
+			if (!this.responseButton.locked)
+			{
+				GameEngine.getInstance().hudGroup.updateSocialExchangeResponseThoughtBubble(this.sgName);
+				this.visible = false;
+			}
+		}
+		
+		
+		public function backButtonClickHandler(e:MouseEvent = null):void
+		{
+			GameEngine.getInstance().hudGroup.responderThoughtBubble.visible = false;
+			//GameEngine.getInstance().hudGroup.responderSubjectiveThoughtBubble.top = GameEngine.getInstance().hudGroup.defaultResponderSubjectThoughtBubbleTop;
+			gameEngine.hudGroup.responderSubjectiveThoughtBubble.thoughtBubbleImageStem.visible = true;
+			
+			GameEngine.getInstance().hudGroup.initiatorSelectedComponent.initiatorThoughtBubble.visible = true;
+		}
+		
+		
+		public function updatePosition(elapsedTime:Number):void 
+		{
+			if (gameEngine.secondaryAvatarSelection == null) return;
+
+			var offsetX:Number = 40;
+			var offsetY:Number = -150;
+			
+			var charX:Number = (gameEngine.worldGroup.avatars[gameEngine.secondaryAvatarSelection.toLowerCase()] as Avatar).locX;
+			var charY:Number = (gameEngine.worldGroup.avatars[gameEngine.secondaryAvatarSelection.toLowerCase()] as Avatar).locY;
+			
+			// fancy local to global trickery
+			//var newPt:Point = gameEngine.worldGroup.avatars[gameEngine.secondaryAvatarSelection.toLowerCase()].localToGlobal(new Point(charX + offsetX, charY + offsetY))
+			var newPt:Point = new Point(charX + offsetX, charY + offsetY);
+			var finalPoint:Point = Utility.translatePoint(newPt, gameEngine.worldGroup, gameEngine.hudGroup);
+			
+			//newPt = this.trapPointOnScreen(newPt);
+			
+			this.left = finalPoint.x
+			this.top = finalPoint.y
+		}
+		
+		public function trapPointOnScreen(pt:Point):Point
+		{
+			if (pt.y < 50)
+			{	
+				pt.y = 50;
+			}
+			
+			if (pt.y + this.height > gameEngine.APPLICATION_HEIGHT)
+			{
+				pt.y = gameEngine.APPLICATION_HEIGHT - this.height;
+			}
+			if (pt.x < 0)
+			{
+				pt.x = 0;
+			}
+			if (pt.x + this.width > gameEngine.APPLICATION_WIDTH)
+			{
+				pt.x = gameEngine.APPLICATION_WIDTH - this.width;
+			}
+			
+			return pt;
+		}
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>
+

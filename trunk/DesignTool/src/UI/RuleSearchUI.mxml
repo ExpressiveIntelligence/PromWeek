@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:UI="UI.*"
+		 xmlns:CiF="CiF.*"	
+		 width="800" 
+		 height="600" 
+		 creationComplete="onCreationComplete()"
+		 >
+		 
+	 <fx:Metadata>
+		
+	</fx:Metadata>
+			
+	
+	
+	
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+
+	<fx:Declarations>
+	</fx:Declarations>
+	
+	<s:Rect width="100%" height="105%">
+		<s:fill>
+				<s:LinearGradient rotation="90">
+				<s:entries>
+					<s:GradientEntry color="#980000" ratio="0.0" alpha="1.0"/>
+					<s:GradientEntry color="#080000" ratio="1.0" alpha="1.0"/>
+					<!--<s:GradientEntry color="0x336699" ratio="1.0" alpha="0.5"/>-->
+				</s:entries>
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+
+	
+	<s:HGroup>
+		
+		<mx:TabNavigator id="searchRuleTabNav" x="8" y="10" width="794" height="768" backgroundColor="#101010" backgroundAlpha="0.6">
+			<s:NavigatorContent label="Search Rule" width="100%" height="100%">
+				<UI:RuleAuthoringUI id="searchRule" />
+			</s:NavigatorContent>
+			<s:NavigatorContent label="Rule Editor" width="100%" height="100%">
+				<s:HGroup>
+					<UI:RuleAuthoringUI id="ruleEditor" />
+					<s:Button label="Update Rule" click="updateRuleInRuleEditor(event)" />
+				</s:HGroup>
+			</s:NavigatorContent>
+		</mx:TabNavigator>
+		<s:VGroup>
+			<s:HGroup>
+				<s:Button id="searchButton" label="Find Rules that Contain Rule to the Left" click="searchButtonPressed(event)" />
+				<s:Button id="updateWeightsButton" label="Update Weights" click="updateWeightsClicked(event)" />
+			</s:HGroup>
+			<s:HGroup width="100%" height="100%">
+				<mx:AdvancedDataGrid id="resultsList" width="100%" height="730" editable="true" doubleClickEnabled="true" doubleClick="onResultsListDoubleClick(event);">
+					<mx:columns>
+						<mx:AdvancedDataGridColumn headerText="Rule" dataField="ruleName" editable="false" />
+						<mx:AdvancedDataGridColumn headerText="Weight" dataField="weightCol" editorDataField="value" editable="true">
+							<mx:itemEditor>
+								<fx:Component>
+									<mx:NumericStepper minimum="-100" maximum="100" />
+								</fx:Component>
+							</mx:itemEditor>
+						</mx:AdvancedDataGridColumn>
+						<mx:AdvancedDataGridColumn headerText="MT" dataField="mtName" editable="false" />
+						<mx:AdvancedDataGridColumn headerText="SG" dataField="sgName" editable="false" />
+						<mx:AdvancedDataGridColumn headerText="SG Rule Set" dataField="sgRuleSet" editable="false" />
+						<mx:AdvancedDataGridColumn headerText="ID" dataField="ruleID" visible="true" editable="false" />
+					</mx:columns>
+				</mx:AdvancedDataGrid>
+				
+			</s:HGroup>
+		</s:VGroup>
+	</s:HGroup>
+	<fx:Script>
+		<![CDATA[
+		
+		//TODO: save up button
+		//TODO: add to right button
+		
+		import CiF.*;
+		import flash.events.MouseEvent;
+		import flash.media.Microphone;
+		import tool.DesignerToolEngine;
+		import flash.events.Event;
+		import flash.events.EventDispatcher;
+		import mx.collections.ArrayCollection;
+		import mx.controls.Alert;
+		
+		public var dte:DesignerToolEngine = DesignerToolEngine.getInstance();
+		private var cif:CiFSingleton = CiFSingleton.getInstance();
+		public var resultsListDP:ArrayCollection;
+		
+		public var ruleToEditID:int;
+		public var resultsListSelectedIndex:int;
+		
+		public function onResultsListDoubleClick(e:flash.events.MouseEvent):void
+		{
+			if (resultsList.selectedIndex != -1)
+			{
+				resultsListSelectedIndex = resultsList.selectedIndex;
+				ruleToEditID = resultsList.selectedIndex;
+				
+				var ruleToEdit:Rule;
+				//var ir:InfluenceRule = dte.workingSocialGame.responderIRS.influenceRules[index].clone() as InfluenceRule;
+				if (resultsListDP[resultsListSelectedIndex].sgName != "")
+				{
+					 var sg:SocialGame = cif.socialGamesLib.getByName(resultsListDP[resultsListSelectedIndex].sgName);
+					if (resultsListDP[resultsListSelectedIndex].sgRuleSet == "I")
+					{
+						ruleToEdit = sg.initiatorIRS.getRuleByID(resultsListDP[resultsListSelectedIndex].ruleID).clone() as InfluenceRule;
+					}
+					else if (resultsListDP[resultsListSelectedIndex].sgRuleSet == "R")
+					{
+						ruleToEdit = sg.responderIRS.getRuleByID(resultsListDP[resultsListSelectedIndex].ruleID).clone() as InfluenceRule;
+					}
+				}
+				else if (resultsListDP[resultsListSelectedIndex].mtName != "")
+				{
+					var mt:Microtheory = cif.getMicrotheoryByName(resultsListDP[resultsListSelectedIndex].mtName);
+					ruleToEdit = mt.initiatorIRS.getRuleByID(resultsListDP[resultsListSelectedIndex].ruleID).clone() as InfluenceRule;
+				}	
+
+				searchRuleTabNav.selectedIndex = 1;
+				ruleEditor.rule = ruleToEdit;
+				ruleEditor.dispatchEvent(new Event("ruleChanged", true, true));
+				
+				//Debug.debug(this, "onResultsListDoubleClick() Valid double click");
+			}
+		}
+		
+		public function updateRuleInRuleEditor(e:MouseEvent):void
+		{
+			var newRule:InfluenceRule = ruleEditor.rule.clone() as InfluenceRule;
+			newRule.weight = resultsListDP[ruleToEditID].weightCol;	
+			if (resultsListDP[ruleToEditID].sgName != "")
+			{
+				var sg:SocialGame = cif.socialGamesLib.getByName(resultsListDP[ruleToEditID].sgName);
+				if (resultsListDP[ruleToEditID].sgRuleSet == "I")
+				{
+					sg.initiatorIRS.replaceRuleAtID(resultsListDP[ruleToEditID].ruleID, newRule)
+				}
+				else if (resultsListDP[ruleToEditID].sgRuleSet == "R")
+				{
+					sg.responderIRS.replaceRuleAtID(resultsListDP[ruleToEditID].ruleID, newRule)
+				}
+			}
+			else if (resultsListDP[ruleToEditID].mtName != "")
+			{
+				var mt:Microtheory = cif.getMicrotheoryByName(resultsListDP[ruleToEditID].mtName);
+				mt.initiatorIRS.replaceRuleAtID(resultsListDP[ruleToEditID].ruleID, newRule)
+			}	
+			
+			Alert.show("The previous rule has been updated to:\n\n\t"+newRule.toString()+"\n\nhas been updated.");
+		}
+		
+		public function updateWeightsClicked(event:MouseEvent):void
+		{
+			var sg:SocialGame;
+			var mt:Microtheory;
+			var ir:InfluenceRule;
+			for (var i:int = 0 ; i < resultsListDP.length; i++ )
+			{
+				if (resultsListDP[i].sgName != "")
+				{
+					sg = cif.socialGamesLib.getByName(resultsListDP[i].sgName);
+					if (resultsListDP[i].sgRuleSet == "I")
+					{
+						sg.initiatorIRS.getRuleByID(resultsListDP[i].ruleID).weight = resultsListDP[i].weightCol;	
+					}
+					else if (resultsListDP[i].sgRuleSet == "R")
+					{
+						sg.responderIRS.getRuleByID(resultsListDP[i].ruleID).weight = resultsListDP[i].weightCol;	
+					}
+					
+				}
+				else if (resultsListDP[i].mtName != "")
+				{
+					mt = cif.getMicrotheoryByName(resultsListDP[i].mtName);
+					//Debug.debug(this, "updateWeightsClicked() Rule Weight: "+resultsListDP[i].weightCol);
+					//Debug.debug(this, "updateWeightsClicked() Rule ID: "+resultsListDP[i].ruleID);
+					//Debug.debug(this, "updateWeightsClicked() Matching Rule: "+mt.initiatorIRS.getRuleByID(resultsListDP[i].ruleID).toString());
+					mt.initiatorIRS.getRuleByID(resultsListDP[i].ruleID).weight = resultsListDP[i].weightCol;
+					mt.responderIRS.getRuleByID(resultsListDP[i].ruleID).weight = resultsListDP[i].weightCol;
+				}
+			}
+			Alert.show("Weights updated\n\nNote, you need to reload the social game or microtheories\nin the authoring windows to reflect these changes.");
+		}
+		
+		
+		public function searchButtonPressed(e:MouseEvent):void
+		{
+			var ruleInEditor:Rule;
+			var theory:Microtheory;
+			var influenceRule:InfluenceRule;
+			var testInfluenceRule:Rule;
+			var pred:Predicate;
+			var sg:SocialGame;
+			
+			var matchingRules:Vector.<InfluenceRule> = new Vector.<InfluenceRule>();
+			var matchingRulesMicrotheories:Vector.<String> = new Vector.<String>();
+			var matchingRulesSocialGames:Vector.<String> = new Vector.<String>();
+			var matchingRulesSocialGamesWhichRole:Vector.<String> = new Vector.<String>();
+			var matchingRuleID:Vector.<int> = new Vector.<int>();
+			var matchingRuleWeight:Vector.<int> = new Vector.<int>();
+			
+			//Debug.debug(this, "searchButtonPressed() " + searchRule.rule.toString() );
+			
+			ruleInEditor = searchRule.rule.clone();
+			
+			ruleInEditor.sortPredicates();
+			
+			for each (theory in cif.microtheories)
+			{
+				for each (influenceRule in theory.initiatorIRS.influenceRules)
+				{
+					testInfluenceRule = influenceRule.clone();
+					for each (pred in theory.definition.predicates)
+					{
+						testInfluenceRule.predicates.push(pred);
+					}
+				
+					testInfluenceRule.sortPredicates();
+					
+					if (Rule.contains(testInfluenceRule, ruleInEditor))
+					{
+						//Debug.debug(this,"searchButtonPressed() Found matching rule: "+testInfluenceRule.toString());
+						
+						matchingRules.push(influenceRule);
+						matchingRulesMicrotheories.push(theory.name);
+						matchingRulesSocialGames.push("");
+						matchingRuleID.push(influenceRule.id);
+						matchingRuleWeight.push(influenceRule.weight);
+						matchingRulesSocialGamesWhichRole.push("");
+					}
+				}
+			}
+			
+			for each (sg in cif.socialGamesLib)
+			{
+				for each (influenceRule in sg.initiatorIRS.influenceRules)
+				{
+					testInfluenceRule = influenceRule.clone();
+					
+					if (Rule.contains(testInfluenceRule, ruleInEditor))
+					{
+						matchingRules.push(influenceRule);
+						matchingRulesMicrotheories.push("");
+						matchingRulesSocialGames.push(sg.name);
+						matchingRuleID.push(influenceRule.id);
+						matchingRuleWeight.push(influenceRule.weight);
+						matchingRulesSocialGamesWhichRole.push("I");
+					}
+				}
+				for each (influenceRule in sg.responderIRS.influenceRules)
+				{
+					testInfluenceRule = influenceRule.clone();
+					
+					if (Rule.contains(testInfluenceRule, ruleInEditor))
+					{
+						matchingRules.push(influenceRule);
+						matchingRulesMicrotheories.push("");
+						matchingRulesSocialGames.push(sg.name);
+						matchingRuleID.push(influenceRule.id);
+						matchingRuleWeight.push(influenceRule.weight);
+						matchingRulesSocialGamesWhichRole.push("R");
+					}
+				}
+			}
+			
+			//now that we have gone through all the rules in cif, print out the matchinf rules
+			var outputString:String = "";
+			for (var i:int = 0; i < matchingRules.length; i++)
+			{
+				outputString += "* ";
+				if (matchingRulesMicrotheories[i] != "")
+				{
+					outputString += matchingRulesMicrotheories[i] + ": ";
+				}
+				else
+				{
+					outputString += matchingRulesSocialGames[i] + ": ";
+				}
+
+				outputString += matchingRules[i].toString() + "\n";
+			}
+			
+			resultsListDP = new ArrayCollection;
+			for (i = 0; i < matchingRules.length; i++ )
+			{
+				resultsListDP.addItem( { ruleName:matchingRules[i].generateRuleName(), weightCol:matchingRuleWeight[i],mtName:matchingRulesMicrotheories[i], sgName:matchingRulesSocialGames[i], sgRuleSet:matchingRulesSocialGamesWhichRole[i],ruleID:matchingRuleID[i] } );
+			}
+			this.resultsList.dataProvider = resultsListDP;
+		}
+		
+		
+		public function onCreationComplete():void 
+		{
+			
+		}
+		
+		
+		
+		
+		]]>
+	</fx:Script>
+</s:Group>

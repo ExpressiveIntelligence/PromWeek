@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 creationComplete="onCreationComplete()"
+		 styleName="classicPromWeek">
+	
+		 
+	<fx:Metadata>
+	</fx:Metadata>
+		
+	<fx:Declarations>
+		<fx:String id="text">Default text.</fx:String>
+		<fx:Number id="cornerRadius">30</fx:Number>
+		<fx:Number id="fontSize">18</fx:Number>
+		<fx:Number id="bubbleFillColor">0xEDEDED</fx:Number>
+		<fx:Number id="bubbleStrokeColor">0x000000</fx:Number>
+		<fx:Number id="bubbleStrokeWeight">5</fx:Number>
+		<fx:Number id="fontColor">0x555555</fx:Number>
+		<fx:Boolean id="thought">false</fx:Boolean>
+	</fx:Declarations>
+	
+
+	
+<!--
+	<s:Rect id="testBoundingBox" width="100%" height="100%">
+		<s:stroke>
+			<s:SolidColorStroke color="0x5555FF" />
+		</s:stroke>
+	</s:Rect>
+-->
+	
+	<s:Rect id="bubbleMain" width="90%" height="90%" radiusX="{cornerRadius}" radiusY="{cornerRadius}">
+		<s:fill>
+			<s:SolidColor color="{bubbleFillColor}" />
+		</s:fill>
+		<s:stroke>
+			<s:SolidColorStroke color="{bubbleStrokeColor}" weight="{bubbleStrokeWeight}"/>
+		</s:stroke>
+	</s:Rect>
+	
+	<s:RichText id="bubbleText" fontSize="{this.fontSize}" color="{fontColor}" text="{this.text}" width="{bubbleMain.width}" height="{bubbleMain.height}" />
+
+	<s:Path id="pointer" x="0" visible="{!thought}">
+		<s:fill>
+			<s:SolidColor color="{bubbleFillColor}" />
+		</s:fill>
+	</s:Path>
+	
+	<s:Line id="cwLine" visible="{!thought}">
+		<s:stroke>
+			<s:SolidColorStroke color="{bubbleStrokeColor}" weight="{bubbleStrokeWeight}" caps="round" />
+		</s:stroke>
+	</s:Line>
+	
+	<s:Line id="ccwLine" visible="{!thought}">
+		<s:stroke>
+			<s:SolidColorStroke color="{bubbleStrokeColor}" weight="{bubbleStrokeWeight}" caps="round"/>
+		</s:stroke>
+	</s:Line>
+	
+	<s:Group id="thoughtBubbles" visible="{thought}">
+		<s:Ellipse id="smallThoughtCircle" width="15" height="15">
+			<s:fill>
+				<s:SolidColor color="{bubbleFillColor}" />
+			</s:fill>
+			<s:stroke>
+				<s:SolidColorStroke color="{bubbleStrokeColor}" weight="{bubbleStrokeWeight}" />
+			</s:stroke>
+		</s:Ellipse>
+		<!--s:Ellipse id="bigThoughtCircle" width="20" height="20">
+			<s:fill>
+				<s:SolidColor color="{bubbleFillColor}" />
+			</s:fill>
+			<s:stroke>
+				<s:SolidColorStroke color="{bubbleStrokeColor}" weight="{bubbleStrokeWeight}" />
+			</s:stroke>
+		</s:Ellipse-->
+		<s:Ellipse id="largeThoughtCircle" width="25" height="25">
+			<s:fill>
+				<s:SolidColor color="{bubbleFillColor}" />
+			</s:fill>
+			<s:stroke>
+				<s:SolidColorStroke color="{bubbleStrokeColor}" weight="{bubbleStrokeWeight}" />
+			</s:stroke>
+		</s:Ellipse>
+		<s:Ellipse id="hugeThoughtCircle" width="33" height="33">
+			<s:fill>
+				<s:SolidColor color="{bubbleFillColor}" />
+			</s:fill>
+			<s:stroke>
+				<s:SolidColorStroke color="{bubbleStrokeColor}" weight="{bubbleStrokeWeight}" />
+			</s:stroke>
+		</s:Ellipse>
+	</s:Group>
+	
+	<fx:Script>
+		<![CDATA[
+		import CiF.Character;
+		import flash.geom.Point;
+		import flashx.textLayout.property.NumberOrPercentOrEnumProperty;
+		import mx.graphics.SolidColorStroke;
+		import spark.primitives.Line;
+		import CiF.Debug;
+		import flash.text.TextField;
+		import flash.text.TextFormat;
+		
+		private var pointsLeft:Boolean = true;
+		private var pointerPadding:Number = 40;
+				
+		private var gameEngine:GameEngine;
+		
+		public var offsetLeftX:Number = 20;
+		public var offsetLeftY:Number = -80;
+
+		public var offsetRightX:Number = -20.0;
+		public var offsetRightY:Number = -80;
+		
+		public var characterY:Number = 0;
+		
+		public function onCreationComplete():void {
+			gameEngine = GameEngine.getInstance();
+			
+			updateLocation();
+		}
+
+		public function update(charName:String):void
+		{
+			var charX:Number = gameEngine.worldGroup.avatars[charName].locX;
+			var charY:Number = gameEngine.worldGroup.avatars[charName].locY;
+			this.characterY = charY;
+			var char:Avatar = gameEngine.worldGroup.avatars[charName]
+			var newLoc:Point;
+			//newLoc = (gameEngine.worldGroup.avatars[charName] as Avatar).content(new Point(0, 0));
+			if (this.pointLeft)
+			{
+				//newLoc = gameEngine.worldGroup.avatars[charName].localToGlobal(new Point(charX + offsetLeftX, charY + offsetLeftY));
+				//newLoc = char.localToGlobal(new Point(charX + offsetLeftX, charY + offsetLeftY));
+				newLoc = Utility.translatePoint(new Point(charX + offsetLeftX, charY + offsetLeftY), gameEngine.worldGroup, gameEngine.hudGroup);
+				//newLoc = Utility.translatePoint(new Point(0, 0), char, gameEngine.hudGroup);
+			}
+			else if (this.pointRight)
+			{
+				//newLoc = gameEngine.worldGroup.avatars[charName].localToGlobal(new Point(charX + offsetRightX, charY + offsetRightY));
+				//newLoc = char.localToGlobal(new Point(charX + offsetRightX, charY + offsetRightY));
+				newLoc = Utility.translatePoint(new Point(charX + offsetRightX, charY + offsetRightY), gameEngine.worldGroup, gameEngine.hudGroup);
+				//newLoc = Utility.translatePoint(new Point(0, 0), char, gameEngine.hudGroup);
+			} 
+			//var newLoc:Point = gameEngine.worldGroup.localToGlobal(new Point(charX, charY));
+			
+			//newLoc = (gameEngine.worldGroup.avatars[charName] as Avatar).content(new Point(0, 0));
+			
+			
+			
+			//if(this.pointLeft)
+				//this.left = newLoc.x;
+			//if (this.pointRight)
+				//this.right = newLoc.x;
+			//this.bottom = newLoc.y;
+			this.x = newLoc.x;
+			if (this.pointRight)
+				this.x -= this.width;
+				
+			//character height is in it's own coordinate system. Let's base it in the hud group to find how much we need to move the dialogue bubble up
+			this.y = newLoc.y - this.height;//- Utility.translatePoint(new Point(0, char.height), char, gameEngine.hudGroup).y;
+			//Debug.debug(this, "update() newLoc: " + newLoc.toString() + " charpt: " + (new Point(charX, charY)).toString() + " top: " + this.top + " left: " + this.bottom + " bottom: " + this.bottom + " right: " + this.right + " x: " + this.x + " y: " + this.y + " char.height: " + char.height );
+			
+			//if(gameEngine.currentState!="performance"){
+				//here
+				//this.top = newLoc.y * this.gameEngine.camera.zoom; // only do this when not performing?
+				//this.top += (200 - this.height);
+				//end
+			//	Debug.debug(this, "setting the top inside of update(), new top is: " + this.top);
+			//}
+			
+			//this.left = newLoc.x * this.gameEngine.camera.zoom;
+			
+			//var newLoc2:Point;
+			//newLoc2 = gameEngine.worldGroup.avatars[charName].localToGlobal(new Point(charX + offsetRightX, charY - (this.height/2)));
+			
+			//this.bottom = newLoc.y ;
+		}
+		
+		
+		public function get pointLeft():Boolean {
+			return this.pointsLeft;
+		}
+		
+		public function get pointRight():Boolean {
+			return !this.pointsLeft;
+		}
+		
+		public function set pointRight(b:Boolean):void {
+			//do nothing if it is pointing right already
+			if(this.pointsLeft != !b) {
+				this.pointsLeft = !b;
+				updateLocation();
+			}
+		}
+		
+		public function set pointLeft(b:Boolean):void {
+			//do nothing if it is already pointing left
+			if (this.pointsLeft != b) {
+				this.pointsLeft = b;
+				updateLocation();
+			}
+		}
+		
+		
+		/**
+		 * Updates the graphical elements of the dialog bubble when the
+		 * location or properties of the bubble change.
+		 */
+		public function updateLocation():void {
+			if (this.pointsLeft) {
+				this.bubbleMain.x = this.width / 10;
+			}else {
+				this.bubbleMain.x = 0;
+			}
+			this.bubbleText.x = bubbleMain.x + this.cornerRadius / 2;
+			this.bubbleText.y = bubbleMain.y + this.cornerRadius / 2;
+			this.bubbleText.width = bubbleMain.width - this.cornerRadius;
+			
+			/*
+			 * Tinkering around with dynamic dialogue bubble resizing.
+			 */ 
+			var tempTextField:TextField = new TextField(); // for finding the 'width's of texts.
+			var tempTextFormat:TextFormat = new TextFormat(); // to help make it match the properties of the dialogue bubbles.
+			tempTextFormat.size = getStyle("font-size");
+			tempTextField.wordWrap = true;
+			tempTextFormat.font = getStyle("font-family");
+			//tempTextFormat.fontFamily
+			tempTextField.width = bubbleText.width*0.6; // this is the width of the initiator line!
+			tempTextField.text = this.text;
+			
+			tempTextField.setTextFormat(tempTextFormat);
+			tempTextField.defaultTextFormat = tempTextFormat;
+			
+			//Debug.debug(this, "width of the initiator line: " + tempTextField.textWidth);
+			//Debug.debug(this, "line: " + this.text);
+			//Debug.debug(this, "number of lines I think it takes: " + tempTextField.numLines);
+			
+			//Debug.debug(this, "I believe this is the static width of init dialogue bubble: " + this.hudGroup.initiatorDiablogueBubble.bubbleText.width);
+			
+			//Debug.debug(this, "PREVIOUS dialogue bubble height: " + this.height);
+			//Debug.debug(this, "num lines FROM dialogue bubble itself?: " + this.hudGroup.initiatorDiablogueBubble.bubbleText.numLines);
+			var baseBubbleheight:int = 90;
+			this.height = (tempTextField.numLines * 23) + 40
+			if (this.height < baseBubbleheight) {
+				this.height = baseBubbleheight;
+			}
+			//this.height = this.bubbleText.height + 40;
+			//Utility.log(this, "updateLocation() number of lines I think it takes: " + tempTextField.numLines + " at a height of " + this.height);
+			
+			//this.hudGroup.initiatorDiablogueBubble.updateLocation();
+			//Debug.debug(this, "WHAT YOU ARE GONNA SEE dialogue bubble height: " + this.height);
+			//flash.text.TextField.getLineMetrics()
+			//this.hudGroup.initiatorDiablogueBubble.top = 250 - this.hudGroup.initiatorDiablogueBubble.height;
+			//this.bubbleMain.y = 50;// - this.height;
+			//this.top = characterY - (250 - this.height);
+			//this.top = characterY;
+			//Debug.debug(this, "value of top: " + this.top);
+			//Debug.debug(this, "value of character Y: " + this.characterY);
+			//Debug.debug(this, "bubbleMain.y: " + this.bubbleMain.y);
+			//this.bubbleMain.y = characterY;
+			
+			//this.bubbleText.y = characterY;
+			//this.bubbleMain.y = characterY;
+			
+			if (this.thought)
+			{
+				constructThoughtCircles();	
+			}
+			else
+			{
+				constructPointer();	
+			}
+		}
+		
+		/**
+		 * This places the small and big thought bubble circles
+		 */
+		public function constructThoughtCircles():void
+		{
+			var bottomPoint:Point = new Point();
+			var offsetX:Number;
+			var offsetY:Number;
+			if (this.pointsLeft) 
+			{
+				bottomPoint.x = bubbleMain.x - 15;
+				bottomPoint.y = (bubbleMain.y + bubbleMain.height - cornerRadius) + 20;
+				
+				offsetX = -15;
+				offsetY = 15;
+				smallThoughtCircle.x = bottomPoint.x - 15 + offsetX;
+				smallThoughtCircle.y = bottomPoint.y + offsetY;
+				
+				//bigThoughtCircle.x = bottomPoint.x + 10 + offsetX;
+				//bigThoughtCircle.y = bottomPoint.y - 15 + offsetY;
+				
+				largeThoughtCircle.x = bottomPoint.x + 3 + offsetX;
+				largeThoughtCircle.y = bottomPoint.y - 29 + offsetY;
+				
+				hugeThoughtCircle.x = bottomPoint.x + 22 + offsetX;
+				hugeThoughtCircle.y = bottomPoint.y - 65 + offsetY;
+			}
+			else
+			{
+				bottomPoint.x = bubbleMain.x + bubbleMain.width;
+				bottomPoint.y = bubbleMain.y + bubbleMain.height - cornerRadius + 20;
+
+				offsetX = 5;
+				offsetY = 15;
+				smallThoughtCircle.x = bottomPoint.x + 15 + offsetX;
+				smallThoughtCircle.y = bottomPoint.y + offsetY;
+				
+				//bigThoughtCircle.x = bottomPoint.x - 10 + offsetX;
+				//bigThoughtCircle.y = bottomPoint.y - 15 + offsetY;
+				
+				largeThoughtCircle.x = bottomPoint.x - 3 + offsetX;
+				largeThoughtCircle.y = bottomPoint.y - 29 + offsetY;
+				
+				hugeThoughtCircle.x = bottomPoint.x - 22 + offsetX;
+				hugeThoughtCircle.y = bottomPoint.y - 65 + offsetY;
+			}
+		}
+		
+		/**
+		 * This function builds the string that is the path description of the
+		 * shape of the dialog bubble pointer.
+		 */
+		public function constructPointer():void {
+			var dataString:String;
+			var corner:Point = new Point();
+			var topPoint:Point = new Point();
+			var bottomPoint:Point = new Point();
+			
+			// This value is used to slightly move the pointer into the proper location
+			var yOffSet:Number = this.height * 0.10 + 5;
+			
+			if (this.pointsLeft) {
+				
+				//start by moving the drawing location to the right of the bottom
+				//right corner of the bubbleMain's rounded corner.
+				bottomPoint.x = bubbleMain.x;
+				//bottomPoint.y = (bubbleMain.y + bubbleMain.height - cornerRadius);
+				//bottomPoint.y = (this.top + this.height - cornerRadius);
+				// Changing bubbleMain.height to this.height and adding the offset fixed the pointer problem 
+				// This same solution is applied for the this.pointsRight case below
+				bottomPoint.y = this.bubbleMain.y + this.height - cornerRadius
+				bottomPoint.y -= yOffSet;
+				dataString = "M " + bottomPoint.x + " " + bottomPoint.y;
+				//to bottom left of the group
+				corner.x = 0;
+				corner.y = this.height;
+				dataString += " L " + corner.x + " " + corner.y;
+				//to the top left of the rounded bottom left corner
+				topPoint.x = (bubbleMain.x + cornerRadius);
+				//topPoint.y = (bubbleMain.y + bubbleMain.height);
+				//topPoint.y = (bubbleMain.y + this.height - (2 * cornerRadius);
+				topPoint.y = this.bubbleMain.y + this.height
+				topPoint.y -= yOffSet;
+				dataString += " L " + topPoint.x + " " + topPoint.y;
+				//close it off
+				dataString += " Z";
+				//Utility.log(this, "constructPointer() left pathString: " + dataString)
+				//Utility.log(this, "constructPointer() this.bubbleMain.height: " + this.bubbleMain.height)
+				Utility.log(this, "constructPointer() yOffSet: " + yOffSet)
+
+				//draw the lines that make up the stroke of the pointer
+				//draw the pointer's clockwise line
+				//draw from corner in
+				cwLine.xFrom = corner.x;
+				cwLine.yFrom = corner.y;
+				cwLine.xTo = topPoint.x;
+				cwLine.yTo = topPoint.y;
+			
+				//draw the pointer's counter-clockwise line
+				ccwLine.xFrom = corner.x;
+				ccwLine.yFrom = corner.y;
+				ccwLine.xTo = bottomPoint.x;
+				ccwLine.yTo = bottomPoint.y;
+				
+				
+			} else {
+				//draw to the top right of the bottom right rounded corner
+				topPoint.x = (bubbleMain.x + bubbleMain.width);
+				//topPoint.y = (bubbleMain.y + bubbleMain.height - cornerRadius);
+				topPoint.y = (bubbleMain.y + this.height - cornerRadius);
+				topPoint.y -= yOffSet;
+				dataString = "M " + topPoint.x + " " + topPoint.y;
+				//to bottom right of the group
+				corner.x = this.width;
+				corner.y = this.height;
+				dataString += " L " + corner.x + " " + corner.y;
+				//to the bottom left of the rounded bottom right corner
+				bottomPoint.x = (bubbleMain.x - cornerRadius + bubbleMain.width);
+				//bottomPoint.y = (bubbleMain.y + bubbleMain.height);
+				bottomPoint.y = (bubbleMain.y + this.height);
+				bottomPoint.y -= yOffSet;
+				dataString += " L " + bottomPoint.x + " " + bottomPoint.y;
+				//close it off
+				dataString += " Z";
+				//draw the lines that make up the stroke of the pointer
+				//draw the pointer's clockwise line
+				//draw from corner in
+				cwLine.xFrom = corner.x;
+				cwLine.yFrom = corner.y;
+				cwLine.xTo = bottomPoint.x;
+				cwLine.yTo = bottomPoint.y;
+			
+				//draw the pointer's counter-clockwise line
+				ccwLine.xFrom = corner.x;
+				ccwLine.yFrom = corner.y;
+				ccwLine.xTo = topPoint.x;
+				ccwLine.yTo = topPoint.y;
+				
+
+
+			}
+			this.pointer.data = dataString;
+			//trace("pointer path: " + dataString);
+			
+			
+		}
+		
+		]]>
+	</fx:Script>
+	
+</s:Group>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 styleName="classicPromWeek"
+		 width="100%" height="100%"> 
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+			 <fx:Number id="numRows">1</fx:Number>
+			 <fx:Number id="origHeight">40</fx:Number>
+		 </fx:Declarations>
+		 
+		
+		<s:Group right="10" bottom="10" width="275" height="{this.numRows * this.origHeight}">
+			<s:Rect width="100%" height="100%" radiusX="5" radiusY="5">
+				<!--<s:stroke>
+					<s:SolidColorStroke color="{getStyle('backgroundStroke')}" weight="3"/>
+				</s:stroke>-->
+				<s:fill>
+					<s:SolidColor color="{getStyle('contentAreaColor')}" alpha="0.9"/>
+				</s:fill>
+			</s:Rect>
+			<s:HGroup width="100%" height="100%" verticalAlign="middle" paddingTop="5" paddingBottom="5" paddingLeft="10" paddingRight="10">
+				<s:HGroup id="hintGroup" width="100%" height="100%" />
+			</s:HGroup>
+		</s:Group> 
+	<fx:Script>
+		<![CDATA[
+		import CiF.CiFSingleton;
+		import CiF.LineOfDialogue;
+		import CiF.Predicate;
+		import CiF.SocialGame;
+		import CiF.SocialGameContext;
+		import flash.events.MouseEvent;
+		import flash.geom.Point;
+		import flash.utils.Dictionary;
+		import PromWeek.assets.ResourceLibrary;
+		import flash.filters.GlowFilter;
+		import spark.components.VGroup;
+
+		private var rL:ResourceLibrary;
+		private var cif:CiFSingleton;
+		private var gameEngine:GameEngine;
+		private var dm:DifficultyManager;
+		private var jpm:JuicePointManager;
+		
+		public var goalSelectionButtons:Vector.<NEW_storyGoalSelectionButton>;
+		
+		public function onCreationComplete():void 
+		{
+			cif = CiFSingleton.getInstance();
+			gameEngine = GameEngine.getInstance();
+			dm = DifficultyManager.getInstance();
+			jpm = JuicePointManager.getInstance();
+			rL = ResourceLibrary.getInstance();
+		}
+
+		
+		public function populateHint(hintText:String):void
+		{
+			hintGroup.removeAllElements();
+			var groupToAdd:VGroup = VisibilityManager.getInstance().createGroupWithTextAndImages(hintText, "QuickPlayHintStyle", 35, 260);
+			this.numRows = groupToAdd.numElements;
+			
+			this.hintGroup.addElement(groupToAdd);
+		}
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>
+

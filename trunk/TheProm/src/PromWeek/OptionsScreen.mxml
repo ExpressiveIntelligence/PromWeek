@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 initialize="initializeOptionsScreen()"
+		 width="100%"
+		 height="100%"
+		 styleName="classicPromWeek">
+		 
+		<fx:Metadata>
+		</fx:Metadata>
+		 
+		<fx:Declarations>
+		</fx:Declarations>
+		
+		<s:Rect id="background" width="100%" height="100%">
+			<s:fill>
+				<s:SolidColor id="backgroundFill" color="{getStyle('backgroundColor')}" />
+			</s:fill>
+		</s:Rect>
+		
+		<!--<mx:Button id="classicPromWeek" width="150" x="300" y="300"  label="Classic Prom Week" buttonDown="changeToClassic()"/>
+		<mx:Button id="greenColor" width="150" x="300" y="350"  label="Green Colors" buttonDown="changeToGreen()"/>
+		<mx:Button id="redColor" width="150" x="300" y="400"  label="Red Colors" buttonDown="changeToRed()"/>-->
+		
+		<s:Group id="backButtonSpot" left="0" top="570">
+		</s:Group>
+		 
+		 <fx:Script>
+			 <![CDATA[
+		
+		import flash.events.MouseEvent;
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import CiF.CiFSingleton;
+		import PromWeek.MainMenuButton;
+		import PromWeek.assets.ResourceLibrary;
+		
+		private var rL:PromWeek.assets.ResourceLibrary;
+		private var cif:CiFSingleton;
+		private var gameEngine:GameEngine;
+		
+		public function initializeOptionsScreen():void {
+			this.gameEngine = GameEngine.getInstance();
+			rL = PromWeek.assets.ResourceLibrary.getInstance();
+			cif = CiFSingleton.getInstance();
+			this.addBackButton("< Back");
+		}
+		
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			/*if(gameEngine.classicPromColors) {
+				this.setStyle("styleName", "classicPromWeek");
+			}
+			else if(gameEngine.greenPromColors) {
+				this.setStyle("styleName", "greenColor");
+			}
+			else if(gameEngine.redPromColors) {
+				this.setStyle("styleName", "redColor");
+			}*/
+			this.invalidateProperties();
+		}
+		
+		public function changeToClassic():void {
+			gameEngine.classicPromColors = true;
+			gameEngine.greenPromColors = false;
+			gameEngine.redPromColors = false;
+			gameEngine.setAllStyles();
+		}
+		
+		public function changeToGreen():void {
+			gameEngine.greenPromColors = true;
+			gameEngine.classicPromColors = false;
+			gameEngine.redPromColors = false;
+			gameEngine.setAllStyles();
+		}
+		
+		public function changeToRed():void {
+			gameEngine.redPromColors = true;
+			gameEngine.greenPromColors = false;
+			gameEngine.classicPromColors = false;
+			gameEngine.setAllStyles();
+		}
+		
+		public function addBackButton(buttonText:String):void {
+			var button:MainMenuButton = new MainMenuButton();
+			button.title = buttonText;
+			button.width = 125;
+			button.height = 45;
+			
+			var self:Object = this;
+			button.addEventListener("click", function(event:MouseEvent):void {
+				self.gameEngine.hudGroup.optionsScreen.visible = false;
+				self.gameEngine.currentState = "MainMenu";
+			});
+			backButtonSpot.addElement(button);
+		}
+			 
+			 ]]>
+		 </fx:Script>
+</s:Group>

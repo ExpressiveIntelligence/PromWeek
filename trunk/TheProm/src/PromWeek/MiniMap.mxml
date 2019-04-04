@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+               xmlns:s="library://ns.adobe.com/flex/spark" 
+               xmlns:mx="library://ns.adobe.com/flex/halo"
+			   creationComplete="onCreationComplete();"
+			   enterFrame="onEnterFrame();"
+			   alpha="0.05"
+			   click="this.alpha=1.0-this.alpha"
+			   styleName="classicPromWeek">
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	
+	
+	<fx:Script>
+		<![CDATA[
+		import flash.geom.Rectangle;
+		import mx.graphics.SolidColor;
+		import spark.primitives.Rect;
+		
+		private var hudColor:Number;
+		private var worldColor:Number;
+		
+		[bindable]
+		public var hudRect:Rect;
+		[bindable]
+		public var worldRect:Rect;
+		
+		[bindable]
+		public var wX:Number;
+		[bindable]
+		public var wY:Number;
+		[bindable]
+		public var wWidth:Number;
+		[bindable]
+		public var wHeight:Number;
+		[bindable]
+		public var wScaleX:Number;
+		[bindable]
+		public var wScaleY:Number;
+		[bindable]
+		public var hX:Number;
+		[bindable]
+		public var hY:Number;
+		[bindable]
+		public var hWidth:Number;
+		[bindable]
+		public var hHeight:Number;
+		[bindable]
+		public var hScaleX:Number;
+		[bindable]
+		public var hScaleY:Number;
+		private function onCreationComplete():void {
+			hudColor = getStyle('miniMaphudColor');
+			worldColor = getStyle('miniMapworldColor');
+			hudRect = new Rect();
+			hudRect.x = hudRect.y = 0;
+			hudRect.width = hudRect.height = 100;
+			hudRect.fill = new SolidColor(this.hudColor);
+			
+			worldRect = new Rect();
+			worldRect.x = worldRect.y = 0;
+			worldRect.width = worldRect.height = 200;
+			worldRect.fill = new SolidColor(this.worldColor);
+			
+			this.addElement(worldRect);
+			this.addElement(hudRect);
+		}
+		
+		private function onEnterFrame():void {
+			if(this.worldRect){
+				this.worldRect.x = this.wX;
+				this.worldRect.y = this.wY;
+				this.worldRect.height = this.wHeight;
+				this.worldRect.width = this.wWidth;
+				this.worldRect.scaleX = this.wScaleX;
+				this.worldRect.scaleY = this.wScaleY;
+				
+				this.hudRect.x = this.hX;
+				this.hudRect.y = this.hY;
+				this.hudRect.height = this.hHeight;
+				this.hudRect.width = this.hWidth;
+				this.hudRect.scaleX = this.hScaleX;
+				this.hudRect.scaleY = this.hScaleY;
+			}
+		}
+		]]>
+	</fx:Script>
+	
+</s:Group>

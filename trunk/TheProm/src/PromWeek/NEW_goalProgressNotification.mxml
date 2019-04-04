@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 styleName="classicPromWeek"
+		 width="100%" height="{10 + 40 + this.numRows * this.origHeight}"> 
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+			 <fx:Number id="numRows">1</fx:Number>
+			 <fx:Number id="origHeight">45</fx:Number>
+		 </fx:Declarations>
+		 
+		<s:Rect width="100%" height="100%" radiusX="20" radiusY="20" visible="true">
+			<s:stroke>
+				<s:SolidColorStroke color="{getStyle('contentAreaStroke')}" weight="3"/>
+			</s:stroke>
+			<s:fill>
+				<s:SolidColor color="{getStyle('contentAreaColor')}" alpha="0.9"/>
+			</s:fill>
+		</s:Rect>
+		
+		<s:VGroup width="100%" height="100%" paddingBottom="5" paddingTop="5" paddingLeft="10" paddingRight="10">
+			<s:RichText id="goalNameText" width="100%" height="35" fontSize="22" color="0xffffff" verticalAlign="middle" textAlign="center" styleName="basicFontStyle" />
+			<s:Group id="goalTaskGroup" />
+		</s:VGroup>
+	<fx:Script>
+		<![CDATA[
+		import CiF.CiFSingleton;
+		import CiF.LineOfDialogue;
+		import CiF.Predicate;
+		import CiF.SocialGame;
+		import CiF.SocialGameContext;
+		import flash.events.MouseEvent;
+		import flash.geom.Point;
+		import flash.utils.Dictionary;
+		import PromWeek.assets.ResourceLibrary;
+		import flash.filters.GlowFilter;
+		import spark.components.VGroup;
+
+		private var rL:ResourceLibrary;
+		private var cif:CiFSingleton;
+		private var gameEngine:GameEngine;
+		private var dm:DifficultyManager;
+		private var jpm:JuicePointManager;
+		
+		public var goalSelectionButtons:Vector.<NEW_storyGoalSelectionButton>;
+		
+		public function onCreationComplete():void 
+		{
+			cif = CiFSingleton.getInstance();
+			gameEngine = GameEngine.getInstance();
+			dm = DifficultyManager.getInstance();
+			jpm = JuicePointManager.getInstance();
+			rL = ResourceLibrary.getInstance();
+		}
+
+		
+		public function populate(taskText:String,goalName:String,good:Boolean,iconName:String=""):void
+		{
+			this.goalTaskGroup.removeAllElements();
+			
+			goalNameText.text = goalName;
+			
+			var task:PromWeek.NEW_goalTaskComponent = new PromWeek.NEW_goalTaskComponent();
+			task.populateTask(taskText, true);//we are gonna overwrite this in a sec
+			task.width = GameEngine.getInstance().hudGroup.newStoryGoalWindow.taskListGroup.width;
+			this.width = GameEngine.getInstance().hudGroup.newStoryGoalWindow.taskListGroup.width + 20;
+			this.numRows = task.numRows;
+			goalTaskGroup.addElement(task);
+			
+			if (iconName != "")
+			{
+				//this means we are a num times uniquely true case
+				task.isTaskCompletedImage.source = ResourceLibrary.getInstance().uiIcons[iconName];
+			}
+			else
+			{
+				if (good)
+				{
+					task.isTaskCompletedImage.source = ResourceLibrary.getInstance().uiIcons["check"];
+				}
+				else
+				{
+					task.isTaskCompletedImage.source = ResourceLibrary.getInstance().uiIcons["cross"];
+				}
+			}
+			
+			
+		}
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>
+

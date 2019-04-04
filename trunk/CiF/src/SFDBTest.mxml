@@ -1,0 +1,235 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication 
+  xmlns:fx="http://ns.adobe.com/mxml/2009" 
+  xmlns:s="library://ns.adobe.com/flex/spark"
+  xmlns:mx = "library://ns.adobe.com/flex/halo"
+  creationComplete="onCreationComplete()"
+  width="320"
+  height="240">
+	
+	<fx:Script>
+	  <![CDATA[  
+		import CiF.*;
+		import flash.utils.getTimer;
+		import flash.utils.Timer;
+	  
+		public var cif:CiFSingleton = CiFSingleton.getInstance();
+		
+	  
+		public function onCreationComplete():void {
+			//fill out cast
+			var c:Character = new Character();
+			c.characterName = "Edward";
+			c.networkID = 0;
+			this.cif.cast.addCharacter(c.clone());
+			c.characterName = "Karen";
+			c.networkID = 1;
+			this.cif.cast.addCharacter(c.clone());
+			c.characterName = "Lily";
+			c.networkID = 2;
+			this.cif.cast.addCharacter(c.clone());
+			c.characterName = "Robert";
+			c.networkID = 3;
+			this.cif.cast.addCharacter(c.clone());
+
+			//c.addStatus(Status.DOUBTING);
+			//trace(c.characterName + "'s statuses: " );
+			//for each (var statusType:Object in c.statuses)
+				//trace("\t-" + Status.getStatusNameByNumber(statusType.type));
+				//trace("\t-" + Status.getStatusNameByNumber((c.statuses[statusType] as Status).type));
+
+			
+			this.cif.resetNetworks();
+			Debug.level = 0;
+			var start:int = getTimer();
+			createSFDBEntries(1000);
+			//trace(this.cif.sfdb.toXMLString());
+			trace("generation done in " + (getTimer() - start) + "ms");
+			trace(this.cif.buddyNetwork);
+			trace(this.cif.romanceNetwork);
+			trace(this.cif.coolNetwork);
+			trace(this.cif.statusNetwork);
+			trace(this.cif.relationshipNetwork);
+			var count:int = 50;
+			var sum:int = 0;
+			var i:int;
+			var times:Vector.<int> = new Vector.<int>;
+			
+			for (i=count; i > 0; --i) {
+				start = getTimer();
+				this.cif.sfdb.findPredicateInChange(createSFDBPredicate());
+				//trace("findPredicateInChange: "+this.cif.sfdb.findPredicateInChange(createSFDBPredicate()) );
+				//trace("search done in " + (getTimer() - start) + "ms");
+				times.push(getTimer() - start);
+			}
+			sum = sumTimes(times);
+			trace(count + " SFDB searches took " + sum + "ms total and a mean of " + (sum / count) + "ms with stddev of " + stddev(times) + "ms");
+			
+			trace(c.characterName + "'s statuses: " );
+			for each (var statusType:Object in c.statuses)
+				trace("\t-" + Status.getStatusNameByNumber(statusType.type));
+				//trace("\t-" + Status.getStatusNameByNumber((c.statuses[statusType] as Status).type));
+		}
+		
+		public function sumTimes(times:Vector.<int>):int {
+			var sum:int = 0;
+			for (var i:int; i < times.length; ++i)
+				sum += times[i];
+			return sum;
+		}
+		
+		public function stddev(times:Vector.<int>):Number {
+			var mean:Number = sumTimes(times) / Number(times.length);
+			var sqDiffSum:Number = 0;
+			var difference:Number = 0;
+			var variance:Number = 0;
+			
+			for (var i:int = 0; i < times.length; ++i) {
+				difference = times[i] - mean;
+				sqDiffSum += difference * difference;
+			}
+			
+			variance = sqDiffSum / Number(times.length);
+			return Math.sqrt(variance);
+		}
+		
+		public function createSFDBPredicate(window:int = 0 ):Predicate {
+			var p:Predicate = new Predicate();
+			p.window = window;
+			switch (int(Math.random() * 100) % 3) {
+				case 0:
+					//relationship
+					p.type = Predicate.RELATIONSHIP;
+					p.relationship = int(Math.random() * 100) % RelationshipNetwork.RELATIONSHIP_COUNT;
+					p.primary = this.cif.cast.characters[int(Math.random() * 100) % this.cif.cast.length].characterName;
+					do {
+						p.secondary = this.cif.cast.characters[int(Math.random() * 100) % this.cif.cast.length].characterName;
+					}while (p.primary == p.secondary);
+					break;
+				case 1:
+					p.type = Predicate.STATUS;
+					//determine the status
+					p.status = int(Math.random() * 100) % StatusNetwork.STATUS_COUNT;
+					//get a primary character
+					p.primary = this.cif.cast.characters[int(Math.random() * 100) % this.cif.cast.length].characterName;
+					//determine if the status is directed or not
+					//if directed get a secondary character
+					if(p.status >= StatusNetwork.FIRST_DIRECTED_STATUS) {					
+						do {
+							p.secondary = this.cif.cast.characters[int(Math.random() * 100) % this.cif.cast.length].characterName;
+						}while (p.primary == p.secondary);
+					}
+					break;
+				case 2:
+					//network
+					p.type = Predicate.NETWORK;
+					p.networkType = int(Math.random() * 100) % SocialNetwork.NETWORK_COUNT;
+					p.networkValue = int(Math.random() * 200) - 100 ;
+					p.operator = Predicate.getOperatorByNumber(int(Math.random() * 200) % Predicate.OPERATOR_COUNT);
+					p.primary = this.cif.cast.characters[int(Math.random() * 100) % this.cif.cast.length].characterName;
+					do {
+						p.secondary = this.cif.cast.characters[int(Math.random() * 100) % this.cif.cast.length].characterName;
+					}while (p.primary == p.secondary);
+					break;
+			}
+			return p;
+			
+		}
+		
+		public function createSFDBEntries(numEntries:int):void {
+			
+			var rand:int;
+			var r:Rule;
+			var p:Predicate;
+			var sc:StatusContext;
+			var tc:TriggerContext;
+			var sgc:SocialGameContext;
+			
+			for (var i:int = 0; i < numEntries; ++i) {
+				rand = int(Math.random() * 100) % 2;
+				if (0 == rand) {
+					//it's a status
+					sc = new StatusContext();
+					p = new Predicate();
+					p.type = Predicate.STATUS;
+					//determine the status
+					p.status = int(Math.random() * 100) % StatusNetwork.STATUS_COUNT;
+					//get a primary character
+					p.primary = this.cif.cast.characters[int(Math.random() * 100) % this.cif.cast.length].characterName;
+					//determine if the status is directed or not
+					//if directed get a secondary character
+					if(p.status >= StatusNetwork.FIRST_DIRECTED_STATUS) {					
+						do {
+							p.secondary = this.cif.cast.characters[int(Math.random() * 100) % this.cif.cast.length].characterName;
+						}while (p.primary == p.secondary);
+					}
+					//trace(p.toString());
+					//valuate the predicate
+					p.valuation(this.cif.cast.getCharByName(p.primary), this.cif.cast.getCharByName(p.secondary));
+					sc.time = i;
+					sc.predicate = p.clone();
+					this.cif.sfdb.contexts.push(sc.clone());
+					//trace(sc.toXMLString());
+					
+				}else if(1==rand){
+					rand = int(Math.random() * 100) % 3;
+					tc = new TriggerContext();
+					p = new Predicate();
+					r = new Rule();
+					
+					switch (rand) {
+						case 0:
+							//relationship
+							p.type = Predicate.RELATIONSHIP;
+							p.relationship = int(Math.random() * 100) % RelationshipNetwork.RELATIONSHIP_COUNT;
+							p.primary = this.cif.cast.characters[int(Math.random() * 100) % this.cif.cast.length].characterName;
+							do {
+								p.secondary = this.cif.cast.characters[int(Math.random() * 100) % this.cif.cast.length].characterName;
+							}while (p.primary == p.secondary);
+							break;
+						case 1:
+							p.type = Predicate.STATUS;
+							//determine the status
+							p.status = int(Math.random() * 100) % StatusNetwork.STATUS_COUNT;
+							//get a primary character
+							p.primary = this.cif.cast.characters[int(Math.random() * 100) % this.cif.cast.length].characterName;
+							//determine if the status is directed or not
+							//if directed get a secondary character
+							if(p.status >= StatusNetwork.FIRST_DIRECTED_STATUS) {					
+								do {
+									p.secondary = this.cif.cast.characters[int(Math.random() * 100) % this.cif.cast.length].characterName;
+								}while (p.primary == p.secondary);
+							}
+							break;
+						case 2:
+							//network
+							p.type = Predicate.NETWORK;
+							p.networkType = int(Math.random() * 100) % SocialNetwork.NETWORK_COUNT;
+							p.networkValue = int(Math.random() * 200) - 100 ;
+							p.operator = Predicate.getOperatorByNumber(int(Math.random() * 200) % Predicate.OPERATOR_COUNT);
+							p.primary = this.cif.cast.characters[int(Math.random() * 100) % this.cif.cast.length].characterName;
+							do {
+								p.secondary = this.cif.cast.characters[int(Math.random() * 100) % this.cif.cast.length].characterName;
+							}while (p.primary == p.secondary);
+							break;
+						default:
+							Debug.debug(this, "createSFDBEntries(): trigger context type creation error.");
+					}
+					//trace(p.toString());
+					r.name = "rule generated for SFDBContext entry number: " + i;
+					r.predicates.push(p.clone());
+					r.valuation(this.cif.cast.getCharByName(p.primary), this.cif.cast.getCharByName(p.secondary));
+					tc.time = i;
+					tc.change = r.clone();
+					this.cif.sfdb.contexts.push(tc.clone());
+					//trace(tc.toXMLString());
+				}else if (2 == rand) {
+					//SocialGameContext type
+					sgc = new SocialGameContext();
+				}
+			}
+		}
+	  ]]>
+	</fx:Script>
+	  
+</s:WindowedApplication>

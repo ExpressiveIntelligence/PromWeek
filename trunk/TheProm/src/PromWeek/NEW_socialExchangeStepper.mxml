@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 preinitialize="onPreinitialize()"
+		 width="100%" height="100%">
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+					
+		 </fx:Declarations>
+		
+		 <s:VGroup horizontalAlign="center" width="100%" height="100%">
+			<s:VGroup id="socialExchangeButtonGroup" width="100%" height="83%" gap="3" />
+			<s:HGroup id="stepperButtonsGroup" width="100%" height="17%" horizontalAlign="center" verticalAlign="middle" paddingLeft="30" paddingRight="30">
+				<s:Button id="stepUpButton" width="50%" height="100%" click="stepUpButtonClicked(event)" skinClass="PromWeek.skins.NEW_triangleButtonSkin" />
+				<s:Button id="stepDownButton" width="50%" height="100%" click="stepDownButtonClicked(event)" skinClass="PromWeek.skins.NEW_triangleButtonSkin" scaleY="-1" />
+			</s:HGroup>
+		</s:VGroup>
+		 
+	<fx:Script>
+		<![CDATA[
+		import CiF.CiFSingleton;
+		import CiF.GameScore;
+		import CiF.LineOfDialogue;
+		import flash.events.MouseEvent;
+		import flash.filters.ConvolutionFilter;
+		import flash.sampler.NewObjectSample;
+		import PromWeek.assets.ResourceLibrary;
+		
+		public const NON_QUICKPLAY_MAX_SGS_IN_STEPPER:int = 10;
+		public const NON_QUICKPLAY_NUMBER_WE_WANT_TO_ENSURE_DIVERSITY_IN:int = 4;
+		
+		public const maxNumButtons:int = 4; // This should really be four!
+		public var numberWeWantToEnsureDiversityIn:int = 4; // 4 is the base number!
+		public var maxSocialGameButtonsInStepper:int = 10; // 10 is the base number!
+		
+		public const exceptionallyImportantGameThreshold:int = 1;
+		
+		private var rL:ResourceLibrary;
+		private var cif:CiFSingleton;
+		private var dm:DifficultyManager;
+		private var gameEngine:PromWeek.GameEngine;
+		
+		public var socialGameNames:Vector.<String>;
+		public var socialGamesLockedState:Vector.<Boolean>;
+		public var superSocialExchangeButtons:Vector.<NEW_superSocialExchangeButton>;
+		
+		public var stepperGameScores:Vector.<GameScore>;
+		
+		private var _currentIndex:int;
+		
+		public function onCreationComplete():void 
+		{			
+			this.superSocialExchangeButtons = new Vector.<NEW_superSocialExchangeButton>();
+			for (var i:int = 0; i < this.maxNumButtons; i++ )
+			{
+				var superSocialExchangeButton:NEW_superSocialExchangeButton = new NEW_superSocialExchangeButton();
+				this.superSocialExchangeButtons.push(superSocialExchangeButton);
+				this.socialExchangeButtonGroup.addElement(superSocialExchangeButton);
+			}
+			
+		}
+		
+		private function onPreinitialize():void 
+		{
+			rL = ResourceLibrary.getInstance();
+			cif = CiFSingleton.getInstance();
+			dm = DifficultyManager.getInstance();
+			gameEngine = PromWeek.GameEngine.getInstance();
+		}
+
+		public function set currentIndex(index:int):void
+		{
+			this._currentIndex = index;
+			
+			this.updateSocialExchangeButtonStepper();
+		}
+		
+		public function get currentIndex():int
+		{
+			return this._currentIndex;
+		}
+		
+		public function stepUpButtonClicked(e:MouseEvent = null):void
+		{
+			this.currentIndex = this.currentIndex - 1;
+		}
+		
+		
+		public function stepDownButtonClicked(e:MouseEvent = null):void
+		{
+			this.currentIndex = this.currentIndex + 1;
+		}
+		
+		
+		/**
+		 * This only updates the stepper based on whats in stepperGameScores
+		 */
+		public function updateSocialExchangeButtonStepper():void
+		{
+			figureOutNumSGButtonsToDisplayAndDiversity();
+			if ((this.currentIndex + this.maxNumButtons) >= this.stepperGameScores.length)
+			{
+				this.stepDownButton.enabled = false;
+			}
+			else
+			{
+				this.stepDownButton.enabled = true;
+			}
+			
+			if (this.currentIndex <= 0)
+			{
+				this.stepUpButton.enabled = false;
+			}
+			else
+			{
+				this.stepUpButton.enabled = true;
+			}
+
+			var numberAdded:int = 0;
+			for each (var superSocialExchangeButton:PromWeek.NEW_superSocialExchangeButton in this.superSocialExchangeButtons)
+			{
+				if ((this.currentIndex + numberAdded) < this.stepperGameScores.length)
+				{
+					var forceUnlock:Boolean;
+					if ((numberAdded + this.currentIndex) < this.maxNumButtons)
+					{
+						forceUnlock = true;
+					}
+					else
+					{
+						forceUnlock = false;
+					}
+					
+					
+					superSocialExchangeButton.updateStateBasedOnGameScore(this.stepperGameScores[this.currentIndex + numberAdded],forceUnlock);
+					superSocialExchangeButton.visible = true;
+					numberAdded++;
+				}
+				else
+				{
+					superSocialExchangeButton.visible = false;
+					this.stepUpButton.enabled = false;
+					this.stepDownButton.enabled = false;
+				}
+			}
+		}
+
+		/**
+		 * This will be called whenever we select a new responder, by the end of it, we have the vector of gamescores all sorted and such
+		 * There will be maxSocialGameButtonsInStepper in the list of gameScores
+		 */
+		public function updateSocialGameScoreList():void
+		{
+
+			figureOutNumSGButtonsToDisplayAndDiversity();
+
+			var volitionThreshold:Number = dm.getVolitionThreshold("initiator"); // adjust volition threshold based on current difficulty setting.
+			//This returns all social games from initiator to responder that are greater than or equal to the volition threshold.
+			//The volition threshold changes based on the difficulty.
+			var topGameScores:Vector.<GameScore> =  cif.cast.getCharByName(gameEngine.primaryAvatarSelection).prospectiveMemory.getHighestGameScoresTo(gameEngine.secondaryAvatarSelection, this.numberWeWantToEnsureDiversityIn, volitionThreshold);
+			
+			var numButtonsToDisplay:int = topGameScores.length;
+			
+			//This is us trying to limit the amount of duplicate intents characters want to play with each other.
+			var exceptionalGameScores:Vector.<GameScore> = new Vector.<GameScore>(); // this will be ALL games that initiator wants to play with responder! ALL of them greater than 0.
+			for each(var gs:GameScore in cif.cast.getCharByName(gameEngine.primaryAvatarSelection).prospectiveMemory.scores) {
+				if (gs.responder.toLowerCase() == gameEngine.secondaryAvatarSelection.toLowerCase()) {
+					if (gs.score > exceptionallyImportantGameThreshold) {
+						var shouldAdd:Boolean = true; // assume that we SHOULD add a new game (i.e. assume that it is not already in top scores).
+						for each (var gs2:GameScore in topGameScores) { //when building our exceptionalGameScores, want to make sure it isn't in the top scores.
+							if ((GameScore.equals(gs, gs2)) || (cif.socialGamesLib.getByName(gs.name).intents[0].predicates[0].getIntentType() == cif.socialGamesLib.getByName(gs2.name).intents[0].predicates[0].getIntentType()) ) { 
+								shouldAdd = false;  // oops! This game already is in top scores OR we already have the intent of this game in our top game scores! Don't add it to exceptionalGameScores!
+							}			
+						}
+						if (shouldAdd) { 
+							exceptionalGameScores.push(gs); // we never encountered gs inside of topGameScores and it has a unique intent -- lets add it to exceptionalGameScores!
+						}
+					}
+				}
+			}
+			var i:int;
+			var j:int;
+			var vectorLength:int = exceptionalGameScores.length;
+			//We need to go through our exceptionalGameScores and make sure that we have no duplicate intents inside of it!  If there are, we remove the game that has the lower score.
+			for (i = 0; i < vectorLength; i++) {
+				for (j = 0; j < vectorLength; j++) {
+					if (j >= exceptionalGameScores.length || (i >= exceptionalGameScores.length)) {
+						break; // get out of here!
+					}
+					if (i != j) { // we don't want to be dealing with the same game!
+						//first we should find out if they have the same intent.
+						if (cif.socialGamesLib.getByName(exceptionalGameScores[i].name).intents[0].predicates[0].getIntentType() == cif.socialGamesLib.getByName(exceptionalGameScores[j].name).intents[0].predicates[0].getIntentType()) { // they have the same intent!
+							if (exceptionalGameScores[i].score > exceptionalGameScores[j].score) { 
+								// i is better than j -- kill j
+								exceptionalGameScores.splice(j, 1);
+								vectorLength--;
+								if (i >= j) { // want to make sure that the length is correct!
+									//i = i - 1;
+								}
+							}
+							else {
+								// j is better than i -- kill i (we also do this if i and j have the same score)
+								exceptionalGameScores.splice(i, 1);
+								vectorLength--;
+								if (j >= i) { // want to make sure that the length is correct!
+									//j = j - 1;
+								}
+							}
+						}
+					}
+				}
+			}
+			
+			function comp(x:GameScore, y:GameScore):Number 
+			{
+				if (x.score < y.score)
+				{
+					return 1.0;
+				}
+				else if (x.score > y.score)
+				{
+					return -1.0;
+				}
+				else
+				{
+					return 0;
+				}
+			}
+			exceptionalGameScores.sort(comp); // so now the game with the highest number is first!
+			topGameScores.sort(comp);
+			
+			
+			//As long as we have 'spare' social games inside of exceptional social games, AND as long as we have duplicate intents
+			//inside of our topGameScores vector, replace the lowest scoring duplicate with the highest scoring exceptionalGameScore.
+			while (exceptionalGameScores.length > 0 && existsDuplicateIntentsInVector(topGameScores)) {
+				var currentLeastGoodIndex:int = -999;
+				for (i = 0; i < topGameScores.length; i++) {
+					for (j = 0; j < topGameScores.length; j++) {
+						if ( i != j) {
+							if (cif.socialGamesLib.getByName(topGameScores[i].name).intents[0].predicates[0].getIntentType() == cif.socialGamesLib.getByName(topGameScores[j].name).intents[0].predicates[0].getIntentType()) { // they have the same intent!
+								if (topGameScores[i].score > topGameScores[j].score) { 
+									// i is better than j -- BUT we cant kill i right away...
+									currentLeastGoodIndex = j;
+								}
+								else {
+									// j is better than i -- BUT we cant kill right away...
+									currentLeastGoodIndex = i;
+								}
+							}
+						}
+					}
+				}
+				if (currentLeastGoodIndex != -999) { // we found something to replace!!!!
+					//Debug.debug(this, "REPLACEMENT! Used to have" + topGameScores[currentLeastGoodIndex].toString() + " now have: " + exceptionalGameScores[0].toString());
+					topGameScores[currentLeastGoodIndex] = exceptionalGameScores.splice(0, 1)[0]; // we can say 0 because we know for sure it is sorted. We add the [0] because splice returns a vector.
+				}
+			}
+					
+			
+			var gameScores:Vector.<GameScore> = topGameScores;
+			gameScores.sort(comp);
+			
+			//If there is a tie in game scores, lets make it so that they
+			//are sorted alphabetically.
+			for (var k:int = 0; k < gameScores.length - 1; k++) {
+				var swapIndex:int = -1;
+				for (var outer:int = k; outer < gameScores.length; outer++){
+					if (gameScores[k].score > gameScores[outer].score && swapIndex != -1) {
+						var tempGameScore:GameScore = gameScores[k].clone();
+						gameScores[k] = gameScores[swapIndex];
+						gameScores[swapIndex] = tempGameScore;
+						break;
+					}
+					else if (gameScores[k].score == gameScores[outer].score) {
+						//need to figure out which one comes first alphabetically.
+						if (gameScores[k].name <= gameScores[outer].name) {
+							//nothing!  We are set!
+						}
+						else {
+							swapIndex = outer;
+						}
+					}
+				}
+			}
+			
+			//at this point gamescores hold a perfect list of diverse social games of length this.numberWeWantToEnsureDiversityIn
+			//now we want to create a list of gamescores of length this.maxGamesStepper
+			var allGameScores:Vector.<GameScore> =  cif.cast.getCharByName(gameEngine.primaryAvatarSelection).prospectiveMemory.getHighestGameScoresTo(gameEngine.secondaryAvatarSelection, gameEngine.currentSetOfSocialGames.length, -1000); // someone will have to REALLY not want to play a game in order for it to not show up in the drop down list.
+			allGameScores.sort(comp);
+			for each(var gsFromAllGameScores:GameScore in allGameScores) 
+			{
+				if (gsFromAllGameScores.score != -100) //means we haven't passed the precondition
+				{
+					var alreadyHaveInList:Boolean = false;
+					for each(var gs1:GameScore in gameScores)
+					{
+						if (gs1.name == gsFromAllGameScores.name)
+						{
+							alreadyHaveInList = true;
+						}
+					}
+					if (!alreadyHaveInList && gameScores.length < this.maxSocialGameButtonsInStepper)
+					{
+						gameScores.push(gsFromAllGameScores);
+					}
+				}
+			}
+			
+			
+			//OK, so by this point, we are all fine and dandy.
+			// the line 
+			// this.stepperGameScores = gameScores;
+			// is under 'normal' circumstances exactly what we want.
+			//However, we now need to verify that we haven't 'forced' any SGs
+			//on this particular turn. If we have, then we have to do a little bit of swapping out.
+			if (gameEngine.currentStory.forcedSGs.length >= 1) { // only both if we've specified some forced games.
+				for each(var forcedSG:ForcedSG in gameEngine.currentStory.forcedSGs) {
+					if (forcedSG.initiator.toLowerCase() == gameEngine.primaryAvatarSelection.toLowerCase() && forcedSG.responder.toLowerCase() == gameEngine.secondaryAvatarSelection.toLowerCase()) {
+						//ok, we know that we are dealing with the 'right' people.
+						if (cif.time == forcedSG.turnsIn) {
+							//And NOW we know that we are dealing with the correct moment in time.
+							//By this point, it seems like now there are two potential issues -- either they ALREADY wanted to play this game, but it wasn't at the top OR they just didn't want to play this game at all.
+							//If it was already in the list, move it out of it's current position and move it to the top.
+							//If it wasn't already in the list, add it to the top, and remove the 'last' game from the list.
+							var indexOfForcedSG:int = gameScoresContainForcedSG(gameScores, forcedSG);
+							if (indexOfForcedSG != -1) {
+								//This means that the game DID exist in the vector already. Splic it out of it's current position and move it to the top of the stack.
+								//var placeHolderGameScore:Vector.<GameScore> = gameScores.splice(indexOfForcedSG, 1);
+								
+								var gsSpecial:GameScore = gameScores[indexOfForcedSG];
+								gameScores.splice(indexOfForcedSG, 1);
+								gameScores.splice(0, 0, gsSpecial);
+								
+								//gameScores.push(placeHolderGameScore[0]); // take it out from the middle and put it on top!
+							}
+							else {
+								//This means that the game did NOT exist in the vector already. Add it to the top, and splice out the last thing in the list.
+								for each(var resurrectedGameScore:GameScore in allGameScores) {
+									if (resurrectedGameScore.name.toLowerCase() == forcedSG.gameName.toLowerCase()) { // awesome! we found the game!
+										//gameScores.push(resurrectedGameScore); // add the 'resurrected' game score to the top of the list!
+										gameScores.splice(0, 0, resurrectedGameScore);
+										gameScores.splice(gameScores.length - 1, 1); // splice out the old thing that they wanted to do!
+										break; // we are only going to be replacing one thing at a time like this.
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			
+			
+			
+			
+			
+			
+			
+			this.stepperGameScores = gameScores;
+		}
+		
+		/**
+		 * This function is meant to check if we have two game scores that have the same
+		 * intent in a vector of game scores.  If we do,return true, if not, false.
+		 * @param	intentVector a vector of gamescores -- the underlying assumption is that we
+		 * do not want duplicate intents.
+		 * @return true if duplicate intents exist, false if otherwise.
+		 */
+		public function existsDuplicateIntentsInVector(intentVector:Vector.<GameScore>):Boolean {
+			for (var i:int = 0; i < intentVector.length; i++) {
+				for (var j:int = 0; j < intentVector.length; j++) {
+					if (i != j) {
+						if (cif.socialGamesLib.getByName(intentVector[i].name).intents[0].predicates[0].getIntentType() == cif.socialGamesLib.getByName(intentVector[j].name).intents[0].predicates[0].getIntentType()) { // they have the same intent!
+							return true;
+						}
+					}
+				}
+			}
+			return false;
+		}
+		
+		public function figureOutNumSGButtonsToDisplayAndDiversity():void {
+			if (gameEngine.currentStory.isQuickPlay) { // quick play mode!
+				maxSocialGameButtonsInStepper = gameEngine.currentStory.quickPlayNumberOfGamesAvailable;
+				if (maxSocialGameButtonsInStepper < 4)
+					numberWeWantToEnsureDiversityIn = maxSocialGameButtonsInStepper;
+				else // don't think we should get to here...
+					numberWeWantToEnsureDiversityIn = NON_QUICKPLAY_NUMBER_WE_WANT_TO_ENSURE_DIVERSITY_IN
+			}
+			else { // non quick play mode! Use defaults!
+				maxSocialGameButtonsInStepper = NON_QUICKPLAY_MAX_SGS_IN_STEPPER;
+				numberWeWantToEnsureDiversityIn = NON_QUICKPLAY_NUMBER_WE_WANT_TO_ENSURE_DIVERSITY_IN;
+			}
+		}
+		
+		/**
+		 * Checks to see if the passed in vector of game scores contains a reference to the forced SG.
+		 * If so, return the index in the vector of the specified game.  If not, return -1
+		 * @param	gameScores A vector of gameScores -- by this point we assume we've already have done a check for the initiator and the responder.
+		 * @param	forcedSG The social game that we want to force the already specified pair of characters to play.
+		 * @return An int that represents the index of the location of the specified forcedSG in the vector of gameScores.  -1 means the game was not in the vector, meaning the characters did not want to play it of their own volition.
+		 */
+		private function gameScoresContainForcedSG(gameScores:Vector.<GameScore>, forcedSG:ForcedSG):int {
+			var i:int = 0;
+			for (i = 0; i < gameScores.length; i++) {
+				if (gameScores[i].name.toLowerCase() == forcedSG.gameName.toLowerCase()) {
+					return i;
+				}
+			}
+			//If we got here, that means that we didn't find it!
+			return -1;
+		}
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

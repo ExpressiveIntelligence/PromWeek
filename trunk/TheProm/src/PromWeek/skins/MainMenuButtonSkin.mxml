@@ -1,0 +1,107 @@
+<s:Skin 
+    xmlns:fx="http://ns.adobe.com/mxml/2009" 
+    xmlns:mx="library://ns.adobe.com/flex/mx" 
+    xmlns:s="library://ns.adobe.com/flex/spark"
+	styleName="classicPromWeek"
+	alpha.disabled="0.1"
+	alpha="1.0">
+
+	<fx:Metadata> 
+		[HostComponent("PromWeek.MainMenuButton")] 
+	</fx:Metadata>
+	<fx:Declarations>
+		<fx:Number id="roundness">5</fx:Number>
+		<fx:Number id="strokeAlpha">1.0</fx:Number>
+		<fx:Number id="strokeColor">0x000000</fx:Number>
+		<fx:Number id="strokeWeight">3</fx:Number>
+	</fx:Declarations>
+	<s:states> 
+		<s:State name="up" /> 
+		<s:State name="over" /> 
+		<s:State name="down" /> 
+		<s:State name="disabled" /> 
+	</s:states>
+	<s:Group width="{hostComponent.width}" height="{hostComponent.height}">
+		<!-- up and disabled states -->
+		<s:Rect width="100%" height="100%" includeIn="up,disabled" visible="{getStyle('mainMenuButtonUseSolidFill')}"  includeInLayout="{getStyle('mainMenuButtonUseSolidFill')}" radiusX="{getStyle('mainMenuButtonRoundness')}" radiusY="{getStyle('mainMenuButtonRoundness')}">
+			<s:fill>
+				<s:SolidColor color="{getStyle('buttonColor')}"  />
+			</s:fill>
+			<s:stroke>
+				<s:SolidColorStroke color="{getStyle('buttonStroke')}" alpha="{this.strokeAlpha}" weight="{getStyle('mainMenuButtonStrokeWeight')}" />
+			</s:stroke>
+		</s:Rect>
+		
+		<s:Rect width="100%" height="100%" includeIn="up,disabled"  visible="{getStyle('mainMenuButtonUseGradient')}"  includeInLayout="{getStyle('mainMenuButtonUseGradient')}" radiusX="{getStyle('mainMenuButtonRoundness')}" radiusY="{getStyle('mainMenuButtonRoundness')}">
+			<s:fill>
+				<s:LinearGradient rotation="90">
+					<s:entries>
+						<s:GradientEntry color="#FFFFFF" alpha="0.1"/>
+						<s:GradientEntry color="#000000" alpha="0.1"/>
+					</s:entries>
+				</s:LinearGradient>
+			</s:fill>
+			<s:stroke>
+				<s:SolidColorStroke color="{getStyle('backgroundStroke')}" alpha="{this.strokeAlpha}" weight="{getStyle('mainMenuButtonStrokeWeight')}" />
+			</s:stroke>
+		</s:Rect>
+		
+		<!-- over state -->
+		<s:Rect width="100%" height="100%" includeIn="over" visible="{getStyle('mainMenuButtonUseSolidFill')}"  includeInLayout="{getStyle('mainMenuButtonUseSolidFill')}" radiusX="{getStyle('mainMenuButtonRoundness')}" radiusY="{getStyle('mainMenuButtonRoundness')}">
+			<s:fill>
+				<s:SolidColor color="{getStyle('buttonColorOver')}" />
+			</s:fill>
+			<s:stroke>
+				<s:SolidColorStroke color="{getStyle('buttonStrokeOver')}" alpha="{this.strokeAlpha}" weight="{getStyle('mainMenuButtonStrokeWeight')}"/>
+			</s:stroke>
+		</s:Rect>
+		
+		<s:Rect width="100%" height="100%" includeIn="over" visible="{getStyle('mainMenuButtonUseGradient')}"  includeInLayout="{getStyle('mainMenuButtonUseGradient')}" radiusX="{getStyle('mainMenuButtonRoundness')}" radiusY="{getStyle('mainMenuButtonRoundness')}">
+			<s:fill>
+				<s:LinearGradient rotation="90">
+					<s:entries>
+						<s:GradientEntry color="#FFFFFF" alpha="0.3"/>
+						<s:GradientEntry color="#000000" alpha="0.1"/>
+					</s:entries>
+				</s:LinearGradient>
+			</s:fill>
+			<s:stroke>
+				<s:SolidColorStroke color="{getStyle('backgroundStroke')}" alpha="{this.strokeAlpha}" weight="{getStyle('mainMenuButtonStrokeWeight')}"/>
+			</s:stroke>
+		</s:Rect>
+		
+		
+		<!-- down state -->
+		<s:Rect width="100%" height="100%" includeIn="down" visible="{getStyle('mainMenuButtonUseSolidFill')}"  includeInLayout="{getStyle('mainMenuButtonUseSolidFill')}"  radiusX="{getStyle('mainMenuButtonRoundness')}" radiusY="{getStyle('mainMenuButtonRoundness')}">
+			<s:fill>
+
+				<s:SolidColor color="{getStyle('buttonColorDown')}" />
+			</s:fill>
+			<s:stroke>
+				<s:SolidColorStroke color="{getStyle('backgroundStroke')}" alpha="{this.strokeAlpha}" weight="{getStyle('mainMenuButtonStrokeWeight')}"/>
+			</s:stroke>
+		</s:Rect>
+		
+		<s:Rect width="100%" height="100%" includeIn="down" visible="{getStyle('mainMenuButtonUseGradient')}"  includeInLayout="{getStyle('mainMenuButtonUseGradient')}"  radiusX="{getStyle('mainMenuButtonRoundness')}" radiusY="{getStyle('mainMenuButtonRoundness')}">
+			<s:fill>
+				<s:LinearGradient rotation="90">
+					<s:entries>
+						<s:GradientEntry color="#000000" alpha="0.1"/>
+						<s:GradientEntry color="#FFFFFF" alpha="0.1"/>
+					</s:entries>
+				</s:LinearGradient>
+			</s:fill>
+			<s:stroke>
+				<s:SolidColorStroke color="{getStyle('backgroundStroke')}" alpha="{this.strokeAlpha}" weight="{getStyle('mainMenuButtonStrokeWeight')}"/>
+			</s:stroke>
+		</s:Rect>
+		
+		
+		<!-- button text for all states -->
+		<s:HGroup width="100%" height="100%">
+			<s:RichText id="title" textAlign="center" fontWeight="bold" fontSize="23" color="{getStyle('textColor')}" verticalAlign="middle" width="100%" height="100%" styleName="promWeekButtonStyle">
+				<s:text>{hostComponent.title}</s:text>
+			</s:RichText>
+		</s:HGroup>
+	</s:Group>
+</s:Skin>

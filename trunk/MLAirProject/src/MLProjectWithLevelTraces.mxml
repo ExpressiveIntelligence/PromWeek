@@ -1,0 +1,1901 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+				xmlns:s="library://ns.adobe.com/flex/spark"
+				xmlns:mx="library://ns.adobe.com/flex/mx"
+				creationComplete="onCreationComplete()"
+				initialize="initializeMLProject()"
+				width="100%"
+				height="100%">
+				
+	<fx:Declarations>
+		<!--fx:XML id="cifStateXMLFoGState" source="../../CiFStates/FoGState.xml" />
+		<fx:XML id="cifLibrariesXML" source="../../CiFStates/libraries (master).xml" /-->
+        <fx:XML id="cifStateXMLFoGState" source="../bin/FoGState.xml" />
+        <fx:XML id="cifLibrariesXML" source="../bin/libraries (master).xml" />
+		<fx:XML id="gameXML" source="gameConfig.xml" />
+	</fx:Declarations>
+	
+	<s:states>
+		<s:State name="Compute"/>
+		<s:State name="TakeABreath"/>
+	</s:states>
+	
+	<fx:Script>
+		<![CDATA[
+		import CiF.*;
+		import flash.filesystem.File;
+		import flash.filesystem.FileStream;
+		import flash.utils.Dictionary;
+	
+		
+		private var cif:CiFSingleton;
+		private var level:Level;
+		private var stories:Vector.<Story>;
+		private var playTrace:Vector.<GameScore>;
+		private static const TIMES_TO_EXECUTE:int = 60; // Number of times to 'execute the level' as it were (e.g. if level is 30 turns and times to execute is 2, then would output 60 social games played).
+		
+		private var parseModeOn:Boolean = true;
+		private var petrubingState:Boolean = true;
+		
+		private static const SIMON_LEVEL_ID:int = 0;
+		private static const CHLOE_LEVEL_ID:int = 1;
+		private static const ZACK_LEVEL_ID:int = 2;
+		private static const MONICA_LEVEL_ID:int = 3;
+		private static const BUZZ_LEVEL_ID:int = 4;
+		
+		
+		private var debonairLastTimeToChloe:Boolean = false;
+		private var debonairToChloeCoolDown:int = 0;
+		
+		private var zackToMonicaRomanticRejectionCooldown:int = 0;
+		private var zackToChloeRomanticRejectionCooldown:int = 0;
+		
+		private var turnsInLevel:int;
+		private var timesRan:int = 0;
+		private var xmlString:String = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n";
+		private var stateXMLString:String = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n";
+		private var myTimer:Timer = new Timer(1000); // 1 second
+		private var featureNumber:int = 0;
+		private var turnsRemainingInLevel:int;
+		private var isInitialRun:Boolean = true;
+		private var isGamewon:Boolean = false;
+		private var firstInANewLevel:Boolean = false;
+		private var availableSocialGames:Vector.<GameScore> = new Vector.<GameScore>();
+		
+		public function initializeMLProject():void {
+			cif = CiFSingleton.getInstance();
+			playTrace = new Vector.<GameScore>();
+			this.currentState = "Compute";
+			xmlString += "<GeneratedRuns bot=\"heroBot\" state=\"iFoG\" libraries=\"libraries (master).xml\" date=\"May9th\">";
+			//stateXMLString += "<TestingWithState>";
+		} 
+		
+		public function onCreationComplete():void {
+			this.cif.parseCiFState(cifStateXMLFoGState); // game state (all of the the characters and relationships to each other.
+			this.cif.parseCiFState(cifLibrariesXML); // master file (social games and microtheories
+			
+			
+
+			
+			this.cif.prepareLocutions();
+			
+			//as of now, this will load a scenario based on the xml
+			this.loadStories(this.gameXML.Stories[0]);
+			
+			this.level = stories[0].levels[0]; // let's look at the first level of the first story for now.
+			trace ("level description is: " + level.description);
+			trace ("level goal is: " + level.goalRules);
+			
+			//PETRUB STATE EXPERIMENT!!!!!
+			if(petrubingState)
+				peturbState();
+			
+			turnsInLevel = 30;
+			
+			turnsRemainingInLevel = turnsInLevel;
+			
+			xmlString += "<LevelTrace id=\"" + timesRan + "\">";
+			stateXMLString += "<LevelTrace id=\"" + timesRan + "\">";
+			
+
+			
+			xmlString += "<InitialVolitions>";
+			//Form the intent for the characters.
+			this.formIntentForAll(level.cast, cif.cast.characters);
+			availableSocialGames = findTopSocialGames();
+			xmlString += "</InitialVolitions>";
+			
+			
+			
+
+			
+			if(!parseModeOn){ // this is the 'normal' functionality (generating play traces
+			// Set up the timer listening, to go again and again!
+			myTimer.addEventListener(TimerEvent.TIMER, runMany);
+			myTimer.start();
+			}
+			else { // this is functionality where we attempt to parse information that we've already gathered.
+				parseData();
+			}
+			
+		}
+		
+		/**
+		 * Translates XML story specifications into instances of the Story class.
+		 * @param	storiesXML	Stories as XML.
+		 */
+		public function loadStories(storiesXML:XML):void {
+			var story:Story;
+			this.stories = new Vector.<Story>();
+			for each (var storyXML:XML in storiesXML..Story) {
+				story = new Story();
+				story.loadFromXML(storyXML);
+				this.stories.push(story);
+			}
+		}
+		
+		
+		/**
+		 * This function will form the intent, pick a social game (based on a bot policy), and then
+		 * play the selected social game.
+		 */
+		public function oneIteration():void {				
+				//FIND A GAME TO PLAY
+				
+				var gameToPlay:GameScore = casanovaBot(level.cast, availableSocialGames, level.goalRules);
+				
+				var init:Character = new Character();
+				var respond:Character = new Character();
+				var other:Character = null
+				for each (var person2:Character in level.cast) {
+					if (person2.characterName.toLowerCase() == gameToPlay.initiator.toLowerCase())
+						init = person2;
+					else if (person2.characterName.toLowerCase() == gameToPlay.responder.toLowerCase())
+						respond = person2;
+					else if (person2.characterName.toLowerCase() == gameToPlay.other.toLowerCase())
+						other = person2;
+				}
+					
+				//play the game, enact the changes, and add the game to a running list of all games played.
+				var test:Boolean = false;
+				var sgContext:SocialGameContext = new SocialGameContext();
+				if (test) {
+					//Give Advice (hoping for effect 5)
+					//sgContext = cif.playGame(cif.socialGamesLib.getByName("Give Advice"), level.cast[CHLOE_LEVEL_ID], level.cast[ZACK_LEVEL_ID], other, cif.cast.characters, level.cast);
+					
+					//Thoughtless remark (hoping for effect 12)
+					sgContext = cif.playGame(cif.socialGamesLib.getByName("Thoughtless Remark"), level.cast[ZACK_LEVEL_ID], level.cast[CHLOE_LEVEL_ID], other, cif.cast.characters, level.cast);
+				}
+				else{
+				 sgContext = cif.playGame(cif.socialGamesLib.getByName(gameToPlay.name), init, respond, other, cif.cast.characters, cif.cast.characters);
+				}
+				
+				xmlString += "<SGC gameName=\"" + sgContext.gameName + "\" initiator=\"" + 
+				sgContext.initiator + "\" responder=\"" + sgContext.responder + "\" other=\"" + sgContext.other + "\" time=\"" + 
+				sgContext.time + "\" effectIndex=\"" + sgContext.effectIndex + "\">";
+				
+				Debug.debug(this, "GAME PLAYED: " + sgContext.toXMLString());
+				
+				
+				//This (or, well, probably not here in the code in teh grand scheme of things... probably in some function somewhere would be best.
+				//is where I need to make sure I find the information about people in the correct order.
+				//And what is that order, we decided?
+				//it was
+				//ZaCK
+				//TARGET
+				//OTHER GIRL
+				//BUZZ
+				//SIMON
+				var tempTargetName:String = "monica"; // doesn't really matter -- will get reset if it needs to!
+				var contextSet:Boolean = false;
+				for each(var intentRule:Rule in cif.socialGamesLib.getByName(sgContext.gameName).intents){
+					//if (sgContext.gameName == "Physical Flirt" || sgContext.gameName == "Conversational Flirt") {
+					//if(intentRule.name == "intent(RomUp)" || intentRule.name == "intent(Dating)"){ // we care about anything that involves romance up or dating!
+					var intentName:String = Predicate.getIntentNameByNumber(intentRule.predicates[intentRule.findIntentIndex()].getIntentType());
+					if( intentName == Predicate.getIntentNameByNumber(Predicate.INTENT_ROMANCE_UP) || intentName == Predicate.getIntentNameByNumber(Predicate.INTENT_DATING)){
+						if (sgContext.initiator.toLowerCase() == "zack") {
+							if (sgContext.responder.toLowerCase() == "monica") {
+								tempTargetName = "monica";
+								if (cif.socialGamesLib.getByName(sgContext.gameName).getEffectByID(sgContext.effectIndex).isAccept) { // Monica Accepted!!!!!
+									stateXMLString += "<SGC gameName=\"" + sgContext.gameName + "\" initiator=\"" + 
+									sgContext.initiator + "\" responder=\"" + sgContext.responder + "\" other=\"" + sgContext.other + "\" time=\"" + 
+									sgContext.time + "\" effectIndex=\"" + sgContext.effectIndex + "\" label=\"1\">";
+									contextSet = true;
+								}
+								else { // Monica REJECTED!!!
+									stateXMLString += "<SGC gameName=\"" + sgContext.gameName + "\" initiator=\"" + 
+									sgContext.initiator + "\" responder=\"" + sgContext.responder + "\" other=\"" + sgContext.other + "\" time=\"" + 
+									sgContext.time + "\" effectIndex=\"" + sgContext.effectIndex + "\" label=\"0\">";
+									contextSet = true;
+									zackToMonicaRomanticRejectionCooldown += 3;
+								}
+							}
+							else if (sgContext.responder.toLowerCase() == "chloe") {
+								tempTargetName = "chloe";
+								if (cif.socialGamesLib.getByName(sgContext.gameName).getEffectByID(sgContext.effectIndex).isAccept) { // Chloe Accepted!!!!!
+									stateXMLString += "<SGC gameName=\"" + sgContext.gameName + "\" initiator=\"" + 
+									sgContext.initiator + "\" responder=\"" + sgContext.responder + "\" other=\"" + sgContext.other + "\" time=\"" + 
+									sgContext.time + "\" effectIndex=\"" + sgContext.effectIndex + "\" label=\"1\">";
+									contextSet = true;
+								}
+								else { // Chloe REJECTED!!!
+									stateXMLString += "<SGC gameName=\"" + sgContext.gameName + "\" initiator=\"" + 
+									sgContext.initiator + "\" responder=\"" + sgContext.responder + "\" other=\"" + sgContext.other + "\" time=\"" + 
+									sgContext.time + "\" effectIndex=\"" + sgContext.effectIndex + "\" label=\"0\">";
+									contextSet = true;
+									zackToChloeRomanticRejectionCooldown += 3;
+								}
+							}
+						}
+					}
+				}
+				if (!contextSet) {
+								stateXMLString += "<SGC gameName=\"" + sgContext.gameName + "\" initiator=\"" + 
+								sgContext.initiator + "\" responder=\"" + sgContext.responder + "\" other=\"" + sgContext.other + "\" time=\"" + 
+								sgContext.time + "\" effectIndex=\"" + sgContext.effectIndex + "\" label=\"NA\">";
+				}
+				
+				zackToChloeRomanticRejectionCooldown = Math.max(0, zackToChloeRomanticRejectionCooldown - 1);
+				zackToMonicaRomanticRejectionCooldown = Math.max(0, zackToMonicaRomanticRejectionCooldown - 1);
+				
+				if (sgContext.initiator.toLowerCase() == "zack" && sgContext.responder.toLowerCase() == "chloe") {
+					if (sgContext.gameName.toLowerCase() == "debonair") {
+						if (debonairLastTimeToChloe) { // oh oh!  Let's give a little bit of a cool down!
+							debonairToChloeCoolDown = 4;
+							debonairLastTimeToChloe = false;
+						}
+						else {
+							debonairLastTimeToChloe = true;
+						}
+					}
+				}
+				
+				debonairToChloeCoolDown = Math.max(0, debonairToChloeCoolDown - 1);
+				
+				printState(tempTargetName);
+				
+
+				
+				cif.changeSocialState(sgContext);
+				playTrace.push(gameToPlay);
+				
+				//Figure out which triggers just transpired.
+				
+				/*
+				xmlString += "<NewTriggers>";
+				for (var i:int = 0; i < cif.sfdb.contexts.length; i++) {
+					if (cif.sfdb.contexts[i].isTrigger() && cif.sfdb.contexts[i].getTime() == cif.time -1 ) { // cif time has already been incremented... we subtract one from it to look at the triggers that were just applied.
+						//trace("Trigger was just applied: " + cif.sfdb.contexts[i]);
+						var trigCon:TriggerContext = cif.sfdb.contexts[i] as TriggerContext;
+						xmlString += trigCon.toXMLString();
+					}
+				}
+				xmlString += "</NewTriggers>";
+				*/
+				
+				//Reset the availableSocial Games.
+				availableSocialGames = new Vector.<GameScore>();
+				
+				//Reform teh Intent
+				this.formIntentForAll(level.cast, cif.cast.characters);
+				
+				//Zack wants to play reminisce with buzz, etc.
+				availableSocialGames = findTopSocialGames();
+				
+				stateXMLString += "</SGC>";
+				xmlString += "</SGC>";
+				turnsRemainingInLevel--;
+				
+				if (level.evaluateGoals()) {
+					var timeEllapsed:int = level.timeLimit - turnsRemainingInLevel;
+					xmlString += "<GameWon iteration=\"" + timesRan + "\" turnNumber=\"" + timeEllapsed + "\"/>";
+					isGamewon = true;
+					return; // we are done with this  for now!
+				}
+				
+				
+		}
+		
+		/**
+		 * //Selects a random game to play, based on which games are available.  As such it doesn't depend too much on
+		 * the social state, BUT, if it NEEDS the social state, it would look within all of the fields of cif (our cif singleton object)
+		 * to divine it.
+		 * @param	cast the people in the level, i.e. the people that can actualy play a social game.
+		 * @param	availableSocialGames all of the social games that are options at this time, that is, the top five social games from each member of the cast TO each member of the cast.
+		 * @param	goals the goals of the level.  Smarter bots will take these into account when determining which social game to play.
+		 */
+		public function randomBot(cast:Vector.<Character>, availableSGS:Vector.<GameScore>, goals:Vector.<Rule>):GameScore {			
+			//find out which social game to play.
+			var gameIndex:int = Math.floor(Math.random() * (availableSGS.length));
+			trace ("Going to play the following social game: " + availableSGS[gameIndex]);
+			return availableSGS[gameIndex];
+		}
+		
+		
+		
+		public var OUTER_LOOP:int
+		
+		/**
+		 * This is a bot that has a HIGH PROPENSITY to pick Zack as the initiator,
+		 * and then if there is a romantic social game for him to play between either
+		 * Cassie or Monica, he will be very interested in playing it!
+		 * @param	cast
+		 * @param	availableSGS
+		 * @param	goals
+		 * @return
+		 */
+		public function casanovaBot(cast:Vector.<Character>, availableSGS:Vector.<GameScore>, goals:Vector.<Rule>):GameScore {
+			//90 percent chance that we choose Zack as initiator.
+			var heroName:String = "zack";
+			if (Math.random() < .65) { // chance that we choose this hero.
+				var startingIndex:int = Math.floor(Math.random() * (availableSGS.length));
+				if (Math.random() < .75) { // 85 percent chance that we make the hero the initiator
+					if (Math.random() < .8) { // pretty good chance Zack will do something romantic, but he may not.
+						for (OUTER_LOOP = startingIndex; OUTER_LOOP < availableSGS.length; OUTER_LOOP++) {	
+							if (availableSGS[OUTER_LOOP].initiator.toLowerCase() == heroName.toLowerCase() &&
+							(availableSGS[OUTER_LOOP].responder.toLowerCase() == "monica" || availableSGS[OUTER_LOOP].responder.toLowerCase() == "chloe")) { // only if zack is init and monica or chloe is target.
+								if (coolDownPrevents(availableSGS[OUTER_LOOP].responder)) {
+									continue;
+								}
+								else{
+									for each(var r:Rule in cif.socialGamesLib.getByName(availableSGS[OUTER_LOOP].name).intents) {
+										//if (r.name == "intent(RomUp)" || r.name == "intent(Dating)") {
+										var intentName:String = Predicate.getIntentNameByNumber(r.predicates[r.findIntentIndex()].getIntentType());
+										if( intentName == Predicate.getIntentNameByNumber(Predicate.INTENT_ROMANCE_UP) || intentName == Predicate.getIntentNameByNumber(Predicate.INTENT_DATING)){
+											//trace("going to play the following social game: " + availableSGS[i]);
+											return availableSGS[OUTER_LOOP];
+										}
+									}
+								}
+							}
+							/*
+							 * This is doing a physical flirt or a conversational flirt to Monica or Chloe -- we're gonna increase the options to include romUP or Dating.
+							if (availableSGS[i3].initiator.toLowerCase() == heroName.toLowerCase() && 
+							(availableSGS[i3].name == "Physical Flirt" || availableSGS[i3].name == "Conversational Flirt")  &&
+							(availableSGS[i3].responder.toLowerCase() == "monica" || availableSGS[i3].responder.toLowerCase() == "chloe")){
+							
+								//ok, we've done it. We've found a game where the hero is the initiator.
+								//Right now we aren't taking any goals of the game into account.
+								return availableSGS[i3];
+							}
+							*/
+						}
+						
+						//Loop around at the beginning!
+						for (OUTER_LOOP = 0; OUTER_LOOP < startingIndex; OUTER_LOOP++) {
+							if (availableSGS[OUTER_LOOP].initiator.toLowerCase() == heroName.toLowerCase() &&
+							(availableSGS[OUTER_LOOP].responder.toLowerCase() == "monica" || availableSGS[OUTER_LOOP].responder.toLowerCase() == "chloe")) { // only if zack is init and monica or chloe is target.
+								if (coolDownPrevents(availableSGS[OUTER_LOOP].responder)) {
+									continue;
+								}
+								else {
+									for each(r in cif.socialGamesLib.getByName(availableSGS[OUTER_LOOP].name).intents) {
+										//if (r.name == "intent(RomUp)" || r.name == "intent(Dating)") {
+										intentName = Predicate.getIntentNameByNumber(r.predicates[r.findIntentIndex()].getIntentType());
+										if( intentName == Predicate.getIntentNameByNumber(Predicate.INTENT_ROMANCE_UP) || intentName == Predicate.getIntentNameByNumber(Predicate.INTENT_DATING)){
+											//trace("going to play the following social game: " + availableSGS[i]);
+											return availableSGS[OUTER_LOOP];
+										}
+									}
+								}
+							}
+						}
+						
+						/*
+						if (availableSGS[j5].initiator.toLowerCase() == heroName.toLowerCase() && 
+						(availableSGS[j5].name == "Physical Flirt" || availableSGS[j5].name == "Conversational Flirt")  &&
+						(availableSGS[j5].responder.toLowerCase() == "monica" || availableSGS[j5].responder.toLowerCase() == "chloe")){
+							return availableSGS[j5];
+						}
+						*/
+						
+					}
+				
+					//THIS IS WHERE I WOULD HANDLE THE CASE WHERE ZACK IS THE INITIATOR BUT HE DIDN'T WANT TO DO ANYTHING
+					//ROMANTIC.  MAYBE I WANT HIM TO DO SOMETHING 'COOL'? If I don't do anything here, it will just
+					//go back to the beginning again!
+					
+					//That is just what I'll do!  I'm going to try to something 'nice' instead. (cool up or bud up).
+					for (OUTER_LOOP = startingIndex; OUTER_LOOP < availableSGS.length; OUTER_LOOP++) {	
+						if (availableSGS[OUTER_LOOP].initiator.toLowerCase() == heroName.toLowerCase() &&
+						(availableSGS[OUTER_LOOP].responder.toLowerCase() == "monica" || availableSGS[OUTER_LOOP].responder.toLowerCase() == "chloe")){ // only if zack is init and monica or chloe is target.
+							for each(r in cif.socialGamesLib.getByName(availableSGS[OUTER_LOOP].name).intents) {
+								//if (r.name == "intent(CoolUp)" || r.name == "intent(BudUp)") {
+								intentName = Predicate.getIntentNameByNumber(r.predicates[r.findIntentIndex()].getIntentType());
+								if ( intentName == Predicate.getIntentNameByNumber(Predicate.INTENT_COOL_UP) || intentName == Predicate.getIntentNameByNumber(Predicate.INTENT_BUDDY_UP)) {
+									
+									if(!networkTooHighPrevents("zack", availableSGS[OUTER_LOOP].responder.toLowerCase(), intentName)){
+										//trace("going to play the following social game: " + availableSGS[i]);
+										return availableSGS[OUTER_LOOP];
+									}
+								}
+							}
+						}
+					}
+					
+					//Loop around at the beginning!
+					for (OUTER_LOOP = 0; OUTER_LOOP < startingIndex; OUTER_LOOP++) {
+						if (availableSGS[OUTER_LOOP].initiator.toLowerCase() == heroName.toLowerCase() &&
+						(availableSGS[OUTER_LOOP].responder.toLowerCase() == "monica" || availableSGS[OUTER_LOOP].responder.toLowerCase() == "chloe")){ // only if zack is init and monica or chloe is target.
+							for each(r in cif.socialGamesLib.getByName(availableSGS[OUTER_LOOP].name).intents) {
+								//if (r.name == "intent(CoolUp)" || r.name == "intent(BudUp)") {
+								intentName = Predicate.getIntentNameByNumber(r.predicates[r.findIntentIndex()].getIntentType());
+								if( intentName == Predicate.getIntentNameByNumber(Predicate.INTENT_COOL_UP) || intentName == Predicate.getIntentNameByNumber(Predicate.INTENT_BUDDY_UP)){
+									//trace("going to play the following social game: " + availableSGS[i]);
+									if(!networkTooHighPrevents("zack", availableSGS[OUTER_LOOP].responder.toLowerCase(), intentName)){
+										//trace("going to play the following social game: " + availableSGS[i]);
+										return availableSGS[OUTER_LOOP];
+									}
+									return availableSGS[OUTER_LOOP];
+								}
+							}
+						}
+					}
+					
+				}
+				else { // hero is the responder at this point.
+					for (OUTER_LOOP = startingIndex; OUTER_LOOP < availableSGS.length; OUTER_LOOP++) {
+						//if (availableSGS[i4].responder.toLowerCase() == heroName.toLowerCase()) {
+						if (availableSGS[OUTER_LOOP].responder.toLowerCase() == heroName.toLowerCase() &&
+						(availableSGS[OUTER_LOOP].initiator.toLowerCase() == "monica" || availableSGS[OUTER_LOOP].initiator.toLowerCase() == "chloe")){ // only if zack is respond and monica or chloe are init.
+							//ok, we've done it. We've found a game where the hero is the responder.
+							//Lets try and focus on a game where someone does something romantic to him
+							//and you know, I think we should make it so that it is specifically Monica or Chloe doing
+							//something romantic (OR nice, even, maybe) to him, too.
+							for each(r in cif.socialGamesLib.getByName(availableSGS[OUTER_LOOP].name).intents) {
+								//if (r.name == "intent(RomUp)" || r.name == "intent(Dating)") {
+								intentName = Predicate.getIntentNameByNumber(r.predicates[r.findIntentIndex()].getIntentType());
+								if( intentName == Predicate.getIntentNameByNumber(Predicate.INTENT_ROMANCE_UP) || intentName == Predicate.getIntentNameByNumber(Predicate.INTENT_DATING)){
+									//trace("going to play the following social game: " + availableSGS[i]);
+									return availableSGS[OUTER_LOOP];
+								}
+							}
+							//return availableSGS[i4];
+						}
+						//trace("hwah");
+					}
+					
+					//I never looped back around at the beginning before!  I guess it didn't matter, but, you know, whatever.
+					for (OUTER_LOOP = 0; OUTER_LOOP < startingIndex; OUTER_LOOP++) {
+						//if (availableSGS[OUTER_LOOP].responder.toLowerCase() == heroName.toLowerCase()) {
+						if (availableSGS[OUTER_LOOP].responder.toLowerCase() == heroName.toLowerCase() &&
+						(availableSGS[OUTER_LOOP].initiator.toLowerCase() == "monica" || availableSGS[OUTER_LOOP].initiator.toLowerCase() == "chloe")){ // only if zack is respond and monica or chloe are init.
+							//ok, we've done it. We've found a game where the hero is the responder.
+							//Lets try and focus on a game where someone does something romantic to him
+							for each(r in cif.socialGamesLib.getByName(availableSGS[OUTER_LOOP].name).intents) {
+								//if (r.name == "intent(RomUp)" || r.name == "intent(Dating)") {
+								intentName = Predicate.getIntentNameByNumber(r.predicates[r.findIntentIndex()].getIntentType());
+								if( intentName == Predicate.getIntentNameByNumber(Predicate.INTENT_ROMANCE_UP) || intentName == Predicate.getIntentNameByNumber(Predicate.INTENT_DATING)){
+									//trace("going to play the following social game: " + availableSGS[i]);
+									return availableSGS[OUTER_LOOP];
+								}
+							}
+							//return availableSGS[i4];
+						}
+						//trace("hwah");
+					}
+				}
+			}
+			else { // just pick someone at random
+				return randomBot(cast, availableSGS, goals);
+			}
+			Debug.debug(this, "Zack didn't want to do anything romantic, I think is why we get  here -- doing random action");
+			return randomBot(cast, availableSGS, goals); // This is good for catching cases where Zack, for instance, didn't have anything romantic he wanted to do.
+		}
+		
+		/**
+		 * This bot will choose a champion based on the goals of the level, and will have a very high
+		 * chance of playing a social game that involves that person, thinking that if they are the
+		 * 'hero' of the level, then they should probably be selected to do stuff!
+		 * @param	cast
+		 * @param	availableSGS
+		 * @param	goals
+		 * @return
+		 */
+		public function heroBot(cast:Vector.<Character>, availableSGS:Vector.<GameScore>, goals:Vector.<Rule>):GameScore {
+			//For now, let's only look at the first rule.
+			var heroName:String = "";
+			var heroScores:Vector.<int> = new Vector.<int>(level.cast.length);
+			var heroIndex:int = -1;
+			var topScore:int = 0;
+			
+			for (var j:int = 0; j < heroScores.length; j++ ) {
+				heroScores[j] = 0;
+				//trace("la");
+			}
+			for each(var p:Predicate in goals[0].predicates) {
+				for (var i:int = 0; i < level.cast.length; i++) {
+					if (level.cast[i].characterName.toLowerCase() == p.first.toLowerCase()) {
+						heroScores[i] += 1;
+					}
+					if (level.cast[i].characterName.toLowerCase() == p.second.toLowerCase()) {
+						heroScores[i] += 1;
+					}
+				}
+				//trace("ba");
+			}
+			for (var i2:int = 0; i2 < heroScores.length; i2++) {
+				if (heroScores[i2] > topScore) {
+					heroIndex = i2;
+					topScore = heroScores[i2];
+				}
+				//trace("ta");
+			}
+			if (heroIndex >= 0) {
+				//Discovering the hero name only HAS to be done once, and really should be.
+				heroName = level.cast[heroIndex].characterName;
+			}
+			else {
+				//There is no hero on this level.  Just pick randomly.
+				return randomBot(cast, availableSGS, goals);
+			}
+			
+			//90 percent chance that we choose this hero.
+			if (Math.random() < .9) {
+				var startingIndex:int = Math.floor(Math.random() * (availableSGS.length));
+				if (Math.random() < .75) { // 75 percent chance that we make the hero the initiator
+					for (var i3:int = startingIndex; i3 < availableSGS.length; i3++) {
+						if (availableSGS[i3].initiator.toLowerCase() == heroName.toLowerCase()) {
+							//ok, we've done it. We've found a game where the hero is the initiator.
+							//Right now we aren't taking any goals of the game into account.
+							return availableSGS[i3];
+						}
+						//trace("ga");
+					}
+					
+					//Loop around at the beginning!
+					for (var j5:int = 0; j5 < startingIndex; j5++) {
+						if (availableSGS[j5].initiator.toLowerCase() == heroName.toLowerCase()) {
+							return availableSGS[j5];
+						}
+						//trace("cha");
+					}	
+				}
+				else { // hero is the responder.
+					for (var i4:int = startingIndex; i4 < availableSGS.length; i4++) {
+						if (availableSGS[i4].responder.toLowerCase() == heroName.toLowerCase()) {
+							//ok, we've done it. We've found a game where the hero is the initiator.
+							//Right now we aren't taking any goals of the game into account.
+							return availableSGS[i4];
+						}
+						//trace("hwah");
+					}
+					
+					//Loop around at the beginning!
+					for (var j2:int = 0; j2 < startingIndex; j2++) {
+						if (availableSGS[j2].responder.toLowerCase() == heroName.toLowerCase()) {
+							return availableSGS[j2];
+						}
+						//trace("sa");
+					}	
+				}
+			}
+			else { // just pick someone at random
+				return randomBot(cast, availableSGS, goals);
+			}
+			return randomBot(cast, availableSGS, goals); // we should never get here.
+		}
+		
+		/**
+		 *  This bot just wants to make people fall in love -- will always play 'rom up' games or 'dating' games if they
+		 * are available, otherwise they will just pick something at random.
+		 * @param	cast
+		 * @param	availableSocialGames
+		 * @param	goals
+		 * @return
+		 */
+		public function matchmakerBot(cast:Vector.<Character>, availableSGS:Vector.<GameScore>, goals:Vector.<Rule>):GameScore {
+			var startingIndex:int = Math.floor(Math.random() * (availableSGS.length));
+			
+			for (var i:int = startingIndex; i < availableSGS.length; i++) {
+				for each(var r:Rule in cif.socialGamesLib.getByName(availableSGS[i].name).intents) {
+					if (r.name == "intent(RomUp)" || r.name == "intent(Dating)") {
+						//trace("going to play the following social game: " + availableSGS[i]);
+						return availableSGS[i];
+					}
+				}
+			}
+			
+			//Loop around at the beginning!
+			for (var j:int = 0; j < startingIndex; j++) {
+				for each(var r2:Rule in cif.socialGamesLib.getByName(availableSGS[j].name).intents) {
+					if (r2.name == "intent(RomUp)" || r2.name == "intent(Dating)") {
+						//trace("going to play the following social game: " + availableSGS[j]);
+						return availableSGS[j];
+					}
+				}				
+			}
+			
+			/*
+			for each (var gs:GameScore in availableSocialGames) {
+				for each(var r:Rule in cif.socialGamesLib.getByName(gs.name).intents) {
+					if (r.name == "intent(RomUp)" || r.name == "intent(Dating)") {
+						trace("going to play the following social game: " + gs);
+						return gs;
+					}
+				}
+			}
+			*/
+			
+			//trace ("No available social games had intent intent(RomUp) or intent(Dating)! Picking something at random!");
+			return randomBot(cast, availableSGS, goals);
+		}
+		
+		public function runMany(event:TimerEvent):void {
+			if (turnsRemainingInLevel <= 0 || isGamewon) {
+				//xmlString += "<LevelTrace id=\"" + timesRan + "\">";
+				xmlString += "</LevelTrace>";
+				stateXMLString += "</LevelTrace>";
+				
+			//My big experiment to see if I can output multiple files in a single run (makes the prospect of losing data much less risky!
+			outputToXML();
+			stateXMLString = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n"; // start again from the beginning, maybe.
+			xmlString = ""; // we don't want this guy to get too big! So for now, let's kill him off!	
+			
+				//ran out of time! Try again!
+				timesRan++;
+				isGamewon = false;
+				turnsRemainingInLevel = turnsInLevel;
+				this.cif.parseCiFState(cifStateXMLFoGState); // game state (all of the the characters and relationships to each other.
+				this.cif.parseCiFState(cifLibrariesXML); // master file (social games and microtheories
+				this.cif.prepareLocutions();
+			
+				
+				//as of now, this will load a scenario based on the xml
+				this.loadStories(this.gameXML.Stories[0]);
+				
+				this.level = stories[0].levels[0]; // let's look at the first level of the first story for now.
+				
+				//AGAIN, ANOTHER BIG PETURB STATE Experiment.
+				if(petrubingState)
+					peturbState();
+				
+				if(timesRan < TIMES_TO_EXECUTE){
+				
+					xmlString += "<LevelTrace id=\"" + timesRan + "\">";
+					stateXMLString += "<LevelTrace id=\"" + timesRan + "\">";
+					
+					xmlString += "<InitialVolitions>";
+					//Form the intent for the characters.
+					this.formIntentForAll(level.cast, cif.cast.characters);
+					availableSocialGames = findTopSocialGames();
+					xmlString += "</InitialVolitions>";
+				}
+				
+				
+				firstInANewLevel = true;
+				
+			}
+			if (timesRan < TIMES_TO_EXECUTE) {
+				var timeEllapsed:int = level.timeLimit - turnsRemainingInLevel;
+				trace("*************Times Played this Level: " + timesRan + " Turns on this level: " + timeEllapsed);
+				oneIteration();
+				//timesRan++;
+			}
+			if (timesRan >= TIMES_TO_EXECUTE) {
+				myTimer.removeEventListener(TimerEvent.TIMER, runMany);
+				/*
+				trace("All Done!  Here is a play trace:");
+				for each(var gs:GameScore in playTrace) {
+					trace(gs);
+				}
+				*/
+				//xmlString += "</SocialGameContext>";
+				//xmlString += "</LevelTrace>";
+				xmlString += "</GeneratedRuns>";
+				outputToXML();
+			}
+		}
+		
+		/**
+		 * This is my personalized formIntentForAll function.  This way I will be able to print out more better microtheory information.
+		 * @param	activeInitiatorAndResponderCast
+		 * @param	activeOtherCast
+		 */
+		public function formIntentForAll(activeInitiatorAndResponderCast:Vector.<Character>, activeOtherCast:Vector.<Character> = null):void {
+			cif.clearProspectiveMemory();
+			xmlString += "<IntentFormations>";
+			for each (var char:Character in activeInitiatorAndResponderCast) {
+				this.formIntent(char, activeInitiatorAndResponderCast, activeOtherCast);
+			}
+			xmlString += "</IntentFormations>";
+		}
+		
+		/**
+		 * Taken from cifSingleton -- it does exactly the same thing as the original formIntent, though it prints out
+		 * microtheory information on a per-character-pair basis.
+		 * 
+		 * @param	initiator 	The subject of the intent formation process.
+		 * @param	activeCast	An optional cast of characters that can be responders.
+		 */
+		public function formIntent(initiator:Character, activeInitiatorAndResponderCast:Vector.<Character> = null, activeOtherCast:Vector.<Character> = null):void {	
+			
+			
+			for each (var responder:Character in activeInitiatorAndResponderCast) {
+				var start:int = getTimer();
+				var firstMT:Boolean = true; // we need to note when the first time we see a rule from a new microtheory is for the start xml tag for a MT
+				var didWeSeeAMT:Boolean = false; // and we need this for the ending XML tag.
+				var currentMTName:String = "";
+				
+				if (responder.characterName != initiator.characterName){
+					cif.formIntentForSocialGames(initiator, responder, activeOtherCast);
+					//trace("True microtheories with init: " + initiator.characterName + " and respond: " + responder.characterName);
+					xmlString += "<IntentFormation from=\"" + initiator.characterName + "\" to=\"" + responder.characterName + "\">";
+					
+					var vSorted:Vector.<RuleRecord> = Vector.<RuleRecord>(vectorToArray(initiator.prospectiveMemory.ruleRecords).sortOn("name"));
+					for each (var ruleRecord:RuleRecord in vSorted){
+					//for each(var ruleRecord:RuleRecord in initiator.prospectiveMemory.ruleRecords) {
+						
+
+						
+						
+						if (ruleRecord.initiator.toLowerCase() == initiator.characterName.toLowerCase() && ruleRecord.responder.toLowerCase() == responder.characterName.toLowerCase()) {
+							
+							//we are dealing with the rule records that we care about!
+							//Lets only look at microtheories
+							if (ruleRecord.type == RuleRecord.MICROTHEORY_TYPE) {
+								//Debug.debug(this, "MT name: " + ruleRecord.name);
+								if (currentMTName != ruleRecord.name) { // we've transitioned!
+									if (firstMT) {
+										xmlString += "<Microtheory name=\"" + ruleRecord.name + "\">";
+										currentMTName = ruleRecord.name;
+										firstMT = false;
+									}
+									else{
+										xmlString += "</Microtheory>";
+										xmlString += "<Microtheory name=\"" + ruleRecord.name + "\">";
+										currentMTName = ruleRecord.name;
+										
+									}
+								}
+								
+								xmlString += "<TrueRule index=\"" + ruleRecord.influenceRule.id + 
+									"\" ruleName=\"" + ruleRecord.influenceRule.generateRuleName() + "\" otherInvolved=\"" + ruleRecord.other + "\"/>";
+								//Debug.debug(this, "rule name: " + ruleRecord.influenceRule.generateRuleName());
+								
+						//Debug.debug(this, "type: " + ruleRecord.type + " name: " + ruleRecord.name + " init: " + ruleRecord.initiator + 
+						//" respond: " + ruleRecord.responder + " other: " + ruleRecord.other + " rule name: " + ruleRecord.influenceRule.generateRuleName());
+							}
+						}
+					}
+					xmlString += "</Microtheory>";
+					
+					/*
+					for each (var mt:Microtheory in cif.microtheories) {
+							//So, because we just formed intent for all, this is only going to capture the microtheories
+							//for certain people...
+							//we may not be able to make use of the form intent for all function.  Sad Face.
+							var influenceRuleIndex:int = 0;
+							
+							var isFirstTime:Boolean = true;
+							var didISeeAMT:Boolean = false;
+							for each (var wasTrue:Boolean in mt.initiatorIRS.lastTruthValues) {
+								
+								if (wasTrue) {
+									
+									//trace("mt name: " + mt.name + " had influence rule at index " + influenceRuleIndex + 
+									//" was true with name of: " + mt.initiatorIRS.influenceRules[influenceRuleIndex].generateRuleName());
+									
+									
+									if (isFirstTime) {
+										xmlString += "<Microtheory name=\"" + mt.name + "\">";
+										isFirstTime = false;
+										didISeeAMT = true;
+									}
+									xmlString += "<TrueRule index=\"" + influenceRuleIndex + 
+									"\" ruleName=\"" + mt.initiatorIRS.influenceRules[influenceRuleIndex].generateRuleName() + "\"/>";
+								}
+								influenceRuleIndex++;
+							}
+							if(didISeeAMT){
+								xmlString += "</Microtheory>";
+							}
+					}
+					*/
+					xmlString += "</IntentFormation>";
+				}
+				
+				//TODO: Decide whether I want the following line commented or not.
+				//Debug.debugDebug.debug(this, "formIntent() intent formation done in " + (getTimer() - start) + "ms between " + initiator.characterName + " and " + responder.characterName);
+			}
+			
+		}
+		
+		
+		//Lifted from design tool main.mxml -- will need to change it lots, for sure but a good starting point I think.
+		public function outputToXML():void {
+			//trace ("wouho h");
+			var stream:FileStream = new FileStream();
+			var outXML:XML;
+			
+			//stateXMLString += "</TestingWithState>";
+			
+			//trace(stateXMLString);
+			
+			var date:Date = new Date();
+			var fileName:String = "/CasanovaWithPeturbations/CasanovaBot-" + (date.month + 1) + "-" + date.date + "-" + date.fullYear + "-" + date.hours + "-" + date.minutes + "-" + date.seconds + ".xml";
+			
+			var applicationDirectoryPath:File = File.applicationDirectory;
+			var nativePathToApplicationDirectory:String = applicationDirectoryPath.nativePath.toString();
+			//nativePathToApplicationDirectory += "/output.xml";
+			nativePathToApplicationDirectory += fileName;
+			var xmlFile:File = new File(nativePathToApplicationDirectory);
+								
+			//trace ("hello?")
+			
+			//if the user wishes to overwrite the file, they are warned in the save dialog
+			//if (!this.workingFile.exists) {
+			stream.open(xmlFile, FileMode.WRITE);
+			//trace ("what?");
+			
+			//outXML = new XML(xmlString);
+			outXML = new XML(stateXMLString);
+			
+			trace ("gonna print to file?");
+			stream.writeUTFBytes(outXML); 	
+			//stream.writeUTFBytes(this.cif.toXMLString());
+			stream.close();
+			
+		}
+		
+		private function findTopSocialGames():Vector.<GameScore>{
+			//trace("Lets go through each character and see what they want to do, maybe?");
+			var availableSGs:Vector.<GameScore> = new Vector.<GameScore>();
+			xmlString += "<SocialGameVolitions>";
+			for each (var guy1:Character in level.cast) {
+				for each (var guy2:Character in level.cast) {
+					if (guy1.characterName == guy2.characterName) continue;
+					var gameScores:Vector.<GameScore> = guy1.prospectiveMemory.getHighestGameScoresTo(guy2.characterName);
+					//trace ("volition from " + guy1.characterName + " to " + guy2.characterName);
+					xmlString += "<TopSocialGames from=\"" + guy1.characterName + "\" to=\"" + guy2.characterName + "\">";
+					for each (var gs:GameScore in gameScores) {
+						//trace("name: " + gs.name + " score: " + gs.score);
+						xmlString += "<SocialGame name=\"" + gs.name + "\" score=\"" + gs.score + "\"/>";
+						availableSGs.push(gs);
+					}
+					//trace( "\n\n same 'from' new 'to' ");
+					xmlString += "</TopSocialGames>";
+				}
+				//trace ( "\n****New 'from'*****");
+			}
+			xmlString += "</SocialGameVolitions>";
+			return availableSGs;
+		}
+		
+		/**
+		* Converts vector to an array
+		* @param    v:*        vector to be converted
+		* @return    Array    converted array
+		*/
+		public function vectorToArray(v:*):Array
+		{
+		var n:int = v.length; var a:Array = new Array();
+		for(var i:int = 0; i < n; i++) a[i] = v[i];
+		return a;
+		}
+		
+		
+		/**
+		* Here's a little example on how to sort a Vector using sortOn
+		
+		var v:Vector.<Object> = new Vector.<Object>();
+		v.push({id:5, email:"andrew@someweb.com"});
+		v.push({id:35, email:"david@someweb.com"});
+		v.push({id:12, email:"jill@someweb.com"});
+
+		// now to sort the Vector on the "id" property
+		
+		// easy and convinient isn't it? ^_^
+		*/
+		
+		/**
+		 * This is a simple function that will print out a '1' if the person
+		 * has the trait, and a 0 if otherwise.
+		 * 
+		 * For all of these functions (save, perhaps, this trait function) we are going to be 
+		 * concerned with knowing who the TARGET is -- the target will either be Chloe or Monica.
+		 * We then will have to do a little bit of re-arranging of parameters once we know who the
+		 * target is (that is feature_97 should always be Zack's buddynetwork value TOWARDS the target,
+		 * not necessarily towards Monica or Chloe.
+		 * 
+		 * I think this means that we are, to some extent, interested in figuring out the state, then, AFTER
+		 * we've played the social game (because it is only then that we know who the target is)
+		 * 
+		 * Or, at the very least, we are interested in it at the point that we've selected a target.
+		 * @param	myGuy
+		 */
+		public function findTrueTraits(myGuy:Character):void {
+			var charName:String = myGuy.characterName;
+			//Debug.debug(this, "finding true traits for " + charName);
+			stateXMLString += "<Traits charName=\"" + charName + "\">";
+			for (var i:int = Trait.LAST_CATEGORY_COUNT; i < Trait.FIRST_TO_IGNORE; i++) {
+				var traitName:String = Trait.getNameByNumber(i)
+				if (myGuy.hasTrait(i)) {
+					stateXMLString += "<feature id=\"" + featureNumber + "\" value=\"1\" type=\"trait\" name=\"" + traitName + "\" cifIDOfPredicate=\"" + i + "\" charName=\"" + charName + "\"/>";
+				}
+				else {
+					stateXMLString += "<feature id=\"" + featureNumber + "\" value=\"0\" type=\"trait\" name=\"" + traitName + "\" cifIDOfPredicate=\"" + i + "\"charName=\"" + charName + "\"/>";
+					//Debug.debug(this, "does not have this trait! The trait of " + Trait.getNameByNumber(i));
+				}
+				featureNumber++;
+			}
+			stateXMLString += "</Traits>";
+		}
+		
+		//I think I am going to have to pass in the name of the target... Yeah
+		/**
+		 * Figures out which statuses are true for the passed in character myGuy.
+		 * If it is a non-directed status, then it is 'easy'
+		 * However, if it is a directed status, then it is 'not easy'
+		 * Specifically, what we end up having to do is go in a very special order
+		 * depending on both the name of the person being evaluated, as well as 
+		 * who the 'target' is (where the target is the person that Zack tried
+		 * to flirt with).
+		 * @param	myGuy the character that we are figuring out if the statuses are true for or not.
+		 * @param targetName the name of the person that Zack tried to flirt with.
+		 */
+		public function findTrueStatuses(myGuy:Character, targetName:String):void{
+			var charName:String = myGuy.characterName.toLowerCase();
+			targetName = targetName.toLowerCase();
+			
+			//First let's just do the easy-peasy non-directed statuses.
+			stateXMLString += "<Statuses charName=\"" + charName + "\">";
+			for (var i:int = Status.FIRST_NOT_DIRECTED_STATUS; i < Status.FIRST_DIRECTED_STATUS; i++) {
+				var statusName:String = Status.getStatusNameByNumber(i);
+				if (myGuy.hasStatus(i)) {
+					stateXMLString += "<feature id=\"" + featureNumber + "\" value=\"1\" type=\"status\" name=\"" + statusName + "\" cifIDOfPredicate=\"" + i + "\" charName=\"" + charName + "\"/>";
+				}
+				else {
+					stateXMLString += "<feature id=\"" + featureNumber + "\" value=\"0\" type=\"status\" name=\"" + statusName + "\" cifIDOfPredicate=\"" + i + "\" charName=\"" + charName + "\"/>";
+				}
+				featureNumber++;
+			}
+			
+			
+			//Now we have to do directed statuses.  Sigh.
+			//OK, we are going to assume that this function gets called in the following order:
+			//Zack
+			//Target (Girl that Zack flirted with)
+			//Other Girl
+			//Buzz
+			//Simon
+			//So, we don't need to worry about that.
+			//What we DO need to worry about is the order that we compute these directed statuses.
+			//The proposed idea that I came up with was as follows:
+			//ZACK
+			//1.) Target
+			//2.) Other Girl
+			//3.) Buzz
+			//4.) Simon
+			//5.) Self
+			//6.) ALL OTHERS?
+			//TARGET
+			//1.) Zack
+			//2.) Other Girl
+			//3.) Buzz
+			//4.) Simon
+			//5.) Self
+			//6.) ALL OTHERS?
+			//OTHER GIRL
+			//1.) Zack
+			//2.) Target
+			//3.) Buzz
+			//4.) Simo
+			//5.) Self
+			//6.) ALL OTHERS?
+			//BUZZ
+			//1.) Zack
+			//2.) Target
+			//3.) Other Girl
+			//4.) Simon
+			//5.) Self
+			//6.) ALL OTHERS?
+			//SIMON
+			//1.) Zack
+			//2.) Target
+			//3.) Other Girl
+			//4.) Simon
+			//5.) Self
+			//6.) ALL OTHERS?
+			
+			//So, again, the ORDER in which this function is called is assued to be correct -- we don't need to worry
+			//about it.  What we need to do checks for IN this function is what the name of the 'myGuy' is, and what
+			//the name of the target is, and compute things accordingly.
+			
+			//OK, that doesn't sound too bad at all, actually!
+			for (var j:int = Status.FIRST_DIRECTED_STATUS; j < Status.STATUS_COUNT; j++) {
+				var directedStatusName:String = Status.getStatusNameByNumber(j);
+				if (charName == "zack") {
+					//ZACK
+					//1.) Target
+					//2.) Other Girl
+					//3.) Buzz
+					//4.) Simon
+					//5.) Self
+					//6.) ALL OTHERS?
+					if(targetName == "monica"){
+						isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[MONICA_LEVEL_ID]), "zack", "monica", directedStatusName,j);
+						isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[CHLOE_LEVEL_ID]), "zack", "chloe", directedStatusName,j);
+					}
+					else if (targetName == "chloe") {
+						isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[CHLOE_LEVEL_ID]), "zack", "chloe", directedStatusName,j);
+						isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[MONICA_LEVEL_ID]), "zack", "monica", directedStatusName,j);
+					}
+					else {
+						//Debug.debug(this, "non-acceptable target name " + targetName + " (only monica and chloe are acceptable)");
+					}
+					isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[BUZZ_LEVEL_ID]), "zack", "buzz", directedStatusName,j);
+					isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[SIMON_LEVEL_ID]), "zack", "simon", directedStatusName,j);
+					isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[ZACK_LEVEL_ID]), "zack", "zack", directedStatusName,j);
+				}
+				else if (charName == "monica") {
+					//TARGET
+					//1.) Zack
+					//2.) Other Girl
+					//3.) Buzz
+					//4.) Simon
+					//5.) Self
+					//6.) ALL OTHERS?
+					isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[ZACK_LEVEL_ID]), "monica", "zack", directedStatusName, j);
+					if (targetName == "monica") { // we are dealing with Monica and SHE is the target -- this next feature should be 'other girl'
+						isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[CHLOE_LEVEL_ID]), "monica", "chloe", directedStatusName,j);
+					}
+					else if (targetName == "chloe") { // we are dealing with onica but she is NOT the target (she IS the other girl) -- this next feature should be the target
+						isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[CHLOE_LEVEL_ID]), "monica", "chloe", directedStatusName,j); // which still happens to be Chloe.
+					}
+					else {
+						Debug.debug(this, "not an acceptable target name when dealing with monica. Needs to be ither monica or chloe, but it was: " + targetName);
+					}
+					isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[BUZZ_LEVEL_ID]), "monica", "buzz", directedStatusName,j);
+					isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[SIMON_LEVEL_ID]), "monica", "simon", directedStatusName,j);
+					isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[MONICA_LEVEL_ID]), "monica", "monica", directedStatusName,j);
+				}
+				else if (charName == "chloe") {
+					//OTHER GIRL
+					//1.) Zack
+					//2.) Target
+					//3.) Buzz
+					//4.) Simo
+					//5.) Self
+					//6.) ALL OTHERS?
+					isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[ZACK_LEVEL_ID]), "chloe", "zack", directedStatusName, j);
+					if (targetName == "monica") { // we are dealing with Chloe, and she is NOT the target -- this next feature should be the target.
+						isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[MONICA_LEVEL_ID]), "chloe", "monica", directedStatusName,j);
+					}
+					else if (targetName == "chloe") { // we are dealing with Chloe and she IS the target -- this next feature should be the other girl (still Monica)
+						isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[MONICA_LEVEL_ID]), "chloe", "monica", directedStatusName,j);
+					}
+					isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[BUZZ_LEVEL_ID]), "chloe", "buzz", directedStatusName,j);
+					isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[SIMON_LEVEL_ID]), "chloe", "simon", directedStatusName,j);
+					isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[CHLOE_LEVEL_ID]), "chloe", "chloe", directedStatusName,j);
+				}
+				else if (charName == "buzz") {
+					//BUZZ
+					//1.) Zack
+					//2.) Target
+					//3.) Other Girl
+					//4.) Simon
+					//5.) Self
+					//6.) ALL OTHERS?
+					isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[ZACK_LEVEL_ID]), "buzz", "zack", directedStatusName, j);
+					if(targetName == "monica"){
+						isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[MONICA_LEVEL_ID]), "buzz", "monica", directedStatusName,j);
+						isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[CHLOE_LEVEL_ID]), "buzz", "chloe", directedStatusName,j);
+					}
+					else if (targetName == "chloe") {
+						isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[CHLOE_LEVEL_ID]), "buzz", "chloe", directedStatusName,j);
+						isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[MONICA_LEVEL_ID]), "buzz", "monica", directedStatusName,j);
+					}
+					else {
+						Debug.debug(this, "dealing with statuses for buzz.  non-acceptable target name " + targetName + " (only monica and chloe are acceptable)");
+					}
+					isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[SIMON_LEVEL_ID]), "buzz", "simon", directedStatusName,j);
+					isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[BUZZ_LEVEL_ID]), "buzz", "buzz", directedStatusName,j);
+					
+				}
+				else if (charName == "simon") {
+					//BUZZ
+					//1.) Zack
+					//2.) Target
+					//3.) Other Girl
+					//4.) Simon
+					//5.) Self
+					//6.) ALL OTHERS?
+					isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[ZACK_LEVEL_ID]), "simon", "zack", directedStatusName, j);
+					if(targetName == "monica"){
+						isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[MONICA_LEVEL_ID]), "simon", "monica", directedStatusName,j);
+						isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[CHLOE_LEVEL_ID]), "simon", "chloe", directedStatusName,j);
+					}
+					else if (targetName == "chloe") {
+						isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[CHLOE_LEVEL_ID]), "simon", "chloe", directedStatusName,j);
+						isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[MONICA_LEVEL_ID]), "simon", "monica", directedStatusName,j);
+					}
+					else {
+						Debug.debug(this, "dealing with statuses for buzz.  non-acceptable target name " + targetName + " (only monica and chloe are acceptable)");
+					}
+					isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[BUZZ_LEVEL_ID]), "simon", "buzz", directedStatusName, j);
+					isDirectedStatusTrue(myGuy.hasStatus(j, level.cast[SIMON_LEVEL_ID]), "simon", "simon", directedStatusName,j);
+					
+				}
+			}
+			
+			
+			stateXMLString += "</Statuses>";
+		}
+		
+		/**
+		 * This will append the output xml with the appropriate values, depending on whether or not
+		 * the directed status evaluated to true or not.
+		 * @param	truthValue whether or not the status was true (the from character DID have this status towards the TO character) or false (they didn't)
+		 * @param	from the name of the character who has the status
+		 * @param	to the name of the character that this status is being directed towards.
+		 * @param   statusName the english name of the status.
+		 * @param   i the id number of the status as it lives in CiF.
+		 */
+		public function isDirectedStatusTrue(truthValue:Boolean, from:String, to:String, statusName:String, i:int):void {
+			if (truthValue) {
+				stateXMLString += "<feature id=\"" + featureNumber + "\" value=\"1\" type=\"directedStatus\" name=\"" + statusName + "\" cifIDOfPredicate=\"" + i + "\" from=\"" + from + "\" to=\"" + to + "\" />";
+			}
+			else {
+				stateXMLString += "<feature id=\"" + featureNumber + "\" value=\"0\" type=\"directedStatus\" name=\"" + statusName + "\" cifIDOfPredicate=\"" + i + "\" from=\"" + from + "\" to=\"" + to + "\" />";
+			}
+			featureNumber++;
+		}
+		
+		/**
+		 * We are interested in the networks which originate from myGuy, and point towards all
+		 * of the other characters (in the very specific order that we've already established above
+		 * the target represents the target of Zack's affections (i.e. who he flirted with.
+		 */
+		public function findTrueNetworks(myGuy:Character, targetName:String):void {
+			stateXMLString += "<Networks charName=\"" + myGuy.characterName + "\" >";
+			var charName:String = myGuy.characterName.toLowerCase();
+			for (var j:int = 0; j < SocialNetwork.NETWORK_COUNT; j++) {
+				
+				var networkName:String = SocialNetwork.getNameFromType(j);
+				if (charName == "zack") {
+					//ZACK
+					//1.) Target
+					//2.) Other Girl
+					//3.) Buzz
+					//4.) Simon
+					//5.) Self
+					//6.) ALL OTHERS?
+					if(targetName == "monica"){
+						isNetworkTrue(level.cast[ZACK_LEVEL_ID], level.cast[MONICA_LEVEL_ID], networkName,j);
+						isNetworkTrue(level.cast[ZACK_LEVEL_ID], level.cast[CHLOE_LEVEL_ID], networkName,j);
+					}
+					else if (targetName == "chloe") {
+						isNetworkTrue(level.cast[ZACK_LEVEL_ID], level.cast[CHLOE_LEVEL_ID], networkName,j);
+						isNetworkTrue(level.cast[ZACK_LEVEL_ID], level.cast[MONICA_LEVEL_ID], networkName,j);
+					}
+					else {
+						Debug.debug(this, "non-acceptable target name " + targetName + " (only monica and chloe are acceptable)");
+					}
+					isNetworkTrue(level.cast[ZACK_LEVEL_ID], level.cast[BUZZ_LEVEL_ID], networkName,j);
+					isNetworkTrue(level.cast[ZACK_LEVEL_ID], level.cast[SIMON_LEVEL_ID], networkName,j);
+					isNetworkTrue(level.cast[ZACK_LEVEL_ID], level.cast[ZACK_LEVEL_ID], networkName,j);
+				}
+				else if (charName == "monica") {
+					//TARGET
+					//1.) Zack
+					//2.) Other Girl
+					//3.) Buzz
+					//4.) Simon
+					//5.) Self
+					//6.) ALL OTHERS?
+					isNetworkTrue(level.cast[MONICA_LEVEL_ID], level.cast[ZACK_LEVEL_ID], networkName, j);
+					if (targetName == "monica") { // we are dealing with Monica and SHE is the target -- this next feature should be 'other girl'
+						isNetworkTrue(level.cast[MONICA_LEVEL_ID], level.cast[CHLOE_LEVEL_ID], networkName, j);
+					}
+					else if (targetName == "chloe") { // we are dealing with onica but she is NOT the target (she IS the other girl) -- this next feature should be the target
+						isNetworkTrue(level.cast[MONICA_LEVEL_ID], level.cast[CHLOE_LEVEL_ID], networkName, j); // which still happens to be Chloe.
+					}
+					else {
+						Debug.debug(this, "not an acceptable target name when dealing with monica. Needs to be ither monica or chloe, but it was: " + targetName);
+					}
+					isNetworkTrue(level.cast[MONICA_LEVEL_ID], level.cast[BUZZ_LEVEL_ID], networkName, j);
+					isNetworkTrue(level.cast[MONICA_LEVEL_ID], level.cast[SIMON_LEVEL_ID], networkName, j);
+					isNetworkTrue(level.cast[MONICA_LEVEL_ID], level.cast[MONICA_LEVEL_ID], networkName, j);
+				}
+				else if (charName == "chloe") {
+					//OTHER GIRL
+					//1.) Zack
+					//2.) Target
+					//3.) Buzz
+					//4.) Simo
+					//5.) Self
+					//6.) ALL OTHERS?
+					isNetworkTrue(level.cast[CHLOE_LEVEL_ID], level.cast[ZACK_LEVEL_ID], networkName, j);
+					if (targetName == "monica") { // we are dealing with Chloe, and she is NOT the target -- this next feature should be the target.
+						isNetworkTrue(level.cast[CHLOE_LEVEL_ID], level.cast[MONICA_LEVEL_ID], networkName, j);
+					}
+					else if (targetName == "chloe") { // we are dealing with Chloe and she IS the target -- this next feature should be the other girl (still Monica)
+						isNetworkTrue(level.cast[CHLOE_LEVEL_ID], level.cast[MONICA_LEVEL_ID], networkName, j);
+					}
+					isNetworkTrue(level.cast[CHLOE_LEVEL_ID], level.cast[BUZZ_LEVEL_ID], networkName, j);
+					isNetworkTrue(level.cast[CHLOE_LEVEL_ID], level.cast[SIMON_LEVEL_ID], networkName, j);
+					isNetworkTrue(level.cast[CHLOE_LEVEL_ID], level.cast[CHLOE_LEVEL_ID], networkName, j);
+				}
+				else if (charName == "buzz") {
+					//BUZZ
+					//1.) Zack
+					//2.) Target
+					//3.) Other Girl
+					//4.) Simon
+					//5.) Self
+					//6.) ALL OTHERS?
+					isNetworkTrue(level.cast[BUZZ_LEVEL_ID], level.cast[ZACK_LEVEL_ID], networkName, j);
+					if (targetName == "monica") {
+						isNetworkTrue(level.cast[BUZZ_LEVEL_ID], level.cast[MONICA_LEVEL_ID], networkName, j);
+						isNetworkTrue(level.cast[BUZZ_LEVEL_ID], level.cast[CHLOE_LEVEL_ID], networkName, j);
+					}
+					else if (targetName == "chloe") {
+						isNetworkTrue(level.cast[BUZZ_LEVEL_ID], level.cast[CHLOE_LEVEL_ID], networkName, j);
+						isNetworkTrue(level.cast[BUZZ_LEVEL_ID], level.cast[MONICA_LEVEL_ID], networkName, j);
+					}
+					else {
+						Debug.debug(this, "dealing with statuses for buzz.  non-acceptable target name " + targetName + " (only monica and chloe are acceptable)");
+					}
+					isNetworkTrue(level.cast[BUZZ_LEVEL_ID], level.cast[SIMON_LEVEL_ID], networkName, j);
+					isNetworkTrue(level.cast[BUZZ_LEVEL_ID], level.cast[BUZZ_LEVEL_ID], networkName, j);
+					
+				}
+				else if (charName == "simon") {
+					//BUZZ
+					//1.) Zack
+					//2.) Target
+					//3.) Other Girl
+					//4.) Simon
+					//5.) Self
+					//6.) ALL OTHERS?
+					isNetworkTrue(level.cast[SIMON_LEVEL_ID], level.cast[ZACK_LEVEL_ID], networkName, j);
+					if (targetName == "monica") {
+						isNetworkTrue(level.cast[SIMON_LEVEL_ID], level.cast[MONICA_LEVEL_ID], networkName, j);
+						isNetworkTrue(level.cast[SIMON_LEVEL_ID], level.cast[CHLOE_LEVEL_ID], networkName, j);
+					}
+					else if (targetName == "chloe") {
+						isNetworkTrue(level.cast[SIMON_LEVEL_ID], level.cast[CHLOE_LEVEL_ID], networkName, j);
+						isNetworkTrue(level.cast[SIMON_LEVEL_ID], level.cast[MONICA_LEVEL_ID], networkName, j);
+					}
+					else {
+						Debug.debug(this, "dealing with statuses for buzz.  non-acceptable target name " + targetName + " (only monica and chloe are acceptable)");
+					}
+					isNetworkTrue(level.cast[SIMON_LEVEL_ID], level.cast[BUZZ_LEVEL_ID], networkName, j);
+					isNetworkTrue(level.cast[SIMON_LEVEL_ID], level.cast[SIMON_LEVEL_ID], networkName, j);					
+				}
+			}
+			stateXMLString += "</Networks>";
+		}
+		
+		/**
+		 * This will append the output xml with the appropriate values, depending on whether or not
+		 * the network evaluated to true or not.  More specifically, it will go through the low, medium, and high
+		 * values for the network.  ONE of them has to be true.
+		 * @param	truthValue whether or not the status was true (the from character DID have this status towards the TO character) or false (they didn't)
+		 * @param	from the name of the character who has the status
+		 * @param	to the name of the character that this status is being directed towards.
+		 * @param   statusName the english name of the status.
+		 * @param   i the id number of the status as it lives in CiF.
+		 */
+		public function isNetworkTrue(from:Character, to:Character, networkName:String, i:int):void {
+			var currentWeight:int = 0;
+			
+			//dealing with buddy network
+			if (SocialNetwork.BUDDY == i) {
+				currentWeight = cif.buddyNetwork.getWeight(from.networkID, to.networkID);
+				if (currentWeight < 34) { // it is low
+					stateXMLString += "<feature id=\"" + featureNumber + "\" value=\"1\" type=\"buddyNetwork\" name=\"low\" cifIDOfPredicate=\"" + i + "\" from=\"" + from.characterName + "\" to=\"" + to.characterName + "\" />";
+				}
+				else { // it is not low
+					stateXMLString += "<feature id=\"" + featureNumber + "\" value=\"0\" type=\"buddyNetwork\" name=\"low\" cifIDOfPredicate=\"" + i + "\" from=\"" + from.characterName + "\" to=\"" + to.characterName + "\" />";
+				}
+				featureNumber++;
+				if (currentWeight > 33 && currentWeight < 67) { // it is medium
+					stateXMLString += "<feature id=\"" + featureNumber + "\" value=\"1\" type=\"buddyNetwork\" name=\"medium\" cifIDOfPredicate=\"" + i + "\" from=\"" + from.characterName + "\" to=\"" + to.characterName + "\" />";
+				}
+				
+				else { // it is not medium
+					stateXMLString += "<feature id=\"" + featureNumber + "\" value=\"0\" type=\"buddyNetwork\" name=\"medium\" cifIDOfPredicate=\"" + i + "\" from=\"" + from.characterName + "\" to=\"" + to.characterName + "\" />";
+				}
+				featureNumber++;
+				if (currentWeight > 66) { // it is high.
+					stateXMLString += "<feature id=\"" + featureNumber + "\" value=\"1\" type=\"buddyNetwork\" name=\"high\" cifIDOfPredicate=\"" + i + "\" from=\"" + from.characterName + "\" to=\"" + to.characterName + "\" />";
+				}
+				else {
+					stateXMLString += "<feature id=\"" + featureNumber + "\" value=\"0\" type=\"buddyNetwork\" name=\"high\" cifIDOfPredicate=\"" + i + "\" from=\"" + from.characterName + "\" to=\"" + to.characterName + "\" />";
+				}
+				featureNumber++;
+			}
+			
+			else if (SocialNetwork.ROMANCE == i){
+				currentWeight = cif.romanceNetwork.getWeight(from.networkID, to.networkID);
+				if (currentWeight < 34) { // it is low
+					stateXMLString += "<feature id=\"" + featureNumber + "\" value=\"1\" type=\"romanceNetwork\" name=\"low\" cifIDOfPredicate=\"" + i + "\" from=\"" + from.characterName + "\" to=\"" + to.characterName + "\" />";
+				}
+				else { // it is not low
+					stateXMLString += "<feature id=\"" + featureNumber + "\" value=\"0\" type=\"romanceNetwork\" name=\"low\" cifIDOfPredicate=\"" + i + "\" from=\"" + from.characterName + "\" to=\"" + to.characterName + "\" />";
+				}
+				featureNumber++;
+				if (currentWeight > 33 && currentWeight < 67) { // it is medium
+					stateXMLString += "<feature id=\"" + featureNumber + "\" value=\"1\" type=\"romanceNetwork\" name=\"medium\" cifIDOfPredicate=\"" + i + "\" from=\"" + from.characterName + "\" to=\"" + to.characterName + "\" />";
+				}
+				else { // it is not medium
+					stateXMLString += "<feature id=\"" + featureNumber + "\" value=\"0\" type=\"romanceNetwork\" name=\"medium\" cifIDOfPredicate=\"" + i + "\" from=\"" + from.characterName + "\" to=\"" + to.characterName + "\" />";
+				}
+				featureNumber++;
+				if (currentWeight > 66) { // it is high.
+					stateXMLString += "<feature id=\"" + featureNumber + "\" value=\"1\" type=\"romanceNetwork\" name=\"high\" cifIDOfPredicate=\"" + i + "\" from=\"" + from.characterName + "\" to=\"" + to.characterName + "\" />";
+				}
+				else {
+					stateXMLString += "<feature id=\"" + featureNumber + "\" value=\"0\" type=\"romanceNetwork\" name=\"high\" cifIDOfPredicate=\"" + i + "\" from=\"" + from.characterName + "\" to=\"" + to.characterName + "\" />";
+				}
+				featureNumber++;
+			}
+			else if (SocialNetwork.COOL == i){
+				currentWeight = cif.coolNetwork.getWeight(from.networkID, to.networkID);
+				if (currentWeight < 34) { // it is low
+					stateXMLString += "<feature id=\"" + featureNumber + "\" value=\"1\" type=\"coolNetwork\" name=\"low\" cifIDOfPredicate=\"" + i + "\" from=\"" + from.characterName + "\" to=\"" + to.characterName + "\" />";
+				}
+				else { // it is not low
+					stateXMLString += "<feature id=\"" + featureNumber + "\" value=\"0\" type=\"coolNetwork\" name=\"low\" cifIDOfPredicate=\"" + i + "\" from=\"" + from.characterName + "\" to=\"" + to.characterName + "\" />";
+				}
+				featureNumber++;
+				if (currentWeight > 33 && currentWeight < 67) { // it is medium
+					stateXMLString += "<feature id=\"" + featureNumber + "\" value=\"1\" type=\"coolNetwork\" name=\"medium\" cifIDOfPredicate=\"" + i + "\" from=\"" + from.characterName + "\" to=\"" + to.characterName + "\" />";
+				}
+				else { // it is not medium
+					stateXMLString += "<feature id=\"" + featureNumber + "\" value=\"0\" type=\"coolNetwork\" name=\"medium\" cifIDOfPredicate=\"" + i + "\" from=\"" + from.characterName + "\" to=\"" + to.characterName + "\" />";
+				}
+				featureNumber++;
+				if (currentWeight > 66) { // it is high.
+					stateXMLString += "<feature id=\"" + featureNumber + "\" value=\"1\" type=\"coolNetwork\" name=\"high\" cifIDOfPredicate=\"" + i + "\" from=\"" + from.characterName + "\" to=\"" + to.characterName + "\" />";
+				}
+				else {
+					stateXMLString += "<feature id=\"" + featureNumber + "\" value=\"0\" type=\"coolNetwork\" name=\"high\" cifIDOfPredicate=\"" + i + "\" from=\"" + from.characterName + "\" to=\"" + to.characterName + "\" />";
+				}
+				featureNumber++;
+			}
+		}
+		
+		/**
+		 * This function is meant to capture all of the complex relationships that haunt all of the happy Prom people.  
+		 * Features will have a value of 1 if they DO have this relationship, and features will have a value of 0 if they don't.
+		 * @param	myGuy the person that we are currently interested in finding relationships about.
+		 * @param	targetName the current target of Zack's affections.
+		 */
+		public function findTrueRelationships(myGuy:Character, targetName:String):void {
+			var charName:String = myGuy.characterName.toLowerCase();
+			stateXMLString += "<Relationships charName=\"" + charName + "\">";
+			for (var j:int = 0; j < RelationshipNetwork.RELATIONSHIP_COUNT; j++) {
+				var networkName:String = RelationshipNetwork.getRelationshipNameByNumber(j);
+				if (charName == "zack") {
+					//ZACK
+					//1.) Target
+					//2.) Other Girl
+					//3.) Buzz
+					//4.) Simon
+					//5.) Self
+					//6.) ALL OTHERS?
+					if(targetName == "monica"){
+						isRelationshipTrue(level.cast[ZACK_LEVEL_ID], level.cast[MONICA_LEVEL_ID], networkName,j);
+						isRelationshipTrue(level.cast[ZACK_LEVEL_ID], level.cast[CHLOE_LEVEL_ID], networkName,j);
+					}
+					else if (targetName == "chloe") {
+						isRelationshipTrue(level.cast[ZACK_LEVEL_ID], level.cast[CHLOE_LEVEL_ID], networkName,j);
+						isRelationshipTrue(level.cast[ZACK_LEVEL_ID], level.cast[MONICA_LEVEL_ID], networkName,j);
+					}
+					else {
+						Debug.debug(this, "non-acceptable target name " + targetName + " (only monica and chloe are acceptable)");
+					}
+					isRelationshipTrue(level.cast[ZACK_LEVEL_ID], level.cast[BUZZ_LEVEL_ID], networkName,j);
+					isRelationshipTrue(level.cast[ZACK_LEVEL_ID], level.cast[SIMON_LEVEL_ID], networkName,j);
+					isRelationshipTrue(level.cast[ZACK_LEVEL_ID], level.cast[ZACK_LEVEL_ID], networkName,j);
+				}
+				else if (charName == "monica") {
+					//TARGET
+					//1.) Zack
+					//2.) Other Girl
+					//3.) Buzz
+					//4.) Simon
+					//5.) Self
+					//6.) ALL OTHERS?
+					isRelationshipTrue(level.cast[MONICA_LEVEL_ID], level.cast[ZACK_LEVEL_ID], networkName, j);
+					if (targetName == "monica") { // we are dealing with Monica and SHE is the target -- this next feature should be 'other girl'
+						isRelationshipTrue(level.cast[MONICA_LEVEL_ID], level.cast[CHLOE_LEVEL_ID], networkName, j);
+					}
+					else if (targetName == "chloe") { // we are dealing with onica but she is NOT the target (she IS the other girl) -- this next feature should be the target
+						isRelationshipTrue(level.cast[MONICA_LEVEL_ID], level.cast[CHLOE_LEVEL_ID], networkName, j); // which still happens to be Chloe.
+					}
+					else {
+						Debug.debug(this, "not an acceptable target name when dealing with monica. Needs to be ither monica or chloe, but it was: " + targetName);
+					}
+					isRelationshipTrue(level.cast[MONICA_LEVEL_ID], level.cast[BUZZ_LEVEL_ID], networkName, j);
+					isRelationshipTrue(level.cast[MONICA_LEVEL_ID], level.cast[SIMON_LEVEL_ID], networkName, j);
+					isRelationshipTrue(level.cast[MONICA_LEVEL_ID], level.cast[MONICA_LEVEL_ID], networkName, j);
+				}
+				else if (charName == "chloe") {
+					//OTHER GIRL
+					//1.) Zack
+					//2.) Target
+					//3.) Buzz
+					//4.) Simo
+					//5.) Self
+					//6.) ALL OTHERS?
+					isRelationshipTrue(level.cast[CHLOE_LEVEL_ID], level.cast[ZACK_LEVEL_ID], networkName, j);
+					if (targetName == "monica") { // we are dealing with Chloe, and she is NOT the target -- this next feature should be the target.
+						isRelationshipTrue(level.cast[CHLOE_LEVEL_ID], level.cast[MONICA_LEVEL_ID], networkName, j);
+					}
+					else if (targetName == "chloe") { // we are dealing with Chloe and she IS the target -- this next feature should be the other girl (still Monica)
+						isRelationshipTrue(level.cast[CHLOE_LEVEL_ID], level.cast[MONICA_LEVEL_ID], networkName, j);
+					}
+					isRelationshipTrue(level.cast[CHLOE_LEVEL_ID], level.cast[BUZZ_LEVEL_ID], networkName, j);
+					isRelationshipTrue(level.cast[CHLOE_LEVEL_ID], level.cast[SIMON_LEVEL_ID], networkName, j);
+					isRelationshipTrue(level.cast[CHLOE_LEVEL_ID], level.cast[CHLOE_LEVEL_ID], networkName, j);
+				}
+				else if (charName == "buzz") {
+					//BUZZ
+					//1.) Zack
+					//2.) Target
+					//3.) Other Girl
+					//4.) Simon
+					//5.) Self
+					//6.) ALL OTHERS?
+					isRelationshipTrue(level.cast[BUZZ_LEVEL_ID], level.cast[ZACK_LEVEL_ID], networkName, j);
+					if (targetName == "monica") {
+						isRelationshipTrue(level.cast[BUZZ_LEVEL_ID], level.cast[MONICA_LEVEL_ID], networkName, j);
+						isRelationshipTrue(level.cast[BUZZ_LEVEL_ID], level.cast[CHLOE_LEVEL_ID], networkName, j);
+					}
+					else if (targetName == "chloe") {
+						isRelationshipTrue(level.cast[BUZZ_LEVEL_ID], level.cast[CHLOE_LEVEL_ID], networkName, j);
+						isRelationshipTrue(level.cast[BUZZ_LEVEL_ID], level.cast[MONICA_LEVEL_ID], networkName, j);
+					}
+					else {
+						Debug.debug(this, "dealing with statuses for buzz.  non-acceptable target name " + targetName + " (only monica and chloe are acceptable)");
+					}
+					isRelationshipTrue(level.cast[BUZZ_LEVEL_ID], level.cast[SIMON_LEVEL_ID], networkName, j);
+					isRelationshipTrue(level.cast[BUZZ_LEVEL_ID], level.cast[BUZZ_LEVEL_ID], networkName, j);
+					
+				}
+				else if (charName == "simon") {
+					//BUZZ
+					//1.) Zack
+					//2.) Target
+					//3.) Other Girl
+					//4.) Simon
+					//5.) Self
+					//6.) ALL OTHERS?
+					isRelationshipTrue(level.cast[SIMON_LEVEL_ID], level.cast[ZACK_LEVEL_ID], networkName, j);
+					if (targetName == "monica") {
+						isRelationshipTrue(level.cast[SIMON_LEVEL_ID], level.cast[MONICA_LEVEL_ID], networkName, j);
+						isRelationshipTrue(level.cast[SIMON_LEVEL_ID], level.cast[CHLOE_LEVEL_ID], networkName, j);
+					}
+					else if (targetName == "chloe") {
+						isRelationshipTrue(level.cast[SIMON_LEVEL_ID], level.cast[CHLOE_LEVEL_ID], networkName, j);
+						isRelationshipTrue(level.cast[SIMON_LEVEL_ID], level.cast[MONICA_LEVEL_ID], networkName, j);
+					}
+					else {
+						Debug.debug(this, "dealing with statuses for buzz.  non-acceptable target name " + targetName + " (only monica and chloe are acceptable)");
+					}
+					isRelationshipTrue(level.cast[SIMON_LEVEL_ID], level.cast[BUZZ_LEVEL_ID], networkName, j);
+					isRelationshipTrue(level.cast[SIMON_LEVEL_ID], level.cast[SIMON_LEVEL_ID], networkName, j);					
+				}
+			}
+			stateXMLString += "</Relationships>";
+		}
+		
+		/**
+		 * This is a fun little function!  What this guy does is, given two characters and the id of a network,
+		 * outputs a bit of state, depending on if the characters do in fact have that relationship or not!
+		 * Fun!
+		 * @param	from the 'starting' character
+		 * @param	to the 'secondary' character
+		 * @param	networkName the english name of the network (e.g. Dating, Friends)
+		 * @param	j the id of the network.
+		 */
+		public function isRelationshipTrue(from:Character, to:Character, networkName:String, i:int):void {
+			if (cif.relationshipNetwork.getRelationship(i, from, to)) {
+				stateXMLString += "<feature id=\"" + featureNumber + "\" value=\"1\" type=\"relationshipNetwork\" name=\"" + networkName + "\" cifIDOfPredicate=\"" + i + "\" from=\"" + from.characterName + "\" to=\"" + to.characterName + "\" />";
+			}
+			else {
+				stateXMLString += "<feature id=\"" + featureNumber + "\" value=\"0\" type=\"relationshipNetwork\" name=\"" + networkName + "\" cifIDOfPredicate=\"" + i + "\" from=\"" + from.characterName + "\" to=\"" + to.characterName + "\" />";
+			}
+			featureNumber++;
+		}
+		
+		/**
+		 * This function prints out what the state is! It takes in who the target is
+		 * (the person that Zack tried to flirt with) because that influences the 'order'
+		 * that the state gets printed in.
+		 * @param	target
+		 */
+		public function printState(target:String):void {
+			featureNumber = 0; // reset the feature number each time we print out the state!
+			stateXMLString += "<State>"
+			
+			stateXMLString += "<Zack>";
+			findTrueTraits(this.level.cast[ZACK_LEVEL_ID]);
+			findTrueStatuses(this.level.cast[ZACK_LEVEL_ID], target);
+			findTrueNetworks(this.level.cast[ZACK_LEVEL_ID], target);
+			findTrueRelationships(this.level.cast[ZACK_LEVEL_ID], target);
+			stateXMLString += "</Zack>";
+			
+			if (target == "monica") {
+				stateXMLString += "<Target name=\"monica\">";
+				findTrueTraits(this.level.cast[MONICA_LEVEL_ID]);
+				findTrueStatuses(this.level.cast[MONICA_LEVEL_ID], target);
+				findTrueNetworks(this.level.cast[MONICA_LEVEL_ID], target);
+				findTrueRelationships(this.level.cast[MONICA_LEVEL_ID], target);
+				stateXMLString += "</Target>";
+				
+				stateXMLString += "<OtherGirl name=\"chloe\">";
+				findTrueTraits(this.level.cast[CHLOE_LEVEL_ID]);
+				findTrueStatuses(this.level.cast[CHLOE_LEVEL_ID], target);
+				findTrueNetworks(this.level.cast[CHLOE_LEVEL_ID], target);
+				findTrueRelationships(this.level.cast[CHLOE_LEVEL_ID], target);
+				stateXMLString += "</OtherGirl>";
+				
+			}
+			else if (target == "chloe") {
+				stateXMLString += "<Target name=\"chloe\">";
+				findTrueTraits(this.level.cast[CHLOE_LEVEL_ID]);
+				findTrueStatuses(this.level.cast[CHLOE_LEVEL_ID], target);
+				findTrueNetworks(this.level.cast[CHLOE_LEVEL_ID], target);
+				findTrueRelationships(this.level.cast[CHLOE_LEVEL_ID], target);
+				stateXMLString += "</Target>";
+				
+				stateXMLString += "<OtherGirl name=\"monica\">";
+				findTrueTraits(this.level.cast[MONICA_LEVEL_ID]);
+				findTrueStatuses(this.level.cast[MONICA_LEVEL_ID], target);
+				findTrueNetworks(this.level.cast[MONICA_LEVEL_ID], target);
+				findTrueRelationships(this.level.cast[MONICA_LEVEL_ID], target);
+				stateXMLString += "</OtherGirl>";
+			}
+			else {
+				Debug.debug(this, "not--acceptable name for target when on the meta level!");
+			}
+			
+			stateXMLString += "<Buzz>";
+			findTrueTraits(this.level.cast[BUZZ_LEVEL_ID]);
+			findTrueStatuses(this.level.cast[BUZZ_LEVEL_ID], target);
+			findTrueNetworks(this.level.cast[BUZZ_LEVEL_ID], target);
+			findTrueRelationships(this.level.cast[BUZZ_LEVEL_ID], target);
+			stateXMLString += "</Buzz>";
+			
+			stateXMLString += "<Simon>";
+			findTrueTraits(this.level.cast[SIMON_LEVEL_ID]);
+			findTrueStatuses(this.level.cast[SIMON_LEVEL_ID], target);
+			findTrueNetworks(this.level.cast[SIMON_LEVEL_ID], target);
+			findTrueRelationships(this.level.cast[SIMON_LEVEL_ID], target);
+			stateXMLString += "</Simon>";
+			
+			stateXMLString += "</State>"
+			
+		}
+		
+		/**
+		 * This is gonna be a great function.
+		 * It will look at ALL of the files in the bin folder, and go through each social game context.
+		 * If it is a SGC that we care about, we will go through each of the features and mark them down.
+		 * Otherwise, we won't!  easy as that!
+		 */
+		public function parseData():void {
+			var nameOfFile:String = "/bin";
+			var numZeros:int = 0;
+			var numOnes:int = 0;
+			var binDirectory:File = new File("C:\\Users\\Ben\\projects\\altprom-POST-SYMPOSIUM\\trunk\\MLAirProject\\bin\\CasanovaWithPeturbationsWITHDesktop");
+			for each(var fileInDirectory:File in binDirectory.getDirectoryListing()) {
+				//Debug.debug(this, "I think I am a file in the bin directory: " + fileInDirectory.name);
+				nameOfFile = fileInDirectory.name;
+				
+				var fs:FileStream = new FileStream();
+				fs.open(fileInDirectory, FileMode.READ);
+				var myXML:XML = XML(fs.readUTFBytes(fs.bytesAvailable));
+				fs.close();
+				
+				//Debug.debug(this, "*** FILE NAME: " + nameOfFile);
+				//Debug.debug(this, "\n");
+				
+				var SGCList:XMLList = myXML.SGC
+				
+				for each(var SocialGameC:XML in SGCList) {
+					
+					if (SocialGameC.attribute("label") == "NA") {
+						//Debug.debug(this, "");
+					}
+					else{
+						var name:String = "";
+						var featureString:String = "";
+						var atttributes:XMLList = SocialGameC.attributes();
+						for each (var a:XML in atttributes) {
+							name += a + " ";
+						}
+						var stateChildren:XMLList = SocialGameC.State.children();
+						
+						//We need to find out who the target and the other girl are!
+						var theTargetOfThisContext:String = "";
+						var theOtherGirlOfThisContext:String = "";
+						
+						for each ( var stateChild:XML in stateChildren) {
+							if (stateChild.name() == "Target") {
+								theTargetOfThisContext = stateChild.attribute("name");
+								//Debug.debug(this, "the target of this context: " + theTargetOfThisContext);
+							}
+							else if (stateChild.name() == "OtherGirl") {
+								theOtherGirlOfThisContext = stateChild.attribute("name");
+								//Debug.debug(this, "the other girl of this context: " + theOtherGirlOfThisContext);
+							}	
+						}
+						
+						for each (stateChild in stateChildren) {
+							var sanityCheck:String = "@ATTRIBUTE " + stateChild.name();
+							var variableType:String = ""
+							var nominalEnding:String = " {0,1}";
+
+							
+							var featureList:XMLList = stateChild.Traits.feature;
+							variableType =  "-Trait-";
+							for each(var feature:XML in featureList){
+								featureString += feature.attribute("value") + ",";
+								//Debug.debug(this, sanityCheck + variableType + feature.attribute("id") + ": " + feature.attribute("value"));
+								var tempTraitName:String = feature.attribute("name");
+								tempTraitName = stripSpaces(tempTraitName);
+								//Debug.debug(this, sanityCheck + variableType + tempTraitName + nominalEnding);
+							}
+							featureList = stateChild.Statuses.feature;
+							variableType =  "-Status-";
+							for each(feature in featureList){
+								featureString += feature.attribute("value") + ",";
+								var tempStatusName:String = feature.attribute("name");
+								tempStatusName = stripSpaces(tempStatusName);
+								var toString:String = feature.attribute("to");
+								if (feature.attribute("cifIDOfPredicate") >= Status.FIRST_DIRECTED_STATUS) {
+									//directed status
+									if(toString.toLowerCase() == theTargetOfThisContext.toLowerCase()){
+										//Debug.debug(this, sanityCheck + variableType + tempStatusName + "towardsTarget" + nominalEnding);
+									}
+									else if(toString.toLowerCase() == theOtherGirlOfThisContext.toLowerCase()){
+										//Debug.debug(this, sanityCheck + variableType + tempStatusName + "towardsOtherGirl" + nominalEnding);
+									}
+									else {
+										//Debug.debug(this, sanityCheck + variableType + tempStatusName + toString+ nominalEnding);
+									}
+									
+								}
+								else {
+									//undirected status.
+									//Debug.debug(this, sanityCheck + variableType + tempStatusName + nominalEnding);
+								}
+								//Debug.debug(this, sanityCheck + variableType + feature.attribute("id") + ": " + feature.attribute("value"));
+							}
+							featureList = stateChild.Networks.feature;
+							variableType =  "-Networks-";
+							for each(feature in featureList){
+								featureString += feature.attribute("value") + ",";
+								toString = feature.attribute("to");
+								//Debug.debug(this, sanityCheck + variableType + feature.attribute("id") + ": " + feature.attribute("value"));
+									if(toString.toLowerCase() == theTargetOfThisContext.toLowerCase()){
+										//Debug.debug(this, sanityCheck + variableType + feature.attribute("type") + feature.attribute("name") + "towardsTarget" + nominalEnding);
+									}
+									else if(toString.toLowerCase() == theOtherGirlOfThisContext.toLowerCase()){
+										//Debug.debug(this, sanityCheck + variableType + feature.attribute("type") + feature.attribute("name") + "towardsOtherGirl" + nominalEnding);
+									}
+									else {
+										//Debug.debug(this, sanityCheck + variableType + feature.attribute("type") + feature.attribute("name") + toString + nominalEnding);
+									}
+							}
+							featureList = stateChild.Relationships.feature;
+							variableType =  "-Relationships-";
+							for each(feature in featureList){
+								featureString += feature.attribute("value") + ",";
+								toString = feature.attribute("to");
+									if(toString.toLowerCase() == theTargetOfThisContext.toLowerCase()){
+										//Debug.debug(this, sanityCheck + variableType + feature.attribute("name") + "towardsTarget" + nominalEnding);
+									}
+									else if(toString.toLowerCase() == theOtherGirlOfThisContext.toLowerCase()){
+										//Debug.debug(this, sanityCheck + variableType + feature.attribute("name") + "towardsOtherGirl" + nominalEnding);
+									}
+									else {
+										//Debug.debug(this, sanityCheck + variableType + feature.attribute("name") + toString + nominalEnding);
+									}
+								//Debug.debug(this, sanityCheck + variableType + feature.attribute("id") + ": " + feature.attribute("value"));
+							}
+							
+						}
+						//Debug.debug(this, "are these the attributes? " + name);
+						//Debug.debug(this, "what about the value of the label: " + SocialGameC.attribute("label"));
+						
+						var labelString:String = "";
+						if ( SocialGameC.attribute("label") == "0"){
+							numZeros++;
+							labelString = "rejected";
+						}
+						else if ( SocialGameC.attribute("label") == "1"){
+							numOnes++;
+							labelString = "accepted";
+						}
+						
+						
+						//Debug.debug(this, nameOfFile + "-" + name + "," + featureString + labelString);
+						//trace(nameOfFile + "-" + name + "," + featureString + labelString);
+						//trace(featureString + labelString);
+						Debug.debug(this, featureString + labelString);
+						
+					}
+				}
+				
+				var actualInformationList:XMLList = myXML.SGC.(@label != "NA");
+				
+				for each (var labledData:XML in actualInformationList) {
+					var outputString:String = "";
+					outputString += nameOfFile + " -- ";
+					var SGCAttributes:XMLList = labledData.SGC.attributes();
+					for each(var SGCAttribute:XML in SGCAttributes) {
+						outputString += SGCAttribute.toString() + " -- ";
+					}
+					//if (labledData.name() == "SGC") { // dealing with an SGC node
+						
+					//}
+					//Debug.debug(this, labledData);
+				}
+				
+				//var SGCAttributes:XMLList = myXML.SGC.attributes();
+				
+				/*
+				for each (var SGCattribute:XML in SGCAttributes) {
+					Debug.debug(this, SGCattribute);
+				}
+				*/
+				
+				//Debug.debug(this, "This is the contents of a file? " + myXML.SGC.gameName());
+				
+			}
+			Debug.debug(this, "The nataive path is: " + binDirectory.nativePath);
+			
+			Debug.debug(this, "All done with parsing!");
+			Debug.debug(this, "Num Zeroes: " + numZeros);
+			Debug.debug(this, "Num Ones: " + numOnes);
+			var total:int = numZeros + numOnes;
+			Debug.debug(this, "Total: " + total);
+		}
+			
+		/**
+		 * Returns true if the cool down prevents this game from being played, false if otherwise.
+		 * @param	personName the name of the preson that we want to see if we can still play a game with (will probably be either monica or chloe)
+		 * @return
+		 */
+		public function coolDownPrevents(personName:String):Boolean {
+			if (personName.toLowerCase() == "monica") {
+				if (zackToMonicaRomanticRejectionCooldown > 0) {
+					return true;
+				}
+			}
+			else if (personName.toLowerCase() == "chloe") {
+				if (zackToChloeRomanticRejectionCooldown > 0) {
+					return true;
+				}
+				
+				if (debonairToChloeCoolDown > 0) {
+					return true;
+				}
+			}
+			
+			return false;
+		}
+		
+		/**
+		 * returns false if there is a good reason to increase this social network (e.g. it is less than HIGH)
+		 * returns true if there is no good reason to raise this network (e.g. it is LOWER than high).
+		 * 
+		 * @param	from will probably just be Zack
+		 * @param	to will probably be monica or chloe
+		 * @param	networkName will be either 'buddy' or 'cool'
+		 */
+		public function networkTooHighPrevents(from:String, to:String, intentName:String):Boolean {
+			var networkValue:int = 0;
+			var fromID:int = 0;
+			var toID:int = 0;
+			
+			if (from.toLowerCase() == "zack") fromID = ZACK_LEVEL_ID;
+			else if (from.toLowerCase() == "chloe") fromID = CHLOE_LEVEL_ID;
+			else if (from.toLowerCase() == "buzz") fromID = BUZZ_LEVEL_ID;
+			else if (from.toLowerCase() == "monica") fromID = MONICA_LEVEL_ID;
+			else if (from.toLowerCase() == "simon") fromID = SIMON_LEVEL_ID;
+			
+			if (to.toLowerCase() == "zack") toID = ZACK_LEVEL_ID;
+			else if (to.toLowerCase() == "chloe") toID = CHLOE_LEVEL_ID;
+			else if (to.toLowerCase() == "buzz") toID = BUZZ_LEVEL_ID;
+			else if (to.toLowerCase() == "monica") toID = MONICA_LEVEL_ID;
+			else if (to.toLowerCase() == "simon") toID = SIMON_LEVEL_ID;
+			
+			if (intentName == Predicate.getIntentNameByNumber(Predicate.INTENT_BUDDY_UP)) {
+				networkValue = cif.buddyNetwork.getWeight(level.cast[toID].networkID, level.cast[fromID].networkID);
+			}
+			else if (intentName == Predicate.getIntentNameByNumber(Predicate.INTENT_COOL_UP)) {
+				networkValue = cif.coolNetwork.getWeight(level.cast[toID].networkID, level.cast[fromID].networkID);
+			}
+			else if (intentName == Predicate.getIntentNameByNumber(Predicate.INTENT_ROMANCE_UP)) { // Romance up probably won't really come into play too much here!
+				networkValue = cif.romanceNetwork.getWeight(level.cast[toID].networkID, level.cast[fromID].networkID);
+			}
+			
+			if (networkValue > 75) { // they already have a very healthy relationship -- no need to try any harder for now
+				return true;
+			}
+			
+			Debug.debug(this, "attitude of " + to + " towards " + from + " is " + networkValue);
+			return false; // their relationship could use some work.
+		}
+		
+		/**
+		 * This is just a goofy little experimental function that will peturb the state in various ways at the start of each level trace.
+		 * specifically, it will just add some various traits and statuses and relationships and junk.
+		 */
+		public function peturbState():void{
+			var charIDToMangle:int = randBetween(0, 4);
+			
+			//Let's give them one new trait, one new status, and one new relationship.
+			var traitIDToAdd:int = randBetween(Trait.LAST_CATEGORY_COUNT, Trait.FIRST_TO_IGNORE - 1);
+			var undirectedStatusIDToAdd:int = randBetween(Status.FIRST_NOT_DIRECTED_STATUS, Status.FIRST_DIRECTED_STATUS - 1);
+			var directedStatusIDToAdd:int = randBetween(Status.FIRST_DIRECTED_STATUS, Status.STATUS_COUNT - 1);
+			var directedStatusRecipientCharID:int = randBetween(0, 4);
+				if (directedStatusRecipientCharID == charIDToMangle) {
+					directedStatusIDToAdd++;
+					if (directedStatusIDToAdd > 4) {
+						directedStatusIDToAdd = 0;
+					}
+				}
+			var relationshipIDToAdd:int = randBetween(0, 2);
+			var relationshipOtherPersonID:int = randBetween(0, 4);
+			if (relationshipOtherPersonID == charIDToMangle) {
+				relationshipOtherPersonID++;
+				if (relationshipOtherPersonID > 4) {
+					relationshipOtherPersonID = 0;
+				}
+			}
+			
+			level.cast[charIDToMangle].addStatus(undirectedStatusIDToAdd);
+			level.cast[charIDToMangle].addStatus(directedStatusIDToAdd, level.cast[directedStatusRecipientCharID]);
+			level.cast[charIDToMangle].setTrait(traitIDToAdd);
+			cif.relationshipNetwork.setRelationship(relationshipIDToAdd, level.cast[charIDToMangle], level.cast[relationshipOtherPersonID]);
+			
+			Debug.debug(this, "character being mangled: " + level.cast[charIDToMangle].characterName);
+			Debug.debug(this, "trait added: " + Trait.getNameByNumber(traitIDToAdd));
+			Debug.debug(this, "undirected status added: " + Status.getStatusNameByNumber(undirectedStatusIDToAdd));
+			Debug.debug(this, "directed status added: " + Status.getStatusNameByNumber(directedStatusIDToAdd) + " towards: " + level.cast[directedStatusRecipientCharID].characterName);
+			Debug.debug(this, "relationship added: " + RelationshipNetwork.getRelationshipNameByNumber(relationshipIDToAdd) + " towards: " + level.cast[relationshipOtherPersonID].characterName);
+			
+		}
+		
+		/**
+		 * returns a random integer between two values.
+		 * Example, we want a number between 9 and 57.
+		 * First we find the 'offset' which is the bigger minus the smaller, or 57 - 9 = 48
+		 * Then we multiple 48 by a random number between 0 and 1.  We now essentially have
+		 * a random number between 0 and 48.
+		 * We then add the lower bound do it.  If the random number was 0, it becomes 9
+		 * If the random number was 48, it becomes 57.
+		 * Yay, everyone is happy!
+		 * @param	lowerBound the smallest value this can be.
+		 * @param	upperBound the biggest value this can be.
+		 */
+		public function randBetween(lowerBound:int, upperBound:int):int {
+			var randomNum:Number = Math.random();
+			var offset:int = upperBound - lowerBound;
+			var finalInt:int = (randomNum * offset) + lowerBound;
+			return finalInt;
+		}
+		
+		/**
+		 * Removes the spaces fro a string
+		 * @param	originalstring the original string, full of spaces
+		 * @return the original string but now with no spaces.
+		 */
+		public function stripSpaces(originalstring:String):String
+		{
+			var original:Array=originalstring.split(" ");
+			return(original.join(""));
+		}
+		]]>
+	</fx:Script>
+	
+</s:Application>

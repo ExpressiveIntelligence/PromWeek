@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:UI="UI.*"
+		 contentBackgroundColor="#FFFFFF" 
+		 width="780" 
+		 height="640" 
+		 >
+    <fx:Metadata>
+		
+	</fx:Metadata>
+	
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	<s:HGroup>
+		<UI:RuleAuthoringUI id="ruleUI" />	
+		<s:Button id="addDefinitionRule" label="Modify Definition" click="addDefinitionRuleToWorkingMT();" />
+	</s:HGroup>
+	
+	<fx:Script>
+		<![CDATA[
+			import flash.events.Event;
+			import mx.collections.ArrayCollection;
+			import CiF.*;
+			import tool.DesignerToolEngine;
+			
+			public var dte:DesignerToolEngine = DesignerToolEngine.getInstance();
+			
+			public function addDefinitionRuleToWorkingMT():void {
+				var defRule:Rule = new Rule();
+				var rIter:Rule;
+				var maxID:uint;
+				
+				defRule.predicates = ruleUI.rule.predicates.concat();
+				if (ruleUI.rule.name == "")// don't let things have a blank name
+					defRule.name = "Anonymous Rule";
+				else 
+					defRule.name = ruleUI.rule.name; 
+				
+				maxID = 0;
+				for each (rIter in dte.workingMicrotheory.definition) {
+					if (maxID <= rIter.id) maxID = rIter.id + 1;
+				}
+				defRule.id = maxID;
+					
+				dte.workingMicrotheory.definition = defRule;
+				dte.microtheoryDefinitionPRDP = dte.generateMicrotheoryDefinitionPRDP();
+				
+				dispatchEvent(new Event("definitionListUpdate", true, true));
+			}
+		]]>
+	</fx:Script>
+	
+</s:Group>

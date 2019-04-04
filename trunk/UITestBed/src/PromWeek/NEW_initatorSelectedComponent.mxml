@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()">
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+			 <fx:Number id="thoughtRayWidth">135</fx:Number>
+		 </fx:Declarations>
+		 
+		<util:SmoothImage id="thoughtRayImage" x="120" y="360" width="{this.thoughtRayWidth}" height="170" maintainAspectRatio="false" />
+		<util:SmoothImage id="initiatorPortraitImage" x="10" y="360" width="170" height="170"/>
+		<prom:NEW_namePlate id="namePlate" height="48" x="{100 - namePlate.width/2}" y="515"/>
+		<prom:NEW_initatorCharHeadSelectionGroup id="initSelectGroup" x="10" y="560" />
+		<prom:NEW_responderCharHeadSelectionGroup id="respSelectGroup" x="{95 + this.thoughtRayWidth}" y="350" />
+		<s:VGroup id="statusGroup" verticalAlign="bottom" bottom="90" x="5"></s:VGroup>
+		<s:Group id="thoughtBubbleStemGroup" x="120" y="360" width="{this.thoughtRayWidth}" height="170"/>
+		<prom:NEW_initiatorThoughtBubble id="initiatorThoughtBubble" x="10" y="100" visible="false" />
+		<s:Button id="switchCharButton" alpha="0.6" visible="false" x="285" y="510" width="40" height="40" skinClass="PromWeek.skins.NEW_switchCharacterButtonSkin" click="characterSwitchClicked(event)" mouseOver="characterSwitchMouseOver(event)" mouseOut="characterSwitchMouseOut(event)" toolTip="Switch selected characters" />
+	<fx:Script>
+		<![CDATA[
+		import CiF.Character;
+		import CiF.CiFSingleton;
+		import CiF.LineOfDialogue;
+		import CiF.Status;
+		import flash.events.Event;
+		import flash.events.MouseEvent;
+		import flash.ui.Mouse;
+		import mx.effects.Glow;
+		import mx.graphics.SolidColor;
+		import mx.graphics.SolidColorStroke;
+		import PromWeek.assets.ResourceLibrary;
+		import CiF.Debug;
+		import spark.primitives.Ellipse;
+		import spark.primitives.Rect;
+		public var rL:ResourceLibrary;
+		
+		public var currentInitiator:String;
+		public var currentResponder:String;
+		public var currentCharacter:Character;
+		
+		public function onCreationComplete():void 
+		{
+			rL = ResourceLibrary.getInstance();
+			thoughtRayImage.source = rL.uiIcons["thoughtRay"];
+			
+			this.addEventListener("RESP_MOUSE_OVER_EVENT", drawThoughtBubble);
+			this.addEventListener("RESP_FACE_CLICKED",respCharFaceClickedEvent);
+			this.addEventListener(MouseEvent.MOUSE_OUT,mouseOutRespCharHeadSelectionGroup);
+		}
+		
+		public function characterSwitchClicked(e:MouseEvent = null):void
+		{
+			var temp:String = this.currentResponder;
+			this.currentResponder = this.currentInitiator;
+			this.currentInitiator = temp;
+			
+			GameEngine.getInstance().hudGroup.initSelectGroup.charFaceClickedEvent(null, this.currentInitiator, true);
+			this.initSelectGroup.charFaceClickedEvent(null, this.currentInitiator, true);			
+			
+			this.populateInitiatorSelectedComponent(null, this.currentInitiator, true);
+			
+			this.respSelectGroup.charFaceClickedEvent(null, this.currentResponder);
+			
+			this.drawThoughtBubble(null, true,this.currentResponder); //charFaceButtons needs to be right
+			this.drawInitiatorBigThoughtBubble();
+		}
+		
+		public function characterSwitchMouseOver(e:MouseEvent = null):void
+		{
+			this.switchCharButton.alpha = 1.0;
+		}
+		
+		public function characterSwitchMouseOut(e:MouseEvent = null):void
+		{
+			this.switchCharButton.alpha = 0.6;
+		}
+		
+		
+		
+		private function respCharFaceClickedEvent(e:Event):void 
+		{
+			//GameEngine.getInstance().hudGroup.responderSubjectiveThoughtBubble.visible = false;
+			GameEngine.getInstance().hudGroup.responderThoughtBubble.visible = false;
+			
+			this.currentResponder = e.target.charName;
+			this.drawThoughtBubble(e, true);
+			this.drawInitiatorBigThoughtBubble();
+			
+			this.switchCharButton.visible = true;
+		}
+		
+		public function drawInitiatorBigThoughtBubble():void 
+		{
+			this.initiatorThoughtBubble.whatInitiatorWantsToDoText.text = "What do I want to do with " + LineOfDialogue.toInitialCap(this.currentResponder) + "?";
+			
+			var sgNames:Vector.<String> = new Vector.<String>();
+			sgNames.push("Ask Out");
+			sgNames.push("Make Plans");
+			sgNames.push("Woo");
+			sgNames.push("Txt Msg Break Up");
+			sgNames.push("Reminisce");
+			sgNames.push("Bully");
+			sgNames.push("Insult Friend Of");
+			sgNames.push("Declare War");
+			this.initiatorThoughtBubble.socialExchangeStepper.socialGameNames = sgNames;
+			
+			var sgNamesLocked:Vector.<Boolean> = new Vector.<Boolean>();
+			sgNamesLocked.push(false);
+			sgNamesLocked.push(false);
+			sgNamesLocked.push(false);
+			sgNamesLocked.push(true);
+			sgNamesLocked.push(true);
+			sgNamesLocked.push(false);
+			sgNamesLocked.push(true);
+			sgNamesLocked.push(false);
+			this.initiatorThoughtBubble.socialExchangeStepper.socialGamesLockedState = sgNamesLocked;
+						
+			this.initiatorThoughtBubble.socialExchangeStepper.currentIndex = 0;
+			this.initiatorThoughtBubble.visible = true;
+		}
+		
+		private function mouseOutRespCharHeadSelectionGroup(e:MouseEvent):void 
+		{
+			if (this.respSelectGroup.currentlySelected == "")
+			{
+				this.thoughtBubbleStemGroup.removeAllElements();
+				this.respSelectGroup.subjectiveThoughtBubble1.visible = false;
+				this.respSelectGroup.subjectiveThoughtBubble2.visible = false;
+			}
+		}
+		
+		public function populateInitiatorSelectedComponent(e:Event=null, charName:String="",switchingChar:Boolean=false):void 
+		{
+			if (e == null)
+			{
+				this.currentInitiator = charName;
+			}
+			else
+			{
+				this.currentInitiator = e.target.charName;
+			}
+			
+			var sizeForCharHead:Number = 170 / (respSelectGroup.cast.length - 1);
+			if ((respSelectGroup.cast.length - 1) >= 4)
+			{
+				sizeForCharHead = 170 / 4;
+			}
+			
+			respSelectGroup.populateFromCast(this.currentInitiator, sizeForCharHead,0);
+			
+			this.thoughtBubbleStemGroup.removeAllElements();
+			this.respSelectGroup.subjectiveThoughtBubble1.visible = false;
+			this.respSelectGroup.subjectiveThoughtBubble2.visible = false;
+			
+			if (e == null)
+			{
+				this.initSelectGroup.charFaceClickedEvent(null, this.currentInitiator,switchingChar);
+			}
+			else
+			{
+				this.initSelectGroup.charFaceClickedEvent(e);
+			}
+			initiatorPortraitImage.source = rL.portraits[this.currentInitiator];
+			namePlate.selectACharacterText.text = this.currentInitiator;
+			
+			this.currentCharacter = CiFSingleton.getInstance().cast.getCharByName(this.currentInitiator);
+			
+			this.updateStatusIcons();
+		}
+		
+		public function drawThoughtBubble(e:Event=null,forceFromSwitchClickChar:Boolean=false,respName:String = ""):void
+		{
+			if (this.respSelectGroup.currentlySelected == "" || forceFromSwitchClickChar)
+			{
+				var nameToUse:String;
+				if (e != null)
+				{
+					nameToUse = e.target.charName;
+				}
+				else
+				{
+					nameToUse = respName;
+				}
+				
+				var indexOfHoverChar:int;
+				for (var i:int = 0; i < this.respSelectGroup.charFaceButtons.length; i++)
+				{
+					if (this.respSelectGroup.charFaceButtons[i].charName == nameToUse)
+					{
+						indexOfHoverChar = i;
+					}
+				}
+				var extraX:Number = (indexOfHoverChar > 3)?(this.respSelectGroup.charFaceButtons[indexOfHoverChar].width + 5):0;
+				var extraY:Number = (indexOfHoverChar > 3)?(this.respSelectGroup.responderSelectionGroup2.y):0;
+				
+				var subjectBubbleToUse:NEW_subjectiveThoughtBubble;
+				var subjectBubbleNotToUse:NEW_subjectiveThoughtBubble;
+				if (indexOfHoverChar >= 4)
+				{
+					subjectBubbleToUse = this.respSelectGroup.subjectiveThoughtBubble2;
+					subjectBubbleNotToUse = this.respSelectGroup.subjectiveThoughtBubble1;
+				}
+				else
+				{
+					subjectBubbleToUse = this.respSelectGroup.subjectiveThoughtBubble1;
+					subjectBubbleNotToUse = this.respSelectGroup.subjectiveThoughtBubble2;
+				}
+				
+				subjectBubbleToUse.x = this.respSelectGroup.charFaceButtons[indexOfHoverChar].x - 10 + extraX;
+				subjectBubbleToUse.y = this.respSelectGroup.charFaceButtons[indexOfHoverChar].y - 35 + extraY;
+				subjectBubbleToUse.updateSubjectiveThoughtBubble(this.currentInitiator, nameToUse);
+				this.drawThoughtBubbleStem(nameToUse,indexOfHoverChar,extraX,extraY);
+				subjectBubbleToUse.visible = true;
+				subjectBubbleNotToUse.visible = false;
+				
+				GameEngine.getInstance().hudGroup.responderSubjectiveThoughtBubble.updateSubjectiveThoughtBubble(nameToUse, this.currentInitiator);
+				GameEngine.getInstance().hudGroup.responderSubjectiveThoughtBubble.objectOfThought = this.currentInitiator;
+				GameEngine.getInstance().hudGroup.responderSubjectiveThoughtBubble.visible = true;
+			}
+		}
+		public function drawThoughtBubbleStem(charName:String, indexOfHoverChar:int, extraX:Number, extraY:Number):void
+		{
+			this.thoughtBubbleStemGroup.removeAllElements();
+			
+
+			//(y2-y1)/(x2-x1)
+			//var slope:Number = (this.respSelectGroup.charFaceButtons[indexOfHoverChar].height * indexOfHoverChar + this.respSelectGroup.charFaceButtons[indexOfHoverChar].height/2 - this.thoughtBubbleStemGroup.height/2) / (this.thoughtBubbleStemGroup.width - 0);
+			var slope:Number = (this.respSelectGroup.charFaceButtons[indexOfHoverChar].y + this.respSelectGroup.charFaceButtons[indexOfHoverChar].height/2 - this.thoughtBubbleStemGroup.height/2 + extraY) / (this.thoughtBubbleStemGroup.width - 10 - 20 + extraX);
+			
+			var circle:Ellipse;
+			var solidColor:SolidColor = new SolidColor();
+			solidColor.color = 0xFFFFFF;
+			var solidColorStroke:SolidColorStroke = new SolidColorStroke();
+			solidColorStroke.color = 0x000000;
+			solidColorStroke.weight = 3;
+			
+			circle = new Ellipse();
+			circle.x = 20;//-7;
+			circle.y = this.thoughtBubbleStemGroup.height / 2 -7;
+			circle.width = 15;
+			circle.height = 15;
+			circle.fill = solidColor;
+			circle.stroke = solidColorStroke;
+			this.thoughtBubbleStemGroup.addElement(circle);
+			
+			circle = new Ellipse();
+			circle.x = this.thoughtBubbleStemGroup.width / 3  + extraX/2; //-12
+			circle.y = (this.thoughtBubbleStemGroup.width / 3) * slope - 12 + this.thoughtBubbleStemGroup.height / 2;
+			circle.width = 24;
+			circle.height = 24;
+			circle.fill = solidColor;
+			circle.stroke = solidColorStroke;
+			this.thoughtBubbleStemGroup.addElement(circle);
+			
+			circle = new Ellipse();
+			circle.x = 2 * this.thoughtBubbleStemGroup.width / 3 - 15 + extraX;
+			circle.y = (2 * this.thoughtBubbleStemGroup.width / 3) * slope - 15 + this.thoughtBubbleStemGroup.height / 2;
+			circle.width = 30;
+			circle.height = 30;
+			circle.fill = solidColor;
+			circle.stroke = solidColorStroke;
+			this.thoughtBubbleStemGroup.addElement(circle);
+		}
+		
+		public function updateStatusIcons():void
+		{
+			this.statusGroup.removeAllElements();
+			
+			var status:Status;
+			var statusIcon:StatusIcon;
+			
+			var shouldDisplayStatus:Boolean;
+			for each (status in this.currentCharacter.statuses)
+			{
+				shouldDisplayStatus = true;
+				if (status.type >= Status.FIRST_TO_IGNORE_NON_DIRECTED && status.type < Status.FIRST_DIRECTED_STATUS)
+				{
+					shouldDisplayStatus = false;
+				}
+				if (shouldDisplayStatus)
+				{
+					statusIcon = new PromWeek.StatusIcon();
+					statusIcon.width = 30;
+					statusIcon.height = 30;
+					statusIcon.loadStatusImagesToIcon(status.type, status.directedToward, status.remainingDuration);
+					this.statusGroup.addElement(statusIcon);
+				}
+				
+			}
+		}
+		
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

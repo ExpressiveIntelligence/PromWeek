@@ -1,0 +1,606 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 preinitialize="onPreinitialize()"
+		 initialize="onInitialize()"
+		 creationComplete="onCreationComplete()"
+		 width="550"
+		 height="450"
+		 left="105"
+		 top="75">
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+		 </fx:Declarations>
+		 
+		
+		 
+		<s:VGroup id="characterSheetDataGroup" top="10" width="{this.width}" height="{this.height}" horizontalAlign="center">
+			<s:HGroup variableColumnWidth="true" height="28%">
+				<s:VGroup horizontalAlign="center">
+					<prom:PlayerPortrait id="thePortrait" width="100" height="100" />
+					<!--<s:Group id="portraitGroup" width="100" height="100" >
+						<util:SmoothImage id="charImage" width="{portraitGroup.width}" height="{portraitGroup.height}" />
+						<s:Rect id="imageFrame" width="100%" height="100%">
+							<s:stroke>
+								<s:SolidColorStroke weight="3" color="#000000" />
+							</s:stroke>
+						</s:Rect>
+												
+						<s:Rect id="namePlate" left="{(portraitGroup.width - portraitGroup.width*.75)/2}" width="75%" height="20%">
+							<s:fill>
+								<s:SolidColor color="#ffffff" alpha=".7"/>
+							</s:fill>
+						</s:Rect>
+						<s:RichText id="nameRichText" top="5" left="{(portraitGroup.width - portraitGroup.width*.75)/2}" width="75%" height="20%" fontSize="16" fontWeight="bold"/>
+					</s:Group>-->
+					<prom:PromWeekButton id="socialHistoryButton" label="History" click="socialHistoryButtonClicked()" />
+				</s:VGroup>
+				<mx:Spacer width="100%"/>
+				<!--
+				<s:VGroup width="280" >
+					<s:TextArea id="characterBio" height="70" width="100%" contentBackgroundColor="#0E386C" color="#FFFD70" fontSize="12" editable="false" selectable="false"/>
+					<s:RichText id="statusTitle" text="Statuses:" color="#FFFD70" fontSize="14" fontWeight="bold" />
+					<s:HGroup id="statusGroup">
+						<prom:StatusIcon id="primaryStatus1" width="35" height="35" />
+						<prom:StatusIcon id="primaryStatus2" width="35" height="35" />
+						<prom:StatusIcon id="primaryStatus3" width="35" height="35" />
+						<prom:StatusIcon id="primaryStatus4" width="35" height="35" />
+					</s:HGroup>		
+				</s:VGroup>
+				<mx:Spacer width="100%"/>
+				<s:HGroup>
+					<s:VGroup width="70">
+						<s:RichText id="traitTitle" text="Traits:" fontSize="14" fontWeight="bold" color="#FFFD70" />
+						<s:RichText id="TraitList" color="#FFFD70" fontSize="12" />
+					</s:VGroup>
+					<s:Group id="removeIconGroup" right="20" width="15" height="15" click="xClickedOn()" toolTip="Close Window">
+						<s:Rect width="{removeIconGroup.width}" height="{removeIconGroup.height}">
+							<s:stroke>
+								<s:SolidColorStroke color="black" alpha="1.0" />
+							</s:stroke>
+							<s:fill>
+								<s:SolidColor color="white" alpha="0.8" />
+							</s:fill>
+						</s:Rect>
+						<s:Line id="line1" xFrom="0" yFrom="0" xTo="{removeIconGroup.width}" yTo="{removeIconGroup.height}" >
+							<s:stroke>
+								<s:SolidColorStroke color="black" alpha="1.0" weight="2" />
+							</s:stroke>
+						</s:Line>
+						<s:Line id="line2" xFrom="0" yFrom="{removeIconGroup.height}" xTo="{removeIconGroup.width}" yTo="0" >
+							<s:stroke>
+								<s:SolidColorStroke color="black" weight="2"/>
+							</s:stroke>
+						</s:Line>		
+					</s:Group>
+				</s:HGroup>
+				-->
+				<s:Group width="100%" height="95%">
+					<s:TabBar id="tabs" left="8" y="2" dataProvider="{vs}" color="0x0E386C" />
+					<mx:ViewStack id="vs" width="375" height="75%" left="8" y="22">
+						<s:NavigatorContent label="Bio"  width="100%" height="100%" creationPolicy="all">
+							<s:BorderContainer width="100%" height="100%" borderWeight="2" cornerRadius="3" dropShadowVisible="true" creationPolicy="all">
+								<s:backgroundFill>
+									<s:LinearGradient rotation="90">
+										<s:GradientEntry color="0x0E386C" />
+										<s:GradientEntry color="0x0E386C" />
+									</s:LinearGradient>
+								</s:backgroundFill>
+								<s:HGroup width="100%" height="100%" paddingBottom="5" paddingTop="5" paddingLeft="5" paddingRight="5">
+									<s:TextArea id="characterBio" height="100%" width="100%" contentBackgroundColor="#0E386C" color="#FFFD70" fontSize="12" editable="false" selectable="false"/>
+								</s:HGroup>
+							</s:BorderContainer>
+						</s:NavigatorContent>
+						<s:NavigatorContent label="Statuses" width="100%" height="100%" creationPolicy="all">
+							<s:BorderContainer width="100%" height="100%" borderWeight="2" 
+									  cornerRadius="3" dropShadowVisible="true" creationPolicy="all">
+								<s:backgroundFill>
+									<s:LinearGradient rotation="90">
+										<s:GradientEntry color="0x0E386C" />
+										<s:GradientEntry color="0x0E386C" />
+									</s:LinearGradient>
+								</s:backgroundFill>
+								<s:VGroup paddingBottom="5" paddingTop="5" paddingLeft="5" paddingRight="5">
+									<s:RichText id="statusTitle" text="Statuses:" color="#FFFD70" fontSize="14" fontWeight="bold" />
+									<s:HGroup id="statusGroup">
+										<!--<prom:StatusIcon id="primaryStatus1" width="35" height="35" />
+										<prom:StatusIcon id="primaryStatus2" width="35" height="35" />
+										<prom:StatusIcon id="primaryStatus3" width="35" height="35" />
+										<prom:StatusIcon id="primaryStatus4" width="35" height="35" />-->
+									</s:HGroup>
+								</s:VGroup>
+							</s:BorderContainer>
+						</s:NavigatorContent>
+						<s:NavigatorContent label="Traits" width="100%" height="100%" creationPolicy="all">
+							<s:BorderContainer width="100%" height="100%" borderWeight="2" 
+									  cornerRadius="3" dropShadowVisible="true" creationPolicy="all">
+								<s:backgroundFill>
+									<s:LinearGradient rotation="90">
+										<s:GradientEntry color="0x0E386C" />
+										<s:GradientEntry color="0x0E386C" />
+									</s:LinearGradient>
+								</s:backgroundFill>
+								<s:VGroup paddingBottom="5" paddingTop="5" paddingLeft="5" paddingRight="5">
+									<s:RichText id="traitTitle" text="Traits:" fontSize="14" fontWeight="bold" color="#FFFD70" />
+									<s:RichText id="TraitList" color="#FFFD70" fontSize="12" />
+								</s:VGroup>
+							</s:BorderContainer>
+						</s:NavigatorContent>
+						<s:NavigatorContent label="Stars" width="100%" height="100%" creationPolicy="all">
+							<s:BorderContainer width="100%" height="100%" borderWeight="2" 
+									  cornerRadius="3" dropShadowVisible="true" creationPolicy="all">
+								<s:backgroundFill>
+									<s:LinearGradient rotation="90">
+										<s:GradientEntry color="0x0E386C" />
+										<s:GradientEntry color="0x0E386C" />
+									</s:LinearGradient>
+								</s:backgroundFill>
+								<s:VGroup id="starGroup" width="100%" height="100%" paddingBottom="5" paddingTop="5" paddingLeft="5" paddingRight="5">
+								</s:VGroup>
+							</s:BorderContainer>
+						</s:NavigatorContent>
+					</mx:ViewStack>
+				</s:Group>
+			</s:HGroup>
+			
+			<mx:Spacer width="100%"/>
+
+			<prom:StateVisualizer id="stateVisualizer" width="550" height="225" />
+		</s:VGroup>
+		
+		<prom:CharPortraitDrawer id="switchPortraitDrawer" x="{thePortrait.x + 40}" y="{thePortrait.y + 15}" visible="true" downward="true" maintainList="false" />
+		
+		<s:Group id="removeIconGroup" x="{this.width - removeIconGroup.width - 5}" y="5" width="15" height="15" click="xClickedOn()" toolTip="Close Window">
+			<s:Rect width="{removeIconGroup.width}" height="{removeIconGroup.height}">
+				<s:stroke>
+					<s:SolidColorStroke color="black" alpha="1.0" />
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor color="white" alpha="0.8" />
+				</s:fill>
+			</s:Rect>
+			<s:Line id="line1" xFrom="0" yFrom="0" xTo="{removeIconGroup.width}" yTo="{removeIconGroup.height}" >
+				<s:stroke>
+					<s:SolidColorStroke color="black" alpha="1.0" weight="2" />
+				</s:stroke>
+			</s:Line>
+			<s:Line id="line2" xFrom="0" yFrom="{removeIconGroup.height}" xTo="{removeIconGroup.width}" yTo="0" >
+				<s:stroke>
+					<s:SolidColorStroke color="black" weight="2"/>
+				</s:stroke>
+			</s:Line>		
+		</s:Group>
+	<fx:Script>
+		<![CDATA[
+		
+		import CiF.CiFSingleton;
+		import flash.geom.Rectangle;
+		import flash.geom.Vector3D;
+		import flash.text.TextField;
+		import flash.text.TextFormat;
+		import flashx.textLayout.utils.CharacterUtil;
+		import mx.controls.Button;
+		import spark.components.Group;
+		import spark.components.Button;
+		import mx.graphics.SolidColor;
+		import mx.graphics.SolidColorStroke;
+		import spark.components.HGroup;
+		import spark.components.RichText;
+		import spark.components.VGroup;
+		import spark.primitives.*;
+		import flash.text.TextField;
+		import spark.components.Label;
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import flash.events.*;
+		import spark.filters.*;
+		import CiF.*;
+		import flashx.textLayout.formats.TextAlign;
+		import PromWeek.assets.ResourceLibrary;
+		
+		private var gameEngine:GameEngine;
+		private var resourceLibrary:PromWeek.assets.ResourceLibrary;
+		private var cif:CiFSingleton;
+		
+		public var resultsString:String;
+		private var resultsLabel:Label;
+		private var resultsStringLabel:RichText;
+		
+		public var mainBodyFill:SolidColor;
+		public var mainBodyStroke:SolidColorStroke;
+		private var mainBody:Rect;
+		public var innerBodyStroke:SolidColorStroke;
+		
+		public var charImageFill:SolidColor;
+		public var charImageStroke:SolidColorStroke;
+
+		//public var charImage:Rect;
+		
+		private var rL:PromWeek.assets.ResourceLibrary;
+		// some changes
+		
+		public var currentCharacter:Character;
+		private var _charName:String;
+		
+		private function onPreinitialize():void {
+			gameEngine = GameEngine.getInstance();
+			cif = CiFSingleton.getInstance();
+		}
+		
+		override protected function createChildren():void {
+			this.mainBody = new Rect();
+			//default values
+			mainBodyFill= new SolidColor(0x1F497D, 1.0); //The Inner Fill (Color, Alpha (1.0 = completely solid))
+			mainBodyStroke = new SolidColorStroke(0x000033, 1.0); //THE BORDER
+			mainBodyStroke.weight = 10;
+			this.mainBody.x = 0;
+			this.mainBody.y = 0;
+			this.mainBody.height = this.height;
+			this.mainBody.width = this.width;//1080;
+			this.mainBody.stroke = mainBodyStroke;
+			this.mainBody.fill = mainBodyFill;
+			this.addElement(mainBody);
+			
+			//mainBody.addEventListener(MouseEvent.CLICK, characterSheetClicked);
+			
+			//I don't think these ever get used anywhere either?  Again,
+			//taken directly from SocialGameResultsUI.mxml
+			this.innerBodyStroke = new SolidColorStroke(0x000033, 1.0);
+			this.innerBodyStroke.weight = 3;
+			
+			//try to make a rectangle INSIDE of my rectangle:
+			charImageFill= new SolidColor(0xFF0000, 1.0); //The Inner Fill (Color, Alpha (1.0 = completely solid))
+			charImageStroke = new SolidColorStroke(0x00FF00, 1.0); //THE BORDER
+			charImageStroke.weight = 0.1;
+			//this.charImage.fill = charImageFill;
+			//this.charImage.stroke = charImageStroke;
+			//this.addElement(charImage);
+			
+			//Don't think we need this?
+			resultsLabel = new Label();
+			resultsLabel.styleName = "Results:";
+			this.addElement(resultsLabel);
+
+			this.setElementIndex(characterSheetDataGroup, this.numElements - 1);
+			this.setElementIndex(switchPortraitDrawer, this.numElements - 1);
+			
+			this.setElementIndex(removeIconGroup, this.numElements - 1);
+			super.createChildren();
+		}
+		
+		public function onInitialize():void 
+		{	
+			this.TraitList.text = "Kind\nOutgoing\nBrave\nSenstitive";
+			this.characterBio.text = "I am the default text assigned during initialization.  However someday I will be a wonderful and hilarious character bio that will grant the user deep insight into the world and lives of these little guys.";
+		}
+		
+		public function onCreationComplete():void {
+			//trace("character sheet on creationComplete");
+			rL = PromWeek.assets.ResourceLibrary.getInstance();
+			this.switchPortraitDrawer.addEventListener("charPortraitClicked", switchCharacters);
+		}
+		
+		override protected function commitProperties():void {
+			Debug.debug(this, "commitProperties()");
+			super.commitProperties();
+			if (this._charName) 
+			{	
+				this.currentCharacter = cif.cast.getCharByName(this._charName);
+				var statuses:Vector.<Status> = this.currentCharacter.statuses;
+				var traits:Vector.<Number> = this.currentCharacter.traits;
+
+				thePortrait.NameRichText.visible = false;
+				thePortrait.NamePlate.visible = false;
+				switchPortraitDrawer.cpanel.label = this.currentCharacter.characterName;
+
+				this.updatePortraitAndBio();
+				
+				this.TraitList.text = "";
+				var traitName:String;
+				for (var i:int; i < traits.length; i++) {
+					traitName = Trait.getNameByNumber(traits[i]);
+					if (traits[i] < Trait.FIRST_TO_IGNORE)
+					{
+						this.TraitList.text += "*" + traitName + "\n";
+					}
+				}
+				
+				this.updateStatusIcons();
+				//this.updateRelationships();
+				
+				switchPortraitDrawer.hiderBtn.label = this.currentCharacter.characterName;
+				this.populateStarsList();
+				
+				stateVisualizer.updateCharacterInfoGroup(this.currentCharacter, gameEngine.currentLevel.cast);
+				//stateVisualizer.updateCharacterInfoGroup(this.currentCharacter,cif.cast.characters);
+			}
+		}
+		
+		public function switchCharacters(e:Event):void {
+			this._charName = switchPortraitDrawer.characterLastClicked;
+			commitProperties();
+		}
+		
+		/**
+		 * This function closes the character sheet
+		 * 
+		 * @param	e
+		 */
+		public function xClickedOn(e:MouseEvent = null):void
+		{
+			this.visible = false;
+		}
+		
+		public function socialHistoryButtonClicked():void
+		{
+			//create a list of chars that includes the selected char
+			var chars:Vector.<Character> = new Vector.<Character>();
+			for each (var char:Character in this.stateVisualizer.charactersToDisplay)
+			{
+				chars.push(char.clone())
+			}
+			chars.push(this.stateVisualizer.selectedCharacter.clone());
+			
+			//gameEngine.hudGroup.sfdbVisualizer.stateFilter.characterFilterGroup.updateIndividualCharacterFilterGroup(chars);
+			//gameEngine.hudGroup.sfdbVisualizer.updateSFDBVisualizer(chars,chars);
+			//gameEngine.hudGroup.sfdbVisualizer.visible = true;
+		}
+		
+		public function populateStarsList():void
+		{
+			if (rL == null)
+			{
+				rL = PromWeek.assets.ResourceLibrary.getInstance();
+			}
+			
+			this.currentCharacter.updateCharacterLabels();
+			
+			starGroup.removeAllElements();
+			var vGroup:VGroup = new VGroup();
+			vGroup.width = starGroup.width;
+			vGroup.height = starGroup.height;
+			var group:Group;
+			var label:Label;
+			var image:SmoothImage;
+			var hGroup:HGroup;
+			for (var i:int = 0; i < this.currentCharacter.characterLabels.length; i++ )
+			{
+				if (i % 3 == 0)
+				{
+					hGroup = new HGroup();
+					hGroup.width = starGroup.width;
+					hGroup.height = 50;
+					vGroup.addElement(hGroup);
+				}
+				group = new Group();
+				label = new Label();
+				label.setStyle("color", "yellow");
+				label.setStyle("fontWeight", "bold");
+				label.setStyle("textAlign",TextAlign.CENTER);
+				image = new SmoothImage();
+				if (this.currentCharacter.characterLabels[i] != "")
+				{
+					image.source = rL.portraits[this.currentCharacter.characterLabels[i].toLowerCase()];
+					if (i == Character.LABEL_DATING)
+					{
+						label.text = (cif.cast.getCharByName(this.currentCharacter.characterLabels[i]).hasTrait(Trait.MALE))?"Boyfriend":"Girlfriend";
+					}
+					else
+					{
+						label.text = Character.getLabelNameByID(i);
+					}
+				}
+				else
+				{
+					label.text = Character.getLabelNameByID(i);
+					image.source = rL.portraits["noOne"];
+				}
+				label.width = 80;
+				image.width = 40;
+				image.height = 40;
+				image.x = 20;
+				group.addElement(image);
+				group.addElement(label);
+				group.toolTip = (this.currentCharacter.characterLabels[i] == "")?"no one":this.currentCharacter.characterLabels[i];
+				hGroup.addElement(group);
+			}
+			
+			starGroup.addElement(vGroup);
+		}
+		
+		
+		
+		public function onCharacterSheetCloseButton():void {
+			trace("onCharacterSheetCloseButton() clicked");
+		}
+		
+		private function characterSheetClicked():void {
+			this.visible = false;
+			
+		}
+		
+		public function updateCharacterSheet(charName:String):void {
+			Debug.debug(this, "updateCharacterSheet()");
+			_charName = charName;
+			
+			this.invalidateProperties();
+			this.invalidateSize();
+			this.invalidateDisplayList();
+		}
+
+		
+		public function updatePortraitAndBio():void 
+		{
+			switch(this.currentCharacter.characterName) 
+			{
+				case 'Mave': 
+					this.characterBio.text = "Mave is a big fish in the small, black-and-lace-filled pool of the high school Goths. She doesn't suffer fools (which includes most of her classmates) and will stop at nothing to get what she wants. But beneath her cynical exterior and acerbic wit lies a desire for a partner who matches her in more than just style."; 
+					thePortrait.PortraitImage.source =  rL.portraits["mave"];
+					break;
+				case 'Edward': 
+					this.characterBio.text = "Edward may be the best dressed Goth in school, but there's not much going on underneath his dapper black hat: he lacks the wit he thinks he has. Once one of the popular crowd before his fall to 'the dark side,' he secretly wants nothing more than to be cool again, although he's too self-defeating and naive to ever get back with the in crowd... isn't he?"; 
+					thePortrait.PortraitImage.source =  rL.portraits["edward"];
+					break;
+				case 'Phoebe': 
+					this.characterBio.text = "Phoebe was once a spoiled rich kid who turned emo senior year, much to the annoyance of everyone except the other emos, who she drives around in her dad's swank car. She can't understand why more people don't want to bask in her winning personality (excepting her long-suffering BFF Lucas). Her best quality is that she won't take no for an answer: maybe she can channel that stubbornness into a less lonely existence?"; 
+					thePortrait.PortraitImage.source =  rL.portraits["phoebe"];
+					break;
+				case 'Nicholas':
+					this.characterBio.text = "Nicholas has been described as a 'smug little punk' by some and a 'vicious heartbreaking monster' by others, and that's just what his parents think of him. Rich, good-looking, three time student body president, Nicholas detests the nerds almost as much as he detests his best 'friend' Oswald, who's always trying to one-up him at something. He's also 'friends' with the rest of the popular crowd, and with ladies from any clique who catch his fancy."; 
+					thePortrait.PortraitImage.source =  rL.portraits["nicholas"];
+					break;
+				case 'Monica':
+					this.characterBio.text = "Monica is a manipulative machiavellian mastermind.  Boys want her, girls want the thing she has that the boys want. She rules this school with an iron fist (fashionably manicured, of course). But smiling out from nearly every page of the yearbook, viciously stepping on the people who get in her way, in her darkest nights Monica can't help but wonder if she's missing something from life..."; 
+					thePortrait.PortraitImage.source =  rL.portraits["monica"];
+					break;
+				case 'Zack':
+					this.characterBio.text = "Zack is a geek and proud of it, flaunting his l33t skillz and pop culture references at every opportunity. If he does okay in his classes it's mostly because he copies off his friend Simon: he'd much rather watch pirated anime than actually study. His single-minded stubbornness and acerbic personality has made him a lot of enemies, but if he does put his mind to something, he'll do whatever it takes to get what he wants."; 
+					thePortrait.PortraitImage.source =  rL.portraits["zack"];
+					break;
+				case 'Lil':
+					this.characterBio.text = "Lil has few friends, meandering through life to the beat of a drummer no one else can quite hear: sometimes awkward, sometimes a compulsive liar, other times she's graceful and can't stand posers. After her recent bad breakup with Zack, she's kept mostly to herself. Who know's what she's plotting underneath all that hair?"; 
+					thePortrait.PortraitImage.source =  rL.portraits["lil"];
+					break;
+				case 'Doug':
+					this.characterBio.text = "Doug does his best to avoid the petty politics that consume his peers, who as a result mostly ignore him. But to his friends, he's a sweet, if awkward kid who isn't afraid to be himself. As long as he's got his board, it's all good.";
+					thePortrait.PortraitImage.source = rL.portraits["doug"];
+				case 'Simon':
+					this.characterBio.text = "While Simon may seem like your classic nerd on the surface, it's actually much, much worse than you'd expect (as president of the lightsaber construction club, he would viciously ban members who did not properly complete their training). However, with prom week coming up, he's been trying to hobnob with the high school elite: maybe he can score a date to the prom who isn't a nerf herder?";
+					thePortrait.PortraitImage.source = rL.portraits["simon"];
+					break;
+				case 'Naomi':
+					this.characterBio.text = "Naomi, head of the prom committee and determined to make it the best prom ever, would seem to have the perfect life: dating star quarterback Buzz, top-notch SAT scores, and a kindness that's earned her friends across the social spectrum. But she can't stop worrying about the future, and is terrified that with one false move she might lose everything.";
+					thePortrait.PortraitImage.source = rL.portraits["naomi"];
+					break;
+				case 'Buzz':
+					this.characterBio.text = "Buzz is the star quarterback of the football team. He knows what he likes (mostly taking cheerleaders out for rides on his motorcycle) and likes what he knows (which isn't much). Though his angry demeanor puts the nerds of the school in a perpetual state of panic, underneath lies a heart yearning to express emotions that he just isn't articulate enough to express.";
+					thePortrait.PortraitImage.source = rL.portraits['buzz'];
+					break;
+				case 'Jordan':
+					this.characterBio.text = "Jordan's competitiveness often lands her in situation she regrets. She managed to work her way to Differential Calculus AP, not due to any great love of math, but due to a disgust of Naomi thinking she is better than her. She would much prefer riding on skateboards (but only if she can be the best at it).";
+					thePortrait.PortraitImage.source = rL.portraits['jordan'];
+					break;
+				case 'Chloe':
+					this.characterBio.text = "Something of a social butterfly, Chloe views herself as the great bridge, connecting the popular and the unpopular kids together, once and forever! Her friends list might be several miles long, but does it come from a genuine desire to befriend, or is it just a means to mask her insecurities?";
+					thePortrait.PortraitImage.source = rL.portraits['cassie'];
+					break;
+				case 'Gunter':
+					this.characterBio.text = "Recently transfered from somewhere in Germany, Gunter is of undeterminate age and questionable intelligence. Most of his new classmates are secretly terrified of his ripped body, punk outfits, and sometimes shocking European sensibilities, although Gunter himself has not seemed to notice their reactions. Can Gunter find a place at school in time to be one of the gang by prom week?";
+					thePortrait.PortraitImage.source = rL.portraits['gunter'];
+					break;
+				case 'Lucas':
+					this.characterBio.text = "Lucas wears his heart on his sleeve (and on most of the rest of his shirt) and has been known to be both a fiercely loyal friend and to burst into tears when mean people talk to him. Slow to change his mind or forget a grudge, Lucas just hopes he can make it through the last week of high school without any humiliation.";
+					thePortrait.PortraitImage.source = rL.portraits['lucas'];
+					break;
+				case 'Oswald':
+					this.characterBio.text = "Captain of the debate team, three-time Tennis Fashion Magazine award winner, Oswald glides through high school like an infomercial spokesman: charming, obsequious, and a little sleazy. He has a love/hate relationship with his best friend Nicholas (that smarmy pretender!) and doesn't really think much about anyone else as long as they stay out of his path to success.";
+					thePortrait.PortraitImage.source = rL.portraits['oswald'];
+					break;
+				case 'Kate':
+					this.characterBio.text = "Kate's felt increasingly awkward all through high school. While her classmates have gone all goth or emo or fashion-crazy, she still likes the simple things: playing in band and riding bikes. She couldn't believe it when popular Nicholas asked her out: what would a guy who could have anyone see in her? Maybe he saw through her frazzled hair and blushing freckles to the sweet soul underneath.";
+					thePortrait.PortraitImage.source = rL.portraits['kate'];
+					break;	
+				case 'Cassandra':
+					this.characterBio.text = "Cassandra has worked hard every step of the way to be one of the popular kids, and at last she's succeeded. Though she knows sometimes you have to be vindictive, petty, or cruel to succeed, she doesn't enjoy it: she just wants to be part of the in-crowd that shops and gossips and dates the cute boys. If she has to break a few hearts or tell a few lies to be part of that, isn't it worth it?";
+					thePortrait.PortraitImage.source = rL.portraits['cassandra'];
+					break;
+				default: 
+					this.characterBio.text = "Err, which character are you talking about again?";
+			}
+		}
+		
+		
+		
+		public function updateStatusIcons():void
+		{
+			this.statusGroup.removeAllElements();
+			
+			var vGroup:VGroup = new VGroup();
+			
+			var hGroup:HGroup;
+			var status:Status;
+			var numDisplayed:int = 0;
+			var statusIcon:StatusIcon;
+			
+			var howManyPerRow:int = 8;
+			
+			for each (status in this.currentCharacter.statuses)
+			{
+				if (numDisplayed % howManyPerRow == 0)
+				{
+					hGroup = new HGroup();
+					vGroup.addElement(hGroup);
+				}
+				statusIcon = new PromWeek.StatusIcon();//this.statusIcons[numDisplayed];
+				statusIcon.width = 35;// (howManyPerRow == 2)?twoPerRomDimension:threePerRomDimension;
+				statusIcon.height = 35;// (howManyPerRow == 2)?twoPerRomDimension:threePerRomDimension;
+				statusIcon.loadStatusImagesToIcon(status.type, status.directedToward, status.remainingDuration);
+				hGroup.addElement(statusIcon);
+				numDisplayed++;
+			}
+			
+			this.statusGroup.addElement(vGroup);
+		}
+		
+		
+		
+		/*
+		public function updateStatusIcons():void
+		{
+			//assume everything is off
+			this.primaryStatus1.visible = false;
+			this.primaryStatus2.visible = false;
+			this.primaryStatus3.visible = false;
+			this.primaryStatus4.visible = false;
+			
+			var status:Status;
+			var numDisplayed:int = 0;
+			for each (status in this.currentCharacter.statuses)
+			{
+				if (numDisplayed == 0)
+				{
+					primaryStatus1.loadStatusImagesToIcon(status.type, status.directedToward, status.remainingDuration);
+					primaryStatus1.visible = true;
+					numDisplayed++;
+				}
+				else if (numDisplayed == 1)
+				{
+					primaryStatus2.loadStatusImagesToIcon(status.type, status.directedToward, status.remainingDuration);
+					primaryStatus2.visible = true;
+					numDisplayed++;
+				}
+				else if (numDisplayed == 2)
+				{
+					primaryStatus3.loadStatusImagesToIcon(status.type, status.directedToward, status.remainingDuration);
+					primaryStatus3.visible = true;
+					numDisplayed++;
+				}
+				else if (numDisplayed == 3)
+				{
+					primaryStatus4.loadStatusImagesToIcon(status.type, status.directedToward, status.remainingDuration);
+					primaryStatus4.visible = true;
+					numDisplayed++;
+				}
+				else
+				{
+					Debug.debug(this, "updateStatusIcons() there were too many statuses to display, only the first four were displayed.");
+				}
+			}
+			if (numDisplayed == 0)
+			{
+				statusGroup.visible = false;
+			}
+		}
+		*/
+		
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

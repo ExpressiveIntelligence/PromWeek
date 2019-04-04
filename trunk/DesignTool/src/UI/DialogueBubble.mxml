@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:UI="UI.*"
+		 creationComplete="onCreationComplete()">
+	
+		 
+	<fx:Metadata>
+	</fx:Metadata>
+		
+	<fx:Declarations>
+		<fx:String id="text">Default text.</fx:String>
+		<fx:Number id="cornerRadius">30</fx:Number>
+		<fx:Number id="fontSize">12</fx:Number>
+		<fx:Number id="bubbleFillColor">0xEDEDED</fx:Number>
+		<fx:Number id="bubbleStrokeColor">0x000000</fx:Number>
+		<fx:Number id="bubbleStrokeWeight">5</fx:Number>
+		<fx:Number id="fontColor">0x555555</fx:Number>
+		<fx:Boolean id="thought">false</fx:Boolean>
+	</fx:Declarations>
+	
+
+	
+<!--
+	<s:Rect id="testBoundingBox" width="100%" height="100%">
+		<s:stroke>
+			<s:SolidColorStroke color="0x5555FF" />
+		</s:stroke>
+	</s:Rect>
+-->
+	
+	<s:Rect id="bubbleMain" width="90%" height="90%" radiusX="{cornerRadius}" radiusY="{cornerRadius}">
+		<s:fill>
+			<s:SolidColor color="{bubbleFillColor}" />
+		</s:fill>
+		<s:stroke>
+			<s:SolidColorStroke color="{bubbleStrokeColor}" weight="{bubbleStrokeWeight}" />
+		</s:stroke>
+	</s:Rect>
+	
+	<s:RichText id="bubbleText" fontSize="{this.fontSize}" color="{fontColor}" text="{this.text}" width="{bubbleMain.width}" height="{bubbleMain.height}" />
+
+	<s:Path id="pointer" x="0" visible="{!thought}">
+		<s:fill>
+			<s:SolidColor color="{bubbleFillColor}" />
+		</s:fill>
+	</s:Path>
+	
+	<s:Line id="cwLine" visible="{!thought}">
+		<s:stroke>
+			<s:SolidColorStroke color="{bubbleStrokeColor}" weight="{bubbleStrokeWeight}" />
+		</s:stroke>
+	</s:Line>
+	
+	<s:Line id="ccwLine" visible="{!thought}">
+		<s:stroke>
+			<s:SolidColorStroke color="{bubbleStrokeColor}" weight="{bubbleStrokeWeight}" />
+		</s:stroke>
+	</s:Line>
+	
+	<s:Group id="thoughtBubbles" visible="{thought}">
+		<s:Ellipse id="smallThoughtCircle" width="10" height="10">
+			<s:fill>
+				<s:SolidColor color="{bubbleFillColor}" />
+			</s:fill>
+			<s:stroke>
+				<s:SolidColorStroke color="{bubbleStrokeColor}" weight="{bubbleStrokeWeight}" />
+			</s:stroke>
+		</s:Ellipse>
+		<s:Ellipse id="bigThoughtCircle" width="14" height="14">
+			<s:fill>
+				<s:SolidColor color="{bubbleFillColor}" />
+			</s:fill>
+			<s:stroke>
+				<s:SolidColorStroke color="{bubbleStrokeColor}" weight="{bubbleStrokeWeight}" />
+			</s:stroke>
+		</s:Ellipse>
+	</s:Group>
+	
+	<fx:Script>
+		<![CDATA[
+		import flash.geom.Point;
+		import mx.graphics.SolidColorStroke;
+		import spark.primitives.Line;
+		
+		private var pointsLeft:Boolean = true;
+		private var pointerPadding:Number = 40;
+		
+		public var offsetLeftX:Number = 0;
+		public var offsetLeftY:Number = -275;
+
+		public var offsetRightX:Number = -200;
+		public var offsetRightY:Number = -275;
+		
+		public function onCreationComplete():void {
+			
+			updateLocation();
+		}
+
+		
+		
+		public function get pointLeft():Boolean {
+			return this.pointsLeft;
+		}
+		
+		public function get pointRight():Boolean {
+			return !this.pointsLeft;
+		}
+		
+		public function set pointRight(b:Boolean):void {
+			//do nothing if it is pointing right already
+			if(this.pointsLeft != !b) {
+				this.pointsLeft = !b;
+				updateLocation();
+			}
+		}
+		
+		public function set pointLeft(b:Boolean):void {
+			//do nothing if it is already pointing left
+			if (this.pointsLeft != b) {
+				this.pointsLeft = b;
+				updateLocation();
+			}
+		}
+		
+		
+		/**
+		 * Updates the graphical elements of the dialog bubble when the
+		 * location or properties of the bubble change.
+		 */
+		public function updateLocation():void {
+			if (this.pointsLeft) {
+				this.bubbleMain.x = this.width / 10;
+			}else {
+				this.bubbleMain.x = 0;
+				
+			}
+			this.bubbleText.x = bubbleMain.x + this.cornerRadius / 2;
+			this.bubbleText.y = bubbleMain.y + this.cornerRadius / 2;
+			this.bubbleText.width = bubbleMain.width - this.cornerRadius;
+			
+			if (this.thought)
+			{
+				constructThoughtCircles();	
+			}
+			else
+			{
+				constructPointer();	
+			}
+		}
+		
+		/**
+		 * This places the small and big thought bubble circles
+		 */
+		public function constructThoughtCircles():void
+		{
+			var bottomPoint:Point = new Point();
+			var offsetX:Number;
+			var offsetY:Number;
+			if (this.pointsLeft) 
+			{
+				bottomPoint.x = bubbleMain.x - 15;
+				bottomPoint.y = (bubbleMain.y + bubbleMain.height - cornerRadius) + 20;
+				
+				offsetX = -15;
+				offsetY = 15;
+				smallThoughtCircle.x = bottomPoint.x + offsetX ;
+				smallThoughtCircle.y = bottomPoint.y + offsetY;
+				
+				bigThoughtCircle.x = bottomPoint.x + 10 + offsetX;
+				bigThoughtCircle.y = bottomPoint.y - 15 + offsetY;
+			}
+			else
+			{
+				bottomPoint.x = bubbleMain.x + bubbleMain.width;
+				bottomPoint.y = bubbleMain.y + bubbleMain.height - cornerRadius + 20;
+
+				offsetX = 5;
+				offsetY = 15;
+				smallThoughtCircle.x = bottomPoint.x + offsetX;
+				smallThoughtCircle.y = bottomPoint.y + offsetY;
+				
+				bigThoughtCircle.x = bottomPoint.x - 10 + offsetX;
+				bigThoughtCircle.y = bottomPoint.y - 15 + offsetY;
+			}
+		}
+		
+		/**
+		 * This function builds the string that is the path description of the
+		 * shape of the dialog bubble pointer.
+		 */
+		public function constructPointer():void {
+			var dataString:String;
+			var corner:Point = new Point();
+			var topPoint:Point = new Point();
+			var bottomPoint:Point = new Point();
+			
+			
+			if (this.pointsLeft) {
+				
+				//start by moving the drawing location to the right of the bottom
+				//right corner of the bubbleMain's rounded corner.
+				bottomPoint.x = bubbleMain.x;
+				bottomPoint.y = (bubbleMain.y + bubbleMain.height - cornerRadius);
+				dataString = "M " + bottomPoint.x + " " + bottomPoint.y;
+				//to bottom left of the group
+				corner.x = 0;
+				corner.y = this.height;
+				dataString += " L " + corner.x + " " + corner.y;
+				//to the top left of the rounded bottom left corner
+				topPoint.x = (bubbleMain.x + cornerRadius);
+				topPoint.y = (bubbleMain.y + bubbleMain.height);
+				dataString += " L " + topPoint.x + " " + topPoint.y;
+				//close it off
+				dataString += " Z";
+
+				//draw the lines that make up the stroke of the pointer
+				//draw the pointer's clockwise line
+				//draw from corner in
+				cwLine.xFrom = corner.x;
+				cwLine.yFrom = corner.y;
+				cwLine.xTo = topPoint.x;
+				cwLine.yTo = topPoint.y;
+			
+				//draw the pointer's counter-clockwise line
+				ccwLine.xFrom = corner.x;
+				ccwLine.yFrom = corner.y;
+				ccwLine.xTo = bottomPoint.x;
+				ccwLine.yTo = bottomPoint.y;
+				
+				
+			} else {
+				//draw to the top right of the bottom right rounded corner
+				topPoint.x = (bubbleMain.x + bubbleMain.width);
+				topPoint.y = (bubbleMain.y + bubbleMain.height - cornerRadius)
+				dataString = "M " + topPoint.x + " " + topPoint.y;
+				//to bottom right of the group
+				corner.x = this.width;
+				corner.y = this.height;
+				dataString += " L " + corner.x + " " + corner.y;
+				//to the bottom left of the rounded bottom right corner
+				bottomPoint.x = (bubbleMain.x - cornerRadius + bubbleMain.width);
+				bottomPoint.y = (bubbleMain.y + bubbleMain.height)
+				dataString += " L " + bottomPoint.x + " " + bottomPoint.y;
+				//close it off
+				dataString += " Z";
+				//draw the lines that make up the stroke of the pointer
+				//draw the pointer's clockwise line
+				//draw from corner in
+				cwLine.xFrom = corner.x;
+				cwLine.yFrom = corner.y;
+				cwLine.xTo = bottomPoint.x;
+				cwLine.yTo = bottomPoint.y;
+			
+				//draw the pointer's counter-clockwise line
+				ccwLine.xFrom = corner.x;
+				ccwLine.yFrom = corner.y;
+				ccwLine.xTo = topPoint.x;
+				ccwLine.yTo = topPoint.y;
+				
+
+
+			}
+			this.pointer.data = dataString;
+			//trace("pointer path: " + dataString);
+			
+			
+		}
+		
+		]]>
+	</fx:Script>
+	
+</s:Group>

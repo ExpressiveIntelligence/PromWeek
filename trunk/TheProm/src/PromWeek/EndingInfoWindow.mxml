@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 initialize="onInitialize()"
+		 width="250"
+		 styleName="classicPromWeek" 
+		 show="justGotVisible(event)">
+	
+	<fx:Metadata>
+	</fx:Metadata>
+		
+	<fx:Declarations>
+		<mx:Fade id="fadeOut" duration="3000" alphaFrom="1.0" alphaTo="0.0" effectEnd="fadeOutDone(event)" />
+	</fx:Declarations>
+	
+	<s:Rect id="Background" left="0" width="100%" height="100%" radiusX="30" radiusY="30">
+		<s:stroke>
+			<s:SolidColorStroke weight="{getStyle('backgroundStrokeWeight')}" color="{getStyle('backgroundStroke')}" caps="none" />
+		</s:stroke>
+		<s:fill>
+			<s:SolidColor color="{getStyle('backgroundColor')}" alpha="0.8" />
+		</s:fill>
+	</s:Rect>
+
+	<s:VGroup width="100%" height="100%" paddingBottom="15" paddingTop="15" paddingLeft="15" paddingRight="15" minHeight="100">
+		<s:RichText id="endingNameRichText" fontWeight="bold" fontStyle="italic" fontSize="16" color="{getStyle('textColor')}" verticalAlign="middle" width="100%" height="40%" styleName="basicFontStyle" />
+		<s:VGroup id="goalsGroup" width="100%" height="60%" paddingLeft="15"/>
+	</s:VGroup>
+	
+	<fx:Script>
+		<![CDATA[
+		import CiF.Debug;
+		import flash.events.KeyboardEvent;
+		import flash.events.Event;
+		import flash.utils.Timer;
+		import flash.events.TimerEvent;
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import PromWeek.assets.ResourceLibrary;
+		import spark.components.HGroup;
+		import spark.components.RichText;
+		
+		public var statisticsManager:StatisticsManager;
+		private var gameEngine:PromWeek.GameEngine;
+		public var resourceLibrary:ResourceLibrary;
+		
+		
+		public var disappearTimer:Timer;
+		
+		public function onInitialize():void {
+			statisticsManager = StatisticsManager.getInstance();
+			this.gameEngine = GameEngine.getInstance();
+			resourceLibrary = ResourceLibrary.getInstance();
+		}
+		
+		
+		public function updateEndingText(ending:Ending):void
+		{
+			this.goalsGroup.removeAllElements();
+			
+			endingNameRichText.text = ending.name;
+
+			var hGroup:HGroup;
+			var image:SmoothImage;
+			var goalName:RichText;
+			for each (var toDoItem:ToDoItem in ending.linkedToDoItems)
+			{
+				hGroup = new HGroup();
+				hGroup.setStyle("verticalAlign","middle");
+				hGroup.width = this.goalsGroup.width;
+				
+				image = new SmoothImage();
+				image.width = 15;
+				image.height = 15;
+				var goalString:String = gameEngine.currentStory.storyLeadCharacter + "-" + toDoItem.name;
+				if (!statisticsManager.goalsSeen[goalString])
+				{
+					image.source = resourceLibrary.uiIcons["star"];
+				}
+				else
+				{
+					image.source = resourceLibrary.uiIcons["check"];
+				}
+				hGroup.addElement(image);
+				
+				goalName = new RichText();
+				goalName.height = 15;
+				goalName.setStyle("color",getStyle('textColor'));
+				goalName.setStyle("styleName","basicFontStyle");
+				goalName.setStyle("fontSize", "12");
+				goalName.setStyle("verticalAlign", "middle");
+				goalName.text = toDoItem.name;
+				hGroup.addElement(goalName);
+				
+				this.goalsGroup.addElement(hGroup);
+			}
+		}
+		
+		
+		public function fadeOutDone(e:Event):void
+		{
+			this.visible = false;
+		}		
+		
+		public function justGotVisible(e:Event = null):void
+		{
+			if (disappearTimer != null)
+			{
+				disappearTimer.stop();
+				disappearTimer = null;
+			}
+			
+			disappearTimer = new Timer(6000, 1);
+			disappearTimer.addEventListener(TimerEvent.TIMER, startToFade);
+			disappearTimer.start();
+		}
+		
+		
+		public function startToFade(e:Event = null):void
+		{
+			this.fadeOut.play([this]);
+		}
+		
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			/*if(gameEngine.classicPromColors) {
+				this.setStyle("styleName", "classicPromWeek");
+			}
+			else if(gameEngine.greenPromColors) {
+				this.setStyle("styleName", "greenColor");
+			}
+			else if(gameEngine.redPromColors) {
+				this.setStyle("styleName", "redColor");
+			}*/
+			this.invalidateProperties();
+		}
+		
+		]]>
+	</fx:Script>
+
+	
+</s:Group>

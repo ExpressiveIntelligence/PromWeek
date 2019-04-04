@@ -1,0 +1,1101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()" 
+		 show="this.update()"
+		 width="700"
+		 height="170"
+		 styleName="classicPromWeek">
+	
+		 
+	<fx:Metadata>
+	</fx:Metadata>
+		
+	<fx:Declarations>
+		<fx:Number id="relationshipIconDimensionShrunk">20</fx:Number>
+		<fx:Number id="relationshipIconDimension">30</fx:Number>
+		<fx:Number id="statusIconDimension">30</fx:Number>
+		<fx:Number id="networkBuddy">0x00FF00</fx:Number>
+		<fx:Number id="networkRomance">0xFF99CE</fx:Number>
+		<fx:Number id="networkCool">0x0000FF</fx:Number>
+		<fx:Number id="shrunkWidthSingle">120</fx:Number>
+		<fx:Number id="shrunkWidthDouble">350</fx:Number>
+		
+		<fx:Number id="twoPerRomDimension">34</fx:Number>
+		<fx:Number id="threePerRomDimension">24</fx:Number>
+	</fx:Declarations>
+	
+	
+	<s:Group id="shrunkGroup">
+		<s:Rect id="shrunkBackgroundRect" visible="{isSingle || isDouble}" width="250" height="30" x="175" y="30">
+			<s:fill>
+				<s:SolidColor  color="{getStyle('backgroundColor')}" alpha="0.8" />
+			</s:fill>
+			<s:stroke>
+				<s:SolidColorStroke weight="{getStyle('backgroundStrokeWeight')}" color="#000000" />
+			</s:stroke>
+		</s:Rect>
+		
+		<s:Rect id="primaryPortraitBackgroundShrunk" top="35" left="180" width="97" height="97" visible="{isSingle || isDouble}">
+			<s:fill>
+				<s:SolidColor color="{getStyle('initBackgroundColor')}" />
+			</s:fill>
+		</s:Rect>
+		<util:SmoothImage id="primaryPortraitImageShrunk" top="35" left="180" width="97" height="97" click="onPrimaryPortraitClickedHandler();"></util:SmoothImage>
+		<s:Rect id="primaryPortraitFrameShrunk" top="35" left="180" visible="{isSingle || isDouble}" width="97" height="97">
+			<s:stroke>
+				<s:SolidColorStroke weight="{getStyle('windowStrokeWeight')}" color="{getStyle('backgroundStroke')}" />
+			</s:stroke>
+		</s:Rect>
+		
+		<s:Rect id="primaryNamePlateShrunk" top="40" left="192" width="77" height="20" visible="{isSingle || isDouble}">
+			<s:fill>
+				<s:SolidColor color="{getStyle('portraitNamePlate')}" alpha=".7"/>
+			</s:fill>
+		</s:Rect>
+		<s:RichText id="primaryNameRichTextShrunk" top="45" left="190" width="77" height="20" visible="{isSingle || isDouble}"></s:RichText>
+		
+		<s:Rect id="secondaryPortraitBackgroundShrunk" top="37" left="420" width="97" height="97" visible="{isDouble}">
+			<s:fill>
+				<s:SolidColor color="{getStyle('respBackgroundColor')}" alpha=".8" />
+			</s:fill>
+		</s:Rect>
+		<util:SmoothImage id="secondaryPortraitImageShrunk" top="35" left="420" width="97" scaleX="-1" height="97" click="onSecondaryPortraitClickedHandler();"></util:SmoothImage>
+		<s:Rect id="secondaryPortraitFrameShrunk" top="35" left="420" visible="{isDouble}" width="97" height="97">
+			<s:stroke>
+				<s:SolidColorStroke weight="{getStyle('windowStrokeWeight')}" color="{getStyle('backgroundStroke')}" />
+			</s:stroke>
+		</s:Rect>	
+		<s:Rect id="secondaryNamePlateShrunk" top="40" left="432" width="77" height="20" visible="{isDouble}">
+			<s:fill>
+				<s:SolidColor color="{getStyle('portraitNamePlate')}" alpha=".7"/>
+			</s:fill>
+		</s:Rect>
+		<s:RichText id="secondaryNameRichTextShrunk" top="45" left="432" width="77" height="20" visible="{isDouble}"></s:RichText>
+	
+			
+			
+		<s:Group id="relationshipIconsGroupShrunk">
+			<util:SmoothImage id="friendsIconShrunk" top="50" left="300" width="{relationshipIconDimensionShrunk}" height="{relationshipIconDimensionShrunk}" toolTip="Friends" />
+			<util:SmoothImage id="datingIconShrunk" top="50" left="335" width="{relationshipIconDimensionShrunk}" height="{relationshipIconDimensionShrunk}" toolTip="Dating" />
+			<util:SmoothImage id="enemiesIconShrunk" top="50" left="370" width="{relationshipIconDimensionShrunk}" height="{relationshipIconDimensionShrunk}" toolTip="Enemies" />
+		</s:Group>
+			
+	</s:Group>
+		
+		
+		
+		
+			
+	<s:Group id="expandedViewGroup">		
+		<s:Path id="backgroundPath" >
+			<s:fill>
+				<s:SolidColor id="backgroundColor" color="{getStyle('backgroundColor')}" alpha="0.8" />
+			</s:fill>
+			
+			<s:stroke>
+				<s:SolidColorStroke weight="5" color="{getStyle('backgroundStroke')}" />
+			</s:stroke>
+		</s:Path>
+		
+		<s:RichText id="primaryStatusesLabel" text="Statuses" left="95" top="38" visible="false" fontSize="14" color="{getStyle('blackText')}" fontWeight="bold" />
+		
+		<s:Group id="primaryStatusIconGroup" left="90" top="45" visible="false">
+			<prom:StatusIcon id="primaryStatus1" left="0" top="0" width="34" height="34" />
+			<prom:StatusIcon id="primaryStatus2" left="45" top="0" width="34" height="34" />
+			<prom:StatusIcon id="primaryStatus3" left="0" top="40" width="34" height="34" />
+			<prom:StatusIcon id="primaryStatus4" left="45" top="40" width="34" height="34" />
+		</s:Group>
+
+		<s:Group id="secondaryStatusIconGroup" left="525" top="45" visible="false">
+			<prom:StatusIcon id="secondaryStatus1" left="0" top="0" width="34" height="34" />
+			<prom:StatusIcon id="secondaryStatus2" left="45" top="0" width="34" height="34" />
+			<prom:StatusIcon id="secondaryStatus3" left="0" top="40" width="34" height="34" />
+			<prom:StatusIcon id="secondaryStatus4" left="45" top="40" width="34" height="34" />
+		</s:Group>
+		
+	
+		<s:RichText id="responderStatusesLabel" text="Statuses" left="535" top="38" visible="false" fontSize="14" color="{getStyle('blackText')}" fontWeight="bold" />
+		
+		<prom:PlayerPortrait id="primaryPortrait" top="35" left="180" width="97" height="97" visible="false" click="onPrimaryPortraitClickedHandler()" />
+		<prom:PlayerPortrait id="secondaryPortrait" top="35" left="420" width="97" height="97" visible="false" click="onSecondaryPortraitClickedHandler()" />
+		<!--<prom:TriplePanel_initiator id="triplePanelInitiator" x="-45" y="35" />
+		<prom:TriplePanel_responder id="triplePanelResponder" x="520" y="35" />-->
+		
+		
+		<s:Group id="relationshipIconsGroup">
+			<util:SmoothImage id="friendsIcon" top="125" left="300" width="{relationshipIconDimension}" height="{relationshipIconDimension}" toolTip="Friends" />
+			<util:SmoothImage id="datingIcon" top="135" left="335" width="{relationshipIconDimension}" height="{relationshipIconDimension}" toolTip="Dating" />
+			<util:SmoothImage id="enemiesIcon" top="125" left="370" width="{relationshipIconDimension}" height="{relationshipIconDimension}" toolTip="Enemies" />
+		</s:Group>
+		
+		<s:Group id="networkLines" top="45" left="280">
+			<s:Path id="primaryToSecondaryBuddyPath" >
+				<s:stroke>
+					<s:SolidColorStroke weight="3" color="{getStyle('buddyColor')}" caps="none" />
+				</s:stroke>
+			</s:Path>
+			<s:Path id="secondaryToPrimaryBuddyPath" >
+				<s:stroke>
+					<s:SolidColorStroke weight="3" color="{getStyle('buddyColor')}" caps="none"/>
+				</s:stroke>		
+			</s:Path>
+			
+			<s:Path id="primaryToSecondaryRomancePath" >
+				<s:stroke>
+					<s:SolidColorStroke weight="3" color="{getStyle('romanceColor')}" caps="none"/>
+				</s:stroke>		
+			</s:Path>
+			<s:Path id="secondaryToPrimaryRomancePath" >
+				<s:stroke>
+					<s:SolidColorStroke weight="3" color="{getStyle('romanceColor')}" caps="none"/>
+				</s:stroke>		
+			</s:Path>
+			
+			<s:Path id="primaryToSecondaryCoolPath" >
+				<s:stroke>
+					<s:SolidColorStroke weight="3" color="{getStyle('coolColor')}" caps="none"/>
+				</s:stroke>		
+			</s:Path>
+			<s:Path id="secondaryToPrimaryCoolPath" >
+				<s:stroke>
+					<s:SolidColorStroke weight="3" color="{getStyle('coolColor')}" caps="none"/>
+				</s:stroke>		
+			</s:Path>
+			<s:Group id="buddyPrimaryToSecondaryMouseOverGroup" x="0" y="-5" width="140" height="10" rollOver="rollOverBuddyPrimaryToSecondary(event)" rollOut="rollOutBuddyPrimaryToSecondary(event)"/>
+			<s:Group id="buddySecondaryToPrimaryMouseOverGroup" x="0" y="7" width="140" height="10" rollOver="rollOverBuddySecondaryToPrimary(event)" rollOut="rollOutBuddySecondaryToPrimary(event)"/>
+			
+			<s:Group id="romancePrimaryToSecondaryMouseOverGroup" x="0" y="25" width="140" height="10" rollOver="rollOverRomancePrimaryToSecondary(event)" rollOut="rollOutRomancePrimaryToSecondary(event)"/>
+			<s:Group id="romanceSecondaryToPrimaryMouseOverGroup" x="0" y="37" width="140" height="10" rollOver="rollOverRomanceSecondaryToPrimary(event)" rollOut="rollOutRomanceSecondaryToPrimary(event)"/>
+			
+			<s:Group id="coolPrimaryToSecondaryMouseOverGroup" x="0" y="55" width="140" height="10" rollOver="rollOverCoolPrimaryToSecondary(event)" rollOut="rollOutCoolPrimaryToSecondary(event)"/>
+			<s:Group id="coolSecondaryToPrimaryMouseOverGroup" x="0" y="67" width="140" height="10" rollOver="rollOverCoolSecondaryToPrimary(event)" rollOut="rollOutCoolSecondaryToPrimary(event)"/>
+		</s:Group>		
+	</s:Group>	
+	
+	
+	
+	<!--<s:Group id="changeSizeGroup" click="changeSizeClicked(event)">
+		<s:Rect width="50" height="50">
+			<s:fill>
+				<s:SolidColor color="0x3B7BCB" alpha="0.8" />
+			</s:fill>
+			<s:stroke>
+				<s:SolidColorStroke weight="5" color="#000000" />
+			</s:stroke>
+		</s:Rect>
+	</s:Group>-->
+	
+	
+	
+	
+	<fx:Script>
+		<![CDATA[
+
+		import CiF.*;
+		import mx.controls.RichTextEditor;
+		import mx.controls.ToolTip;
+		import mx.core.IUIComponent;
+		import flashx.textLayout.property.BooleanProperty;
+		import flash.events.MouseEvent;
+		import mx.graphics.SolidColor;
+		import mx.managers.ToolTipManager;
+		import mx.controls.ToolTip;
+		import flashx.textLayout.formats.TextAlign;
+		import flashx.textLayout.utils.CharacterUtil;
+		import PromWeek.GameEngine;
+		import PromWeek.assets.ResourceLibrary;
+		import spark.components.Group;
+		import spark.components.HGroup;
+		import spark.components.RichText;
+		import spark.components.VGroup;
+		import spark.primitives.Rect;
+		
+		public static const DEFAULT_MAX_DESIRE:Number = 12;
+		public static const DEFAULT_MIN_DESIRE:Number = -12;
+		
+		public static const DEFAULT_ZERO_POINT:Number = 0.5;
+		
+		
+		public var expandedView:Boolean = true;
+		
+		
+		// These are for use in determining how long the network lines are
+		public static const BUDDY_BUDDY_UP_SIGNIFICANCE:Number = 0.4;
+		public static const BUDDY_FRIENDS_SIGNIFICANCE:Number = 0.4;
+		public static const BUDDY_END_ENEMIES_SIGNIFICANCE:Number = 0.2;	
+		
+		public static const BUDDY_END_FRIENDS_SIGNIFICANCE:Number = 0.4;
+		public static const BUDDY_BUDDY_DOWN_SIGNIFICANCE:Number = 0.4;		
+		public static const BUDDY_ENEMIES_SIGNIFICANCE:Number = 0.2;
+		
+		
+		
+		public static const ROMANCE_ROMANCE_UP_SIGNIFICANCE:Number = 0.4;
+		public static const ROMANCE_DATING_SIGNIFICANCE:Number = 0.6;
+		
+		public static const ROMANCE_END_DATING_SIGNIFICANCE:Number = 0.6;
+		public static const ROMANCE_ROMANCE_DOWN_SIGNIFICANCE:Number = 0.4;
+		
+		
+		
+		public static const COOL_COOL_UP_SIGNIFICANCE:Number = 1.0;
+		
+		public static const COOL_COOL_DOWN_SIGNIFICANCE:Number = 1.0;
+		//-------------------------------------------------
+
+		// These are used to say what percent of the rules must be true of an intent type in order to contribute 
+		// that intent's full significance to the network line. Seems like something that would require tuning
+		// Lots of magic numbers...
+		public static const BUDDY_UP_POS_THRESHOLD:Number = 0.05
+		public static const BUDDY_UP_NEG_THRESHOLD:Number = 0.05
+		public static const BUDDY_DOWN_POS_THRESHOLD:Number = 0.05
+		public static const BUDDY_DOWN_NEG_THRESHOLD:Number = 0.05
+		public static const ROMANCE_UP_POS_THRESHOLD:Number = 0.05
+		public static const ROMANCE_UP_NEG_THRESHOLD:Number = 0.05
+		public static const ROMANCE_DOWN_POS_THRESHOLD:Number = 0.05
+		public static const ROMANCE_DOWN_NEG_THRESHOLD:Number = 0.05
+		public static const COOL_UP_POS_THRESHOLD:Number = 0.05
+		public static const COOL_UP_NEG_THRESHOLD:Number = 0.05
+		public static const COOL_DOWN_POS_THRESHOLD:Number = 0.05
+		public static const COOL_DOWN_NEG_THRESHOLD:Number = 0.05
+		public static const FRIENDS_POS_THRESHOLD:Number = 0.05
+		public static const FRIENDS_NEG_THRESHOLD:Number = 0.05
+		public static const END_FRIENDS_POS_THRESHOLD:Number = 0.05
+		public static const END_FRIENDS_NEG_THRESHOLD:Number = 0.05
+		public static const DATING_POS_THRESHOLD:Number = 0.05
+		public static const DATING_NEG_THRESHOLD:Number = 0.05
+		public static const END_DATING_POS_THRESHOLD:Number = 0.05
+		public static const END_DATING_NEG_THRESHOLD:Number = 0.05
+		public static const ENEMIES_POS_THRESHOLD:Number = 0.05
+		public static const ENEMIES_NEG_THRESHOLD:Number = 0.05
+		public static const END_ENEMIES_POS_THRESHOLD:Number = 0.05
+		public static const END_ENEMIES_NEG_THRESHOLD:Number = 0.05
+		//---------------------------------------------------------------
+		
+		private var gameEngine:GameEngine;
+		private var resourceLibrary:PromWeek.assets.ResourceLibrary;
+		private var cif:CiFSingleton;
+		
+		[Bindable]
+		private var isOpen:Boolean = true;
+		[Bindable]
+		private var isClosed:Boolean = false;
+		[Bindable]
+		private var isSingle:Boolean = true;
+		[Bindable]
+		private var isDouble:Boolean = false;
+		
+		public var currentCharacter:String;
+		
+		public var currentPrimaryCharacter:Character;
+		public var currentSecondaryCharacter:Character;
+		
+		public var triplePanelBGGroup:Group;
+		
+		/**
+		 * This will hole a bunch of premade status icons. This is to overcome the confusion between creating 
+		 * mxml objects in as3 and trying to reference them right after creating them and how it creates nulls
+		 */
+		//public var statusIcons:Vector.<PromWeek.StatusIcon>;
+		
+		public function onCreationComplete():void
+		{
+			/*
+			this.statusIcons = new Vector.<StatusIcon>();
+			for (var ii:int = 0; ii < 16; ii++ )
+			{
+				this.statusIcons[ii] = new PromWeek.StatusIcon();
+			}
+			*/
+			gameEngine = GameEngine.getInstance();
+			resourceLibrary = PromWeek.assets.ResourceLibrary.getInstance();
+			cif = CiFSingleton.getInstance();
+			
+			//initialize game-consistent change/intent type colors
+			this.networkBuddy = GameEngine.BUDDY_COLOR;
+			this.networkRomance = GameEngine.ROMANCE_COLOR;
+			this.networkCool = GameEngine.COOL_COLOR;
+			
+			/*
+			triplePanelInitiator.btnA.label = "S";
+			triplePanelInitiator.btnB.label = "T";
+			triplePanelInitiator.btnC.label = "St";
+			
+			triplePanelResponder.btnA.label = "S";
+			triplePanelResponder.btnB.label = "T";
+			triplePanelResponder.btnC.label = "St";
+			
+			var triplePanelBGRect:Rect = new Rect();
+			var solidColor:SolidColor = new SolidColor();
+			solidColor.color = 0x3B7BCB;
+			triplePanelBGRect.fill = solidColor;
+			triplePanelBGRect.width = this.triplePanelInitiator.popOutPanelWidth;
+			triplePanelBGRect.height = this.triplePanelInitiator.height;
+			this.triplePanelBGGroup = new Group();
+			this.triplePanelBGGroup.addElement(triplePanelBGRect);
+			*/
+		}
+		
+		public function changeSizeClicked(e:MouseEvent = null):void
+		{
+			if (this.expandedView)
+			{
+				this.expandedView = false;
+			}
+			else
+			{
+				this.expandedView = true;
+			}
+			this.update();
+		}
+		
+		public function update():void
+		{
+			if (this.expandedView)
+			{
+				turnOffAllOfMinimizedView();
+				
+				drawBackgroundPath();
+				drawPortraits();
+				//updateTraitLists();
+				updateStatusIcons();
+				if (this.isDouble)
+				{
+					drawNetworkLines();
+					drawRelationshipIcons();
+					this.networkLines.visible = true;
+					this.relationshipIconsGroup.visible = true;
+					
+				}
+				else
+				{
+					this.networkLines.visible = false;
+					this.relationshipIconsGroup.visible = false;
+					this.secondaryStatusIconGroup.visible = false;
+				}
+				
+				this.expandedViewGroup.visible = true;
+			}
+			else
+			{
+				turnOffAllOfExpandedView();
+				
+				//drawBackgroundPath();
+				drawShrunkPortraits();
+				//updateTraitLists();
+				//updateStatusIcons();
+				if (this.isDouble)
+				{
+					this.shrunkBackgroundRect.width = this.shrunkWidthDouble;
+					drawRelationshipIconsShrunk();
+					this.networkLines.visible = true;
+					this.relationshipIconsGroupShrunk.visible = true;
+				}
+				else
+				{
+					this.shrunkBackgroundRect.width = this.shrunkWidthSingle;
+					this.relationshipIconsGroupShrunk.visible = false;
+				}
+				
+				this.shrunkGroup.visible = true;
+			}
+			
+		}
+		
+		public function turnOffAllOfMinimizedView():void
+		{
+			this.shrunkGroup.visible = false;
+		}
+		
+		public function turnOffAllOfExpandedView():void
+		{
+			this.expandedViewGroup.visible = false;
+		}
+		
+		public function updateStatusIcons():void
+		{
+			//Debug.debug(this,"UPDATING STATUS ICONS");
+			
+			this.primaryStatusIconGroup.removeAllElements();
+			
+			
+			var vGroup:VGroup = new VGroup();
+			vGroup.width = primaryStatusIconGroup.width;
+			vGroup.height = primaryStatusIconGroup.height;
+			//vGroup.paddingBottom = 10;
+			//vGroup.paddingTop = 10;
+			//vGroup.paddingLeft = 10;
+			//vGroup.paddingRight = 10;
+			
+			var hGroup:HGroup;
+			var status:Status;
+			var numDisplayed:int = 0;
+			var statusIcon:StatusIcon;
+			
+			var howManyPerRow:int = (this.currentPrimaryCharacter.statuses.length > 4)?3:2;
+			
+			for each (status in this.currentPrimaryCharacter.statuses)
+			{
+				if (numDisplayed % howManyPerRow == 0)
+				{
+					hGroup = new HGroup();
+					vGroup.addElement(hGroup);
+				}
+				statusIcon = new PromWeek.StatusIcon();//this.statusIcons[numDisplayed];
+				statusIcon.width = (howManyPerRow == 2)?twoPerRomDimension:threePerRomDimension;
+				statusIcon.height = (howManyPerRow == 2)?twoPerRomDimension:threePerRomDimension;
+				statusIcon.loadStatusImagesToIcon(status.type, status.directedToward, status.remainingDuration);
+				hGroup.addElement(statusIcon);
+				numDisplayed++;
+			}
+			this.primaryStatusIconGroup.addElement(vGroup);
+			
+			this.primaryStatusIconGroup.visible = true;
+			
+			
+			if (this.isDouble && this.isOpen)
+			{
+				this.secondaryStatusIconGroup.removeAllElements();
+				
+				vGroup = new VGroup();
+				vGroup.width = secondaryStatusIconGroup.width;
+				vGroup.height = secondaryStatusIconGroup.height;
+				//vGroup.paddingBottom = 10;
+				//vGroup.paddingTop = 10;
+				//vGroup.paddingLeft = 10;
+				//vGroup.paddingRight = 10;
+				
+				howManyPerRow = (this.currentSecondaryCharacter.statuses.length > 4)?3:2;
+				
+				numDisplayed = 0;
+				for each (status in this.currentSecondaryCharacter.statuses)
+				{
+					if (numDisplayed % howManyPerRow == 0)
+					{
+						hGroup = new HGroup();
+						vGroup.addElement(hGroup);
+					}
+					statusIcon = new PromWeek.StatusIcon();//this.statusIcons[numDisplayed];
+					statusIcon.width = (howManyPerRow == 2)?twoPerRomDimension:threePerRomDimension;
+					statusIcon.height = (howManyPerRow == 2)?twoPerRomDimension:threePerRomDimension;
+					statusIcon.loadStatusImagesToIcon(status.type, status.directedToward, status.remainingDuration);
+					hGroup.addElement(statusIcon);
+					numDisplayed++;
+				}
+				this.secondaryStatusIconGroup.addElement(vGroup);
+				
+				this.secondaryStatusIconGroup.visible = true;
+			}
+			
+		}
+
+		/*
+		public function updateTraitLists():void
+		{
+			
+			
+			var trait:Number;
+
+			primaryTraits.text = "";
+			for each (trait in this.currentPrimaryCharacter.traits)
+			{
+				if (Trait.getNameByNumber(trait) != "male" && Trait.getNameByNumber(trait) != "female")
+				{
+					primaryTraits.text += Trait.getNameByNumber(trait) + "\n";		
+				}
+			}
+
+			if (this.isDouble)
+			{
+				secondaryTraits.text = "";
+				for each (trait in this.currentSecondaryCharacter.traits)
+				{
+					if (Trait.getNameByNumber(trait) != "male" && Trait.getNameByNumber(trait) != "female")
+					{
+						secondaryTraits.text += Trait.getNameByNumber(trait) + "\n";	
+					}
+				}
+			}
+		}
+		*/
+		public function drawPortraits():void
+		{
+			//Debug.debug(this, "drawPortraits() " + this.currentPrimaryCharacter.characterName.toLowerCase() + "---")
+			//Debug.debug(this, "drawPortraits() portraits: " + this.resourceLibrary.portraits.length);
+			
+			primaryPortrait.visible = true;
+			//triplePanelInitiator.visible = true;
+			primaryPortrait.PortraitImage.source = resourceLibrary.portraits[this.currentPrimaryCharacter.characterName.toLowerCase()];
+			primaryPortrait.PortraitImage.toolTip = currentPrimaryCharacter.characterName;
+			primaryPortrait.topGradient.color = 0x00FF00;
+			primaryPortrait.botGradient.color = 0xFFFFFF;
+			primaryPortrait.NameRichText.text = this.currentPrimaryCharacter.characterName;
+			primaryPortrait.NameRichText.setStyle("textAlign", TextAlign.CENTER);
+			if (this.isDouble)
+			{
+				secondaryPortrait.visible = true;
+				//triplePanelResponder.visible = true;
+				secondaryPortrait.PortraitImage.source = resourceLibrary.portraits[this.currentSecondaryCharacter.characterName.toLowerCase()];
+				secondaryPortrait.PortraitImage.toolTip = this.currentSecondaryCharacter.characterName;
+				secondaryPortrait.topGradient.color = 0xFCFF00;
+				secondaryPortrait.botGradient.color = 0xFFFFFF;
+				secondaryPortrait.NameRichText.text = this.currentSecondaryCharacter.characterName;
+				secondaryPortrait.NameRichText.setStyle("textAlign", TextAlign.CENTER);
+			}
+			else
+			{
+				secondaryPortrait.visible = false;
+				//triplePanelResponder.visible = false;
+			}
+		}
+		
+		public function drawShrunkPortraits():void
+		{
+			//Debug.debug(this, "drawPortraits() " + this.currentPrimaryCharacter.characterName.toLowerCase() + "---")
+			//Debug.debug(this, "drawPortraits() portraits: " + this.resourceLibrary.portraits.length);
+			
+			this.primaryPortraitImageShrunk.visible = true;
+			this.primaryPortraitImageShrunk.source = resourceLibrary.charHeads[this.currentPrimaryCharacter.characterName.toLowerCase()];
+			this.primaryPortraitImageShrunk.toolTip = currentPrimaryCharacter.characterName;
+			this.primaryNameRichTextShrunk.text = this.currentPrimaryCharacter.characterName;
+			this.primaryNameRichTextShrunk.setStyle("textAlign", TextAlign.CENTER);
+			if (this.isDouble)
+			{
+				this.secondaryPortraitImageShrunk.visible = true;
+				this.secondaryPortraitImageShrunk.source = resourceLibrary.charHeads[this.currentSecondaryCharacter.characterName.toLowerCase()];
+				this.secondaryPortraitImageShrunk.toolTip = this.currentSecondaryCharacter.characterName;
+				this.secondaryNameRichTextShrunk.text = this.currentSecondaryCharacter.characterName;
+				this.secondaryNameRichTextShrunk.setStyle("textAlign", TextAlign.CENTER);
+			}
+			else
+			{
+				this.secondaryPortraitImageShrunk.visible = false;
+				
+			}
+		}
+		
+		/**
+		 * This function will return the percent that we oughta fill the network line for a specified intent
+		 * The math is suspect at this point. It will require tuning, and even then it may not be what we want...
+		 * 
+		 * @param	intentType As defined in Predicate
+		 * @param	posMagicScaleMod TBD scale modifiers...
+		 * @param	negMagicScaleMod
+		 * @return
+		 */
+		public function getIntentPercentImpact(char1:Character, char2:Character,intentType:int, posMagicScaleMod:Number=1,negMagicScaleMod:Number=1):Number
+		{	
+			//if the prospective memory intent cache hasn't been filled yet, return 0. btw, this shouldn't ever happen
+			if (char1.prospectiveMemory.intentPosScoreCache[char2.networkID][intentType] == ProspectiveMemory.DEFAULT_INTENT_SCORE) return 0.0;
+			
+			var percent:Number;
+				
+			//Debug.debug(this,"getIntentPercentImpact() " +Predicate.getIntentNameByNumber(intentType)+" PosScore: " + this.currentPrimaryCharacter.prospectiveMemory.intentPosScoreCache[this.currentSecondaryCharacter.networkID][intentType])
+			//Debug.debug(this,"getIntentPercentImpact() " +Predicate.getIntentNameByNumber(intentType)+" NegScore: " + this.currentPrimaryCharacter.prospectiveMemory.intentNegScoreCache[this.currentSecondaryCharacter.networkID][intentType])			
+			
+			var posPercent:Number = char1.prospectiveMemory.intentPosScoreCache[char2.networkID][intentType] / (cif.intentsTotalPos[intentType] * posMagicScaleMod);
+			var negPercent:Number = char1.prospectiveMemory.intentNegScoreCache[char2.networkID][intentType] / (cif.intentsTotalNeg[intentType] * negMagicScaleMod);
+
+			//Debug.debug(this,"getIntentPercentImpact() " + Predicate.getIntentNameByNumber(intentType)+" Pos%: " + posPercent + " Neg%: " + negPercent)
+			
+			percent = Math.min(Math.max((posPercent - negPercent), 0), 1);
+			
+			//Debug.debug(this, "getIntentPercentImpact() " + Predicate.getIntentNameByNumber(intentType) + " Total%: " + percent);
+
+			return Math.abs(percent);
+		}
+		
+		
+		/**
+		 * These function handle all the tool tip stuff
+		 */
+		public var buddyToolTip:ToolTip;
+		public var romanceToolTip:ToolTip;
+		public var coolToolTip:ToolTip;
+		public function rollOverBuddyPrimaryToSecondary(e:MouseEvent):void
+		{
+			buddyToolTip = ToolTipManager.createToolTip((this.currentPrimaryCharacter.characterName + " buddy feelings toward " + this.currentSecondaryCharacter.characterName), networkLines.left + buddyPrimaryToSecondaryMouseOverGroup.x, networkLines.top + buddyPrimaryToSecondaryMouseOverGroup.y + 10) as ToolTip;
+		}
+		public function rollOutBuddyPrimaryToSecondary(e:MouseEvent):void
+		{
+			ToolTipManager.destroyToolTip(buddyToolTip);
+		}
+		public function rollOverBuddySecondaryToPrimary(e:MouseEvent):void
+		{
+			buddyToolTip = ToolTipManager.createToolTip((this.currentSecondaryCharacter.characterName + "'s buddy feelings toward " + this.currentPrimaryCharacter.characterName), networkLines.left + buddySecondaryToPrimaryMouseOverGroup.x,networkLines.top + buddySecondaryToPrimaryMouseOverGroup.y + 10) as ToolTip;
+		}
+		public function rollOutBuddySecondaryToPrimary(e:MouseEvent):void
+		{
+			ToolTipManager.destroyToolTip(buddyToolTip);
+		}
+		public function rollOverRomancePrimaryToSecondary(e:MouseEvent):void
+		{
+			romanceToolTip = ToolTipManager.createToolTip((this.currentPrimaryCharacter.characterName + "'s feelings of romance toward " + this.currentSecondaryCharacter.characterName), networkLines.left + romancePrimaryToSecondaryMouseOverGroup.x, networkLines.top + romancePrimaryToSecondaryMouseOverGroup.y + 10) as ToolTip;
+		}
+		public function rollOutRomancePrimaryToSecondary(e:MouseEvent):void
+		{
+			ToolTipManager.destroyToolTip(romanceToolTip);
+		}
+		
+		public function rollOverRomanceSecondaryToPrimary(e:MouseEvent):void
+		{
+			romanceToolTip = ToolTipManager.createToolTip((this.currentSecondaryCharacter.characterName + "'s feelings of romance toward " + this.currentPrimaryCharacter.characterName), networkLines.left + romanceSecondaryToPrimaryMouseOverGroup.x,networkLines.top + romanceSecondaryToPrimaryMouseOverGroup.y + 10) as ToolTip;
+		}
+		public function rollOutRomanceSecondaryToPrimary(e:MouseEvent):void
+		{
+			ToolTipManager.destroyToolTip(romanceToolTip);
+		}
+		public function rollOverCoolPrimaryToSecondary(e:MouseEvent):void
+		{
+			coolToolTip = ToolTipManager.createToolTip(("How cool " + this.currentPrimaryCharacter.characterName + " thinks " + this.currentSecondaryCharacter.characterName), networkLines.left + coolPrimaryToSecondaryMouseOverGroup.x, networkLines.top + coolPrimaryToSecondaryMouseOverGroup.y + 10) as ToolTip;
+		}
+		public function rollOutCoolPrimaryToSecondary(e:MouseEvent):void
+		{
+			ToolTipManager.destroyToolTip(coolToolTip);
+		}
+		public function rollOverCoolSecondaryToPrimary(e:MouseEvent):void
+		{
+			coolToolTip = ToolTipManager.createToolTip(("How cool " + this.currentSecondaryCharacter.characterName + " thinks " + this.currentPrimaryCharacter.characterName), networkLines.left + coolSecondaryToPrimaryMouseOverGroup.x,networkLines.top + coolSecondaryToPrimaryMouseOverGroup.y + 10) as ToolTip;
+		}
+		public function rollOutCoolSecondaryToPrimary(e:MouseEvent):void
+		{
+			ToolTipManager.destroyToolTip(coolToolTip);
+		}
+		
+		
+		public function drawNetworkLines():void
+		{
+			var cif:CiFSingleton = CiFSingleton.getInstance();
+			var primaryProsMem:ProspectiveMemory = this.currentPrimaryCharacter.prospectiveMemory;
+			var secondaryProsMem:ProspectiveMemory = this.currentSecondaryCharacter.prospectiveMemory;
+			
+			var value:Number;
+			var networkLineLength:Number;
+			var pathString:String;
+			
+			var posTotalWeight:Number = 0.0;
+			var negTotalWeight:Number = 0.0;
+			
+			var pos:Number = 0.0;
+			var neg:Number = 0.0;
+			var curIntent:Number;
+			
+			var finalPrimaryGreenValue:Number;
+			var finalSecondaryGreenValue:Number;
+			var finalPrimaryRedValue:Number;
+			var finalSecondaryRedValue:Number;
+			var finalPrimaryBlueValue:Number;
+			var finalSecondaryBlueValue:Number;
+			
+			//Green from initiator
+			finalPrimaryGreenValue = gameEngine.worldGroup.avatars[this.currentPrimaryCharacter.characterName.toLowerCase()].subjectiveGreenOpinions[this.currentSecondaryCharacter.networkID];
+			//Green from Responder
+			finalSecondaryGreenValue = gameEngine.worldGroup.avatars[this.currentSecondaryCharacter.characterName.toLowerCase()].subjectiveGreenOpinions[this.currentPrimaryCharacter.networkID];
+
+			//Red from initiator
+			finalPrimaryRedValue = gameEngine.worldGroup.avatars[this.currentPrimaryCharacter.characterName.toLowerCase()].subjectiveRedOpinions[this.currentSecondaryCharacter.networkID];
+			//Red from Responder
+			finalSecondaryRedValue = gameEngine.worldGroup.avatars[this.currentSecondaryCharacter.characterName.toLowerCase()].subjectiveRedOpinions[this.currentPrimaryCharacter.networkID];
+						
+			//Blue from initiator
+			finalPrimaryBlueValue = gameEngine.worldGroup.avatars[this.currentPrimaryCharacter.characterName.toLowerCase()].subjectiveBlueOpinions[this.currentSecondaryCharacter.networkID];
+			//Blue from Responder
+			finalSecondaryBlueValue = gameEngine.worldGroup.avatars[this.currentSecondaryCharacter.characterName.toLowerCase()].subjectiveBlueOpinions[this.currentPrimaryCharacter.networkID];
+			
+			
+			//Debug.debug(this, "drawNetworkLines() getPortionOfLineToFill Green i to r: " + finalPrimaryGreenValue);
+			//Debug.debug(this, "drawNetworkLines() getPortionOfLineToFill Red i to r: " + finalPrimaryRedValue);
+			//Debug.debug(this, "drawNetworkLines() getPortionOfLineToFill Blue i to r: " + finalPrimaryBlueValue);
+			
+			//buddy
+			//Debug.debug(this,"drawNetworkLines() " + getIntentPercentImpact(Predicate.INTENT_FRIENDS))//,.1,.1));
+			//value = getIntentPercentImpact(this.currentPrimaryCharacter, this.currentSecondaryCharacter,Predicate.INTENT_FRIENDS, FRIENDS_POS_THRESHOLD, FRIENDS_NEG_THRESHOLD) * BUDDY_FRIENDS_SIGNIFICANCE;
+			//value -= getIntentPercentImpact(this.currentPrimaryCharacter, this.currentSecondaryCharacter,Predicate.INTENT_END_FRIENDS, END_FRIENDS_POS_THRESHOLD, END_FRIENDS_NEG_THRESHOLD) * BUDDY_END_FRIENDS_SIGNIFICANCE;
+			//value -= getIntentPercentImpact(this.currentPrimaryCharacter, this.currentSecondaryCharacter,Predicate.INTENT_ENEMIES, ENEMIES_POS_THRESHOLD, ENEMIES_NEG_THRESHOLD) * BUDDY_ENEMIES_SIGNIFICANCE;
+			//value += getIntentPercentImpact(this.currentPrimaryCharacter, this.currentSecondaryCharacter,Predicate.INTENT_END_ENEMIES, END_ENEMIES_POS_THRESHOLD, END_ENEMIES_NEG_THRESHOLD) * BUDDY_END_ENEMIES_SIGNIFICANCE;
+			//value += getIntentPercentImpact(this.currentPrimaryCharacter, this.currentSecondaryCharacter,Predicate.INTENT_BUDDY_UP, BUDDY_UP_POS_THRESHOLD, BUDDY_UP_NEG_THRESHOLD) * BUDDY_BUDDY_UP_SIGNIFICANCE;
+			//value -= getIntentPercentImpact(this.currentPrimaryCharacter, this.currentSecondaryCharacter, Predicate.INTENT_BUDDY_DOWN, BUDDY_DOWN_POS_THRESHOLD, BUDDY_DOWN_NEG_THRESHOLD) * BUDDY_BUDDY_DOWN_SIGNIFICANCE;
+			//value *= 100;
+			//Debug.debug(this, "drawNetworkLines() Buddy Value: " + value);
+			//value = cif.buddyNetwork.getWeight(this.currentPrimaryCharacter.networkID, this.currentSecondaryCharacter.networkID);
+			
+			
+			//networkLineLength = 10 + value/100 * 120;			
+			networkLineLength = 10 + finalPrimaryGreenValue * 120;
+			pathString = "";
+			pathString += "m 0 0 "
+			pathString += "l " + networkLineLength + " 0 ";
+			pathString += "l -5 5 ";
+			pathString += "m 5 -5 ";
+			pathString += "l -5 -5 ";
+			primaryToSecondaryBuddyPath.data = new String(pathString);
+			
+			
+			//value = getIntentPercentImpact(this.currentSecondaryCharacter, this.currentPrimaryCharacter,Predicate.INTENT_FRIENDS, FRIENDS_POS_THRESHOLD, FRIENDS_NEG_THRESHOLD) * BUDDY_FRIENDS_SIGNIFICANCE;
+			//value += getIntentPercentImpact(this.currentSecondaryCharacter, this.currentPrimaryCharacter,Predicate.INTENT_END_FRIENDS, END_FRIENDS_POS_THRESHOLD, END_FRIENDS_NEG_THRESHOLD) * BUDDY_END_FRIENDS_SIGNIFICANCE;
+			//value += getIntentPercentImpact(this.currentSecondaryCharacter, this.currentPrimaryCharacter,Predicate.INTENT_ENEMIES, ENEMIES_POS_THRESHOLD, ENEMIES_NEG_THRESHOLD) * BUDDY_ENEMIES_SIGNIFICANCE;
+			//value += getIntentPercentImpact(this.currentSecondaryCharacter, this.currentPrimaryCharacter,Predicate.INTENT_END_ENEMIES, END_ENEMIES_POS_THRESHOLD, END_ENEMIES_NEG_THRESHOLD) * BUDDY_END_ENEMIES_SIGNIFICANCE;
+			//value += getIntentPercentImpact(this.currentSecondaryCharacter, this.currentPrimaryCharacter,Predicate.INTENT_BUDDY_UP, BUDDY_UP_POS_THRESHOLD, BUDDY_UP_NEG_THRESHOLD) * BUDDY_BUDDY_UP_SIGNIFICANCE;
+			//value += getIntentPercentImpact(this.currentSecondaryCharacter, this.currentPrimaryCharacter, Predicate.INTENT_BUDDY_DOWN, BUDDY_DOWN_POS_THRESHOLD, BUDDY_DOWN_NEG_THRESHOLD) * BUDDY_BUDDY_DOWN_SIGNIFICANCE;
+			//value *= 100;
+			
+			//value = cif.buddyNetwork.getWeight(this.currentSecondaryCharacter.networkID, this.currentPrimaryCharacter.networkID);
+			networkLineLength = 10 + finalSecondaryGreenValue * 120;
+			pathString = "";
+			pathString += "m 140 12 "
+			pathString += "l " + -1*networkLineLength + " 0 ";
+			pathString += "l 5 -5 ";
+			pathString += "m -5 5 ";
+			pathString += "l 5 5 ";
+			secondaryToPrimaryBuddyPath.data = new String(pathString);
+			
+			//romance
+			//value = getIntentPercentImpact(this.currentPrimaryCharacter, this.currentSecondaryCharacter,Predicate.INTENT_DATING, DATING_POS_THRESHOLD, DATING_NEG_THRESHOLD) * ROMANCE_DATING_SIGNIFICANCE;
+			//value += getIntentPercentImpact(this.currentPrimaryCharacter, this.currentSecondaryCharacter, Predicate.INTENT_END_DATING, END_DATING_POS_THRESHOLD, END_DATING_NEG_THRESHOLD) * ROMANCE_END_DATING_SIGNIFICANCE;
+			//value += getIntentPercentImpact(this.currentPrimaryCharacter, this.currentSecondaryCharacter,Predicate.INTENT_ROMANCE_UP, ROMANCE_UP_POS_THRESHOLD, ROMANCE_UP_NEG_THRESHOLD) * ROMANCE_ROMANCE_UP_SIGNIFICANCE;
+			//value += getIntentPercentImpact(this.currentPrimaryCharacter, this.currentSecondaryCharacter, Predicate.INTENT_ROMANCE_DOWN, ROMANCE_DOWN_POS_THRESHOLD, ROMANCE_DOWN_NEG_THRESHOLD) * ROMANCE_ROMANCE_DOWN_SIGNIFICANCE;
+			//value *= 100;
+			//value = cif.romanceNetwork.getWeight(this.currentPrimaryCharacter.networkID, this.currentSecondaryCharacter.networkID);
+			networkLineLength = 10 + finalPrimaryRedValue * 120;
+			pathString = "";
+			pathString += "m 0 30 "
+			pathString += "l " + networkLineLength + " 0 ";
+			pathString += "l -5 5 ";
+			pathString += "m 5 -5 ";
+			pathString += "l -5 -5 ";
+			primaryToSecondaryRomancePath.data = new String(pathString);
+			
+			//value = getIntentPercentImpact(this.currentSecondaryCharacter, this.currentPrimaryCharacter,Predicate.INTENT_DATING, DATING_POS_THRESHOLD, DATING_NEG_THRESHOLD) * ROMANCE_DATING_SIGNIFICANCE;
+			//value += getIntentPercentImpact(this.currentSecondaryCharacter, this.currentPrimaryCharacter, Predicate.INTENT_END_DATING, END_DATING_POS_THRESHOLD, END_DATING_NEG_THRESHOLD) * ROMANCE_END_DATING_SIGNIFICANCE;
+			//value += getIntentPercentImpact(this.currentSecondaryCharacter, this.currentPrimaryCharacter,Predicate.INTENT_ROMANCE_UP, ROMANCE_UP_POS_THRESHOLD, ROMANCE_UP_NEG_THRESHOLD) * ROMANCE_ROMANCE_UP_SIGNIFICANCE;
+			//value += getIntentPercentImpact(this.currentSecondaryCharacter, this.currentPrimaryCharacter, Predicate.INTENT_ROMANCE_DOWN, ROMANCE_DOWN_POS_THRESHOLD, ROMANCE_DOWN_NEG_THRESHOLD) * ROMANCE_ROMANCE_DOWN_SIGNIFICANCE;
+			//value *= 100;
+			//value = cif.romanceNetwork.getWeight(this.currentSecondaryCharacter.networkID, this.currentPrimaryCharacter.networkID);
+			networkLineLength = 10 + finalSecondaryRedValue * 120;
+			pathString = "";
+			pathString += "m 140 42 "
+			pathString += "l " + -1*networkLineLength + " 0 ";
+			pathString += "l 5 -5 ";
+			pathString += "m -5 5 ";
+			pathString += "l 5 5 ";
+			secondaryToPrimaryRomancePath.data = new String(pathString);
+			
+			//cool
+			//value = getIntentPercentImpact(this.currentPrimaryCharacter, this.currentSecondaryCharacter,Predicate.INTENT_COOL_UP, COOL_UP_POS_THRESHOLD, COOL_UP_NEG_THRESHOLD) * COOL_COOL_UP_SIGNIFICANCE;
+			//value += getIntentPercentImpact(this.currentPrimaryCharacter, this.currentSecondaryCharacter, Predicate.INTENT_COOL_DOWN, COOL_DOWN_POS_THRESHOLD, COOL_DOWN_NEG_THRESHOLD) * COOL_COOL_DOWN_SIGNIFICANCE;
+			//value *= 100;
+			//value = cif.coolNetwork.getWeight(this.currentPrimaryCharacter.networkID, this.currentSecondaryCharacter.networkID);
+			networkLineLength = 10 + finalPrimaryBlueValue * 120;	
+			pathString = "";
+			pathString += "m 0 60 "
+			pathString += "l " + networkLineLength + " 0 ";
+			pathString += "l -5 5 ";
+			pathString += "m 5 -5 ";
+			pathString += "l -5 -5 ";
+			primaryToSecondaryCoolPath.data = new String(pathString);
+			
+			//value = getIntentPercentImpact(this.currentSecondaryCharacter, this.currentPrimaryCharacter,Predicate.INTENT_COOL_UP, COOL_UP_POS_THRESHOLD, COOL_UP_NEG_THRESHOLD) * COOL_COOL_UP_SIGNIFICANCE;
+			//value += getIntentPercentImpact(this.currentSecondaryCharacter, this.currentPrimaryCharacter, Predicate.INTENT_COOL_DOWN, COOL_DOWN_POS_THRESHOLD, COOL_DOWN_NEG_THRESHOLD) * COOL_COOL_DOWN_SIGNIFICANCE;
+			//value *= 100;
+			//value = cif.coolNetwork.getWeight(this.currentSecondaryCharacter.networkID, this.currentPrimaryCharacter.networkID);
+			networkLineLength = 10 + finalSecondaryBlueValue * 120;	
+			pathString = "";
+			pathString += "m 140 72 "
+			pathString += "l " + -1*networkLineLength + " 0 ";
+			pathString += "l 5 -5 ";
+			pathString += "m -5 5 ";
+			pathString += "l 5 5 ";
+			secondaryToPrimaryCoolPath.data = new String(pathString);
+		}
+		
+		public static function getPortionOfLineToFill(opinionValue:Number):Number
+		{
+			if (opinionValue > 0)
+			{
+				if (opinionValue > DEFAULT_MAX_DESIRE)
+				{
+					opinionValue = DEFAULT_MAX_DESIRE;
+				}
+				return DEFAULT_ZERO_POINT + opinionValue / DEFAULT_MAX_DESIRE * (1 - DEFAULT_ZERO_POINT);
+			}
+			else
+			{
+				if (opinionValue < DEFAULT_MIN_DESIRE)
+				{
+					opinionValue = DEFAULT_MIN_DESIRE;
+				}
+				return DEFAULT_ZERO_POINT - (opinionValue / DEFAULT_MIN_DESIRE * DEFAULT_ZERO_POINT);
+			}
+		}
+		
+		public function drawRelationshipIcons():void
+		{
+			var hasRelationship:Boolean;
+
+			//friends
+			hasRelationship = cif.relationshipNetwork.getRelationship(RelationshipNetwork.FRIENDS, this.currentPrimaryCharacter, this.currentSecondaryCharacter);
+			if (hasRelationship)
+			{
+				this.friendsIcon.source = resourceLibrary.relationshipIcons["friends"];
+			}
+			else
+			{
+				this.friendsIcon.source = resourceLibrary.relationshipIcons["notFriends"];
+			}
+			
+			//dating
+			hasRelationship = cif.relationshipNetwork.getRelationship(RelationshipNetwork.DATING, this.currentPrimaryCharacter, this.currentSecondaryCharacter);
+			if (hasRelationship)
+			{
+				this.datingIcon.source = resourceLibrary.relationshipIcons["dating"];
+			}
+			else
+			{
+				this.datingIcon.source = resourceLibrary.relationshipIcons["notDating"];
+			}
+			
+			//enemies
+			hasRelationship = cif.relationshipNetwork.getRelationship(RelationshipNetwork.ENEMIES, this.currentPrimaryCharacter, this.currentSecondaryCharacter);
+			if (hasRelationship)
+			{
+				this.enemiesIcon.source = resourceLibrary.relationshipIcons["enemies"];
+			}
+			else
+			{
+				this.enemiesIcon.source = resourceLibrary.relationshipIcons["notEnemies"];
+			}
+		}
+		
+		
+		public function drawRelationshipIconsShrunk():void
+		{
+			var hasRelationship:Boolean;
+
+			//friends
+			hasRelationship = cif.relationshipNetwork.getRelationship(RelationshipNetwork.FRIENDS, this.currentPrimaryCharacter, this.currentSecondaryCharacter);
+			if (hasRelationship)
+			{
+				this.friendsIconShrunk.source = resourceLibrary.relationshipIcons["friends"];
+			}
+			else
+			{
+				this.friendsIconShrunk.source = resourceLibrary.relationshipIcons["notFriends"];
+			}
+			
+			//dating
+			hasRelationship = cif.relationshipNetwork.getRelationship(RelationshipNetwork.DATING, this.currentPrimaryCharacter, this.currentSecondaryCharacter);
+			if (hasRelationship)
+			{
+				this.datingIconShrunk.source = resourceLibrary.relationshipIcons["dating"];
+			}
+			else
+			{
+				this.datingIconShrunk.source = resourceLibrary.relationshipIcons["notDating"];
+			}
+			
+			//enemies
+			hasRelationship = cif.relationshipNetwork.getRelationship(RelationshipNetwork.ENEMIES, this.currentPrimaryCharacter, this.currentSecondaryCharacter);
+			if (hasRelationship)
+			{
+				this.enemiesIconShrunk.source = resourceLibrary.relationshipIcons["enemies"];
+			}
+			else
+			{
+				this.enemiesIconShrunk.source = resourceLibrary.relationshipIcons["notEnemies"];
+			}
+		}
+		
+		public function drawBackgroundPath():void
+		{
+			var pathString:String = "";
+			
+			
+			if (this.isOpen && this.isSingle)
+			{
+				//top left, going counter clockwise from here
+				pathString += "M 80 30 ";
+				pathString += "l 0 110 ";
+				pathString += "l 205 0 ";
+				pathString += "l 0 -110 ";
+				pathString += "Z";
+			}
+			else if (this.isOpen && this.isDouble)
+			{
+				//top left, going counter clockwise from here
+				pathString += "M 80 30 ";				
+				pathString += "l 0 110 ";
+				pathString += "l 205 0 ";
+				pathString += "q 65 60 130 0 "
+				pathString += "l 200 0 "
+				pathString += "l 0 -110 ";
+				pathString += "Z";
+			}
+			
+			
+			
+			/*
+			if (this.isOpen && this.isSingle)
+			{
+				//top left, going counter clockwise from here
+				
+				//pathString += "M 175 30 ";
+				pathString += "M 150 30 ";
+				
+				pathString += "l 0 110 ";
+				
+				//pathString += "l 285 0 ";
+				pathString += "l 137 0 ";
+				
+				pathString += "l 0 -110 ";
+				pathString += "Z";
+			}
+			else if (this.isOpen && this.isDouble)
+			{
+				
+				//top left, going counter clockwise from here
+				
+				//pathString += "M 175 30 ";
+				pathString += "M 150 30 ";
+				
+				pathString += "l 0 110 ";
+				
+				//pathString += "l 285 0 ";
+				//pathString += "l 205 0 ";
+				pathString += "l 112 0 ";
+				//pathString += "l 130 0 ";
+				
+				pathString += "q 65 60 130 0 "
+				
+				//pathString += "l 285 0 "
+				//pathString += "l 200 0 "
+				pathString += "l 108 0 "
+				//pathString += "l 138 0 "
+				
+				pathString += "l 0 -110 ";
+				
+				//pathString += "l -285 0 ";
+				//pathString += "l -200 0 ";
+				
+				//pathString += "q -65 -60 -130 0 "
+				pathString += "Z";
+			}
+			*/
+			/*
+			else if (this.isClosed && this.isSingle)
+			{
+				//top left, going counter clockwise from here
+				pathString += "M 175 30 ";
+				pathString += "l 0 110 ";
+				pathString += "l 110 0 ";
+				pathString += "l 0 -110 ";
+				pathString += "Z";
+			}
+			else if (this.isClosed && this.isDouble)
+			{
+				//top left, going counter clockwise from here
+				pathString += "M 175 30 ";
+				pathString += "l 0 110 ";
+				pathString += "l 110 0 ";
+				pathString += "q 65 60 130 0 "
+				pathString += "l 110 0 "
+				pathString += "l 0 -110 ";
+				pathString += "l -110 0 ";
+				pathString += "q -65 -60 -130 0 "
+				pathString += "Z";
+				
+			}
+			*/
+			backgroundPath.data = pathString;
+		}
+		
+		public function get single():Boolean
+		{
+			return this.isSingle;
+		}
+		public function set single(bool:Boolean):void
+		{
+			this.isSingle = bool;
+			this.isDouble = !bool;
+			
+			this.update();
+		}
+		public function get double():Boolean
+		{
+			return this.isDouble;
+		}
+		public function set double(bool:Boolean):void
+		{
+			this.isDouble = bool;
+			this.isSingle = !bool;
+			
+			this.update();
+		}
+	
+		public function get closed():Boolean
+		{
+			return this.isClosed;
+		}
+		public function set closed(bool:Boolean):void
+		{
+			this.isClosed = bool;
+			this.isOpen = !bool;
+			
+			this.update();
+		}
+		public function get open():Boolean
+		{
+			return this.isOpen;
+		}
+		public function set open(bool:Boolean):void
+		{
+			this.isOpen = bool;
+			this.isClosed = !bool;
+			
+			this.update();
+		}
+		
+		/**
+		 * The primary portrait was clicked -- bubble up an event to the HUDGroup to 
+		 * signify that a character sheet should be displayed.
+		 */
+		public function onPrimaryPortraitClickedHandler():void {
+			//Debug.debug(this, "In real life, I will bubble up an event handler, but for now, I am just printing that the primary portrait was clicked!");
+			dispatchEvent(new Event("primaryPortraitClicked", true, true));
+		}
+		
+		/**
+		 * The Secondary portrait was clicked -- bubble up an event to the HUDGroup to
+		 * signify that a character sheet should be displayed.
+		 */
+		public function onSecondaryPortraitClickedHandler():void {
+			//Debug.debug(this, "In real life, I will bubble up an event handler, but for now, I am just printing that the secondary portrait was clicked!");
+			dispatchEvent(new Event("secondaryPortraitClicked", true, true));
+		}
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			/*if(gameEngine.classicPromColors) {
+				this.setStyle("styleName", "classicPromWeek");
+			}
+			else if(gameEngine.greenPromColors) {
+				this.setStyle("styleName", "greenColor");
+			}
+			else if(gameEngine.redPromColors) {
+				this.setStyle("styleName", "redColor");
+			}*/
+			this.invalidateProperties();
+		}
+		
+		
+		]]>
+	</fx:Script>
+		
+	
+</s:Group>

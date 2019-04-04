@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 initialize="initializeSSUEntry()"
+		 width="270"
+		 height="75"
+		 styleName="classicPromWeek">
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+		 </fx:Declarations>
+		 
+		<s:Group id="SSUInfoGroup" width="100%" height="100%">
+			<s:Rect width="100%" height="100%">
+				<s:stroke>
+					<s:SolidColorStroke weight="{getStyle('backgroundStrokeWeight')}" color="{getStyle('backgroundStroke')}" />
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor color="{getStyle('backgroundColor')}" alpha="1.0"/>
+				</s:fill>
+			</s:Rect>
+			<s:HGroup width="100%" height="100%" paddingTop="10" paddingLeft="5">
+				<prom:PlayerPortrait id="SSUportrait" width="50" height="50" />
+				<!--prom:ToggleableContainerButton id="twitterIcon" click="onTwitterClick(event)" width="25" height="100%" />
+				<prom:ToggleableContainerButton id="facebookIcon" click="onFacebookClick(event)" width="25" height="25" /-->
+				<util:SmoothImage id="twitterIcon" click="onTwitterClick(event)" width="25" height="100%"></util:SmoothImage>
+				<!--<s:VGroup width="75">
+					<s:Group id="portraitGroup" x="12" width="50" height="50">
+						<util:SmoothImage id="SSUportrait" width="{portraitGroup.width}" height="{portraitGroup.height}"/>
+					</s:Group>
+					<s:Group id="portraitName">
+						<s:Rect width="100%" height="20" x="10">
+							<s:fill>
+								<mx:SolidColor color="{getStyle('contentAreaColor')}" alpha="0.5"/>
+							</s:fill>
+						</s:Rect>
+						<s:RichText id="SSUname" width="100%" height="20" x="2" y="2" color="{getStyle('textColor')}" fontWeight="bold" verticalAlign="middle" textAlign="center" fontSize="12" />
+					</s:Group>
+				</s:VGroup>-->
+				<s:HGroup id="feedLine" width="100%" height="100%" paddingLeft="5" paddingRight="5">
+					<s:RichText id="SSULine" color="{getStyle('textColor')}" width="100%" styleName="basicFontStyle"/>
+				</s:HGroup>
+			</s:HGroup>
+		</s:Group>
+		
+	<fx:Script>
+		<![CDATA[
+		import flash.events.Event;
+		import flash.events.TimerEvent;
+		import flash.utils.Timer;
+		
+		public function onCreationComplete():void {
+		}
+		public function initializeSSUEntry():void {
+			
+		}
+		
+		public function fadeIn():void{
+			this.alpha = 0
+			var timer:Timer = new Timer(25, 20) 
+			timer.addEventListener(TimerEvent.TIMER, increaseAlpha)
+			timer.start()
+		}
+		
+		public function increaseAlpha(e:Event):void {
+			this.alpha += 0.05
+		}
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

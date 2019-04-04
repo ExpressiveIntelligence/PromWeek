@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 width="100%"
+		 height="100%"
+		 styleName="classicPromWeek">
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+			<fx:Boolean id="isNext">true</fx:Boolean>
+			<fx:Boolean id="isPrev">false</fx:Boolean>
+			<fx:Boolean id="toggleable">false</fx:Boolean>
+		 </fx:Declarations>
+		 
+		 
+		 <prom:ToggleableContainerButton id="nextPrevButton" width="100%" height="100%" click="nextPrevClickedOn(event)" toggleable="{toggleable}" boxPadding="0" />
+		 
+		 
+		
+	<fx:Script>
+		<![CDATA[
+		import flash.events.MouseEvent;
+		import mx.graphics.SolidColor;
+		import mx.graphics.SolidColorStroke;
+		import spark.components.Group;
+		import spark.primitives.Path;
+		
+		private var outlinePath:Path;
+		
+		public function onCreationComplete():void 
+		{
+			//create the background of the next/prev sg buttons
+			var group:Group = new Group();
+			var stroke:SolidColorStroke;
+			
+			//if (isNext)
+			//{
+				stroke = new SolidColorStroke();
+				stroke.color = getStyle('navSGArrowColor');
+				stroke.weight = 2;
+				var p:Path = new Path();
+				p.stroke = stroke;
+				var pData:String = "M 0 0 l ";
+				pData += this.nextPrevButton.mainContainer.width + " " + this.nextPrevButton.mainContainer.height / 2;
+				pData += " " + (-1 * this.nextPrevButton.mainContainer.width) + " " + this.nextPrevButton.mainContainer.height / 2;
+				p.data = pData;
+				group.addElement(p);
+				group.width = this.nextPrevButton.mainContainer.width;
+				group.height = this.nextPrevButton.mainContainer.height;
+				nextPrevButton.mainContainer.addElement(group);
+			//}
+			if(isPrev)
+			{
+				group.scaleX = -1;
+				p.x = -group.width;
+				/*
+				group= new Group();
+				p = new Path();
+				//stroke = new SolidColorStroke();
+				//stroke.color = 0x000000;
+				p.stroke = stroke;
+				pData = "M " + this.nextPrevButton.width + " 0 l ";
+				pData += (-1 * this.nextPrevButton.width) + " " + this.nextPrevButton.height / 2;
+				pData += " " + this.nextPrevButton.width + " " + this.nextPrevButton.height / 2;
+				p.data = pData;
+				group.addElement(p);
+				group.width = this.nextPrevButton.width;
+				group.height = this.nextPrevButton.height;
+				nextPrevButton.mainContainer.addElement(group);
+				*/
+			}
+			this.outlinePath = p;
+		}
+		
+		protected override function commitProperties():void {
+			super.commitProperties();
+			if(this.outlinePath) {
+				this.outlinePath.stroke = new SolidColorStroke(getStyle("contentAreaStroke"));
+				this.outlinePath.fill = new SolidColor(getStyle("contentAreaAltColor"));
+			}
+		}
+		
+		public function nextPrevClickedOn(e:MouseEvent = null):void
+		{
+			
+		}
+
+		
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			this.nextPrevButton.setStyleName();
+			this.invalidateProperties();
+		}
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

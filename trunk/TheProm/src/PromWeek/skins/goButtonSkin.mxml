@@ -1,0 +1,212 @@
+<s:Skin 
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/mx" 
+	xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+	minWidth="21" minHeight="21"
+	alpha="1.0"
+	alpha.over="1.0"
+	alpha.down="1.0"
+	creationComplete="onCreationComplete()"
+	styleName="classicPromWeek">
+
+	<fx:Metadata>[HostComponent("PromWeek.goButton")]</fx:Metadata>
+    
+	<fx:Declarations>
+		<fx:String id="pathData">M 0 50
+								l 100 0
+								q -50 -75 -100 0 
+								Z</fx:String>
+		<!--<fx:String id="pathData">M 0 0 l 0 165 l 600 0 l 0 -140 l -475 0 s -25 -50 -100 -50 l -25 0 Z</fx:String>-->
+		<fx:Number id="backgroundFillColor">0x4B0082</fx:Number>
+		<fx:Number id="borderColor">0x000000</fx:Number>
+		<fx:Number id="textColor">0xFFFF66</fx:Number>
+		
+		
+		<fx:Number id="unlockedFillColor">0x0E386C</fx:Number>
+		<fx:Number id="lockedFillColor">0xB8C9C9</fx:Number>
+		<fx:Number id="selectedFillColor">0x5F9F9F</fx:Number>
+		
+		<fx:Number id="unlockedBorderColor">0x1D7CF2</fx:Number>
+		<fx:Number id="lockedBorderColor">0x551A8B</fx:Number>
+		<fx:Number id="selectedBorderColor">0x00CDCD</fx:Number>
+		
+		<fx:Number id="unlockedOverBorderColor">0xFF0000</fx:Number>
+		<fx:Number id="lockedOverBorderColor">0xFF0000</fx:Number>
+		<fx:Number id="selectedOverBorderColor">0x00CDCD</fx:Number>
+
+	</fx:Declarations>
+	
+    <!-- states -->
+    <s:states>
+		<s:State name="normal" />
+        <s:State name="up" />
+        <s:State name="over" />
+		<s:State name="downAndSelected" />
+		<s:State name="disabledAndSelected" />
+		<s:State name="overAndSelected" />
+		<s:State name="upAndSelected" />
+        <s:State name="down" />
+        <s:State name="disabled" />
+        <s:State name="lockedover" />
+        <s:State name="unlockedover" />
+		<s:State name="unlockedClick" />
+		<!--Final States -->
+		 <s:State name="unlockedOver" />
+		 <s:State name="unlocked" />
+		 <s:State name="locked" />
+		
+    </s:states>
+		
+		<!-- UNLOCKED STATES -->
+		
+		<!-- unlocked, hover, ~selected -->
+		<s:Group includeIn="unlockedOver">
+			<s:Path id="unlockedHoverPath" x="0" y="0" data="{pathData}">
+				 <s:stroke>
+					<s:SolidColorStroke color="{getStyle('buttonStroke')}" weight="3" />
+				 </s:stroke>
+				<s:fill>
+					<s:LinearGradient rotation="90">
+						<s:entries>
+							<s:GradientEntry color="#FFFFFF" alpha=".3" />
+							<s:GradientEntry color="{getStyle('buttonColor')}" ratio=".4" alpha=".6" />
+						</s:entries>
+					</s:LinearGradient>
+				</s:fill>
+			</s:Path>
+			<s:Path id="overLay" x="0" y="0" data="{pathData}">
+				<s:fill>
+					<s:LinearGradient rotation="90">
+							<s:entries>
+								<s:GradientEntry color="#FFFFFF" alpha="0.1"/>
+								<s:GradientEntry color="#AAAAAA" alpha="0.1"/>
+							</s:entries>
+					</s:LinearGradient>
+				</s:fill>
+			</s:Path>
+			<!--<s:RichText id="unlockedHoverText" text="Go!" paddingLeft="15" y="-10" textAlign="center" fontSize="30" fontWeight="bold" color="#FFC125" />-->
+		</s:Group>
+		
+		<!-- unlocked, ~hover, ~selected -->
+		<s:Group includeIn="unlocked">
+			<s:Path id="unlockedPath" x="0" y="0" data="{pathData}">
+				 <s:stroke>
+					<s:SolidColorStroke color="{getStyle('buttonStroke')}" weight="3" />
+				 </s:stroke>
+				<s:fill>
+					<s:LinearGradient rotation="90">
+						<s:entries>
+							<s:GradientEntry color="#FFFFFF" alpha=".3" />
+							<s:GradientEntry color="{getStyle('buttonColor')}" ratio=".4" alpha=".6" />
+						</s:entries>
+					</s:LinearGradient>
+				</s:fill>
+			</s:Path>
+			<!--<s:RichText id="unlockedText" text="Go!" paddingLeft="15" y="-10" textAlign="center" fontSize="30" fontWeight="bold" color="#FFC125" />-->
+		</s:Group>
+		
+		<!-- This is what you see when you click down on the button -->
+		<s:Group includeIn="unlockedClick">
+			<s:Path id="unlockedpressedDownPath" x="0" y="0" data="{pathData}">
+				 <s:stroke>
+					<s:SolidColorStroke color="{getStyle('buttonStroke')}" weight="3" />
+				 </s:stroke>
+				<s:fill>
+					<s:LinearGradient rotation="90">
+						<s:entries>
+							<s:GradientEntry color="#FFFFFF" alpha=".3" />
+							<s:GradientEntry color="{getStyle('buttonColor')}" ratio=".4" alpha=".6" />
+						</s:entries>
+					</s:LinearGradient>
+				</s:fill>
+			</s:Path>
+			<s:Path id="overLayDown" x="0" y="0" data="{pathData}">
+				<s:fill>
+					<s:LinearGradient rotation="90">
+							<s:entries>
+								<s:GradientEntry color="#AAAAAA" alpha="0.2"/>
+								<s:GradientEntry color="#FFFFFF" alpha="0.1"/>
+							</s:entries>
+					</s:LinearGradient>
+				</s:fill>
+			</s:Path>
+			<!--<s:RichText id="unlockedDownText" text="Go!" paddingLeft="15" y="-10" textAlign="center" fontSize="30" fontWeight="bold" color="#FFC125" />-->
+		</s:Group>
+		
+		<!-- LOCKED STATE -->
+		<s:Group includeIn="locked">
+			<s:Path id="lockedPath" x="0" y="0" data="{pathData}">
+				 <s:stroke>
+					<s:SolidColorStroke color="{getStyle('buttonStroke')}" weight="3" />
+				 </s:stroke>
+				<s:fill>
+					<s:SolidColor color="{getStyle('buttonColor')}" alpha="1.0" />
+				</s:fill>
+			</s:Path>
+			<!--<s:RichText id="lockedText" text="Go!" paddingLeft="15" y="-10" fontSize="30" fontWeight="bold" color="#000000" />-->
+		</s:Group>
+		<util:SmoothImage id="playButtonPic" x="36" y="15" width="30" height="30"></util:SmoothImage>
+	<fx:Script>
+		<![CDATA[
+		
+		import CiF.Debug;
+		import CiF.RelationshipNetwork;
+		import CiF.SocialFactsDB;
+		import flash.events.MouseEvent;
+		import mx.graphics.SolidColor;
+		import mx.graphics.Stroke;
+		import mx.controls.Text
+		import spark.skins.spark.ButtonSkin;
+		import flash.display.Graphics;
+		import PromWeek.SocialGameButton;
+		import PromWeek.RelationshipButtonIcon;
+		import PromWeek.GameEngine;
+		import PromWeek.assets.ResourceLibrary
+		import flash.events.Event
+		
+		private var alphaValue:Number = 1.0;
+		
+		public function onCreationComplete():void {
+			//Debug.debug(this, "onCreationComplete()");
+			var rL:ResourceLibrary = ResourceLibrary.getInstance();
+			
+			this.playButtonPic.source = rL.uiIcons["playIcon"];
+		}
+		
+		override protected function createChildren():void {
+			initializeButtons()
+			super.createChildren()
+		}
+			
+		/**
+		 * This is where we initialize the buttons! Put your text/images here! (you can also modify them post-construction,
+		 * but that's a big chunk of code to do externally!
+		 * Make sure to put "mouseEnabled=false" on all the pieces, just to make sure they don't have anything to do with 
+		 * the mouse (eg: highlighting text on a button)
+		 */
+		private function initializeButtons():void {
+			
+		}
+		
+		// took this out of updateDisplayList and moved it here for code clarity and so I could use it outside 
+		// of this class
+		public function styleThisButton():void {
+			switch(this.currentState) {
+				case "locked": Debug.debug(this, "style as locked!");  break;
+				case "normal": Debug.debug(this, "style as normal!"); break;
+				default: Debug.debug(this, "style as not locked nor normal!"); break;
+			}
+		}
+		
+		override protected function commitProperties():void
+		{
+			super.commitProperties();
+			var gameEngine:GameEngine = GameEngine.getInstance();
+			//Debug.debug(this, "updateDisplayList() entered." );
+			styleThisButton();
+		}
+		
+		]]>
+	</fx:Script>
+</s:Skin>

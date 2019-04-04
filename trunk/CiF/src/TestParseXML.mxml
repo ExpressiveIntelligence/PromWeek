@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication 
+  xmlns:fx="http://ns.adobe.com/mxml/2009" 
+  xmlns:s="library://ns.adobe.com/flex/spark"
+  xmlns:mx = "library://ns.adobe.com/flex/halo"
+  creationComplete="onCreationComplete()"
+  
+  width="800"
+  height="600">
+	  
+ 	<fx:Declarations>
+			<fx:XML id="StateXML" source="CiFStateTest.xml" />
+	</fx:Declarations>
+	
+	  
+	<fx:Script>
+	  <![CDATA[
+		  import CiF.*;
+		  
+		  public var cif:CiFSingleton = CiFSingleton.getInstance();
+		  
+	public function onCreationComplete():void {
+		this.cif.parseCiFState(StateXML);	
+		trace(this.cif.socialGamesLib.toXMLString());
+	}
+	  
+	  
+
+	  ]]>
+	</fx:Script>
+	  
+</s:WindowedApplication>

@@ -1,0 +1,58 @@
+<s:Skin 
+    xmlns:fx="http://ns.adobe.com/mxml/2009" 
+    xmlns:mx="library://ns.adobe.com/flex/mx" 
+    xmlns:s="library://ns.adobe.com/flex/spark">
+
+	<fx:Metadata> 
+		[HostComponent("PromWeek.MainMenuButton")] 
+	</fx:Metadata>
+
+	<s:states> 
+		<s:State name="up" /> 
+		<s:State name="over" /> 
+		<s:State name="down" /> 
+		<s:State name="disabled" /> 
+	</s:states>
+	<s:Group width="{hostComponent.width}" height="{hostComponent.height}">
+		<s:Rect width="100%" height="100%" includeIn="up">
+			<s:fill>
+				<s:LinearGradient rotation="90">
+					<s:entries>
+						<s:GradientEntry color="#FFFFFF" alpha="0.1"/>
+						<s:GradientEntry color="#000000" alpha="0.1"/>
+					</s:entries>
+				</s:LinearGradient>
+			</s:fill>
+		</s:Rect>
+		
+		<s:Rect width="100%" height="100%" includeIn="over">
+			<s:fill>
+				<s:LinearGradient rotation="90">
+					<s:entries>
+						<s:GradientEntry color="#FFFFFF" alpha="0.3"/>
+						<s:GradientEntry color="#000000" alpha="0.1"/>
+					</s:entries>
+				</s:LinearGradient>
+			</s:fill>
+		</s:Rect>
+		
+		<s:Rect width="100%" height="100%" includeIn="down">
+			<s:fill>
+				<s:LinearGradient rotation="90">
+					<s:entries>
+						<s:GradientEntry color="#000000" alpha="0.1"/>
+						<s:GradientEntry color="#FFFFFF" alpha="0.1"/>
+					</s:entries>
+				</s:LinearGradient>
+			</s:fill>
+		</s:Rect>
+		<s:VGroup width="100%" paddingTop="5" paddingBottom="20" paddingRight="20" paddingLeft="10" height="100%">
+			<s:Label paddingTop="0" id="title" fontWeight="bold" fontSize="30" color="#FFFFFF" paddingBottom="20" paddingRight="20" textAlign="center">
+				<s:text>{hostComponent.title}</s:text>
+			</s:Label>
+			<!--<s:Label minWidth="0" width="100%" id="description" fontSize="14" lineHeight="140%" color="#FFFFFF">
+				<s:text>{hostComponent.description}</s:text>
+			</s:Label>-->
+		</s:VGroup>
+	</s:Group>
+</s:Skin>

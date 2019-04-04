@@ -1,0 +1,59 @@
+body
+{
+/*background-color:#000000;*/
+}
+
+  .gradientVGREEN{
+/* thanks to http://blog.fakedarren.com/2010/01/cross-browser-css-gradients/ */
+/* and http://www.puremango.co.uk/2010/04/css-gradient/ */
+    /* fallback (Opera) */
+    background: #008800;
+    /* Mozilla: */
+    background: -moz-linear-gradient(top, #00FF00, #000000);
+    /* Chrome, Safari:*/
+    background: -webkit-gradient(linear,
+                left top, left bottom, from(#00FF00), to(#000000));
+    /* MSIE */
+    filter: progid:DXImageTransform.Microsoft.Gradient(
+                StartColorStr='#00FF00', EndColorStr='#000000', GradientType=0);
+  }
+  
+  .gradientV{
+/* thanks to http://blog.fakedarren.com/2010/01/cross-browser-css-gradients/ */
+/* and http://www.puremango.co.uk/2010/04/css-gradient/ */
+    /* fallback (Opera) */
+    background: #000088;
+    /* Mozilla: */
+    background: -moz-linear-gradient(top, #034fbd, #47adfd);
+    /* Chrome, Safari:*/
+    background: -webkit-gradient(linear,
+                left top, left bottom, from(#034fbd), to(#47adfd));
+    /* MSIE */
+    filter: progid:DXImageTransform.Microsoft.Gradient(
+                StartColorStr='#034fbd', EndColorStr='#47adfd', GradientType=0);
+  }
+  
+  .gradientVOLD{
+	background: linear-gradient(deepskyblue,white);
+  }
+  
+  #footer{
+	width:400px;
+	clear:both;
+	margin:0 auto;
+  }
+  
+   #wrap{
+	width:750px;
+	margin:0 auto;
+  }
+  
+  #left{
+	float:left;
+	width:300px;
+  }
+  
+  #right{
+	float:right;
+	width:300px;
+  }

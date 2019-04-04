@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 preinitialize="onPreinitialize()"
+		 >
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+				<fx:Boolean id="selected">false</fx:Boolean>
+				<fx:Number id="selectionColor">0x00FF00</fx:Number>
+					
+				<!--<mx:Glow id="glowCharHead" duration="250"
+					alphaFrom="1.0" alphaTo="0.3"
+					blurXFrom="0.0" blurXTo="50.0"
+					blurYFrom="0.0" blurYTo="50.0"
+					color="{this.selectionColor}" target="{charHeadImage}" 
+					effectStart="glowInst = GlowInstance(event.effectInstance);" effectEnd="glowInst=null"/>-->
+				<mx:Glow id="glowCharHead" duration="200"
+					alphaFrom="0.8" alphaTo="0.3"
+					blurXFrom="16" blurXTo="0"
+					blurYFrom="16" blurYTo="0"
+					color="{this.selectionColor}" target="{charHeadImage}" 
+					effectStart="glowInst = GlowInstance(event.effectInstance);" effectEnd="glowInst=null"/>
+						
+		 </fx:Declarations>
+		 
+		 <s:Ellipse id="selectedCircle" width="100%" height="100%" visible="{this.selected}">
+			<s:fill>
+				<s:LinearGradient rotation="90">
+					<s:entries>
+						<s:GradientEntry id="topGradient" color="#FFFFFF" alpha="0.7"/>
+						<s:GradientEntry id="botGradient" color="{this.selectionColor}" alpha="0.7"/>
+					</s:entries>
+				</s:LinearGradient>
+			</s:fill>
+			<s:stroke>
+				<s:SolidColorStroke color="{this.selectionColor}"/>
+			</s:stroke>
+		 </s:Ellipse>
+		 
+		 <util:SmoothImage id="charHeadImage" width="100%" height="100%" mouseOver="handleMouseGlow(event)" mouseOut="handleMouseGlow(event)" click="onCharHeadClick(event)" />
+		 
+	<fx:Script>
+		<![CDATA[
+		import flash.events.Event;
+		import flash.events.MouseEvent;
+		import flash.filters.GlowFilter;
+		import mx.effects.effectClasses.*;
+		import flash.ui.Mouse;
+		import mx.effects.Glow;
+		import PromWeek.assets.ResourceLibrary;
+		import CiF.Debug;
+		public var rL:ResourceLibrary;
+		
+		private var _charName:String;
+		private var _mode:String;
+		
+		private var glowEffects:Array;
+		private var unglowEffects:Array;
+		private var gameEngine:GameEngine;
+		public var color:Number;
+		
+		private var glowInst:GlowInstance;
+		
+		public function onCreationComplete():void 
+		{
+			gameEngine = PromWeek.GameEngine.getInstance()
+			
+		}
+		
+		private function onPreinitialize():void 
+		{
+			rL = ResourceLibrary.getInstance();
+		}
+		
+		
+		public function set charName(name:String):void
+		{
+			this._charName = name;
+			this.charHeadImage.source = ResourceLibrary.getInstance().charHeads[name.toLowerCase()];
+		}
+		
+		public function get charName():String
+		{
+			return this._charName;
+		}
+		
+		public function set mode(initOrResp:String):void
+		{
+			_mode = initOrResp;
+			
+			if (_mode == "initiator")
+			{
+				this.selectionColor = 0x00FF00;
+			}
+			else if (_mode == "responder")
+			{
+				this.selectionColor = 0xffe400;
+			}
+		}
+		public function get mode():String
+		{
+			return _mode;
+		}
+				
+		public function handleMouseGlow(event:MouseEvent):void
+		{
+			if (!gameEngine.currentStory.isQuickPlay)
+			{
+				if (!gameEngine.tutorialStopped)
+				{
+					return;
+				}
+			}
+			
+			
+			if (glowInst)
+			{
+				glowInst.reverse();
+			}
+			else
+			{
+				if (mode == "responder")
+				{
+					this.dispatchEvent(new Event("RESP_MOUSE_OVER_EVENT",true));
+				}
+				glowCharHead.play([event.currentTarget], event.type != MouseEvent.MOUSE_OUT);
+			}
+		}
+		
+		
+		
+		public function onCharHeadClick(e:MouseEvent=null):void
+		{
+			if (!gameEngine.currentStory.isQuickPlay){
+				if (!gameEngine.tutorialStopped)
+				{
+					return;
+				}
+			}
+			
+			//stops us from being able to click as the initselectcomp is fading.
+			//wild clicking ould cause this!
+			if (gameEngine.hudGroup.initSelectedCurrentlyFading)
+			{
+				return;
+			}
+			
+			
+			this.selected = !this.selected;
+			
+			
+			if (mode == "initiator")
+			{
+				//this is here because fast clicking would cause a problem
+				if (!gameEngine.hudGroup.initiatorSelectedComponent.currentlyFading && !gameEngine.hudGroup.initiatorSelectedComponent.initTBubCurrentlyFading)
+				{
+					this.dispatchEvent(new Event("INIT_FACE_CLICKED", true));
+				}
+			}
+			else if (mode == "responder")
+			{
+				this.dispatchEvent(new Event("RESP_FACE_CLICKED", true));
+			}
+			//Debug.debug(this,"char head clicked!!!");
+		}
+		
+		
+		public function removeAllGlowFilters():void
+		{
+			var tempFilters:Array = this.charHeadImage.filters;
+
+			var glowFilters:Vector.<GlowFilter> = new Vector.<GlowFilter>();
+			// Loop through the filters to find the index of the GlowFilter instance.
+			var glowIndex:int;
+			var numFilters:int = tempFilters.length;
+			for (var i:int = 0; i < numFilters; i++)
+			{
+				if (tempFilters[i] is GlowFilter)
+				{
+					glowFilters.push(tempFilters[i]);
+				}
+			}
+
+			// Remove the glow filter from the array.
+			for each (var glowFilter:int in glowFilters)
+				tempFilters.splice(tempFilters.indexOf(glowFilter), 1);
+
+			// Apply the new set of filters to the display object.
+			this.charHeadImage.filters = tempFilters;
+
+		}
+		
+		
+		
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

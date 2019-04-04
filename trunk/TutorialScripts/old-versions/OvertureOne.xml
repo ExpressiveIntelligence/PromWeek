@@ -1,0 +1,119 @@
+<!-- 
+Some notes on writing tutorial scripts:
+object: This is the name of the object or UI element that you want the user to click on.  For the full list of objects, see the 'fillComponentDictionary' function of Tutorial.mxml.  Not every object is currently supported.  If you see something you want, you can add it yourself by simply adding the component to the fillComponentDictionary function.  Or e-mail Ben and he'll do it for you!  Leave it blank if you just want to present information, and have the user progress the tutorial by pushing next.
+name: some objects require more specification (e.g. avatars).  To specify which avatar you care about, use the name field. (e.g. object='avatar', name='zack')
+eventType: There are three event types currently:
+	*"click" or "over": Click means you click on the object, over means you highlight your mouse over it.  
+	* "deselect": this is used for when you want to have a tutorial step be "deselect" an avatar.  Right now, this has only been tested with avatars (i.e. object=avatar name=zack event=deselect)
+	*More events can be added as well, though you should probably ask Ben to add it for you.
+preText: This is text that shows up BEFORE you do the event.  I.e. the contents of this text should tell you WHAT to click on "e.g. click on Zack!"
+postText: DEPRECATED The contents of this text shows up AFTER you do the event (e.g. 'good job, you just clicked on Zack!").  This doesn't work quite as well as it used to.  The new recommended way to do this is to introduce a new tutorial step that just has a blank 'object'
+disableExceptions: Normally, everything EXCEPT for the object specified will be disabled, i.e. you won't be able to click on them.  However, there may be times when you DO want people to be able to click on a couple of things that aren't the specified thing to click on.  You can specify what those 'exceptions' are using this attribute.  Use the same names that you would put in the 'object' tag.  If you want to reference something that would use the name attribute, specify it with a hyphen between the object and the name (e.g. avatar-zack).  To specify multiple excpetions, specify them with a comma (e.g. avatar-zack,avatar-chloe,miniMapFriends).  Be careful about spaces i.e. dont use them!
+disableExceptionsButStillProgress: Very similar to "disableExceptions". However, unlike the above (which specifies things the player CAN click on without progressing the tutorial), the objects specified here WILL progress the tutorial.  An example of when you might want to use this is when playing a social game.  You'll want *either* the 'go' button, OR clicking on the social game button itself to BOTH be clickable, AND to both progress the tutorial.
+nextVisible: if true, the 'progress tutorial' button will show up.  If false, it will not.  If the object is left blank, then make sure that this is set to true, or there is no way to progress the tutorial.
+
+MAKING USE OF RICH TEXT:
+	
+TO HAVE SPECIAL COLORED TEXT: 
+-place the text that you want to have be a special color within a 'span' tag.  For example, this write "this is green text" in the color Green, you would do the following:
+		DIFFERENT COLOR EXAMPLE: <span color='0x00FF00'>this is green text</span>
+		<span color='0xFF9999'>pink</span>
+		<span color='0x0000FF'>blue</span>
+		
+
+TO HAVE A PICTURE embedded in the text:
+-Use span tags again, using one of a variety of special codes between the span tags. For some weird reason, in order for the span tags to be recognized, you need to specify their color attribute.  I dunno, it's weird.  I don't think the value of the color attribute matters. Be careful about spaces: there shouldn't be any!  New special codes can be added easily.  Contact Ben if the code you want isn't here.
+		FRIENDSHIP SMILE FACE:  <span color='0xFFFF00' >FRIENDS</span>
+		DATING HEART:  <span color='0xFFFF00' >DATING</span>
+		ENEMY ANGRY FACE:  <span color='0xFFFF00' >ENEMIES</span>
+		END FRIENDSHIP: <span color='0xFFFF00' >ENDFRIENDS</span>
+		END DATING: <span color='0xFFFF00' >ENDDATING</span>
+		EMD ENEMIES: <span color='0xFFFF00' >ENDENEMIES</span>
+		JUICE POINT LOCK: <span color='0xFFFF00' >LOCK</span>
+		
+-->
+
+<TutorialScript>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="0">
+			<![CDATA[Welcome to Prom Week!  In Prom Week, you'll manipulate the lives of 18 hapless highschoolers. Let's get started!]]>
+	</TutorialStep>
+	
+	<TutorialStep object="avatar" name="zack" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="0">
+		<![CDATA[Click and drag on the screen (or zoom out using the mouse scroll wheel) until you see two characters, Zack and Chloe.  When you do, give Zack a click (he's the one with the square glasses and the penguin t-shirt).]]>
+	</TutorialStep>
+	
+	<TutorialStep object="avatar" name="chloe" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false"  quadrant="0">
+		<![CDATA[Excellent.  Now click on Chloe (with the stylish purple scarf). ]]>
+	</TutorialStep>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="2">
+			<![CDATA[Above Chloe's head are the social exchanges Zack wants to try with Chloe. You may have to click and drag the background to have a good view of all five.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="" name="" eventType="click" preText=""  postText="" disableExceptions="" nextVisible="true"  quadrant="2">
+		<![CDATA[These five things are what Zack wants to do with Chloe more than anything in the world, based on his personality, his current relationship with her, and their shared history. ]]>
+	</TutorialStep>
+	
+	<TutorialStep object="socialGameButton2" name="" eventType="click" preText=""  postText="" disableExceptions="" nextVisible="false"  quadrant="2">
+		<![CDATA[Prom Week is all about using social exchanges to tell stories. Let's try making Zack and Chloe friends. Click the 'Confide In' button.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="socialGameButton2" name="" eventType="click" preText=""  postText="" disableExceptions="" nextVisible="false" quadrant="2">
+		<![CDATA[Click 'Confide In' again to begin the scene and let's see what happens. (Click anywhere on the screen to advance through each line of dialogue.)]]>
+	</TutorialStep>
+	
+	<TutorialStep object="continueButton" name="" eventType="click" preText="" disableExceptions="" nextVisible="false" quadrant="3">
+		<![CDATA[Sweet!  Zack and Chloe are now friends.  In the 'Changes' bar in the center of the window above, you can also see that Zack did something 'romantic' to Chloe. Click the continue button under Chloe's picture to close the results screen.]]>
+	</TutorialStep>
+
+	<TutorialStep object="" name="" eventType="click" preText="" disableExceptions="" nextVisible="true">
+		<![CDATA[Characters can be friends <span color='0xFFFF00'>FRIENDS</span> , dating <span color='0xFFFF00'>DATING</span> , or enemies <span color='0xFFFF00'>ENEMIES</span> . The icons show you what effect different social exchanges will have.]]>
+	</TutorialStep>
+	
+	<!--TutorialStep object="" name="" eventType="click" preText="" disableExceptions="" nextVisible="true">
+		<![CDATA[Some social exchanges don't directly change relationships, but can prime the social state for future friendships, romances, and enemies.  <span color='0x00FF00'>Buddy Exchanges (green)</span> affect the strength of the friendship of two characters. <span color='0xFF9999'>Romance Exchanges (pink)</span> alter the amount of romantic interest characters have in each other.  ]]>
+	</TutorialStep>
+	
+	<TutorialStep object="avatar" name="zack" eventType="click" preText="" disableExceptions="" nextVisible="false">
+		<![CDATA[Finally, <span color='0x0000FF'>Cool Exchanges (blue)</span> make characters come across as more (or less) cool.  Think you got all that?  Let's review!  Click on Zack again.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="avatar" name="chloe" eventType="click" preText="" disableExceptions="" nextVisible="false">
+		<![CDATA[And now click on Chloe!]]>
+	</TutorialStep>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" disableExceptions="" nextVisible="true">
+		<![CDATA[Do you remember you remember what we learned?  <span color='0x0000FF'>'Brag'</span> is <span color='0x0000FF'>blue</span>, and means that Zack will attempt to make Chloe think he is <span color='0x0000FF'>cooler</span>.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" disableExceptions="" nextVisible="true">
+		<![CDATA[<span color='0x00FF00'>'Give Advice'</span> is ]]>
+	</TutorialStep-->
+		
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" nextVisible="false" isOver="true" >
+		<![CDATA[That's the core of how to play Prom Week! But there's a lot more going on in the character's minds. Play the Basic Gameplay 2 tutorial next to learn how to exert more influence over characters' stories.]]>
+	</TutorialStep>	
+	
+	<!--'spare tutorial steps' to make most of the things non-clickable-->
+	<TutorialStep object="socialGameButton0" name="" eventType="click" preText="" postText="" nextVisible="false">
+		<![CDATA[]]>
+	</TutorialStep>
+	
+	<TutorialStep object="socialGameButton1" name="" eventType="click" preText="" postText="" nextVisible="false">
+		<![CDATA[]]>
+	</TutorialStep>
+	
+	<TutorialStep object="socialGameButton2" name="" eventType="click" preText="" postText="" nextVisible="false">
+		<![CDATA[]]>
+	</TutorialStep>
+	
+	<TutorialStep object="socialGameButton3" name="" eventType="click" preText="" postText="" nextVisible="false">
+		<![CDATA[]]>
+	</TutorialStep>
+	
+	<TutorialStep object="socialGameButton4" name="" eventType="click" preText="" postText="" nextVisible="false">
+		<![CDATA[]]>
+	</TutorialStep>
+
+</TutorialScript>

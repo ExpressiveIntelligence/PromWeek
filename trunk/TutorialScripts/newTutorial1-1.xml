@@ -1,0 +1,80 @@
+<!--
+
+This is day 1 (Thursday) of the new tutorial 1. 
+* Chloe works up the courage to flirt with Doug, who she's had a crush on for a long time.
+* It succeeds. We teach the very basics of intent.
+* The player clisk the clock to end the level.
+
+!!!! TUTORIALS NEED TO BE ADDED TO trunk/AuthoringLibrary/src/PromWeek/AuthoringLibrary.mxml in 2 places!!!!
+AND ALSO to the first level of the character in question, using a tutorialScript="TutorialName" tag.
+
+-->
+
+<TutorialScript>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="2" centerOnCharacter="Chloe">
+		<![CDATA[This is the most terrifying moment of Chloe's life.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="2" stop="false" centerOnCharacter="Doug">
+		<![CDATA[It's the day before the Prom, and she's wondering if she should tell that cute boy from algebra she's got a major crush on him!]]>
+	</TutorialStep>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="2" stop="true">
+		<![CDATA[It's now or never. Help Chloe make her dreams come true!]]>
+	</TutorialStep>
+	
+<!-- 	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="2" centerOnCharacter="Chloe">
+		<![CDATA[This is the most terrifying moment of Chloe's life.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="2" centerOnCharacter="Doug">
+		<![CDATA[It's the day before the Prom and she's about to tell that cute boy from algebra she's got a major crush on him.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="0">
+		<![CDATA[Click and drag on the screen (or zoom out using the mouse scroll wheel) till you see both Chloe and Doug.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="avatar" name="chloe" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false"  quadrant="0">
+		<![CDATA[Click Chloe (the one with that stylish purple scarf).]]>
+	</TutorialStep>
+	
+	<TutorialStep object="avatar" name="doug" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false"  quadrant="0">
+		<![CDATA[Now click on Doug.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="socialGameButton4" name="" eventType="click" preText=""  postText="" disableExceptions="" nextVisible="false" quadrant="2" socialGameButtonNumber="4" sgName="Flirt">
+		<![CDATA[There's lots of stuff Chloe *could* do... but for now, click on 'Flirt.']]>
+	</TutorialStep>
+	
+	<TutorialStep object="socialGameButton4" name="" eventType="click" preText=""  postText="" disableExceptions="" nextVisible="false" quadrant="2" socialGameButtonNumber="4" sgName="Flirt">
+		<![CDATA[Now click 'Flirt' again, cross your fingers, and watch what happens.)]]>
+	</TutorialStep>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="3" >
+		<![CDATA[It worked! Doug liked the flirt, and now he feels more romantic towards Chloe!]]>
+	</TutorialStep>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="3">
+		<![CDATA[But things could have turned out differently. Doug might have decided to <span styleName='bold'>reject</span>
+ Chloe's flirt... depending on his personality and social history.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="continueButton" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="2">
+		<![CDATA[Click the 'Continue' above.]]>
+	</TutorialStep> 
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="0">
+		<![CDATA[Chloe wants to ask Doug to be her prom date, but she's out of time: the bell's about to ring!]]>
+	</TutorialStep>
+	
+	<TutorialStep object="levelClock" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="1">
+		<![CDATA[Click the countdown timer in the lower left to skip to the next level and see whats in store for tomorrow: The Prom!]]>
+	</TutorialStep>
+	
+	<TutorialStep object="levelSkipYes" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="1">
+		<![CDATA[Click 'Yes' to end the level.]]>
+	</TutorialStep>
+ -->	
+</TutorialScript>

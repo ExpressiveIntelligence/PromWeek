@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 initialize="initializeAchievementsScreen()"
+		 width="100%"
+		 height="100%"
+		 styleName="classicPromWeek">
+		 
+		<fx:Metadata>
+		</fx:Metadata>
+		 
+		<fx:Declarations>
+		</fx:Declarations>
+		
+		<util:SmoothImage id="background" width="760" height="600" />
+		
+		<s:Group id="backButtonSpot" left="0" top="570">
+		</s:Group>
+		 
+		 <fx:Script>
+			 <![CDATA[
+		
+		import flash.events.MouseEvent;
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import CiF.CiFSingleton;
+		import flash.events.TimerEvent;
+		import flash.utils.getTimer;
+		import flash.utils.Timer;
+		import PromWeek.MainMenuButton;
+		import PromWeek.assets.ResourceLibrary;
+		
+		private var rL:PromWeek.assets.ResourceLibrary;
+		private var cif:CiFSingleton;
+		private var gameEngine:GameEngine;
+		
+		public function initializeAchievementsScreen():void {
+			this.gameEngine = GameEngine.getInstance();
+			rL = PromWeek.assets.ResourceLibrary.getInstance();
+			background.source = rL.achievementBackground;
+			cif = CiFSingleton.getInstance();
+			gameEngine.loadAchievements();
+			for each(var achievement:Achievement in gameEngine.achievements) {
+				this.addAchievement(achievement);
+			}
+			this.addBackButton("< Back");
+		}
+		
+		/**
+		 * Puts the achievement image on the screen with all the proper information.
+		 * @param	achievement
+		 */
+		public function addAchievement(achievement:Achievement):void {
+			var achievementImage:SmoothImage = new SmoothImage();
+			if(achievement.needsToFadeIn && achievement.complete){
+				achievementImage.source = achievement.picture;
+				achievementImage.alpha = 0.05;
+				fadeIn(achievementImage);
+				achievement.needsToFadeIn = false;
+			}
+			else if(!achievement.needsToFadeIn && achievement.complete){
+				achievementImage.source = achievement.picture;
+			}
+			else{
+				achievementImage.source = achievement.grayedPicture;
+			}
+			achievementImage.x = achievement.locX;
+			achievementImage.y = achievement.locY;
+			achievementImage.height = 70;
+			achievementImage.width = 70;
+			achievementImage.toolTip = achievement.name + "\n" + achievement.toolTip;
+			this.addElement(achievementImage);
+		}
+		
+		public function fadeIn(theImage:SmoothImage):void {
+			var timer:Timer = new Timer(25, 20);
+			timer.addEventListener(TimerEvent.TIMER,function(event:TimerEvent):void {
+				theImage.alpha += .05;
+			});
+			timer.start();
+		}
+		
+		/**
+		 * Adds the back button to go back to the main menu.
+		 * @param	buttonText
+		 */
+		public function addBackButton(buttonText:String):void {
+			var button:MainMenuButton = new MainMenuButton();
+			button.title = buttonText;
+			button.width = 125;
+			button.height = 45;
+			
+			var self:Object = this;
+			button.addEventListener("click", function(event:MouseEvent):void {
+				self.gameEngine.hudGroup.achievementsScreen.visible = false;
+				self.gameEngine.currentState = "MainMenu";
+			});
+			backButtonSpot.addElement(button);
+		}
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			/*if(gameEngine.classicPromColors) {
+				this.setStyle("styleName", "classicPromWeek");
+			}
+			else if(gameEngine.greenPromColors) {
+				this.setStyle("styleName", "greenColor");
+			}
+			else if(gameEngine.redPromColors) {
+				this.setStyle("styleName", "redColor");
+			}*/
+			this.invalidateProperties();
+		}
+			 
+			 ]]>
+		 </fx:Script>
+</s:Group>

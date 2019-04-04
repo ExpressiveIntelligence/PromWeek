@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 height="100"
+		 width="25">
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+
+	<s:VGroup id="mainGroup">
+		<util:SmoothImage id="mainImage" height="{this.height}" width="{this.width}" depth="25"/>
+	</s:VGroup>
+
+	<fx:Script>
+		<![CDATA[
+
+		import mx.flash.UIMovieClip;
+		import PromWeek.assets.ResourceLibrary;
+		import CiF.Debug
+		
+		public var offsetX:Number = 0;//-30
+		public var offsetY:Number = -190
+		
+		public var initiator:String
+		public var responder:String
+		public var turnsRemaining:int;
+		public var gameName:String
+		private var aa:AutonomousAction
+		private var reslib:ResourceLibrary = ResourceLibrary.getInstance()
+		private var emphasis:UIMovieClip
+		
+		public var toolTipString:String
+		
+		public var gameEngine:GameEngine = GameEngine.getInstance()
+		
+		public function getAssets():void {
+			//mainImage.source = reslib.uiIcons["exclamationPt"]
+			mainImage.source = reslib.uiIcons["aaIcon"];
+			//emphasis = reslib.uiIcons["aan_emphasizer"];
+		}
+		
+		public function notify():void {
+			Debug.debug(this,"Notification called on " + this.gameName)
+			//emphasis.notify();
+		}
+		
+		public function setAutonomousAction(naa:AutonomousAction):void {
+			if(!mainImage.source) getAssets()
+			aa = naa
+			initiator = naa.initiator
+			responder = naa.responder
+			turnsRemaining = naa.remainingTimeUntilAction
+			gameName = naa.gameName
+			//mainGroup.addElement(emphasis)
+			this.toolTipString = initiator + " wants to " + gameName + " with \n" + responder + " in " + turnsRemaining + " turns!"
+			this.mainImage.toolTip = toolTipString
+			
+
+			// Cool mouse hack to try: rectangle on this guy with the tooltip instead of the whole thing (Thanks Corey)
+		}
+		
+		//It returns 1 if it still exists and 0 if it deletes itself
+		public function update():int {
+			if (turnsRemaining < 1) {
+				// let's get rid of some stuff!
+				if (gameEngine.hudGroup.autonomousIcons != null)
+				{
+					if (gameEngine.hudGroup.autonomousActionGroup.getElementIndex(gameEngine.hudGroup.autonomousIcons[initiator.toLowerCase()]) != -1)
+					{
+						gameEngine.hudGroup.autonomousActionGroup.removeElement(gameEngine.hudGroup.autonomousIcons[initiator.toLowerCase()]);
+					}
+					gameEngine.hudGroup.autonomousIcons[initiator.toLowerCase()] = null
+					delete(gameEngine.hudGroup.autonomousIcons[initiator.toLowerCase()]) // don't think this is necessary?
+				}
+				return 0;
+			}
+			var charX:Number = (gameEngine.worldGroup.avatars[initiator.toLowerCase()] as Avatar).locX
+			var charY:Number = (gameEngine.worldGroup.avatars[initiator.toLowerCase()] as Avatar).locY
+			
+			// fancy local to global trickery
+			var newPt:Point = gameEngine.worldGroup.avatars[initiator.toLowerCase()].localToGlobal(new Point(charX + offsetX, charY + offsetY))
+			this.scaleX = gameEngine.camera.zoom
+			this.scaleY = gameEngine.camera.zoom
+			this.top = newPt.y
+			this.left = newPt.x
+			
+			return 1;
+		}
+		
+		public function updateTime(t:Number):void {
+			turnsRemaining += t
+			this.toolTipString = initiator + " wants to " + gameName + " with \n" + responder + " in " + turnsRemaining + " turns!"
+			this.mainImage.toolTip = toolTipString
+		}
+		]]>
+	</fx:Script>
+	
+</s:Group>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 initialize="GoalUpdatedGroupInitialize()"
+		 width="175"
+		 height="70">
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+		 </fx:Declarations>
+		 
+		<s:VGroup id="theGroup" width="100%" height="100%" verticalAlign="bottom">
+		</s:VGroup>
+		
+	<fx:Script>
+		<![CDATA[
+		import CiF.Predicate;
+		import flash.events.MouseEvent;
+		import flash.geom.Vector3D;
+		import flash.sampler.NewObjectSample;
+		import PromWeek.AchievementPopUp;
+		import PromWeek.assets.ResourceLibrary;
+		public var popUpVector:Vector.<Object>;
+
+		
+		public function onCreationComplete():void {
+			this.popUpVector = new Vector.<Object>();
+		}
+		
+		public function GoalUpdatedGroupInitialize():void{	
+			
+		}
+		
+		/**
+		 * Puts goals in the group to be displayed.
+		 */
+		public function createGoalProgressPopUp(todoItem:ToDoItem, toolTipString:String, good:Boolean, predChangeIndex:Number):void 
+		{
+			var popUp:PromWeek.GoalUpdatedPopUp = new PromWeek.GoalUpdatedPopUp();
+			popUp.showUpdatedGoal(todoItem.name,toolTipString, good, predChangeIndex);
+			popUp.setStyleName();
+			theGroup.addElement(popUp);
+			popUpVector.push(popUp);
+		}
+		
+		/**
+		 * Puts autonomous actions in the group to be displayed
+		 */
+		public function createAutonomousPopUp(autonomousAction:AutonomousActionNotifier):void {
+			var popUp:AutonomousActionPopUp = new PromWeek.AutonomousActionPopUp();
+			popUp.setStyleName();
+			popUp.autoActionUpdate(autonomousAction);
+			theGroup.addElement(popUp);
+			popUpVector.push(popUp);
+		}
+		
+		/**
+		 * Puts an SSU in the group to be displayed
+		 */
+		public function createSSUPopUp(char:String, entry:String):void {
+			var popUp:SSUUpdate = new PromWeek.SSUUpdate();
+			popUp.setStyleName();
+			popUp.showSSU(char, entry);
+			theGroup.addElement(popUp);
+			popUpVector.push(popUp);
+		}
+		
+		public function update(time:Number):void {
+			for (var i:int = 0; i < popUpVector.length; i++ ) {
+				var popUpUpdate:Object = this.popUpVector[i];
+				popUpUpdate.update(time);
+				if (popUpUpdate.timeToDeleteMe){
+					this.theGroup.removeElementAt(i);
+					this.popUpVector.splice(i, 1);
+				}
+			}
+		}
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

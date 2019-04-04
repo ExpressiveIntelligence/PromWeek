@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 initialize="customAlertInitialize()"
+		 width="400"
+		 height="200"
+		 styleName="classicPromWeek">
+	
+	<fx:Metadata>
+	</fx:Metadata>
+		
+	<fx:Declarations>
+		<fx:Boolean id="shouldTurnOnTutorial">false</fx:Boolean>
+	</fx:Declarations>
+	
+	<s:Rect id="Background" left="0" width="100%" height="100%">
+			<s:stroke>
+				<s:SolidColorStroke weight="10" color="{getStyle('backgroundStroke')}" caps="none" />
+			</s:stroke>
+			<s:fill>
+				<s:SolidColor color="{getStyle('backgroundColor')}" alpha="1.0" />
+			</s:fill>
+	</s:Rect>
+
+	<s:VGroup horizontalAlign="center" width="100%" height="100%" paddingLeft="25" paddingRight="25" paddingBottom="25" paddingTop="25">
+		<s:Label id="title" width="100%" height="25%" fontWeight="bold" fontSize="30" color="{getStyle('textColor')}" paddingBottom="0" textAlign="center" styleName="basicFontStyle">
+				<s:text></s:text>
+		</s:Label>
+		<s:RichText id="message" width="100%" height="60%" fontSize="13" lineHeight="140%" color="{getStyle('textColor')}" textAlign="center" styleName="basicFontStyle" verticalAlign="middle" />
+		<s:VGroup width="100%" height="15%" id="buttonGroup" horizontalAlign="center">
+			<prom:PromWeekButton id="closeButton" width="100" height="25" top="0"  label="OK!" buttonDown="closeWindow()"/>
+		</s:VGroup>
+	</s:VGroup>
+	
+	<fx:Script>
+		<![CDATA[
+		import CiF.Debug;
+		import flash.events.KeyboardEvent;
+		import PromWeek.assets.ResourceLibrary;
+		
+		public var statisticsManager:StatisticsManager;
+		private var gameEngine:PromWeek.GameEngine;
+		
+		public function customAlertInitialize():void {
+			statisticsManager = StatisticsManager.getInstance();
+			this.gameEngine = GameEngine.getInstance();
+		}
+		
+		public function closeWindow():void {
+			this.visible = false;
+			this.includeInLayout = false;  // Does this keep it from showing up on subsequent levels?
+			
+			if (shouldTurnOnTutorial)
+			{
+				gameEngine.tutorialPopup.visible = true;
+				shouldTurnOnTutorial = false;
+			}
+			
+			//Right now this means that this 'custom alert' only serves one purpose as long as this guy
+			//lives right here -- if (when) we discover new uses for the custom alert, we'll need to 
+			//refactor this.
+			statisticsManager.playedSeveralGamesWithoutIndirection = false; // make the alert not show up again.
+			statisticsManager.closedTheIndirectGamesPlayedWindow = true; // it now REALLlY won't show up again.
+		}
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			/*if(gameEngine.classicPromColors) {
+				this.setStyle("styleName", "classicPromWeek");
+			}
+			else if(gameEngine.greenPromColors) {
+				this.setStyle("styleName", "greenColor");
+			}
+			else if(gameEngine.redPromColors) {
+				this.setStyle("styleName", "redColor");
+			}*/
+			this.invalidateProperties();
+		}
+		
+		]]>
+	</fx:Script>
+
+	
+</s:Group>

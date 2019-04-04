@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:UI="UI.*"
+		 width="700" 
+		 height="600" 
+		 contentBackgroundColor="#FFFFFF" >
+	<s:layout>
+		<s:BasicLayout />
+	</s:layout>
+	
+	<fx:Declarations>
+		<s:RadioButtonGroup id="forRole" 
+			valueCommit="addInfluenceRule.label='Add to '+ forRole.selection.label; updateInfluenceRule.label='Update to '+forRole.selection.label" />
+			
+		<fx:Number id="weight" >0</fx:Number>
+		<fx:Boolean id="isInitiatorRule">true</fx:Boolean>
+		<fx:Boolean id="isResponderRule">false</fx:Boolean>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+
+	<s:HGroup>
+		<UI:RuleAuthoringUI id="ruleUI" />
+		<s:VGroup>
+			<s:RadioButton label="Initiator" color="#ffffff" selected="@{isInitiatorRule}" groupName="forRole" />
+			<s:RadioButton label="Responder" color="#ffffff" selected="@{isResponderRule}" groupName="forRole" />
+			<s:Label text="Influence Rule Weight" verticalAlign="justify"  color="#ffffff"/>
+			<s:NumericStepper minimum="-100" maximum="100" value="@{weight}" /> 
+			<s:Button id="addInfluenceRule" click="addInfluenceRuleToWorkingMicrotheory();" />
+			<s:Button id="updateInfluenceRule" click="updateInfluenceRuleToWorkingMicrotheory();" /> 
+		</s:VGroup>
+	</s:HGroup>
+		
+	<fx:Script>
+		<![CDATA[
+			import CiF.Debug;
+			import CiF.InfluenceRule;
+			import flash.events.Event;
+			import tool.DesignerToolEngine;
+			
+			public var dte:DesignerToolEngine = DesignerToolEngine.getInstance();
+		
+			
+			public function updateInfluenceRuleToWorkingMicrotheory():void {
+				var ir:InfluenceRule;
+				var irToUpdate:InfluenceRule = new InfluenceRule();
+				var i:uint;
+				irToUpdate.name = this.ruleUI.rule.name;
+				irToUpdate.predicates = this.ruleUI.rule.predicates.concat();
+				irToUpdate.weight = this.weight;
+				irToUpdate.id = this.ruleUI.rule.id;
+				
+				Debug.debug(this, "updateInfluenceRuleToWorkingMicrotheory() irToUpdate: " + irToUpdate.toString());
+				
+				if (this.isInitiatorRule) {
+					for (i = 0; i < dte.workingMicrotheory.initiatorIRS.influenceRules.length; ++i) {
+						if (dte.workingMicrotheory.initiatorIRS.influenceRules[i].id == irToUpdate.id) {
+							//Debug.debug(this, "updateInfluenceRuleToWorkingMicrotheory() i= "+i+" - " + dte.workingMicrotheory.initiatorIRS.influenceRules[i] + " to " + irToUpdate);
+							dte.workingMicrotheory.initiatorIRS.influenceRules[i] = irToUpdate;
+							dispatchEvent(new Event("irsListUpdate", true, true));
+							return;
+						}
+					}
+				}else if (this.isResponderRule) {
+					for (i = 0; i < dte.workingMicrotheory.responderIRS.influenceRules.length; ++i) {
+						if (dte.workingMicrotheory.responderIRS.influenceRules[i].id == irToUpdate.id) {
+							dte.workingMicrotheory.responderIRS.influenceRules[i] = irToUpdate;
+							dispatchEvent(new Event("irsListUpdate", true, true));
+							return;
+						}
+					}
+				}
+				//corresponding id not found in the working social game -- add it 
+				addInfluenceRuleToWorkingMicrotheory();
+			}
+				
+			public function addInfluenceRuleToWorkingMicrotheory():void {
+				var irToAdd:InfluenceRule = new InfluenceRule();
+				var irIterator:InfluenceRule;
+				var maxID:int = 0;
+				//TODO: make this ruleUI.rule.clone() as InfluenceRule
+				irToAdd.predicates = ruleUI.rule.predicates.concat();// = ruleUI.rule as InfluenceRule;
+				//ir.name = ruleUI.rule.name;
+				if (ruleUI.rule.name == "")// don't let things have a blank name
+					irToAdd.name  = "Anonymous Rule";
+				else 
+					irToAdd.name  = ruleUI.rule.name; 
+				irToAdd.weight = this.weight;
+				
+				if (this.isInitiatorRule) {
+					for each(irIterator in dte.workingMicrotheory.initiatorIRS.influenceRules)
+						if (maxID <= irIterator.id) maxID = irIterator.id + 1;
+					irToAdd.id = maxID;
+					dte.workingMicrotheory.initiatorIRS.influenceRules.push(irToAdd);
+					dte.initiatorIRSDP = dte.generateInitiatorIRSDP();
+					
+				}else {
+					for each(irIterator in dte.workingMicrotheory.responderIRS.influenceRules)
+						if (maxID <= irIterator.id) maxID = irIterator.id + 1;
+					irToAdd.id = maxID;
+					dte.workingMicrotheory.responderIRS.influenceRules.push(irToAdd);
+					dte.responderIRSDP = dte.generateResponderIRSDP();
+				}
+				
+				this.ruleUI.rule.id = maxID;
+				
+				dispatchEvent(new Event("irsListUpdate", true, true));
+			}
+
+		]]>
+	</fx:Script>
+</s:Group>

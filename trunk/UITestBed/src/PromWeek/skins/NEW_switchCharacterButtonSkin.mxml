@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Skin 
+    xmlns:fx="http://ns.adobe.com/mxml/2009" 
+    xmlns:s="library://ns.adobe.com/flex/spark"  
+	creationComplete="onCreationComplete()"
+	xmlns:util="com.util.*"
+    alpha.disabled="0.5"> 
+ 
+     <fx:Metadata> 
+        [HostComponent("spark.components.Button")] 
+    </fx:Metadata> 
+ 
+    <s:states> 
+        <s:State name="up" enterState="onEnterState(event)" /> 
+        <s:State name="over" enterState="onEnterState(event)"/> 
+        <s:State name="down" enterState="onEnterState(event)"/> 
+        <s:State name="disabled" enterState="onEnterState(event)"/> 
+    </s:states>  
+
+    <util:SmoothImage id="upImage" visible="false" width="{hostComponent.width}" height="{hostComponent.height}" maintainAspectRatio="false"/>
+    <util:SmoothImage id="overImage" visible="false" width="{hostComponent.width}" height="{hostComponent.height}" maintainAspectRatio="false"/>
+    <util:SmoothImage id="downImage" visible="false" width="{hostComponent.width}" height="{hostComponent.height}" maintainAspectRatio="false"/>
+    
+	<s:Label id="labelDisplay" 
+			 color="#ffffff"
+			 width="{hostComponent.width}" height="{hostComponent.height}"
+			 textAlign="center" 
+			 fontSize="14" fontSize.over="18" fontSize.down="18" fontWeight="bold" fontStyle="italic"
+			 verticalAlign="middle" />
+ 
+    <fx:Script> 
+        <![CDATA[
+			import flash.events.Event;
+			import PromWeek.assets.ResourceLibrary;
+		
+			public var rL:ResourceLibrary;
+		
+			public function onCreationComplete():void 
+			{
+				rL = ResourceLibrary.getInstance();
+				
+				this.upImage.source = rL.uiIcons["switchUp"];
+				this.downImage.source = rL.uiIcons["switchDown"];
+				this.overImage.source = rL.uiIcons["switchOver"];
+			}
+		
+			
+			public function onEnterState(e:Event):void
+			{
+				if (e.currentTarget.name == "up")
+				{
+					this.upImage.visible = true;
+					this.downImage.visible = false;
+					this.overImage.visible = false;
+				}
+				else if (e.currentTarget.name == "down")
+				{
+					this.upImage.visible = false;
+					this.downImage.visible = true;
+					this.overImage.visible = false;
+				}
+				else if (e.currentTarget.name == "over")
+				{
+					this.upImage.visible = false;
+					this.downImage.visible = false;
+					this.overImage.visible = true;
+				}
+			}
+           
+        ]]>
+    </fx:Script> 
+	
+	
+</s:Skin >

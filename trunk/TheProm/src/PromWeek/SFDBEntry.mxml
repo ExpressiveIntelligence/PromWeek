@@ -1,0 +1,653 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 initialize="initializeSFDBEntry()"
+		 width="100%"
+		 height="100%"
+		 styleName="classicPromWeek">
+		 
+		 <fx:Metadata>
+			
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+			<fx:Number id="noTriggerRecordPosition">60</fx:Number>
+			<fx:Number id="triggerRecordPosition">40</fx:Number>
+			<fx:Number id="smallerBGHeight">215</fx:Number>
+			<fx:Number id="largerBGHeight">335</fx:Number>
+			<fx:Number id="smallerButtonHeight">220</fx:Number>
+			<fx:Number id="largerButtonHeight">340</fx:Number>
+			<!--<mx:Fade id="initFadeOut" duration="300" alphaFrom="1.0" alphaTo="0.0" effectEnd="fadeOutDoneInit(event)" />
+			<mx:Fade id="initFadeIn" duration="300" alphaFrom="0.0" alphaTo="1.0" effectStart="fadeInStartedInit(event)" />
+			<mx:Fade id="respFadeOut" duration="300" alphaFrom="1.0" alphaTo="0.0" effectEnd="fadeOutDoneResp(event)" />
+			<mx:Fade id="respFadeIn" duration="300" alphaFrom="0.0" alphaTo="1.0" effectStart="fadeInStartedResp(event)" />-->
+			<mx:Fade id="moreInfoFadeOut" duration="300" alphaFrom="1.0" alphaTo="0.0" effectEnd="fadeOutDoneMoreInfo(event)" />
+			<mx:Fade id="moreFadeIn" duration="300" alphaFrom="0.0" alphaTo="1.0" effectStart="fadeInStartedMoreInfo(event)" />
+		 </fx:Declarations>
+		<s:HGroup horizontalAlign="center" verticalAlign="middle" width="100%" height="100%">
+			<s:Group id="origShapeGroup" width="530" height="315" > <!--x="{this.width/2 - origShapeGroup.width/2}" y="{this.height/2 - origShapeGroup.height/2 - 35}"-->
+				<s:Group id="SFDBInfoGroup" width="100%" height="100%" x="0" y="0">					
+					<s:Rect id="bgRect" width="100%" height="{this.smallerBGHeight}" radiusX="20" radiusY="20">
+						<s:fill>
+							<s:SolidColor color="{getStyle('backgroundColor')}" alpha="1"/>
+						</s:fill>
+						<s:stroke>
+							<s:SolidColorStroke weight="4" color="{getStyle('backgroundStroke')}" />
+						</s:stroke>
+					</s:Rect>
+					<s:VGroup width="100%" height="100%" gap="0" x="0" y="0"  paddingTop="10" paddingBottom="10" paddingLeft="20" paddingRight="20">
+						<s:HGroup width="100%" height="{origShapeGroup.height - 115}">
+							<s:Group width="100%" height="100%">
+								<s:HGroup width="100%" height="100%" x="0" y="0" verticalAlign="middle">
+									<s:Label id="description" width="100%" height="100%" x="35" y="0" color="{getStyle('textColor')}" fontWeight="bold" fontSize="18" styleName="basicFontStyle"/>
+								</s:HGroup>
+								<s:Group width="100%" height="100%">
+									<s:VGroup width="100%" height="100%" x="0" y="57">
+										<prom:PlayerPortrait id="initiatorPortrait" />
+									</s:VGroup>
+									<s:VGroup id="changesGroup" x="120" y="50" gap="2" paddingTop="5">
+										<s:Label id="changesLabel" text="Changes:" color="{getStyle('textColor')}" fontWeight="bold" fontSize="10" styleName="basicFontStyle" />
+										<prom:SocialChangeRecord id="sgChangeRecord" width="400" height="70" scaleX="0.65" scaleY="0.65"></prom:SocialChangeRecord>
+										<s:Label id="falloutLabel" text="Fallout:" color="{getStyle('textColor')}" fontWeight="bold" fontSize="10" styleName="basicFontStyle"/>
+										<prom:SocialChangeRecord id="triggerChangeRecord" width="400" height="70" scaleX="0.65" scaleY="0.65"></prom:SocialChangeRecord>
+									</s:VGroup>
+									
+									<s:VGroup width="100%" height="100%" x="{origShapeGroup.width - 130}" y="57">
+										<prom:PlayerPortrait id="responderPortrait" />
+									</s:VGroup>
+									<s:VGroup id="ifOtherGroup" visible="false" x="{origShapeGroup.width - 115}" y="58">
+										<prom:PlayerPortrait id="ifOtherResponderPortrait" width="50" height="50" />
+										<prom:PlayerPortrait id="otherPortrait" width="50" height="50" />
+									</s:VGroup>
+								</s:Group>
+							</s:Group>
+						</s:HGroup>
+						<s:VGroup id="socialGameExtraInfoGroup" width="100%" height="115" horizontalAlign="center">
+							<prom:SocialGameInfoComponent id="sgInfoComponent" width="430" height="100%" visible="false" />
+						</s:VGroup>
+					</s:VGroup>
+				</s:Group>
+				<prom:PromWeekButton id="detailsButton" click="detailsButtonClicked(event)" x="230" y="190" label="Details" />
+				<prom:ToggleableContainerButton toggleable="false" id="tweetButton" click="tweetClickedOn(event)" x="40" y="175" width="25" height="25" boxPadding="0" />
+				<prom:ToggleableContainerButton toggleable="false" id="facebookButton" click="facebookClickedOn(event)" x="75" y="175" width="25" height="25" boxPadding="0" />
+			</s:Group>
+		</s:HGroup>
+		<prom:PromWeekButton id="continueButton" click="xClickedOn(event)" width="75"  height="40" scaleX="2" scaleY="2" right="20" bottom="20" label="Continue" />
+		
+		
+	<fx:Script>
+		<![CDATA[
+		
+		import com.facebook.graph.Facebook;
+		import com.facebook.graph.data.FacebookSession;
+		import com.facebook.graph.net.FacebookRequest;
+		import com.adobe.images.JPGEncoder;
+		import com.adobe.images.PNGEncoder;
+		import flash.net.URLRequest;
+		import flash.net.URLRequestHeader;
+		
+		import CiF.CiFSingleton;
+		import flash.text.TextField;
+		import flash.geom.Point;
+		import flash.display.Shape;
+		import flash.display.Bitmap;
+		import flash.display.BitmapData;
+		import flash.geom.Vector3D;
+		import flash.net.FileReference;
+		import flash.text.TextFormat;
+		import flash.utils.Dictionary;
+		import flash.utils.ByteArray;
+		import flash.net.URLRequestMethod;
+		import flash.net.navigateToURL;
+		import spark.components.Group;
+		import spark.components.Button;
+		import mx.graphics.SolidColor;
+		import mx.graphics.SolidColorStroke;
+		import spark.components.RichText;
+		import spark.primitives.*;
+		import spark.components.Label;
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import flash.events.*;
+		import CiF.*;
+		import flashx.textLayout.formats.TextAlign;
+		import PromWeek.assets.ResourceLibrary;
+		
+		public static const PORTRAIT_HEIGHT:Number = 40;
+		public static const PORTRAIT_WIDTH:Number = 40;
+		
+		public static const TYPE_BACKSTORY:int = 0;
+		public static const TYPE_SOCIAL_GAME:int = 1;
+		public static const TYPE_TRIGGER:int = 2;
+		
+		private var gameEngine:GameEngine;
+		private var resourceLibrary:PromWeek.assets.ResourceLibrary;
+		private var cif:CiFSingleton;
+		
+		public var mainBodyFill:SolidColor;
+		public var mainBodyStroke:SolidColorStroke;
+		private var mainBody:Rect;
+		
+		public var type:int;
+		
+		public var context:SFDBContext;
+		public var triggerContexts:Vector.<TriggerContext>;
+		public var sgContext:SocialGameContext;
+		public var backstoryContext:SocialGameContext;
+		
+		public var initiatorMotives:String;
+		public var responderMotives:String;
+		public var motiveRoleTruthInit:Boolean;
+		public var motiveRoleTruthResp:Boolean;
+		public var backColor:Number;
+		public var backStroke:Number;
+		
+		public function onCreationComplete():void {
+			gameEngine = GameEngine.getInstance();
+			resourceLibrary = PromWeek.assets.ResourceLibrary.getInstance();
+			cif = CiFSingleton.getInstance();
+			
+			//tweetButton.source = resourceLibrary.uiIcons["twitter"];
+			//facebookButton.source = resourceLibrary.uiIcons["facebook"];
+			
+			this.setSocialMediaIcons();
+			
+			this.backColor = this.getStyle('backgroundColor');
+			this.backStroke = this.getStyle('backgroundStroke');
+			
+			// see if we should have an X or not:
+			//if (gameEngine.currentState != "Results") {
+				//removeIconGroup.visible = false
+			//}
+			
+			//this.addEventListener(MouseEvent.CLICK,minimizeMotivesAndFactors);
+		}
+		
+		/**
+		 * Fills in the ToggleableButtonContainers with the facebook and twitter
+		 * icons appropriately.
+		 */
+		public function setSocialMediaIcons():void {
+			//Create the twitter button
+			var image:SmoothImage = new SmoothImage();
+			//image.width = this.tweetButton.mainContainer.height;
+			//image.height = this.tweetButton.mainContainer.height;
+			image.width = 18;
+			image.height = 18;
+			
+			image.source = resourceLibrary.uiIcons["twitter"];
+			var group:Group = new Group();
+			group.addElement(image);
+			group.width = this.tweetButton.mainContainer.width;
+			group.height = this.tweetButton.mainContainer.height;
+			image.x = group.width / 2 - image.width / 2;
+			image.y = group.height / 2 - image.height / 2;
+			this.tweetButton.mainContainer.addElement(group);
+			
+			//Create the Facebook button
+			image = new SmoothImage();
+			//image.width = this.facebookButton.mainContainer.height;
+			//image.height = this.facebookButton.mainContainer.height;
+			image.width = 21;
+			image.height = 21;
+			
+			image.source = resourceLibrary.uiIcons["facebook"];
+			group = new Group();
+			group.addElement(image);
+			group.width = this.facebookButton.mainContainer.width;
+			group.height = this.facebookButton.mainContainer.height;
+			//image.x = group.width / 2 - image.width / 2;
+			//image.y = group.height / 2 - image.height / 2;
+			image.x = 1;
+			image.y = 2;
+			this.facebookButton.mainContainer.addElement(group);
+			
+
+		}
+		
+		public function initializeSFDBEntry():void 
+		{	
+			//trace("character sheet initialize");
+			//gameEngine = GameEngine.getInstance();
+			//cif = CiFSingleton.getInstance();
+			//resourceLibrary = PromWeek.assets.ResourceLibrary.getInstance();
+			//For Z Ordering
+			this.backColor = this.getStyle('backgroundColor');
+			this.backStroke = this.getStyle('backgroundStroke');
+			//this.setElementIndex(this.SFDBInfoGroup, this.numElements - 1);
+		}
+		
+		
+		public function detailsButtonClicked(e:MouseEvent = null):void
+		{
+			if (this.sgInfoComponent.visible == false)
+			{
+				bgRect.height = largerBGHeight;
+				
+				this.continueButton.y = this.largerButtonHeight;
+				
+				this.sgInfoComponent.visible = true;
+			}
+		}
+		
+		public function fadeOutDoneMoreInfo(e:Event):void
+		{
+			
+			//initiatorMotivesWindow.visible = false;
+		}		
+		public function fadeInStartedMoreInfo(e:Event):void
+		{
+			
+			//initiatorMotivesWindow.visible = true;
+		}
+		
+		
+		/*
+		public function fadeOutDoneInit(e:Event):void
+		{
+			initiatorMotivesWindow.visible = false;
+		}		
+		public function fadeInStartedInit(e:Event):void
+		{
+			initiatorMotivesWindow.visible = true;
+		}
+		public function fadeOutDoneResp(e:Event):void
+		{
+			responderMotivesWindow.visible = false;
+		}		
+		public function fadeInStartedResp(e:Event):void
+		{
+			responderMotivesWindow.visible = true;
+		}		
+		
+		public function minimizeMotivesAndFactors(e:MouseEvent = null):void
+		{
+			if (responderMotivesWindow.visible)
+				respFadeOut.play([responderMotivesWindow]);
+			if (initiatorMotivesWindow.visible)
+				initFadeOut.play([initiatorMotivesWindow]);
+		}
+		*/
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			this.detailsButton.setStyleName();
+			this.continueButton.setStyleName();
+			this.triggerChangeRecord.setStyleName();
+			this.backColor = this.getStyle('backgroundColor');
+			this.backStroke = this.getStyle('backgroundStroke');
+			this.sgInfoComponent.setStyleName();
+			this.sgChangeRecord.setStyleName();
+			this.triggerChangeRecord.setStyleName();
+			this.invalidateProperties();
+		}
+		
+		public function moreInfoButtonClicked(e:Event = null):void
+		{
+			
+		}
+		
+		/*
+		public function initiatorMotiveButtonClicked(e:Event = null):void
+		{
+			//no matter what, this means we should turn off the initiator motives window
+			if (responderMotivesWindow.visible)
+			{
+				respFadeOut.play([responderMotivesWindow]);
+			}
+			
+			if (initiatorMotivesWindow.visible)
+			{
+				// this means we are toggling it off
+				initFadeOut.play([initiatorMotivesWindow]);
+			}
+			else
+			{
+				//turn it on
+				initFadeIn.play([initiatorMotivesWindow]);
+			}
+		}
+		
+		public function responderMotiveButtonClicked(e:Event = null):void
+		{
+			//no matter what, this means we should turn off the initiator motives window
+			if (initiatorMotivesWindow.visible)
+			{
+				initFadeOut.play([initiatorMotivesWindow]);
+			}
+			
+			if (responderMotivesWindow.visible)
+			{
+				// this means we are toggling it off
+				respFadeOut.play([responderMotivesWindow]);
+			}
+			else
+			{
+				//turn it on
+				respFadeIn.play([responderMotivesWindow]);
+			}
+		}
+		*/
+		public function createSFDBEntryComponent(context1:SFDBContext):void
+		{
+			
+			context = context1;
+			
+			if (context.isSocialGame())
+			{
+				this.sgContext = this.context as SocialGameContext;
+				if ((context as SocialGameContext).isBackstory)
+				{
+					this.backstoryContext = context as SocialGameContext;
+					this.type = PromWeek.SFDBEntry.TYPE_BACKSTORY;
+					this.createBackstoryEntry(this.sgContext);
+				}
+				else
+				{
+					this.sgContext = context as SocialGameContext;
+					this.type = PromWeek.SFDBEntry.TYPE_SOCIAL_GAME;					
+					this.createSocialGameEntry(this.sgContext);
+				}
+			}
+		}
+		
+		
+		public function createSocialGameEntry(sgContext1:SocialGameContext=null):void
+		{	
+			bgRect.height = smallerBGHeight;
+			
+			this.continueButton.enabled = false;
+			
+			continueButton.y = this.smallerButtonHeight;
+			
+			this.sgInfoComponent.visible = false;
+			
+			
+			this.sgContext = sgContext1;
+			
+			//label.text = sgContext.performanceRealizationString;//context.toXMLString();
+			var otherChar:Character;
+			//if (!this.sgContext.other)
+			//{
+				//otherChar = new Character();
+			//}
+			//else
+			//{
+				otherChar = sgContext.getOther();
+			//}
+			
+			
+			
+			
+			//reset the socialchange record
+			triggerChangeRecord.socialChanges = new Vector.<SocialChange>();
+			triggerChangeRecord.setIndexToEnd();
+			triggerChangeRecord.initializeToInvisible();
+			triggerChangeRecord.nextOne();
+			sgChangeRecord.socialChanges = new Vector.<SocialChange>();
+			sgChangeRecord.setIndexToEnd();
+			sgChangeRecord.initializeToInvisible();
+			sgChangeRecord.nextOne();
+			
+			
+			
+			
+			
+			var sg:SocialGame = cif.socialGamesLib.getByName(this.sgContext.gameName);
+			var effect:Effect = sg.getEffectByID(this.sgContext.effectID);
+			
+			//now I need to build the visuals.
+			this.description.text = effect.renderTextNotForDialogue(this.sgContext.getInitiator(), this.sgContext.getResponder(), otherChar);
+			//this.whenText.text = sgContext.time + ": ";
+			
+			this.initiatorPortrait.PortraitImage.source = resourceLibrary.portraits[sgContext.initiator.toLowerCase()];
+			this.initiatorPortrait.NameRichText.text = sgContext.initiator;
+			//this.initiatorPortrait.NameRichText.setStyle("textAlign", TextAlign.CENTER);
+			this.initiatorPortrait.figureWidth();
+
+			//determine whether there is an other or not that we should display
+			if (this.sgContext.getOther())
+			{
+				this.ifOtherGroup.visible = true;
+				this.responderPortrait.visible = false;
+				
+				this.ifOtherResponderPortrait.PortraitImage.source = resourceLibrary.portraits[sgContext.responder.toLowerCase()];
+				this.ifOtherResponderPortrait.NameRichText.text = sgContext.responder;
+				this.ifOtherResponderPortrait.NameRichText.setStyle("textAlign", TextAlign.CENTER);
+				this.ifOtherResponderPortrait.figureWidth();
+				
+				this.otherPortrait.PortraitImage.source = resourceLibrary.portraits[this.sgContext.getOther().characterName.toLowerCase()];
+				this.otherPortrait.NameRichText.text = this.sgContext.getOther().characterName;
+				//this.otherPortrait.NameRichText.setStyle("textAlign", TextAlign.CENTER);
+				this.otherPortrait.figureWidth();
+			}
+			else
+			{
+				this.ifOtherGroup.visible = false;
+				this.responderPortrait.visible = true;
+				
+				//this means that there isn't an other to display
+				this.responderPortrait.PortraitImage.source = resourceLibrary.portraits[sgContext.responder.toLowerCase()];
+				this.responderPortrait.NameRichText.text = sgContext.responder;
+				//this.responderPortrait.NameRichText.setStyle("textAlign", TextAlign.CENTER);
+				this.responderPortrait.figureWidth();
+			}
+		}
+		
+		public function createBackstoryEntry(backstoryContext1:SocialGameContext):void
+		{
+			this.backstoryContext = backstoryContext1;
+			
+			//this.initiatorMotiveButton.visible = false;
+			//this.responderMotiveButton.visible = false;
+			//this.initiatorMotivesWindow.visible = false;
+			//this.responderMotivesWindow.visible = false;
+			
+			//this.width = 550;
+			//this.height = 200;
+			
+			this.mainBody = new Rect();
+			//default values
+			/*this.setStyle("styleName", "classicPromWeek");
+			backColor = this.getStyle('backgroundColor');
+			backStroke = this.getStyle('backgroundStroke');
+			mainBodyFill = new SolidColor(backColor, 1.0); //The Inner Fill (Color, Alpha (1.0 = completely solid))
+			mainBodyStroke = new SolidColorStroke(backStroke, 1.0); //THE BORDER
+			mainBodyStroke.weight = 10;
+			this.mainBody.x = 0;
+			this.mainBody.y = 0;
+			this.mainBody.height = this.height;
+			this.mainBody.width = this.width;
+			this.mainBody.stroke = mainBodyStroke;
+			this.mainBody.fill = mainBodyFill;
+			this.addElement(mainBody);*/
+			
+			var performanceString:String = "";
+			for each (var locution:Locution in this.backstoryContext.backstoryLocutions)
+			{
+				performanceString += locution.renderText(this.backstoryContext.getInitiator(), this.backstoryContext.getResponder(), this.backstoryContext.getOther(), null);
+			}
+
+			this.description.text = performanceString;
+			//this.whenText.text = backstoryContext.time + ": ";
+			
+			this.initiatorPortrait.PortraitImage.source = resourceLibrary.portraits[sgContext.initiator.toLowerCase()];
+			this.initiatorPortrait.NameRichText.text = sgContext.initiator;
+			//this.initiatorPortrait.NameRichText.setStyle("textAlign", TextAlign.CENTER);
+			this.initiatorPortrait.figureWidth();
+
+			//determine whether there is an other or not that we should display
+			if (this.backstoryContext.getOther())
+			{
+				this.ifOtherGroup.visible = true;
+				this.responderPortrait.visible = false;
+				
+				this.ifOtherResponderPortrait.PortraitImage.source = resourceLibrary.portraits[sgContext.responder.toLowerCase()];
+				this.ifOtherResponderPortrait.NameRichText.text = sgContext.responder;
+				//this.ifOtherResponderPortrait.NameRichText.setStyle("textAlign", TextAlign.CENTER);
+				this.ifOtherResponderPortrait.figureWidth();
+				
+				this.otherPortrait.PortraitImage.source = resourceLibrary.portraits[this.backstoryContext.getOther().characterName.toLowerCase()];
+				this.otherPortrait.NameRichText.text = this.backstoryContext.getOther().characterName;
+				//this.otherPortrait.NameRichText.setStyle("textAlign", TextAlign.CENTER);
+				this.otherPortrait.figureWidth();
+			}
+			else
+			{
+				//this means that there isn't an other to display
+				this.responderPortrait.PortraitImage.source = resourceLibrary.portraits[sgContext.responder.toLowerCase()];
+				this.responderPortrait.NameRichText.text = sgContext.responder;
+				//this.responderPortrait.NameRichText.setStyle("textAlign", TextAlign.CENTER);
+				this.responderPortrait.figureWidth();
+			}
+			
+			this.falloutLabel.alpha = 0.2;
+			this.changesLabel.alpha = 0.2;
+			this.sgChangeRecord.alpha = 0.2;
+			this.triggerChangeRecord.alpha = 0.2;
+		}
+		
+		public function xClickedOn(e:MouseEvent = null):void
+		{
+			if (!gameEngine.isFormingIntent)
+			{
+				if (!VisibilityManager.getInstance().useOldInterface)
+				{
+					gameEngine.hudGroup.storyGoalWindow.toDoItemAccordion.updateToDoList();
+					if (gameEngine.hudGroup.goalProgressGroup.goalProgressPopUps.length > 0)
+					{
+						//this means we have goal notifications to do!
+
+						//this will have polulated the hudGroup.goalProgressGroup with all the goal progresses
+						if (VisibilityManager.getInstance().quickPlayLevelGoalsCompleted)
+						{
+							this.continueButton.label = "Challenge Complete!";
+						}
+						else
+						{
+							this.continueButton.label = "Continue";
+						}
+						gameEngine.hudGroup.goalProgressGroup.refreshGoalPopUps();
+						this.visible = false;
+					}
+					else
+					{
+						this.gameEngine.hudGroup.megaUI.clear();
+						PromWeek.GameEngine.getInstance().onClickInResultsState();
+						this.visible = false;
+					}
+				}
+				else
+				{
+					this.gameEngine.hudGroup.megaUI.clear();
+					PromWeek.GameEngine.getInstance().onClickInResultsState();
+					this.visible = false;
+				}
+			}
+		}
+		
+		//The tweet button was clicked on!
+		public function tweetClickedOn(e:MouseEvent = null):void {
+			Debug.debug(this, "Tweet clicked on!");
+			Utility.handleTweet(description.text);
+		}
+		
+		/**
+		 * The click event handler for the 'facebook button' clicked on.
+		 * What this should do is take the transcript of the just-played social game, and attempt to
+		 * post it on the user's facebook wall.  This will most likely take the form of showing a little
+		 * pop up window that is prepopulated with the social game transcript, (and that also gives the player
+		 * the ability to add a cute little comment of their own to it).
+		 * @param	e
+		 */
+		public function facebookClickedOn(e:MouseEvent = null):void {
+			Debug.debug(this, "facebookClickedOn() Facebook click!");
+			
+			//*************************
+			//Going to try to do some programmatic image creation.
+			var fileName:String = "";
+			fileName = gameEngine.getBackend().encodeSgTranscriptToImage(gameEngine.currentDialogueInstantiation, description.text, gameEngine.initiatorName, gameEngine.responderName, gameEngine.otherName);
+			
+			//************************
+			
+			Debug.debug(this, "this is the value of filename (inside of SFDBEntry.mxml: " + fileName);
+			var fileNameWithHTML:String = fileName + ".html";
+			Debug.debug(this, "this is the filename with html: " + fileNameWithHTML);
+			
+			if (Facebook.getAuthResponse()) {
+				Debug.debug(this, "facebookClickedOn() about to do postToWallHandler!");
+				//postToWallHandler();
+				Utility.postToFacebookWall(description.text, 
+				"That and many, many more charmingly awkward moments are awaiting you in Prom Week!", 
+				"Prom Week is an interactive drama that employs Social Physics to deliver a unique style of story based gameplay.  Click here to start shaping the lives of hapless highschoolers today!",
+				fileName);
+			}
+			else {
+				Debug.debug(this, "Facebook.getSession() returend false I guess!  Sorry!");
+				
+				
+				Debug.debug(this, "BUT GONNA TRY IT ANYWAY");
+				//postToWallHandler();
+				Utility.postToFacebookWall(description.text, 
+				"That and many, many more charmingly awkward moments are awaiting you in Prom Week!", 
+				"Prom Week is an interactive drama that employs Social Physics to deliver a unique style of story based gameplay.  Click here to start shaping the lives of hapless highschoolers today!",
+				fileName);
+				
+			}
+			
+		}
+		
+	   private function postToWallHandler():void
+	   {
+		  var params:Object = {
+			 message:'App test message',
+			 name:'Test Image',
+			 link:'http://alinktosomeimage',
+			 picture:'http://alinktosomeimage',
+			 description:'This is a test post to the wall of the app user'
+		  };
+		  Facebook.postData('me/feed/', postToWallCompleteHandler, params);
+		  
+	   }
+		
+	   private function postToWallCompleteHandler(response:Object, fail:Object):void{
+		  Debug.debug(this, "postToWallCompleteHandler() response: " + response + "fail: " + fail);
+	   }
+		   
+		/*
+		private function publishToStream():void{
+			var message:String = "Stream.publish example";
+			var attachment:Object = {media: [{
+			type: "image",
+			src: "http://novacoders.com/design/img/logo.gif",
+			href: "http://novacoders.com/"
+			}]};
+			var actionLinkData:ActionLinkData = new ActionLinkData();
+			actionLinkData.href = "http://novacoders.com/services/flashdevelopment/";
+			actionLinkData.text = "Flash games development";
+			var post:PublishPost = new PublishPost(message, attachment, [actionLinkData], fbook.uid);
+			post.addEventListener(FacebookEvent.COMPLETE, onPublish);
+			var call:FacebookCall = fbook.post(post);
+		}
+
+		private function onPublish(e:Event):void{
+			if(e.error!=null){
+				// fbook.grantExtendedPermission("publish_stream");
+				trace("Publish to stream: " + e.error.errorMsg);
+			}else{
+				trace("Publish to stream: onPublish " + e.data);
+			}
+		}
+		*/
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

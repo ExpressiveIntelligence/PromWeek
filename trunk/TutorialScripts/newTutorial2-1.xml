@@ -1,0 +1,186 @@
+<!--
+
+This is day 1 (Thursday) of the new tutorial 2. 
+* Zack's goal is to befriend Naomi since she's head of the prom selection committee.
+* Zack's attempt fails.
+* We teach intents and accept and reject.
+* Why did this fail? Briefly explore state, see network vals.
+* How can Zack improve relations with Naomi?
+* Zack is mean to someone Naomi is enemies with (monica)
+* Success.
+* Naomi confides in Zack, bringing up SFDB of previous entry. Success.
+* Force them to click level clock.
+
+-->
+
+<TutorialScript>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="2" centerOnCharacter="Zack">
+		<![CDATA[Zack has his work cut out for him if he wants to be Prom King... ]]>
+	</TutorialStep>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="2" centerOnCharacter="Naomi">
+		<![CDATA[He's gotta grease the wheels with Prom Chair Naomi...]]>
+	</TutorialStep>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="2" stop="false">
+		<![CDATA[And spread as much slander and libel about his competition, mainly Buzz, as possible. ]]>
+	</TutorialStep>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="2" stop="false">
+		<![CDATA[It wouldn't hurt to get a date, either... ]]>
+	</TutorialStep>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="2" stop="true">
+		<![CDATA[Have fun! ]]>
+	</TutorialStep>
+	
+	<!--<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="2" centerOnCharacter="Zack">
+		<![CDATA[Zack's got a problem. His secret dream of stealing the Prom King throne from that jerk Buzz is in danger.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="2" centerOnCharacter="Naomi">
+		<![CDATA[After he failed to hack the voting machines, Zack's fallback is to do some social hacking: befriend Naomi, head of the Prom Royalty Selection Committee.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="0">
+		<![CDATA[Click and drag on the screen (or zoom out using the mouse scroll wheel) till you see both Zack (in the square glasses and penguin t-shirt) and Naomi (with the red flower in her hair).]]>
+	</TutorialStep>
+	
+	<TutorialStep object="avatar" name="zack" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false"  quadrant="0">
+		<![CDATA[Click Zack. Let's see if he can turn on the charm.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="avatar" name="naomi" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false"  quadrant="0">
+		<![CDATA[Now click on Naomi.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="socialGameButton1" name="" eventType="click" preText=""  postText="" disableExceptions="" nextVisible="false" quadrant="2" socialGameButtonNumber="1" sgName="Make Plans">
+		<![CDATA[Click on 'Make Plans.' The smiley face means Zack hopes this action will make Naomi his friend.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="selectedGameButton" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="1" socialGameButtonNumber="1" sgName="Make Plans">
+		<![CDATA[To find out more information about the selected action, click 'Make Plans' at the bottom center of the screen, underneath the 'Play' button.]]>
+	</TutorialStep> 
+	
+	<TutorialStep object="initiatorIntentImage" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="0" socialGameButtonNumber="1" sgName="Make Plans">
+		<![CDATA[You can hover your mouse in the window to see what Zack hopes to accomplish by taking this action.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="goButton" name="" eventType="click" preText=""  postText="" disableExceptions="" nextVisible="false" quadrant="1" socialGameButtonNumber="1" sgName="Make Plans">
+		<![CDATA[Click the 'Play' button to start the scene.]]>
+	</TutorialStep>
+	
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="2" >
+		<![CDATA[Oh noes! Naomi didn't buy it. She 'rejected' Zack's intention to become friends.]]>
+	</TutorialStep>
+	
+	
+	<TutorialStep object="continueButton" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="2">
+		<![CDATA[Click 'Continue' above.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="0">
+		<![CDATA[How can Zack make Naomi like him more? One way might be to remember the old phrase, 'The enemy of my enemy is my friend...']]>
+	</TutorialStep>
+
+	<TutorialStep object="avatar" name="naomi" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="0">
+		<![CDATA[Click on Naomi.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="exploreStateButton" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="0">
+		<![CDATA[Now click the 'Social Summary' button near the bottom left (with the three people icons).]]>
+	</TutorialStep>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="1" >
+		<![CDATA[The bottom pane shows a map of Naomi's feelings towards the characters in this level. See the angry face by Monica? That means she and Naomi are enemies.]]>
+	</TutorialStep> 
+
+	<TutorialStep object="avatar" name="naomi" eventType="deselect" preText="" postText="" disableExceptions="" nextVisible="false"  quadrant="0">
+		<![CDATA[Click on the background to deselect Naomi.]]>
+	</TutorialStep>	
+
+	
+	<TutorialStep object="avatar" name="zack" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="0">
+		<![CDATA[Now click Zack.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="avatar" name="monica" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="0">
+		<![CDATA[We're going to make Zack and Monica enemies to give him something in common with Naomi. Find and click Monica (with the pink bow).]]>
+	</TutorialStep>
+	
+	<TutorialStep object="socialGameButton3" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="2" socialGameButtonNumber="3" sgName="Insult Friend of">
+		<![CDATA[Click 'Insult Friend of.' That ought to rile her up.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="socialGameButton3" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="2" socialGameButtonNumber="3" sgName="Insult Friend of">
+		<![CDATA[Click 'Insult Friend of' again and watch the sparks fly.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="3">
+		<![CDATA[Wow! Monica did not take that well. She and Zack are enemies now... exactly according to plan.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="3">
+		<![CDATA[After every interaction, you can hover your mouse over the icons in the results window to get details on what happened. Try it now.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="continueButton" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="2">
+		<![CDATA[Click 'Continue.']]>
+	</TutorialStep>
+	
+	<TutorialStep object="avatar" name="naomi" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="1">
+		<![CDATA[Let's see if Naomi's feelings towards Zack have changed. Click on Naomi.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="avatar" name="zack" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="1">
+		<![CDATA[Now click Zack.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="socialGameButton4" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="2" socialGameButtonNumber="4" sgName="Confide In">
+		<![CDATA[Hmm... now Naomi wants to 'Confide In' Zack. Sounds promising! Click it.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="socialGameButton4" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="2" socialGameButtonNumber="4" sgName="Confide In">
+		<![CDATA[Click again and let's watch.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="3">
+		<![CDATA[Excellent. Now that Zack's in with the judge, his chances of claiming the Prom King crown are much better.]]>
+	</TutorialStep>
+	
+	
+	<TutorialStep object="continueButton" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="3">
+		<![CDATA[ Click 'Continue.']]>
+	</TutorialStep>
+	
+	<TutorialStep object="goalButton" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="2">
+		<![CDATA[Each character's story steps through the days leading up to Friday's prom. You have all week to achieve your goals. Let's see what Zack's goals are: click the 'Goals' button.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="2">
+		<![CDATA[Remember, you can click on any goal to see the conditions that must be true to achieve it.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="2">
+		<![CDATA[Important safety tip: goals can become undone if their conditions are no longer true by the end of Prom Week! You've got to make sure they stay satisfied until the end of the big night.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="goalButton" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="2">
+		<![CDATA[Click 'Goals' again to close Zack's goals.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="2">
+		<![CDATA[When you've made as much progress with the characters on the current day as you can, you can skip ahead to the next day.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="levelClock" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="2">
+		<![CDATA[Let's go ahead and click the countdown clock to skip forward.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="levelSkipYes" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="2">
+		<![CDATA[Click 'yes' to end the level.]]>
+	</TutorialStep>-->
+	
+</TutorialScript>

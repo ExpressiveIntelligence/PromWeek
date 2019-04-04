@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Button xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 creationComplete="onCreationComplete()"
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 skinClass="PromWeek.skins.NEW_socialExchangeResponseButtonSkin" >
+
+		 
+	 <fx:Metadata>
+	 </fx:Metadata>
+	 
+	 <fx:Declarations>
+		 <fx:Boolean id="locked">true</fx:Boolean>
+	 </fx:Declarations>
+		 
+    <s:states>
+		<!-- Not used -->
+		 <s:State name="up" />
+		 <s:State name="over" />
+		 <s:State name="down" />
+		 <s:State name="disabled" />
+		 
+		 <!-- Used -->
+		 <s:State name="unlockedOver" />
+		 <s:State name="unlockedUp" />
+		 <s:State name="unlockedDown" />
+		 <s:State name="lockedOver" />
+		 <s:State name="lockedUp" />
+		 <s:State name="lockedDown" />
+    </s:states>
+		 
+	<fx:Script>
+		<![CDATA[
+			import flash.events.MouseEvent;
+		
+			private var _sgName:String;
+			public var isOver:Boolean;
+			public var isMouseDown:Boolean;
+		
+			private var jpm:JuicePointManager;
+			private var gameEngine:PromWeek.GameEngine;
+			private var phantomJuiceIsOn:Boolean = false;
+			
+			public function onCreationComplete():void
+			{
+				jpm = JuicePointManager.getInstance();
+				gameEngine = PromWeek.GameEngine.getInstance();
+				this.addEventListener(MouseEvent.MOUSE_OVER, onMouseOver);
+				this.addEventListener(MouseEvent.MOUSE_OUT, onMouseOut);
+				this.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
+				this.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+			}
+
+			
+			private function onMouseOver(e:MouseEvent):void 
+			{
+				if (this.locked)
+				{
+					GameEngine.getInstance().hudGroup.topBar.juiceBar.phantomJuiceBar(jpm.COST_FOR_UNLOCKING_RESPONDER_MOTIVE);
+					phantomJuiceIsOn = true;
+				}
+				
+				isOver = true;
+				invalidateSkinState();
+			}
+			
+			private function onMouseOut(e:MouseEvent):void 
+			{
+				if (phantomJuiceIsOn)
+				{
+					GameEngine.getInstance().hudGroup.topBar.juiceBar.phantomJuiceHide();
+					phantomJuiceIsOn = false;
+				}
+				
+				isOver = false;
+				this.isMouseDown = false;
+				invalidateSkinState();
+			}
+			
+			private function onMouseDown(e:MouseEvent):void 
+			{
+				this.isMouseDown = true;
+				invalidateSkinState();
+			}
+			
+			private function onMouseUp(e:MouseEvent):void 
+			{
+				this.isMouseDown = false;
+				invalidateSkinState();
+			}
+			
+			//Returns which skin state we want to be looking at.
+			override protected function getCurrentSkinState():String 
+			{
+				if (this.locked)
+				{
+					if (this.isMouseDown)
+					{
+						return "lockedDown";
+					}
+					else
+					{
+						if (this.isOver)
+						{
+							return "lockedOver";
+						}
+						else
+						{
+							return "lockedUp";
+						}
+					}
+				}
+				else
+				{
+					if (this.isMouseDown)
+					{
+						return "unlockedDown";
+					}
+					else
+					{
+						if (this.isOver)
+						{
+							return "unlockedOver";
+						}
+						else
+						{
+							return "unlockedUp";
+						}
+					}					
+				}
+			}
+		]]>
+
+	</fx:Script>
+	
+</s:Button>

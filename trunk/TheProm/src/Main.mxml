@@ -1,0 +1,708 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+				xmlns:s="library://ns.adobe.com/flex/spark"
+				xmlns:mx="library://ns.adobe.com/flex/mx"
+				xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+				preinitialize="onPreinitialize()"
+				preloader="PromWeekPreloader"
+				initialize="onInitialize()"
+				creationComplete="onCreationComplete()"
+				applicationComplete="onApplicationComplete()"
+				resize="onResize(event)"
+				width="100%"
+				height="100%">
+				<!--width="1024"
+				height="600">-->
+				<!--width="780"
+				height="985">-->
+				<!--width="600"
+				height="780">-->
+				<!-- maxWidth="780"
+				maxHeight="985">-->
+	<fx:Declarations>
+		<!--<fx:XML id="cifStateXMLDemo" source="../../CiFStates/AIIDEDemoState.xml" />-->
+		<!--<fx:XML id="cifStateXMLDemo" source="../../CiFStates/TestState.xml" />-->
+		<!--<fx:XML id="cifStateXMLDemo" source="../../CiFStates/TestState.xml" />-->
+		<!--<fx:XML id="cifStateXMLFoGState" source="../../CiFStates/FoGState.xml" />-->
+		<!--<fx:XML id="cifStateXMLTestTrigger" source="../../CiFStates/TestTriggerState.xml" />-->
+		<!--fx:XML id="cifLibrariesXML" source="../../CiFStates/AIIDEDemoLibrary.xml" /-->
+		
+		<!--fx:XML id="cifLibrariesXML" source="../../CiFStates/libraries (master).xml" /-->
+		
+		<fx:XML id="cifStateXML" source="../../CiFStates/PromWeekCharacters.xml" />
+		
+		
+		
+		<fx:XML id="gameXML" source="gameConfig.xml" />
+		<!--<fx:XML id="cifLibrariesXML" source="../../CiFStates/libraries (mike).xml" />-->
+		
+		<prom:Tutorial id="tutorial" /> <!-- an empty shell of a tutorial - gets filled in based on the script specified in the XML defining the level -->
+		<!-- include the authoring lib!-->
+		<prom:AuthoringLibrary id="authLib"/>
+		
+	</fx:Declarations>
+	
+	<fx:Style source="main.css"/>
+	
+	<fx:Style>
+
+		@font-face{
+			font-family: Academic;
+			src: url("PromWeek/fonts/Academic M54.ttf");
+		}
+		.QuickPlayInstructionStyle{
+			font-family: nunito;
+			font-size: 24pt;
+			color: #FFFFFF;
+			fontLookup: embeddedCFF;
+			vertical-align: middle;
+		}
+		.QuickPlayHintStyle{
+			font-family: nunito;
+			font-size: 18pt;
+			color: #FFFFFF;
+			fontLookup: embeddedCFF;
+			vertical-align: middle;
+		}
+		.GoalTaskStyle{
+			font-family: nunito;
+			font-size: 18pt;
+			color: #FFFFFF;
+			fontLookup: embeddedCFF;
+			vertical-align: middle;
+		}
+		
+		@font-face {
+			src: url("PromWeek/fonts/Acme-Regular.ttf");
+			fontFamily: "Acme";
+			embedAsCFF: true;
+		}
+		.selectACharacterText {
+			fontFamily: nunito;
+			fontLookup: embeddedCFF;
+			fontSize: 24;
+		}
+		
+		@font-face {
+			src: url("PromWeek/fonts/ltromatic.ttf");
+			fontFamily: "letteromatic";
+			embedAsCFF: true;
+		}
+		.namePlateStyle {
+			fontFamily: letteromatic;
+			fontLookup: embeddedCFF;
+			fontSize: 20;
+		}
+		
+		@font-face {
+			src: url("PromWeek/fonts/Acme-Regular.ttf");
+			fontFamily: "AlteHaasGroteskRegular";
+			embedAsCFF: true;
+		}
+		.subjectiveOpinionWords {
+			fontFamily: nunito;
+			fontLookup: embeddedCFF;
+			fontSize: 13;
+		}
+		
+		@font-face {
+			src: url("PromWeek/fonts/Acme-Regular.ttf");
+			fontFamily: "Rockwell";
+			embedAsCFF: true;
+		}
+		.socialExchangeButton {
+			fontFamily: nunito;
+			fontLookup: embeddedCFF;
+			fontSize: 34;
+		}
+		
+		@font-face {
+			src: url("PromWeek/fonts/Acme-Regular.ttf");
+			fontFamily: "CreativeBlock";
+			embedAsCFF: true;
+		}
+		.bigThoughtBubbleTitleStyle {
+			fontFamily: Acme;
+			fontLookup: embeddedCFF;
+			fontSize: 20;
+		}
+		
+		@font-face {
+			src: url("PromWeek/fonts/Acme-Regular.ttf");
+			fontFamily: "CreativeBlock";
+			embedAsCFF: true;
+		}
+		.responseTextStyle {
+			fontFamily: Acme;
+			fontLookup: embeddedCFF;
+			fontSize: 20;
+		}
+		
+		@font-face {
+			src: url("PromWeek/fonts/Nunito-Regular.ttf");
+			fontFamily: "nunito";
+			embedAsCFF: true;
+			font-weight: normal;
+		}
+		@font-face {
+			src: url("PromWeek/fonts/Nunito-Bold.ttf");
+			fontFamily: "nunito";
+			embedAsCFF: true;
+			font-weight: bold;
+		}
+		.considerationTextStyle {
+			fontFamily: nunito;
+			fontLookup: embeddedCFF;
+			fontSize: 15;
+		}
+		.playSocialExchangeButtonStyle {
+			fontFamily: nunito;
+			fontLookup: embeddedCFF;
+			fontWeight: bold;
+			fontSize: 18;
+		}
+		.dayOfWeekStyle {
+			fontFamily: nunito;
+			fontLookup: embeddedCFF;
+			fontSize: 21;
+			fontWeight: bold;
+		}
+		.goalButtonStyle {
+			fontFamily: nunito;
+			fontLookup: embeddedCFF;
+			fontWeight: bold;
+			fontSize: 20;
+		}
+		.levelEndTitleStyle {
+			fontFamily: nunito;
+			fontLookup: embeddedCFF;
+			fontWeight: bold;
+			fontSize: 40;
+		}
+		.storyGoalTitleTextStyle {
+			fontFamily: nunito;
+			fontLookup: embeddedCFF;
+			fontWeight: bold;
+			fontSize: 30;
+		}
+		.selectCharTitleScreenStyle {
+			fontFamily: nunito;
+			fontLookup: embeddedCFF;
+		}
+		.timeLeftStyle {
+			fontFamily: nunito;
+			fontLookup: embeddedCFF;
+		}
+		.promWeekButtonStyle {
+			fontFamily: nunito;
+			fontLookup: embeddedCFF;
+		}
+		.storyGoalTextStyle {
+			fontFamily: nunito;
+			fontLookup: embeddedCFF;
+			
+		}
+		.basicFontStyle {
+			fontFamily: nunito;
+			fontLookup: embeddedCFF;
+		}
+		.characterSheetTitleTextStyle {
+			fontFamily: nunito;
+			fontWeight: bold;
+			fontSize: 23;
+			fontLookup: embeddedCFF;
+		}
+		.goalProgressTitleTextStyle {
+			fontFamily: nunito;
+			fontWeight: bold;
+			fontSize: 26;
+			fontLookup: embeddedCFF;
+		}
+		
+		
+		@namespace s "library://ns.adobe.com/flex/spark";
+		s|List s|Scroller {
+            horizontalScrollPolicy: off;
+            verticalScrollPolicy: on;
+        }
+ 
+        s|List s|VScrollBar {
+            skinClass: ClassReference("PromWeek.skins.NEW_listScrollSkin");
+        }
+	</fx:Style>
+	
+	<fx:Script>
+	<![CDATA[
+		import com.furusystems.dconsole2.DConsole;
+		import com.furusystems.dconsole2.plugins.StatsOutputUtil;
+		import com.demonsters.debugger.MonsterDebugger;
+		import com.jac.mouse.MouseWheelEnabler;
+		import flash.events.FullScreenEvent;
+		import net.keithhair.managers.KeyManager;
+		import spark.components.Application;
+		//import net.keithhair.KeyManager;
+		import flash.events.Event;
+		import flash.events.UncaughtErrorEvent;
+		import flash.net.SharedObject;
+		import flash.system.Security;
+		import mx.core.UIComponent;
+		import flash.display.DisplayObject;
+		import flash.events.ErrorEvent;
+		import flash.events.KeyboardEvent;
+		import flash.display.LoaderInfo;
+		import flash.events.MouseEvent;
+		import mx.core.IVisualElement;
+		import mx.core.IVisualElementContainer;
+		import mx.events.CloseEvent;
+		import mx.controls.Alert;
+		import mx.core.FlexGlobals;
+		import mx.controls.ToolTip;
+		import mx.events.ResizeEvent;
+		import mx.logging.ILogger;
+		import mx.logging.Log;
+		import PromWeek.*;
+		import CiF.*;
+		import com.facebook.graph.Facebook;
+		import com.facebook.graph.data.FacebookSession;
+		import mx.controls.Alert;
+		import flash.net.URLLoader;
+		import flash.net.URLRequest;
+		import flash.text.Font;
+		
+		private var cif:CiFSingleton;
+		private var gameEngine:GameEngine;
+		
+		private const USE_CONSOLE_BUTTON:Boolean = false; /* WARNING: This does not do anything, you want useConsoleButton in GameEngine.mxml. */
+		private var mouseClickLogXML:XML;
+		private var mouseClickXMLVector:Vector.<XML>;
+		
+		public static const MAX_ZOOM:Number = 1.5;
+		public static const MIN_ZOOM:Number = 0.25;
+		public static const MOUSE_WHEEL_ZOOM_FACTOR:Number = .01;
+
+		public var errorReportSent:Boolean = false;
+
+		/*
+		[Embed(source="fonts/VIVALDII.TTF", fontWeight= "normal", fontName="PromWeekFontEmbedded", fontFamily="PromWeekFontEmbedded",mimeType="application/x-font", embedAsCFF="true")]
+		public const customFont:Class;
+
+		
+		public function FontLib():void
+		{
+			Font.registerFont(customFont);
+			var fonts:Array = Font.enumerateFonts(false);
+		}
+		*/
+		
+		
+		
+		private function onPreinitialize():void {
+			Debug.debug(this, "onPreinitialize()");
+			cif = CiFSingleton.getInstance();
+			tutorial = new PromWeek.Tutorial();
+			gameEngine = GameEngine.getInstance();
+			gameEngine.intitialState = cifStateXML;
+			gameEngine.defaultState = cifStateXML; // set this as the default state to use if a special unique start state is not specified.
+			this.gameEngine.tutorial = tutorial;
+			this.mouseClickLogXML = new XML(<MouseEvents />);
+			this.mouseClickXMLVector = new Vector.<XML>();
+			//this.FontLib();
+			//this.setStyle("font-family", "PromWeekFontEmbedded");
+			
+			this.cif.parseCiFState(cifStateXML);
+			authLib.loadXMLGames()
+			for each(var value:XML in authLib.games) {
+				this.cif.parseCiFState(value)
+			}
+			
+			authLib.loadXMLStories();
+			for each(value in authLib.stories) {
+				gameEngine.loadStories(value);
+			}
+			
+			authLib.loadQuickPlayStories();
+			for each(value in authLib.quickPlayStories) {
+				gameEngine.loadStories(value); // we're gonna keep everything inside of gameEngine's story vector for now... might cause problems later I suppose.
+			}
+			
+			authLib.loadTutorials();
+			authLib.loadCifStates();
+			
+			gameEngine.intitialStateForTutorials = authLib.cifStartStates["tutorialCifStateXML"];
+			
+			this.cif.prepareLocutions();
+			
+			
+			gameEngine = GameEngine.getInstance();
+			
+			//gameEngine.loadStories(this.gameXML.Stories[0]);
+			
+			//Maybe wait to do this after a story has been selected.
+			//this.tutorial.parseTutorialScript(firstTutorialXML);
+			
+			
+			gameEngine.isAuthoringLoaded = true;
+			if (gameEngine.useConsoleButton) {
+				gameEngine.useConsoleButton = true;
+			}
+			else {
+				gameEngine.useConsoleButton = false;
+			}
+			Debug.debug(this, "onPreinitialize() authoring has been loaded.");
+			
+			ToolTip.maxWidth = 400; // let the tooltip box get nice and big!
+			
+			Debug.debug(this, "preInitialize() width: " + this.width + " height: " + this.height + " scale: " + this.unscaledHeight);
+		}
+		
+		override protected function createChildren():void {
+			Debug.debug(this, "onCreateChildren()");
+			
+			//based on the dimensions, determine what scale we want
+			// for now its hard coded...
+			
+			
+			// Monster Debugger trace message
+			CONFIG::monster {
+				MonsterDebugger.initialize(this);
+				Utility.log(this, "MonsterDebugger initialized.");
+			}
+
+			//gameEngine.setDimensions(this.width, this.height, 1.3);
+			// Flex trace message
+			var logger:ILogger = Log.getLogger("Main.mxml");
+			logger.error("Hello World!");
+			
+			//Security.loadPolicyFile("http://promweek.soe.ucsc.edu/crossdomain.xml");
+			//Security.showSettings();
+			
+			// initialize backend if the game config contains the API base url
+			if (this.gameXML.hasOwnProperty("Config") && this.gameXML.Config.hasOwnProperty("BackendURL"))
+				gameEngine.initializeBackend(this.gameXML.Config.BackendURL);
+				
+			//Debug.debug(this, "****************************************do I even get here?");
+			//Debug.debug(this, "****************************************Hello?!?");
+			
+			
+			var loginID:String;
+			var so:SharedObject = SharedObject.getLocal("promWeek");
+			if (so.size > 0)
+			{
+				if (so.data.promWeekLoginID)
+				{
+					loginID = so.data.promWeekLoginID.toString();
+				}
+			}
+			
+			
+			gameEngine.gameXML = this.gameXML;
+			
+			if (!loginID)
+			{
+				this.gameEngine.getBackend().getNewLoginID();
+				
+			}
+			else
+			{
+				this.gameEngine.getBackend().setFacebookId(loginID);
+				this.gameEngine.facebookLogin();
+			}
+
+			addElement(gameEngine);
+			
+			//Effect.generateTestData();
+			
+			
+			
+			super.createChildren();
+		}
+		
+		/*
+		public function facebookLoginCallback(success:Object, fail:Object):void {
+			if (success && success.accessToken) {
+				this.saveFacebookId(success, fail);
+				//Alert.show("Facebook logon success. FBID: " + gameEngine.getBackend().getFacebookId());
+				MonsterDebugger.trace(this, "facebookLoginCallback() Facebook logon success. FBID: " + gameEngine.getBackend().getFacebookId());
+			} else {
+				//Alert.show("Facebook logon fail.");
+				MonsterDebugger.trace(this, "facebookLoginCallback() Facebook logon fail.");
+				//Facebook.login(saveFacebookId, { scope: "email, publish_stream" });
+			}
+		}
+		*/
+		
+		
+		
+
+		
+		
+		public function onInitialize():void {
+			Debug.debug(this, "onInitialize()");
+		}
+		
+		public function onCreationComplete():void {
+			Debug.debug(this, "onCreationComplete()");
+			
+			this.addEventListener(KeyboardEvent.KEY_DOWN, onEventKeyDown, true);
+			this.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel, false);
+			this.addEventListener("startTutorial", startTutorial, true);
+			this.addEventListener(ErrorEvent.ERROR, onErrorEvent, true);
+			this.addEventListener(MouseEvent.CLICK, onMouseClick, true);
+			//this.addEventListener(Event.RESIZE, resized);
+			//this.setFocus();
+			CONFIG::monster {
+				DConsole.createCommand("gameEngine", GameEngine.getInstance);
+			}
+						
+			//gameEngine.setDimensions(this.width, this.height, 1.0);
+			//
+			//gameEngine.setDimensions(this.width, this.height);//, 1.3);
+			
+			this.onResize();
+			
+			gameEngine.tutorial = this.tutorial
+			
+			//this.setFocus();
+			
+		}
+
+		
+		/**
+		 * MouseEvent.CLICK handler with capture phase on. This will capture all mouse click events in Prom Week,
+		 * log them, and let the click continue throught he event handling phases.
+		 * 
+		 * @param	e
+		 */
+		private function onMouseClick(e:MouseEvent):void {
+			if (50 < this.mouseClickXMLVector.length)
+				this.mouseClickXMLVector.shift()
+			this.mouseClickXMLVector.push(<MouseEvent target={e.target} type={e.type} relatedObject={e.relatedObject} stageX={e.stageX} stageY={e.stageY} localX={e.localX} localY={e.localY} />)
+			//this.mouseClickLogXML.appendChild(<MouseEvent target={e.target} type={e.type} relatedObject={e.relatedObject} stageX={e.stageX} stageY={e.stageY} localX={e.localX} localY={e.localY} />);
+		}
+
+		
+		public function onApplicationComplete():void {
+			Debug.debug(this, "onAComplete()");
+			//get proper mousewheel mojo in browswers
+			//MouseWheelTrap.setup(stage)
+			MouseWheelEnabler.init(stage);
+			loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onUncaughtError);
+			
+			
+			//this.gameEngine.theStage = Application.application.stage;//this.stage;
+			
+			var keyManager:KeyManager = new KeyManager(this.stage);
+			keyManager.addKeySequence(["f", "a", "c", "a", "d", "e"], openEasterEgg);
+			//keyManager.addKey(["t"], styleSwitch);
+			//keyManager.addKey(["n"], null);
+		}
+		
+		
+		private function nullification():void {
+			this.mouseClickLogXML.appendChild(this.mouseClickXMLVector[800]);
+		}
+		
+		public function styleSwitch():void {
+			if ("classicPromWeek" == gameEngine.activeStyleName)
+				gameEngine.activeStyleName = "classicPromWeekX";
+			else
+				gameEngine.activeStyleName = "classicPromWeek";
+			gameEngine.setAllStyles();
+		}
+		
+		public function openEasterEgg(e:Event = null):void
+		{
+			if (this.gameEngine.currentState == "MainMenu")
+			{
+				this.gameEngine.currentState = "FacadeState";
+			}
+		}
+		
+		
+		
+		public function onUncaughtError(e:UncaughtErrorEvent):void {
+			if(!this.errorReportSent) {
+			//e.toString() e.text e.target e.currentTarget e.error  e.errorID (e.error as Error).errorID (e.error as Error)..message (e.error as Error).name (e.error as Error).getStackTrace()
+				this.errorReportSent = true;
+				for (var i:int = this.mouseClickXMLVector.length; i >= 0; --i) 
+					this.mouseClickLogXML.appendChild(this.mouseClickXMLVector[i]);
+				gameEngine.getBackend().sendBugTrace(this.mouseClickLogXML, e);
+				Alert.show("Our apologies -- Prom Week has encountered an unexpected error. An error report has been automatically generated and sent to the development team.\n\nThank you for your patience and understanding.", "Sorry!", Alert.OK);
+			}
+		}
+		
+		
+		public function onMouseWheel(e:MouseEvent=null):void {
+			
+			//where we don't want to zoom
+			if ("Performance" == this.gameEngine.currentState) {
+				return;
+			}
+			
+			if (!VisibilityManager.getInstance().useOldInterface)
+			{
+				return;
+			}
+			
+			if(this.gameEngine.camera) {
+				this.gameEngine.camera.zoom += MOUSE_WHEEL_ZOOM_FACTOR * e.delta;
+				if (this.gameEngine.camera.zoom >= MAX_ZOOM) {
+					Debug.debug(this, "onMouseWheel(): Maximum Zoom Reached.");
+					this.gameEngine.camera.zoom = MAX_ZOOM;
+				}
+				else if (this.gameEngine.camera.zoom <= MIN_ZOOM) {
+					Debug.debug(this, "onMouseWheel(): Minimum Zoom Reached.");
+					this.gameEngine.camera.zoom = MIN_ZOOM;
+				}
+				Debug.debug(this, "onMouseWheel() destination zoom level: " + gameEngine.camera.zoom);
+				//this.gameEngine.camera.update();
+			}
+		}
+		
+		public function onErrorEvent(e:ErrorEvent):void {
+			
+			Alert.show(e.toString(), this.mouseClickLogXML + e.type, Alert.OK);
+			
+		}
+		
+		public function onResize(e:ResizeEvent=null):void {
+			
+			//Utility.log(this, e);
+			//Debug.debug(this, e.toString());
+			//e.stopPropagation();
+			
+			//standard ratio
+			var standardAspectRatio:Number = 760 / 600;
+			
+			var scale:Number = this.height / 600;
+			this.scaleX = this.scaleY = scale;
+			
+			if(gameEngine) {
+				if (standardAspectRatio < this.width / this.height) {
+					
+					gameEngine.setDimensions(this.width / scale, 600);
+					
+				}else
+					gameEngine.setDimensions(760, 600);
+			}
+			
+		}
+		
+		public function onEventKeyDown(e:KeyboardEvent):void {
+			//Debug.debug(this, "on event key down");
+			//Debug.debug(this, "active position: " + gameEngine.hudGroup.consolePopUp.consoleTextInput.selectionActivePosition + " anchor position: " + gameEngine.hudGroup.consolePopUp.consoleTextInput.selectionAnchorPosition);
+			var cif:CiFSingleton = CiFSingleton.getInstance();
+			
+			if (gameEngine.isDConsoleActive) return;
+			//DConsole.registerPlugins(
+			
+			if (gameEngine.shouldAcceptNormalKeyboardInput) { // kind of a hacky way to let people use keys when using the console.
+				//Debug.debug(this, "keyboradEvent thing is not visible!");
+				switch(e.keyCode) {
+					case 65: //a
+						//print something
+						break;
+					case 80: //p
+						trace(cif.cast.prospectiveMemeoriesToString());
+						break;
+					case 84: //t
+						
+						break;
+					case 187: //=+
+						this.gameEngine.camera.zoom += 0.10;
+						if (this.gameEngine.camera.zoom >= MAX_ZOOM) {
+							Debug.debug(this, "Maximum Zoom Reached.");
+							this.gameEngine.camera.zoom = MAX_ZOOM;
+						}
+						Debug.debug(this, "destination zoom level: " + gameEngine.camera.zoom);
+						this.gameEngine.camera.update();
+						break;
+					case 189: //-_
+						this.gameEngine.camera.zoom -= 0.10;
+						if (this.gameEngine.camera.zoom <= MIN_ZOOM) {
+							Debug.debug(this, "Minimum Zoom Reached.");
+							this.gameEngine.camera.zoom = MIN_ZOOM;
+						}
+						Debug.debug(this, "destination zoom level: " + gameEngine.camera.zoom);
+						this.gameEngine.camera.update();
+						break;
+					case 78: // n
+						Debug.debug(this, "Are you thinking about cheating?");
+						Alert.show("Push 'Yes' to skip to the next level!", "CHEAT CODE ACTIVATED", Alert.YES | Alert.NO, this, confirmCheatingLevelSkipHandler);
+						break;
+				}
+			}
+			
+			else { // the console is open... handle the 'backspace' key maybe?
+				//Debug.debug(this, "key code understood to be: " + e.keyCode);
+				switch(e.keyCode) {
+					case 8: // backspace
+					//Delete the point that the cursor is at.
+					var tempString:String;
+					if (gameEngine.hudGroup.consolePopUp.consoleTextInput.selectionActivePosition > 0) { // only delete stuff if cursor isn't placed at beginning.
+						var oldPos:int = gameEngine.hudGroup.consolePopUp.consoleTextInput.selectionActivePosition;
+						tempString = gameEngine.hudGroup.consolePopUp.consoleTextInput.text.slice(0, gameEngine.hudGroup.consolePopUp.consoleTextInput.selectionActivePosition - 1) + 
+							gameEngine.hudGroup.consolePopUp.consoleTextInput.text.slice(gameEngine.hudGroup.consolePopUp.consoleTextInput.selectionActivePosition, gameEngine.hudGroup.consolePopUp.consoleTextInput.text.length);
+							//gameEngine.hudGroup.consolePopUp.consoleTextInput.selectionActivePosition = gameEngine.hudGroup.consolePopUp.consoleTextInput.selectionActivePosition - 1;
+							//Debug.debug(this, "temp string is: " + tempString);
+							gameEngine.hudGroup.consolePopUp.consoleTextInput.text = tempString;
+							gameEngine.hudGroup.consolePopUp.consoleTextInput.selectRange(oldPos - 1, oldPos - 1);
+					}
+						break;
+					case 13: // enter
+						//Debug.debug(this, "processing enter key");
+						gameEngine.hudGroup.consolePopUp.carryOutConsoleCommand();
+						break;
+					case 37: // left arrow
+						if (gameEngine.hudGroup.consolePopUp.consoleTextInput.selectionActivePosition > 0) {
+							gameEngine.hudGroup.consolePopUp.consoleTextInput.selectRange(gameEngine.hudGroup.consolePopUp.consoleTextInput.selectionActivePosition + - 1, gameEngine.hudGroup.consolePopUp.consoleTextInput.selectionActivePosition - 1);
+						}
+						break;
+					case 39: // right arrow
+						if (gameEngine.hudGroup.consolePopUp.consoleTextInput.selectionActivePosition < gameEngine.hudGroup.consolePopUp.consoleTextInput.text.length) {
+							gameEngine.hudGroup.consolePopUp.consoleTextInput.selectRange(gameEngine.hudGroup.consolePopUp.consoleTextInput.selectionActivePosition + 1, gameEngine.hudGroup.consolePopUp.consoleTextInput.selectionActivePosition + 1);
+						}
+						break;
+				}
+			}
+			//e.stopPropagation();
+			
+		}
+		
+		
+		
+		public function confirmCheatingLevelSkipHandler(levelSkip:CloseEvent):void {
+			if (Alert.YES == levelSkip.detail ) {
+				Debug.debug(this, "Level skip ACTIVATED");
+				this.gameEngine.isLevelFinished = true;
+			}
+			else {
+				Debug.debug(this, "Level skip NOT ACTIVATED");
+			}
+		}
+		
+		public function startTutorial(e:Event):void {
+			//Debug.debug(this, "startTutorial()");
+			//Debug.debug(this, "this is the file I think I need to load: " + gameEngine.currentLevel.tutorialScriptName);
+			
+			//USED TO WORK FINE, CHANGING THINGS AROUND NOW THAT WE ARE EMBEDDING TUTORIALS
+			//var tutorialLoader:URLLoader = new URLLoader(new URLRequest("../../TutorialScripts/" + gameEngine.currentLevel.tutorialScriptName));
+			//tutorialLoader.addEventListener(Event.COMPLETE, tutorialXMLLoaded);
+			
+			Debug.debug(this, "this is the file I think I need to load: " + gameEngine.currentLevel.tutorialScriptName);
+			//We need to find the .xml portion of the string and ELIMINATE IT YO
+			var tutorialName:String = gameEngine.currentLevel.tutorialScriptName;
+			tutorialName =  tutorialName.replace(".xml", "");
+			tutorial.prepare();
+			tutorial.parseTutorialScript(authLib.tutorials[tutorialName]);
+		}
+		
+		private function tutorialXMLLoaded(e:Event):void{
+			var tutorialXML:XML = new XML(e.target.data)
+			//Debug.debug(this, "tutorialXMLLoaded(): " + tutorialXML);
+			tutorial.prepare();
+			tutorial.parseTutorialScript(tutorialXML);
+		}	
+	]]>
+	</fx:Script>
+</s:Application>

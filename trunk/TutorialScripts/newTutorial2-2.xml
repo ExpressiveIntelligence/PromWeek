@@ -1,0 +1,129 @@
+<!--
+
+This is day 2 (Friday) of the new tutorial 2. 
+* Zack wants to depose Buzz
+* Juice points.
+* Now it's your turn!
+-->
+
+<TutorialScript>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="2" centerOnCharacter="Zack">
+		<![CDATA[Geeze! It's the Prom already! Where did that week go?]]>
+	</TutorialStep>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="2" stop="true">
+		<![CDATA[It's now or never for Zack--good luck!]]>
+	</TutorialStep>
+	
+<!-- 	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="0" centerOnCharacter="Zack">
+		<![CDATA[Now it's your turn to shape Zack's prom night... for better or worse!]]>
+	</TutorialStep>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="0" centerOnCharacter="Zack">
+		<![CDATA[Now it's your turn to shape Zack's prom night... for better or worse!]]>
+	</TutorialStep>
+	
+	<TutorialStep object="juiceBar" name="" eventType="over" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="0">
+		<![CDATA[But one last thing... see that orange bar in the lower left?]]>
+	</TutorialStep>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="0">
+		<![CDATA[You might have noticed it filling up as characters take actions.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="0">
+		<![CDATA[You can spend this energy to drive characters out of their comfort zones... by predicting what they'll do, or even take actions they don't think they want to...]]>
+	</TutorialStep>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="0">
+		<![CDATA[...which is sometimes EXACTLY what they need to do to achieve their goals!]]>
+	</TutorialStep>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="0">
+		<![CDATA[Example: our boy Zack needs a prom queen for one of his goals, but time is running short. How can we ensure Zack finds a date?]]>
+	</TutorialStep>
+	
+	<TutorialStep object="avatar" name="zack" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false"  quadrant="0">
+		<![CDATA[Click Zack.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="avatar" name="lil" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false"  quadrant="0">
+		<![CDATA[Now find and click Lil (with the rockin' boots and wild hair).]]>
+	</TutorialStep>
+	
+	<TutorialStep object="socialGameButton0" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="2" socialGameButtonNumber="0" sgName="Ask Out">
+		<![CDATA[Click 'Ask Out.']]>
+	</TutorialStep>
+	
+	<TutorialStep object="selectedGameButton" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="1" socialGameButtonNumber="0" sgName="Ask Out" >
+		<![CDATA[Now click the 'Ask Out' button on the bottom of the screen.]]>
+	</TutorialStep> 	
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="0" socialGameButtonNumber="0" sgName="Ask Out">
+		<![CDATA[Zack has a strong desire to ask Lil out... but what if he bombs?]]>
+	</TutorialStep>
+		
+	<TutorialStep object="megaUIResultsButton" name="" eventType="over" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="0" socialGameButtonNumber="0" sgName="Ask Out">
+		<![CDATA[Let's see what the future holds. Hover over the purple 'Results' button to find out how much this will cost.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="juiceBar" name="" eventType="over" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="0" socialGameButtonNumber="0" sgName="Ask Out">
+		<![CDATA[You'll see a preview of how much an action will cost before you click.]]>
+	</TutorialStep>	
+	
+	<TutorialStep object="megaUIResultsButton" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="0" socialGameButtonNumber="0" sgName="Ask Out">
+		<![CDATA[Go ahead and click 'Results.']]>
+	</TutorialStep>
+	
+	<TutorialStep object="responderResponse" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="0" socialGameButtonNumber="0" sgName="Ask Out">
+		<![CDATA[The bottom center window shows that Lil is totally going to reject Zack's attempt to ask her out. Yikes! Maybe it's because she has the 'mopey' and 'takes things slowly' traits...]]>
+	</TutorialStep>
+	
+	<TutorialStep object="responderResponseIntensity" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="0" socialGameButtonNumber="0" sgName="Ask Out">
+		<![CDATA[But we can also see that Lil's decision to reject is Weak. Let's see if we can convince her to take a chance on Zack. ]]>
+	</TutorialStep>
+	
+	<TutorialStep object="megaUISwitchOutcomeButton" name="" eventType="over" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="0" socialGameButtonNumber="0" sgName="Ask Out">
+		<![CDATA[Hover over the purple button 'Change Response' in the bottom center window.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="juiceBar" name="" eventType="over" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="0" socialGameButtonNumber="0" sgName="Ask Out">
+		<![CDATA[Changing responses is pricey, but we can afford it.]]>
+	</TutorialStep>	
+	
+	<TutorialStep object="megaUISwitchOutcomeButton" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="0" socialGameButtonNumber="0" sgName="Ask Out">
+		<![CDATA[Now go ahead and click 'Change Response.']]>
+	</TutorialStep>
+	
+	<TutorialStep object="responderResponse" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="0" socialGameButtonNumber="0" sgName="Ask Out">
+		<![CDATA[Now Lil will accept Zack's proposition. Sometimes characters need a little nudging before they'll take a big plunge!]]>
+	</TutorialStep>
+	
+	<TutorialStep object="goButton" name="" eventType="click" preText=""  postText="" disableExceptions="" nextVisible="false" quadrant="1" socialGameButtonNumber="0" sgName="Ask Out">
+		<![CDATA[Click the 'Play' button and let's watch this romance kindle.]]>
+	</TutorialStep>
+	
+	
+
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="3">
+		<![CDATA[Nice work! Now Zack has a girlfriend, and he's achieved another of his prom night goals.]]>
+	</TutorialStep>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="3">
+		<![CDATA[Although we forgot to mention a little complication. Buzz had a crush on Lil! Now under 'Fallout' above, you can see he's seriously upset with Zack!]]>
+	</TutorialStep>
+	
+	<TutorialStep object="continueButton" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="2">
+		<![CDATA[Click 'Continue.']]>
+	</TutorialStep>
+	
+	<TutorialStep object="levelClock" name="" eventType="over" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="0">
+		<![CDATA[We'll leave it to you to sort out this mess. When you've achieved the goals you want for Zack, click the countdown timer to see his prom night ending.]]>
+	</TutorialStep>
+	
+		<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="0" stop="true">
+		<![CDATA[Have fun!]]>
+	</TutorialStep> -->
+	
+</TutorialScript>

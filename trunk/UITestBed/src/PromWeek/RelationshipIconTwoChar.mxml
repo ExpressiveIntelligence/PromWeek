@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()">
+	
+		 
+	<fx:Metadata>
+	</fx:Metadata>
+		
+	<fx:Declarations>
+		<fx:Number id="relIconWidth">50</fx:Number>
+		<fx:Number id="relIconHeight">50</fx:Number>
+		<fx:Number id="charIconWidth">35</fx:Number>
+		<fx:Number id="charIconHeight">35</fx:Number>
+		<fx:Number id="crossWidth">85</fx:Number>
+		<fx:Number id="crossHeight">50</fx:Number>
+	</fx:Declarations>
+	
+	
+	<!--<s:BorderContainer id="relIconContainer" cornerRadius="5"  width="{width}" height="{height}"
+					 borderWeight="2" borderStyle="solid" borderColor="0x000000" creationPolicy="all">
+	  <s:Group maskType="clip"  width="40" height="40">
+		  <s:mask>
+			  <s:Graphic>
+				  <s:Rect radiusX="{relIconContainer.getStyle('cornerRadius')}"
+						  radiusY="{relIconContainer.getStyle('cornerRadius')}"
+						  width="{relIconContainer.width-(relIconContainer.getStyle('borderWeight')*2)+1}"
+						  height="{relIconContainer.height-(relIconContainer.getStyle('borderWeight')*2)+1}">
+					  <s:fill>
+						  <s:SolidColor color="0xCCFFFF" alpha="0.2" />
+					  </s:fill>
+				  </s:Rect>
+			  </s:Graphic>
+		  </s:mask>
+		  <s:Group id="iconGroup">
+				<util:SmoothImage id="relIcon" width="{width*.7}" height="{height*.7}" />
+				<util:SmoothImage id="relIconLeft" width="{width*.7}" height="{height*.7}" />
+				<util:SmoothImage id="relIconRight" width="{width*.7}" height="{height*.7}" />
+		  </s:Group>
+	  </s:Group>
+	</s:BorderContainer>-->
+		
+		
+	  <s:Group id="iconGroup">
+			<util:SmoothImage id="relIcon" width="{relIconWidth}" height="{relIconHeight}" />
+			<util:SmoothImage id="relIconLeft" width="{charIconWidth}" height="{charIconHeight}" />
+			<util:SmoothImage id="relIconRight" width="{charIconWidth}" height="{charIconHeight}" />
+							
+			<s:Group id="negatedGroup" visible="false">
+				<s:Line id="line1" xFrom="0" yFrom="0" xTo="{crossWidth}" yTo="{crossHeight}">
+					<s:stroke>
+						<s:SolidColorStroke color="red" alpha="1.0" weight="7" />
+					</s:stroke>
+				</s:Line>
+				<s:Line id="line2" xFrom="0" yFrom="{crossHeight}" xTo="{crossWidth}" yTo="0">
+					<s:stroke>
+						<s:SolidColorStroke color="red" alpha=".8" weight="10"/>
+					</s:stroke>
+				</s:Line>
+			</s:Group> 
+	  </s:Group>
+
+	  
+	  
+	<fx:Script>
+		<![CDATA[		
+		import CiF.*;
+		import PromWeek.assets.ResourceLibrary;
+		
+		private var resourceLibrary:PromWeek.assets.ResourceLibrary = ResourceLibrary.getInstance()
+		
+		public var readyToPopulateComponents:Boolean = false;
+		
+		
+		public var relID:Number;
+		public var char1:String;
+		public var char2:String;
+		public var negated:Boolean;
+		public var isIntent:Boolean;
+		public var whyText:String;
+		
+		public function onCreationComplete():void
+		{
+			//resourceLibrary = PromWeek.assets.ResourceLibrary.getInstance();
+		}
+		
+		override protected function commitProperties():void
+		{
+			if (readyToPopulateComponents)
+			{
+				this.relIcon.source = resourceLibrary.relationshipIcons[RelationshipNetwork.getRelationshipNameByNumber(relID)]
+						
+				var changeName:String = "";
+				switch (relID) {
+					case RelationshipNetwork.FRIENDS: changeName = (negated ? "stopFriend" : "startFriend"); break;
+					case RelationshipNetwork.ENEMIES: changeName = (negated ? "stopEnemy" : "startEnemy"); break;
+					case RelationshipNetwork.DATING: changeName = (negated ? "stopDating" : "startDating"); break;
+				}
+				
+				var cif:CiFSingleton = CiFSingleton.getInstance();
+				var cChar1:Character = cif.cast.getCharByName(char1);
+				var char1isMale:Boolean = cChar1.hasTrait(Trait.MALE);
+				var char1HimHer:String = (char1isMale ? "him" : "her");
+				var char1HeShe:String = (char1isMale ? "he" : "she");
+				var introTxt:String = "...for ";
+				
+				if (isIntent) // future tense
+				{
+					switch(changeName)
+					{
+						case "startFriend": this.toolTip = introTxt + char1HeShe + " and " + char2 + " to become friends"; break;
+						case "stopFriend": this.toolTip = introTxt + char1HeShe + " and " + char2 + " to end their friendship"; break;
+						case "startEnemy": this.toolTip = introTxt + char1HeShe + " and " + char2 + " to become enemies"; break;
+						case "stopEnemy": this.toolTip = introTxt + char1HeShe + " and " + char2 + " to stop being enemies"; break;
+						case "startDating": this.toolTip = introTxt + char1HeShe + " and " + char2 + " to start dating"; break;
+						case "stopDating": this.toolTip = introTxt + char1HeShe + " and " + char2 + " to break up"; break;
+					}
+				}
+				else // present tense (this is now true)
+				{
+					switch(changeName)
+					{
+						case "startFriend": this.toolTip = char1 + " and " + char2 + " are friends"; break;
+						case "stopFriend": this.toolTip = char1 + " and " + char2 + " are no longer friends"; break;
+						case "startEnemy": this.toolTip = char1 + " and " + char2 + " are enemies"; break;
+						case "stopEnemy": this.toolTip = char1 + " made up with " + char2; break;
+						case "startDating": this.toolTip = char1 + " and " + char2 + " are dating"; break;
+						case "stopDating": this.toolTip = char1 + " and " + char2 + " broke up"; break;
+					}
+				}
+				if (whyText)
+				{
+					this.toolTip += "\n\n" + whyText;
+				}
+				
+				this.toolTip = LineOfDialogue.preprocessLine(this.toolTip);
+				
+				relIconLeft.source = resourceLibrary.portraits[char1.toLowerCase()];
+				relIconRight.source = resourceLibrary.portraits[char2.toLowerCase()];
+				
+				relIcon.left = charIconWidth / 2;
+				relIconLeft.left = 0;
+				relIconRight.left = (relIconWidth);
+				relIconLeft.top = (relIconHeight - charIconHeight)/2;
+				relIconRight.top = (relIconHeight - charIconHeight)/2;
+				relIconRight.scaleX = -1;
+				this.relIconLeft.visible = true;
+				this.relIconRight.visible = true;
+				this.visible = true;
+				
+				if (negated)
+				{
+					this.negatedGroup.visible = true;
+				}
+				else
+				{
+					this.negatedGroup.visible = false;
+				}
+			}
+			
+			super.commitProperties();
+		}
+		
+		
+		
+		public function loadImagesToIcon(relID1:Number, char1a:String = "", char2a:String = "", negated1:Boolean = false,whyText1:String = "",isIntent1:Boolean=false):void
+		{	
+
+			this.relID = relID1;
+			this.char1 = char1a; 
+			this.char2 = char2a;
+			this.negated = negated1;
+			this.whyText = whyText1;
+			this.isIntent = isIntent1;
+			
+			this.readyToPopulateComponents = true;
+			
+			
+			this.invalidateProperties();
+			this.invalidateSize();
+			this.invalidateDisplayList();
+		}
+		
+		]]>
+	</fx:Script>
+		
+	
+</s:Group>

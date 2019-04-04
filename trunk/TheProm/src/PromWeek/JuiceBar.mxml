@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+               xmlns:s="library://ns.adobe.com/flex/spark" 
+               xmlns:mx="library://ns.adobe.com/flex/halo"
+			   width="100%"
+			   height="100%"
+			   creationComplete="onCreationComplete()"
+			   preinitialize="onPreInitialize()"
+			   styleName="classicPromWeek"
+			   toolTip="Social Influence Points">
+	
+	<fx:Declarations>
+		<fx:Number id="border">4</fx:Number>
+		<fx:Number id="cursor">0</fx:Number>
+		<s:Fade id="fadeOut" alphaFrom="1.0" alphaTo="0.0" duration="100" />
+		<s:Fade id="fadeIn" alphaFrom="0.0" alphaTo="1.0" duration="100" />
+		<fx:Number id="roundness">6</fx:Number>
+	</fx:Declarations>
+	
+	<!-- The bottom layer -->
+	<s:Rect id="bottomRect" width="100%" height="100%" radiusX="{this.roundness}" radiusY="{this.roundness}">
+			<!--<s:stroke>
+				<s:SolidColorStroke weight="{getStyle('backgroundStrokeWeight')}" color="{getStyle('backgroundStroke')}" />
+			</s:stroke>-->
+			<s:fill>
+				<s:SolidColor color="{getStyle('backgroundColor')}" alpha="1.0"/>
+			</s:fill>
+	</s:Rect>
+	<!--The layer for phantom negative points-->
+	<s:Rect id="phantomPointsNegative" width="0" height="90%" y="{middleRect.y}" radiusX="{this.roundness}" radiusY="{this.roundness}"><!--topLeftRadiusX="{this.roundness}" topLeftRadiusY="{this.roundness}" bottomLeftRadiusX="{this.roundness}" bottomLeftRadiusY="{this.roundness}">-->
+		<s:fill>
+			<s:SolidColor color="{getStyle('juiceColorNeg')}" alpha="0.7"/>
+		</s:fill>
+		<s:stroke>
+			<s:SolidColorStroke color="{getStyle('juiceColorNeg')}" alpha="0.8" />
+		</s:stroke>
+	</s:Rect>
+	<!-- The middle layer -->
+	<s:Rect id="middleRect" width="{this.cursor}" height="{this.height - this.border}" radiusX="{this.roundness}" radiusY="{this.roundness}"><!--y="2" x="{this.border/2}">-->
+			<s:fill>
+				<s:SolidColor color="{getStyle('juiceColor')}" alpha="0.9"/>
+			</s:fill>
+	</s:Rect>
+	<!-- The Street Fighter layer -->
+	<s:Rect id="streetFighterLayer" width="0" height="90%" y="{middleRect.y}" radiusX="{this.roundness}" radiusY="{this.roundness}"><!--x="{middleRect.x}">-->
+			<s:fill>
+				<s:SolidColor color="#FF0000" alpha="1.0"/>
+			</s:fill>
+	</s:Rect>
+	<!--The layer for phantom positive points-->
+	<s:Rect id="phantomPointsPositive" width="0" height="90%" y="{middleRect.y}" radiusX="{this.roundness}" radiusY="{this.roundness}"><!--topLeftRadiusX="{this.roundness}" topLeftRadiusY="{this.roundness}" bottomLeftRadiusX="{this.roundness}" bottomLeftRadiusY="{this.roundness}">-->
+			<s:fill>
+				<s:SolidColor color="{getStyle('juiceColorPos')}" alpha="1.0"/>
+			</s:fill>
+			<s:stroke>
+				<s:SolidColorStroke color="{getStyle('juiceColorPos')}" alpha="0.8"/>
+			</s:stroke>
+	</s:Rect>
+
+	<s:Rect width="100%" height="100%" radiusX="{this.roundness}" radiusY="{this.roundness}">
+		<s:stroke>
+			<s:SolidColorStroke weight="3" color="{getStyle('backgroundStroke')}" alpha="0.6" />
+		</s:stroke>
+	</s:Rect>
+	
+	
+	<fx:Script>
+		<![CDATA[
+		import com.greensock.TweenLite;
+		import flash.events.TimerEvent;
+		import flash.utils.Timer;
+		import CiF.Debug;
+		
+		private var timer:Timer
+		private var max:Number // max width (not normalized)
+		private var scale:Number // used for dynamic sizing and normalization
+		private var curStart:Number // holds where it starts, bounds checking
+		public var animating:Boolean // used to protect data from being molested by two events at once
+		private var gameEngine:PromWeek.GameEngine;
+		
+		public function onPreInitialize():void {
+			max = this.width - this.border * 2
+			scale = max / 100
+			this.gameEngine = PromWeek.GameEngine.getInstance();
+		}
+		
+		public function onCreationComplete():void {
+			
+		}
+		
+		//non-fullscreen-mode-width should be 236ish
+		//full screen mode width should be 340ish.
+		// to force it to a certain position! (use 1-100 scale!)
+		public function setCursor(x:Number):void {
+			max = this.width - this.border * 2
+			scale = max / 100
+			cursor = x * scale
+			if (cursor < 0) cursor = 0
+			if (cursor > max) cursor = max
+		}
+		
+		public function updateOnResize(currentJuice:Number):void {
+			setCursor(currentJuice);
+		}
+		
+		/**
+		 * phantomJuiceBar will show the difference between how many juice points you have now and what the number given is.
+		 * For example: you have 50 points, and X is 75, it'll show a 25-point difference in the positive direction as a non-red colour.
+		 * Example2: You have 65 points, and X is 50. It'll show a 15-point red difference in the negativedirection
+		 * @param	x
+		 */
+		public function phantomJuiceBar(x:Number):void {
+			phantomJuiceHide()
+			max = this.width - this.border * 2
+			scale = max / 100
+			//Debug.debug(this, "should be tring to make phantom juice bar appear...");
+			var diff:Number = cursor - x * scale
+			// you have enough points!
+			if (diff < 0) {
+				phantomPointsNegative.width = -diff
+				phantomPointsNegative.x = cursor
+				fadeIn.play([phantomPointsNegative])
+			} else {
+				phantomPointsPositive.width = x*scale
+				phantomPointsPositive.x = cursor - x*scale
+				fadeIn.play([phantomPointsPositive])
+			}
+		}
+		/**
+		 * hide everythin!
+		 */
+		public function phantomJuiceHide():void {
+			phantomPointsNegative.visible = false
+			phantomPointsPositive.visible = false
+		}
+		
+		// add some number of guys!
+		public function add(x:Number):void {
+			max = this.width - this.border * 2
+			scale = max / 100
+			// if we're still animating, Don't do anything!
+			//if (animating) return;
+			// sanity Czech!
+			if (cursor >= max) {
+				cursor = max; 
+				return;
+			}
+			// set the starting value
+			curStart = cursor
+			var curEndValue:Number = cursor + x*scale;
+			if (curEndValue > max) curEndValue = max;
+		
+			TweenLite.to(this, 1.0, {cursor:curEndValue } )
+			
+			// set the animating bool
+			//animating = true
+			// make a new timer with 25ms resolution (should be enough to make good animation)
+			//timer = new Timer(25)
+			// do this strange convoluted way to pass an additional parameter (x) into the event guy
+			//timer.addEventListener(TimerEvent.TIMER, function(e:TimerEvent):void { moverPositive(e, x) } )
+			//timer.start()
+		}
+		
+		/**
+		 * This one is hairy. 
+		 */
+		public function subtract(x:Number):void {
+			max = this.width - this.border * 2
+			scale = max / 100
+			// same thing here, if we're still doin stuff, NO MORE!
+			//if (animating) return
+			//animating = true
+			// move the streetFighterLayer's X to the ending point of the animation, normalized of course
+			streetFighterLayer.x = middleRect.x + middleRect.width - (x * scale)
+			// bounds Czech!
+			if(streetFighterLayer.x < middleRect.x) streetFighterLayer.x = middleRect.x
+			// make it so!
+			streetFighterLayer.width = x * scale
+			// left most bounds Czech
+			if (streetFighterLayer.width > cursor) streetFighterLayer.width = cursor
+			// set SFL to be visible
+			streetFighterLayer.alpha = 1.0
+			// adjust the middle rectangle's width appropriately and do a bounds Czech
+			cursor -= x * scale
+			if(cursor < 0) cursor = 0
+			// YET ANOTHER bounds Czech
+			if (middleRect.width < 0) middleRect.width = 0;
+			
+			TweenLite.to(streetFighterLayer, 1.0, { width:0 } )
+
+			// new timer with high res
+			//timer = new Timer(25)
+			//timer.addEventListener(TimerEvent.TIMER, function(e:TimerEvent):void { moverNegative(e, x); } )
+			// when it completes, fade out the streetFighterLayer!
+			//timer.addEventListener(TimerEvent.TIMER_COMPLETE, function(e:TimerEvent):void{fadeOut.play([streetFighterLayer])})
+			//timer.start()
+		}
+		
+		/**
+		 * this guy just moves the SFL width leftward, until 0. Pretty simple :D
+		 * @param	e
+		 * @param	dx
+		 */
+		private function moverNegative(e:TimerEvent, dx:Number):void {
+			// keep going until SFL is empty!
+			if (streetFighterLayer.width > 0) {
+				streetFighterLayer.width -= scale * dx / 12
+			} else {
+				// if we've min'd out stop the timer and remove all listeners
+				timer.removeEventListener(TimerEvent.TIMER, function(e:TimerEvent):void { moverNegative(e, x); } )
+				timer.stop()
+				animating = false
+			}
+		}
+
+		// function for moving in the positive direction!
+		private function moverPositive(e:TimerEvent, dx:Number):void {
+			max = this.width - this.border * 2
+			scale = max / 100
+			// if we haven't gone completely off the right edge AND we still should keep adding:
+			if (cursor < max && (cursor - curStart) < dx * scale) {
+				cursor += scale
+			} else {
+				if(cursor > max) cursor = max
+				// if we've maxed out, stop the timer and get rid of the listeners
+				timer.removeEventListener(TimerEvent.TIMER,function(e:TimerEvent):void { moverPositive(e, x) })
+				timer.stop()
+				animating = false
+			}
+		}
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			/*if(gameEngine.classicPromColors) {
+				this.setStyle("styleName", "classicPromWeek");
+			}
+			else if(gameEngine.greenPromColors) {
+				this.setStyle("styleName", "greenColor");
+			}
+			else if(gameEngine.redPromColors) {
+				this.setStyle("styleName", "redColor");
+			}*/
+			this.invalidateProperties();
+		}
+		
+		]]>
+	</fx:Script>
+</s:Group>

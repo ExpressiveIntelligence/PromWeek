@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()">
+	
+		 
+	<fx:Metadata>
+	</fx:Metadata>
+		
+	<fx:Declarations>
+		<fx:Number id="iconWidth">50</fx:Number>
+		<fx:Number id="iconHeight">50</fx:Number>
+		<fx:Number id="charIconWidth">35</fx:Number>
+		<fx:Number id="charIconHeight">35</fx:Number>
+		<fx:Number id="crossWidth">85</fx:Number>
+		<fx:Number id="crossHeight">50</fx:Number>
+		
+		<fx:Boolean id="shouldDisplayName">false</fx:Boolean>
+	</fx:Declarations>
+		
+	  <s:Group id="iconGroup">
+			<!--<util:SmoothImage id="sfdbLabelIcon" width="{iconWidth}" height="{iconHeight}" />-->
+			<prom:StatusIcon id="sfdbLabelIcon" width="{iconWidth}" height="{iconHeight}" shouldDisplayTimeRemaining="false" />
+			<util:SmoothImage id="charIconLeft" width="{charIconWidth}" height="{charIconHeight}" />
+			<util:SmoothImage id="charIconRight" width="{charIconWidth}" height="{charIconHeight}" />
+			<s:Group id="labelPlateGroup" width="{sfdbLabelIcon.width + sfdbLabelIcon.width/4 + 10}" height="{sfdbLabelIcon.height/3}"  >
+				<s:Rect width="100%" height="100%" radiusX="3" radiusY="3">
+					<s:fill>
+						<mx:SolidColor color="white" alpha="0.8" />
+					</s:fill>
+				</s:Rect>
+				<s:RichText id="sfdbName" width="100%" height="100%" fontSize="14" color="black" verticalAlign="middle" textAlign="center" styleName="basicFontStyle"/>
+			</s:Group>
+	  </s:Group>
+
+	  
+	  
+	<fx:Script>
+		<![CDATA[		
+		import CiF.*;
+		import PromWeek.assets.ResourceLibrary;
+		import flash.utils.Dictionary;
+		
+		private var resourceLibrary:PromWeek.assets.ResourceLibrary = ResourceLibrary.getInstance()
+		private var gameEngine:GameEngine;
+		private var _sfdbID:Number;
+		private var _char1:String;
+		private var _char2:String;
+		private var _negated:Boolean;
+		private var _whyText:String;
+		private var _pred:Predicate;
+		private var _primed:Boolean;
+		
+		public function onCreationComplete():void
+		{
+			//resourceLibrary = PromWeek.assets.ResourceLibrary.getInstance();
+			gameEngine = GameEngine.getInstance();
+		}
+		
+		override protected function commitProperties():void {
+			if(this._primed) {
+				var tempDictionary:Dictionary;// = new Dictionary()
+				//this.sfdbLabelIcon.source = resourceLibrary.statusIcons[Status.getStatusNameByNumber(Status.TRUSTS)];
+				sfdbLabelIcon.loadStatusImagesToIcon(Status.TRUSTS);
+				if (!gameEngine)
+					gameEngine = GameEngine.getInstance();
+					
+					
+				if (this._sfdbID == SocialFactsDB.MISUNDERSTOOD)
+				{
+					this.sfdbName.text = "wrong";
+				}
+				else if (this._sfdbID == SocialFactsDB.FAILED_ROMANCE)
+				{
+					this.sfdbName.text = "rom fail";
+				}
+				else
+				{
+					this.sfdbName.text = SocialFactsDB.getLabelByNumber(this._sfdbID);
+				}
+			
+				if (this._pred){
+					//tempDictionary = new Dictionary()
+					//tempDictionary = gameEngine.getNamesFromRoles(this._pred);
+					//this.toolTip = this._pred.toNaturalLanguageString(tempDictionary['primary'], tempDictionary['secondary'], "");
+					this.toolTip = this._pred.toNaturalLanguageString(this._char1, this._char2);
+				}
+				
+				
+				charIconLeft.source = resourceLibrary.portraits[this._char1.toLowerCase()];
+				charIconRight.source = resourceLibrary.portraits[this._char2.toLowerCase()];
+				
+				sfdbLabelIcon.left = charIconWidth / 2;
+				charIconLeft.left = 0;
+				charIconRight.left = (iconWidth);
+				charIconLeft.top = (iconHeight - charIconHeight)/2;
+				charIconRight.top = (iconHeight - charIconHeight)/2;
+				charIconRight.scaleX = -1;
+				this.charIconLeft.visible = true;
+				this.charIconRight.visible = true;
+				
+				this.labelPlateGroup.left = charIconWidth / 2 - (labelPlateGroup.width - sfdbLabelIcon.width)/2//this.labelPlateGroup.width / 2; 
+				this.labelPlateGroup.top = this.sfdbLabelIcon.height - this.labelPlateGroup.height;
+				
+			}
+		}
+		
+		public function loadImagesToIcon(sfdbID:Number, char1:String = "", char2:String = "", pred:Predicate=null):void
+		{	
+			_sfdbID = sfdbID;
+			_char1 = char1;
+			_char2 = char2;
+			_pred = pred;
+			
+			_primed = true;
+			
+			this.invalidateProperties();
+			this.invalidateSize();
+			this.invalidateDisplayList();
+		}
+		
+		]]>
+	</fx:Script>
+		
+	
+</s:Group>

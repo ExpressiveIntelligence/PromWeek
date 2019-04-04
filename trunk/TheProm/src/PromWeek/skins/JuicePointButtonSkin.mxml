@@ -1,0 +1,265 @@
+﻿<s:Skin 
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/mx" 
+	xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+	minWidth="21" minHeight="21"
+	width="100%" height="100%"
+	alpha="1.0"
+	alpha.over="1.0"
+	alpha.down="1.0"
+	creationComplete="onCreationComplete()"
+	styleName="classicPromWeek">
+
+	<fx:Metadata>[HostComponent("PromWeek.JuicePointButton")]</fx:Metadata>
+    
+	<fx:Declarations>
+		<!--<fx:Number id="backgroundFillColor">0x4B0082</fx:Number>
+		<fx:Number id="borderColor">0x000000</fx:Number>
+		<fx:Number id="textColor">0xFFFF66</fx:Number>
+		
+		<fx:Number id="unlockedFillColor">0x26466D</fx:Number>
+		<fx:Number id="lockedFillColor">0x2E0854</fx:Number>
+		<fx:Number id="selectedFillColor">0x5F9F9F</fx:Number>
+		<fx:Number id="disabledGreyFill">0xD6D6D6</fx:Number>
+		
+		<fx:Number id="unlockedBorderColor">0x1D7CF2</fx:Number>
+		<fx:Number id="lockedBorderColor">0x551A8B</fx:Number>
+		<fx:Number id="selectedBorderColor">0x00CDCD</fx:Number>
+		
+		<fx:Number id="unlockedOverBorderColor">0xFF0000</fx:Number>
+		<fx:Number id="lockedOverBorderColor">0xFF0000</fx:Number>
+		<fx:Number id="selectedOverBorderColor">0x00CDCD</fx:Number>-->
+
+	</fx:Declarations>
+	
+    <!-- states -->
+    <s:states>
+		<s:State name="normal" />
+        <s:State name="up" />
+        <s:State name="over" />
+		<s:State name="downAndSelected" />
+		<s:State name="disabledAndSelected" />
+		<s:State name="overAndSelected" />
+		<s:State name="upAndSelected" />
+        <s:State name="down" />
+        
+        <s:State name="lockedover" />
+        <s:State name="unlockedover" />
+		
+		<!--Final States -->
+		 <s:State name="unlockedOverAndSelected" />
+		 <s:State name="unlockedOver" />
+		 <s:State name="unlockedSelected" />
+		 <s:State name="unlocked" />
+		 
+		 <s:State name="disabled" />
+		 <s:State name="lockedOverSelected" />
+		 <s:State name="lockedOver" />
+		 <s:State name="lockedSelected" />
+		 <s:State name="locked" />
+		
+    </s:states>
+	
+
+	<s:Group id="mainBtnGroup" width="100%" click="mainBtnClick(event)">
+		<s:Rect width="100%" height="100%" radiusX="8">
+			<s:stroke>
+				<s:SolidColorStroke weight="3" color="#000033" />
+			</s:stroke>
+			<s:fill>
+				<s:SolidColor color="{getStyle('juiceButtonColor')}" />
+			</s:fill>
+		</s:Rect>
+		
+
+		
+		<!-- UNLOCKED STATES -->
+		<!-- unlocked, hover, and selected -->
+		<s:Rect width="100%" height="100%" radiusX="8" includeIn="unlockedOverAndSelected">
+			<s:stroke> <s:SolidColorStroke weight="3" color="{getStyle('juiceButtonSelectedOverBorder')}" /> </s:stroke>
+			<s:fill> <s:SolidColor color="{getStyle('juiceButtonSelectedColor')}" />  </s:fill>
+		</s:Rect>
+		
+		<!-- unlocked, hover, ~selected -->
+		<s:Rect width="100%" height="100%" radiusX="8" includeIn="unlockedOver">
+			<s:stroke> <s:SolidColorStroke weight="3" color="{getStyle('juiceButtonUnlockedOverBorder')}" /> </s:stroke>
+			<s:fill> <s:SolidColor color="{getStyle('juiceButtonUnlockedColor')}" />  </s:fill>
+		</s:Rect>
+		
+		<!-- unlocked, ~hover, selected -->
+		<s:Rect width="100%" height="100%" radiusX="8" includeIn="unlockedSelected">
+			<s:stroke> <s:SolidColorStroke weight="3" color="{getStyle('juiceButtonSelectedBorder')}" /> </s:stroke>
+			<s:fill> <s:SolidColor color="{getStyle('juiceButtonSelectedColor')}" />  </s:fill>
+		</s:Rect>
+		
+		<!-- unlocked, ~hover, ~selected -->
+		<s:Rect width="100%" height="100%" radiusX="8" includeIn="unlocked">
+			<s:stroke> <s:SolidColorStroke weight="3" color="{getStyle('juiceButtonUnlockedBorder')}" /> </s:stroke>
+			<s:fill> <s:SolidColor color="{getStyle('juiceButtonUnlockedColor')}" />  </s:fill>
+		</s:Rect>
+		
+		<!-- LOCKED STATES -->
+		
+		<!-- DISABLED LOCKED -->
+		<s:Rect width="100%" height="100%" radiusX="8" includeIn="disabled">
+			<s:stroke> <s:SolidColorStroke weight="3" color="{getStyle('juiceButtonLockedBorder')}" /> </s:stroke>
+			<s:fill> <s:SolidColor color="{getStyle('juiceButtonLockedColor')}" />  </s:fill>
+		</s:Rect>
+		<s:Rect width="100%" height="100%" radiusX="8" includeIn="disabled">
+			<s:stroke> <s:SolidColorStroke weight="3" color="{getStyle('juiceButtonDisabledFill')}" alpha="0.3" /> </s:stroke>
+			<s:fill> <s:SolidColor color="{getStyle('juiceButtonDisabledFill')}" alpha="0.3" />  </s:fill>
+		</s:Rect>
+		
+		<!-- ~unlocked, hover, selected -->
+		<s:Rect width="100%" height="100%" radiusX="8" includeIn="lockedOverSelected">
+			<s:stroke> <s:SolidColorStroke weight="3" color="{getStyle('juiceButtonSelectedOverBorder')}" /> </s:stroke>
+			<s:fill> <s:SolidColor color="{getStyle('juiceButtonSelectedColor')}" />  </s:fill>
+		</s:Rect>
+		
+		<!-- ~unlocked, hover, ~selected -->
+		<s:Rect width="100%" height="100%" radiusX="8" includeIn="lockedOver">
+			<s:stroke> <s:SolidColorStroke weight="3" color="{getStyle('juiceButtonLockedOverBorder')}" /> </s:stroke>
+			<s:fill> <s:SolidColor color="{getStyle('juiceButtonLockedColor')}" />  </s:fill>
+		</s:Rect>
+		
+		<!-- ~unlocked, ~hover, selected -->
+		<s:Rect width="100%" height="100%" radiusX="8" includeIn="lockedSelected">
+			<s:stroke> <s:SolidColorStroke weight="3" color="{getStyle('juiceButtonSelectedBorder')}" /> </s:stroke>
+			<s:fill> <s:SolidColor color="{getStyle('juiceButtonSelectedColor')}" />  </s:fill>
+		</s:Rect>
+		
+		<!-- ~unlocked, ~hover, ~selected-->
+		<s:Rect width="100%" height="100%" radiusX="8" includeIn="locked">
+			<s:stroke> <s:SolidColorStroke weight="3" color="{getStyle('juiceButtonLockedBorder')}" /> </s:stroke>
+			<s:fill> <s:SolidColor color="{getStyle('juiceButtonLockedColor')}" />  </s:fill>
+		</s:Rect>
+		
+		<!-- OLD STATES -->
+		
+		<!-- This is what you see when you hover the mouse over a button that is NOT selected yet -->
+		<s:Rect width="100%" height="100%" radiusX="8" includeIn="over">
+			<s:stroke> <s:SolidColorStroke weight="3" color="#FF0000" /> </s:stroke>
+			<s:fill> <s:SolidColor color="#2E0854" />  </s:fill>
+		</s:Rect>
+		
+		<!-- This is what you see flash when you first click down on a juice point button -->
+		<s:Rect width="100%" height="100%" radiusX="8" includeIn="down">
+			<s:stroke> <s:SolidColorStroke weight="3" color="#00FF00" /> </s:stroke>
+			<s:fill> <s:SolidColor color="#2E0854" />  </s:fill>
+		</s:Rect>
+		
+		<!-- This I believe is never seen, because when a button gets selected it is marked as disabled -->
+		<s:Rect width="100%" height="100%" radiusX="8" includeIn="downAndSelected">
+			<s:stroke> <s:SolidColorStroke weight="3" color="#0000FF" /> </s:stroke>
+			<s:fill> <s:SolidColor color="#2E0854" />  </s:fill>
+		</s:Rect>
+		
+		<!-- This one gets over-ridden by the one below it 'disabled and selected' -->
+		<s:Rect width="100%" height="100%" radiusX="8" includeIn="upAndSelected">
+			<s:stroke> <s:SolidColorStroke weight="3" color="#C1CDCD" /> </s:stroke>
+			<s:fill> <s:SolidColor color="#388E8E" />  </s:fill>
+		</s:Rect>
+		
+		<!-- This one gets over-ridden by the one below it 'disabled and selected' -->
+		<s:Rect width="100%" height="100%" radiusX="8" includeIn="overAndSelected">
+			<s:stroke> <s:SolidColorStroke weight="3" color="#C1CDCD" /> </s:stroke>
+			<s:fill> <s:SolidColor color="#388E8E" />  </s:fill>
+		</s:Rect>
+		
+		<!-- This is the one you probably care about!  This is what it looks like when you click on it! -->
+		<s:Rect width="100%" height="100%" radiusX="8" includeIn="disabledAndSelected">
+			<s:stroke> <s:SolidColorStroke weight="3" color="#C1CDCD" /> </s:stroke>
+			<s:fill> <s:SolidColor color="#388E8E" />  </s:fill>
+		</s:Rect>
+		
+		<!-- END OLD STATES -->
+		
+		
+		<s:HGroup id="mainBtn" paddingLeft="3" paddingRight="3" width="100%" height="100%">
+			<mx:Text id="mainBtnText" width="80%" height="100%" selectable="false" mouseEnabled="false" color="#FFFFFF" text="{hostComponent.label}" fontSize="11" textAlign="left"/>
+			<s:HGroup width="20%" height="100%" paddingTop="3" paddingRight="3" horizontalAlign="right"><util:SmoothImage id="lock" scaleX="0.6" scaleY="0.6" top="5" right="5" includeIn="disabled, lockedOverSelected, locked, lockedSelected, lockedOver" /></s:HGroup>
+		</s:HGroup>
+		
+
+	</s:Group>
+
+ 
+	 
+	<fx:Script>
+		<![CDATA[
+		
+		import CiF.Debug;
+		import CiF.RelationshipNetwork;
+		import CiF.SocialFactsDB;
+		import flash.events.MouseEvent;
+		import mx.graphics.SolidColor;
+		import mx.graphics.Stroke;
+		import mx.controls.Text
+		import spark.skins.spark.ButtonSkin;
+		import flash.display.Graphics;
+		import PromWeek.SocialGameButton;
+		import PromWeek.RelationshipButtonIcon;
+		import PromWeek.GameEngine;
+		import PromWeek.assets.ResourceLibrary
+		import flash.events.Event
+		
+		private var alphaValue:Number = 1.0;
+		private var shiftKeyPressed:Boolean = false
+		private var resourceLibrary:PromWeek.assets.ResourceLibrary;
+		
+		public function onCreationComplete():void {
+			Debug.debug(this, "onCreationComplete()");
+			resourceLibrary = PromWeek.assets.ResourceLibrary.getInstance();
+			lock.source = this.resourceLibrary.uiIcons['lock'];
+		}
+		
+		override protected function createChildren():void {
+			initializeButtons()
+			super.createChildren()
+		}
+			
+		/**
+		 * This is where we initialize the buttons! Put your text/images here! (you can also modify them post-construction,
+		 * but that's a big chunk of code to do externally!
+		 * Make sure to put "mouseEnabled=false" on all the pieces, just to make sure they don't have anything to do with 
+		 * the mouse (eg: highlighting text on a button)
+		 */
+		private function initializeButtons():void {
+			
+		}
+		
+		// took this out of updateDisplayList and moved it here for code clarity and so I could use it outside 
+		// of this class
+		public function styleThisButton():void {
+			switch(this.currentState) {
+				//case "locked": Debug.debug(this, "style as locked!");  break;
+				//case "normal": Debug.debug(this, "style as normal!"); break;
+				//default: Debug.debug(this, "style as not locked nor normal!"); break;
+			}
+		}
+		
+		override protected function commitProperties():void
+		{
+			super.commitProperties();
+			var gameEngine:GameEngine = GameEngine.getInstance();
+			//Debug.debug(this, "updateDisplayList() entered." );
+			styleThisButton();
+		}
+		
+		/**
+		 * Here are all the events that this button will be throwing!
+		 * 	buttonPressed - the center button is pressed
+		 *  extraBtnPressed - the extra button has been pressed!
+		*/
+		private function mainBtnClick(event:MouseEvent):void {
+			if (event.shiftKey) {
+				dispatchEvent(new Event("juiceButtonPressedShift", true, true))
+			} else {
+				dispatchEvent(new Event("juiceButtonPressed", true, true))
+			}
+		}
+		
+		]]>
+	</fx:Script>
+</s:Skin>

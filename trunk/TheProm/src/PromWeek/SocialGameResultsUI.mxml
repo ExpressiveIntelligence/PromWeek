@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 click="onClick(event)"
+		 initialize="initializeCharacterInfoUI()"
+		 width="660"
+		 height="500"
+		 styleName="classicPromWeek">
+	
+		 
+	<fx:Metadata>
+	</fx:Metadata>
+		
+	<fx:Declarations>
+	</fx:Declarations>
+	
+	
+	
+	
+	<!--<s:RichText id="resultsRichText" height="90%" width="90%" x="10" y="10" color="#FFFD70" fontSize="14" />-->
+	<s:RichText id="perfromanceRealizationStringRichText" x="10" y="10" color="{getStyle('textColor')}" fontSize="22" />
+	<s:RichText id="whatHappenedRichText" x="10" y="40" color="{getStyle('textColor')}" fontSize="22" text="What Changed?"/>
+		<s:RichText id="whatHappenedListRichText" x="50" y="65" color="{getStyle('textColor')}" fontSize="18" />
+	<s:RichText id="whyDidInitDoThatRichText" x="10" y="150" color="{getStyle('textColor')}" fontSize="22" />
+		<s:RichText id="whyDidInitDoThatListRichText" x="50" y="175" color="{getStyle('textColor')}" fontSize="18" />
+	<s:RichText id="whyDidRespDoThatRichText" x="10" y="310" color="{getStyle('textColor')}" fontSize="22" />
+		<s:RichText id="whyDidRespDoThatListRichText" x="50" y="335" color="{getStyle('textColor')}" fontSize="18" />
+	
+	<s:RichText id="pleaseWaitRichText" x="205" y="465" color="#6096d9" fontSize="24" text="Please Wait, the characters are thinking..." visible="true"/>
+	<s:RichText id="clickToContinueRichText" x="440" y="465" color="{getStyle('textColor')}" fontSize="24" visible="false" text="Click to continue" />
+		
+	
+	
+	
+	<fx:Script>
+		<![CDATA[
+		
+		import flash.text.TextField;
+		import flash.text.TextFormat;
+		import spark.components.Group;
+		import spark.components.Button;
+		import mx.graphics.SolidColor;
+		import mx.graphics.SolidColorStroke;
+		import spark.primitives.*;
+		import spark.components.Label;
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import CiF.*;
+		
+		import flash.events.MouseEvent;
+		import spark.components.Button;
+		import spark.components.RichText;
+		import flash.events.Event;
+		import PromWeek.assets.ResourceLibrary;
+	
+		private var gameEngine:GameEngine;
+		private var resourceLibrary:PromWeek.assets.ResourceLibrary;
+		private var cif:CiFSingleton;
+		
+		public var mainBodyFill:SolidColor;
+		public var mainBodyStroke:SolidColorStroke;
+		private var mainBody:Rect;
+		
+		public var resultsString:String;
+		
+		private var socialNetworksGroup:Group;
+		
+		//private var resultsLabel:Label;
+		private var resultsStringLabel:RichText;
+		
+		public var innerBodyStroke:SolidColorStroke;
+	
+		
+		public function onCreationComplete():void
+		{
+			cif = CiFSingleton.getInstance();
+		}
+		
+		public function initializeCharacterInfoUI():void
+		{
+			gameEngine = GameEngine.getInstance();
+			cif = CiFSingleton.getInstance();
+			
+			
+			this.x = 0;
+			this.y = 0;
+			
+			this.mainBody = new Rect();
+			
+			//default values
+			mainBodyFill= new SolidColor(getStyle('navSGArrowColor'), getStyle('backgroundColorAlpha'));
+			mainBodyStroke = new SolidColorStroke(getStyle('backgroundStroke'), getStyle('backgroundColorAlpha'));
+			mainBodyStroke.weight = 10;
+			this.mainBody.x = 0;
+			this.mainBody.y = 0;
+			this.mainBody.height = this.height;
+			this.mainBody.width = this.width;//1080;
+			this.mainBody.stroke = mainBodyStroke;
+			this.mainBody.fill = mainBodyFill;
+			this.addElement(mainBody);
+			
+			this.innerBodyStroke = new SolidColorStroke(getStyle('backgroundStroke'), getStyle('backgroundColorAlpha'));
+			this.innerBodyStroke.weight = 3;
+			
+			this.setElementIndex(perfromanceRealizationStringRichText, this.numElements - 1);
+			this.setElementIndex(whatHappenedRichText, this.numElements - 1);
+			this.setElementIndex(whatHappenedListRichText, this.numElements - 1);
+			this.setElementIndex(whyDidInitDoThatRichText, this.numElements - 1);
+			this.setElementIndex(whyDidInitDoThatListRichText, this.numElements - 1);
+			this.setElementIndex(whyDidRespDoThatRichText, this.numElements - 1);
+			this.setElementIndex(whyDidRespDoThatListRichText, this.numElements - 1);
+			this.setElementIndex(pleaseWaitRichText, this.numElements - 1);
+			this.setElementIndex(clickToContinueRichText, this.numElements - 1);
+			
+
+		}
+		
+		//A simple click handler--if the socialGameResults are brought up due to someone
+		//clicking on an icon on the social change record, make the social change record go away.
+		public function onClick(event:MouseEvent):void {
+			if(clickToContinueRichText.visible && gameEngine.currentState == "Interaction")
+				this.visible = false;
+				this.visible = false;
+		}
+		
+		public function update():void
+		{
+			
+		}
+		
+		]]>
+	</fx:Script>
+		
+	
+</s:Group>

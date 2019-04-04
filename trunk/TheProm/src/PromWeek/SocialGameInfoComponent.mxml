@@ -1,0 +1,829 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 initialize="onInitialize()"
+		 creationComplete="onCreationComplete()"
+		 width="100%"
+		 height="100%"
+		 styleName="classicPromWeek">
+	
+	<fx:Metadata>
+	</fx:Metadata>
+		
+	<fx:Declarations>
+	</fx:Declarations>
+
+	<s:VGroup id="vgroup" width="100%" height="100%"  paddingBottom="5" paddingTop="5" paddingLeft="5" paddingRight="5">
+		<s:HGroup id="hgroup" width="100%" height="100%" gap="0">
+			<s:VGroup gap="0" width="18%" height="100%"> 
+				<prom:JuicePointButton id="initiatorIntentButton" label="Intent" selected="true" enabled="false" width="80" click="initiatorIntentClicked()" visible="true" currentState="{this.currentState}" cost="0" toolTip="What the social exchange is meant to do" />
+				<prom:JuicePointButton id="initiatorMotivesButton" label="Motives" width="80" click="initiatorMotivesClicked()" visible="true" currentState="{this.currentState}" cost="0" toolTip="Why the initiator wants to do this" />
+				<prom:JuicePointButton id="responderMotivesButton" label="Factors" width="80" click="responderMotivesClicked()" visible="true" currentState="{this.currentState}" toolTip="The responder's main considerations for choosing how to respond" />
+				<!--<prom:JuicePointButton id="forecastButton" label="Forecast" width="80" click="forecastClicked()" visible="true" currentState="{this.currentState}" toolTip="What might happen" />-->
+				<prom:JuicePointButton id="resultsButton" label="Results" width="80" click="resultsClicked()" visible="true" currentState="{this.currentState}" toolTip="How the responder will respond" />
+			</s:VGroup>
+			<s:Group width="82%" height="100%">  
+				<s:Rect id="bgRect" width="100%" height="100%" topRightRadiusX="25" topRightRadiusY="25">
+					<s:stroke><mx:SolidColorStroke color="{getStyle('backgroundStroke')}" weight="1" /></s:stroke>
+					<s:fill><mx:SolidColor color="{getStyle('contentAreaAltColor')}" /> </s:fill>
+				</s:Rect>
+				<s:Group id="initiatorMotivesGroup" width="100%" height="100%" visible="false">
+						<!--icon="@Embed('assets/bulletCheck.png')">-->
+					<s:VGroup width="100%" height="100%" >
+						<s:HGroup paddingLeft="3" paddingTop="3" width="100%" height="15%"><s:RichText text="Initiator's Motives:" fontSize="12" verticalAlign="middle" styleName="basicFontStyle"/></s:HGroup>
+						<s:TextArea id="initiatorMotivesText" width="100%" height="100%" contentBackgroundColor="{getStyle('contentAreaColor')}" color="{getStyle('contentAreaTextColor')}" fontSize="12" editable="false" selectable="false" styleName="basicFontStyle" />
+						<!--<s:TextArea id="initiatorMotivesText" width="330" height="75" contentBackgroundColor="{getStyle('contentAreaColor')}" color="{getStyle('contentAreaTextColor')}" fontSize="12" editable="false" selectable="false" styleName="basicFontStyle" />-->
+					</s:VGroup>
+				</s:Group>
+				<s:Group id="initiatorIntentGroup" width="100%" height="100%" visible="true">
+						<!--icon="@Embed('assets/bulletCritical.png')">-->
+					<s:HGroup width="100%" height="100%" paddingTop="18" paddingLeft="20">
+						<s:VGroup width="50%" height="100%">
+							<s:Label id="initIntentLabel" text="Intent:" verticalAlign="middle" fontSize="11" styleName="basicFontStyle"/>
+							<s:HGroup paddingLeft="20">
+								<s:HGroup id="intentImageGroup" width="50" height="50" />
+							</s:HGroup>
+						</s:VGroup>
+						<s:VGroup width="50%" height="100%">
+							<s:Label id="initIntensityLabel" text="Strength of Desire:" fontSize="11" styleName="basicFontStyle"/>
+							<mx:Spacer height="12%"></mx:Spacer>
+							<s:HGroup paddingLeft="25"><s:RichText id="intensityLabel" fontSize="20" verticalAlign="middle" styleName="basicFontStyle"/></s:HGroup>
+						</s:VGroup>
+					</s:HGroup>
+				</s:Group>
+				<s:Group id="responderMotivesGroup" width="100%" height="100%" visible="false">
+						<!--icon="@Embed('assets/bulletWarning.png')">-->
+					<s:VGroup width="100%" height="100%" >
+						<s:HGroup paddingLeft="3" paddingTop="3" width="100%" height="15%"><s:RichText text="Responder's Factors:" fontSize="12" verticalAlign="middle" styleName="basicFontStyle"/></s:HGroup>
+						<s:TextArea id="responderMotivesText" width="100%" height="100%" contentBackgroundColor="{getStyle('contentAreaColor')}" color="{getStyle('contentAreaTextColor')}" fontSize="12" editable="false" selectable="false" styleName="basicFontStyle"/>
+						<!--<s:TextArea id="responderMotivesText" width="330" height="75" contentBackgroundColor="{getStyle('contentAreaColor')}" color="{getStyle('contentAreaTextColor')}" fontSize="12" editable="false" selectable="false" styleName="basicFontStyle"/>-->
+					</s:VGroup>
+				</s:Group>
+				<s:Group id="resultsGroup" width="100%" height="100%" visible="false">
+						<!--icon="@Embed('assets/bulletCritical.png')">-->
+					<s:HGroup width="100%" height="100%" paddingLeft="20" paddingTop="18" paddingBottom="15">
+						<s:VGroup width="50%" height="100%" >
+							<s:HGroup width="100%" height="40%">
+								<s:RichText id="responderIntentNameLabel" text="will..."  verticalAlign="middle" fontSize="11" width="40%" height="100%" styleName="basicFontStyle" />
+								<s:RichText id="predictionLabel" fontSize="20" verticalAlign="middle" width="60%" height="100%" styleName="basicFontStyle"/>
+							</s:HGroup>
+							<s:HGroup width="100%" height="50%">
+								<s:RichText id="responderIntentLabel" text="Results:"  verticalAlign="middle" fontSize="11" width="40%" height="100%" styleName="basicFontStyle"/>
+								<s:HGroup id="intentImageGroupForResponse" width="30" height="30" scaleX="0.6" scaleY="0.6" />
+							</s:HGroup>
+						</s:VGroup>
+						<s:VGroup width="50%" height="100%" gap="0">
+							<s:HGroup paddingLeft="0" width="100%" height="0" verticalAlign="middle" visible="false">
+								<!--<prom:JuicePointButton width="150" height="25" id="switchOutcomeButton" label="Change Response" click="switchOutcomeClicked()" visible="false" toolTip="Force the responder to respond in the opposite way"  />-->
+								<prom:JuicePointButton width="150" height="0" id="switchOutcomeButton" label="Change Response" click="switchOutcomeClicked()" visible="false" toolTip="Force the responder to respond in the opposite way" />
+							</s:HGroup>
+							<s:VGroup width="100%" height="100%" verticalAlign="middle">
+								<s:Label id="respIntensityLabel" text="Strength of Response:" fontSize="11" styleName="basicFontStyle"/>
+								<!--<mx:Spacer height="5%"></mx:Spacer>-->
+								<s:HGroup paddingLeft="50"><s:RichText id="responderIntensityLabel" fontSize="20" verticalAlign="middle" styleName="basicFontStyle"/></s:HGroup>
+							</s:VGroup>
+						</s:VGroup>
+					</s:HGroup>
+				</s:Group>
+
+				
+				<s:Group id="forecastGroup" width="100%" height="100%" visible="false">
+						<!--icon="@Embed('assets/bulletCritical.png')">-->
+					<s:VGroup width="100%" height="100%" paddingLeft="5">
+						<s:Label text="Forecast:" fontWeight="bold" />
+						<s:HGroup width="100%" height="100%">
+							<s:VGroup width="49%" height="100%">
+								<s:Label id="forecastSuccessLabel" width="100%" text="If Responder Accepts:" visible="false" fontSize="12" color="{getStyle('contentAreaTextColor')}" backgroundColor="#0E386C" />
+								<s:TextArea id="forecastAccept" width="100%" height="90%" contentBackgroundColor="{getStyle('contentAreaColor')}" color="{getStyle('contentAreaTextColor')}" fontSize="12" editable="false" selectable="false" visible="false" />
+							</s:VGroup>
+							<s:VGroup width="49%" height="100%">
+								<s:Label id="forecastFailureLabel" width="100%" text="If Responder Rejects" visible="false" fontSize="12" color="{getStyle('contentAreaTextColor')}" backgroundColor="#0E386C" />
+								<s:TextArea id="forecastReject" width="100%" height="90%" contentBackgroundColor="{getStyle('contentAreaColor')}" color="{getStyle('contentAreaTextColor')}" fontSize="12" editable="false" selectable="false" visible="false" />
+							</s:VGroup>
+						</s:HGroup>
+					</s:VGroup>
+				</s:Group>
+			</s:Group>
+		</s:HGroup>
+	</s:VGroup>
+	
+	
+	
+	<fx:Script>
+		<![CDATA[
+		import CiF.Character;
+		import CiF.CiFSingleton;
+		import CiF.Debug;
+		import CiF.LineOfDialogue;
+		import CiF.Predicate;
+		import CiF.SocialGameContext;
+		import CiF.SocialGamesLib;
+		import PromWeek.assets.ResourceLibrary;
+		import PromWeek.skins.NEW_listScrollSkin;
+		
+		private var gameEngine:PromWeek.GameEngine;
+		public var jpm:JuicePointManager;
+		public var cif:CiFSingleton;
+		public var dm:DifficultyManager;
+		
+		public var notSFDBVersion:Boolean = true;
+		
+		
+		public function onInitialize():void 
+		{
+
+		}
+		
+		
+		public function onCreationComplete():void
+		{
+			this.gameEngine = GameEngine.getInstance();
+			jpm = JuicePointManager.getInstance();
+			cif = CiFSingleton.getInstance();
+			dm = DifficultyManager.getInstance();
+			
+			if (!notSFDBVersion)
+			{
+				//in this case, we want to change the mouse over names for the juice buttons
+				initiatorIntentButton.toolTip = "What the social exchange is meant to do";
+				initiatorMotivesButton.toolTip = "Why the initiator wants to do this";
+				responderMotivesButton.toolTip = "The responder's main considerations when choosing how to respond"
+				resultsButton.toolTip = "How the responder reacted";
+			}
+			
+			initiatorMotivesText.scroller.verticalScrollBar.setStyle("skinClass", NEW_listScrollSkin);
+			responderMotivesText.scroller.verticalScrollBar.setStyle("skinClass", NEW_listScrollSkin);
+			
+		}
+		
+		public function populateInitiatorIntent(sgc1:SocialGameContext):void
+		{
+			this.sgc = sgc1;
+			//set the intent picture and intensity
+			this.intentImageGroup.removeAllElements();
+			var intentPred:Predicate = cif.socialGamesLib.getByName(sgc.gameName).intents[0].predicates[0];
+			this.intentImageGroup.addElement(MegaUI.getIntentImage(intentPred, this.gameEngine.hudGroup.megaUI.currentPrimaryCharacter, this.gameEngine.hudGroup.megaUI.currentSecondaryCharacter));
+			if (notSFDBVersion)
+			{
+				this.initIntentLabel.text = gameEngine.hudGroup.megaUI.currentPrimaryCharacter.characterName + " intends:";
+			}
+			else
+			{
+				this.initIntentLabel.text = gameEngine.hudGroup.megaUI.currentPrimaryCharacter.characterName + " intended:";
+			}
+			this.intensityLabel.text = LineOfDialogue.toInitialCap(gameEngine.getIntensityOfDesireToDoWhatTheCharacterDid("initiator", sgc));
+		}
+		
+		public function populateInitiatorIntentForResponse(sgc1:SocialGameContext):void
+		{
+			this.sgc = sgc1;
+			//set the intent picture and intensity
+			this.intentImageGroupForResponse.removeAllElements();
+			var intentPred:Predicate = cif.socialGamesLib.getByName(gameEngine.hudGroup.megaUI.selectedGameName).intents[0].predicates[0];
+			this.intentImageGroupForResponse.addElement(MegaUI.getIntentImage(intentPred, gameEngine.hudGroup.megaUI.currentPrimaryCharacter, gameEngine.hudGroup.megaUI.currentSecondaryCharacter));
+		}
+		
+		public var sgc:SocialGameContext;
+		public function loadSGInfoForSFDBEntryWindow(socialGameName:String, init:Character, resp:Character, oth:Character=null):void
+		{	
+			notSFDBVersion = false;
+			
+			this.bgRect.topRightRadiusX = 0;
+			this.bgRect.topRightRadiusY = 0;
+			
+			responderMotivesButton.isUnlocked = true;
+			initiatorMotivesButton.isUnlocked = true;
+			resultsButton.isUnlocked = true;
+			initiatorIntentButton.isUnlocked = true;
+			
+			switchOutcomeButton.visible = true;
+			switchOutcomeButton.enabled = false;
+			switchOutcomeButton.alpha = 0.1;
+			
+			var castToUse:Vector.<Character>;
+			/*
+			if (gameEngine.currentStory.storyLeadCharacter == "Zack" || gameEngine.currentStory.storyLeadCharacter == "Chloe")
+			{
+				castToUse = gameEngine.currentLevel.cast;
+			}
+			else
+			{
+				castToUse = cif.cast.characters;
+			}
+			*/
+			castToUse = cif.cast.characters;
+			this.sgc = cif.playGame(cif.socialGamesLib.getByName(socialGameName), init, resp,oth, castToUse, gameEngine.currentLevel.cast, false, dm.getVolitionThreshold("responder"), dm.getResponderBoostFromDictionary(init.characterName, resp.characterName, socialGameName) );
+			
+			this.gameEngine.hudGroup.megaUI.currentPrimaryCharacter = init;
+			this.gameEngine.hudGroup.megaUI.currentSecondaryCharacter = resp;
+			var indexString:String = gameEngine.hudGroup.megaUI.currentPrimaryCharacter.characterName.toLowerCase() + "-" + gameEngine.hudGroup.megaUI.currentSecondaryCharacter.characterName.toLowerCase() + "-" + socialGameName.toLowerCase();
+			jpm.unlockHint(init.characterName.toLowerCase(), resp.characterName.toLowerCase(), socialGameName.toLowerCase(), jpm.HINT_SG_OUTCOME);
+			//get the info for the results info window
+			if (!gameEngine.hudGroup.megaUI.actualResponderMotiveStrengthDictionary[indexString]) { // we haven't computed this yet, we need to populate it!
+				gameEngine.hudGroup.megaUI.actualResponderMotiveStrengthDictionary[indexString] = gameEngine.getIntensityOfDesireToDoWhatTheCharacterDid("responder", gameEngine.hudGroup.megaUI.socialGameContext);
+				gameEngine.hudGroup.megaUI.currentResponderMotiveStrengthDictionary[indexString] = gameEngine.getIntensityOfDesireToDoWhatTheCharacterDid("responder", gameEngine.hudGroup.megaUI.socialGameContext);
+			}
+			
+			Debug.debug(this, "********************* responder score is: " + sgc.responderScore + " and threshold is: " + dm.getVolitionThreshold("responder"));
+			if (sgc.responderScore >= dm.getVolitionThreshold("responder")) Debug.debug(this, "should predict accept I think!");
+			
+			if (sgc.responderScore >= dm.getVolitionThreshold("responder")) {
+				//gameEngine.hudGroup.sgInfoWindow.predictionValues.text = "Accept"
+				this.predictionLabel.text = "Accept";
+			}
+			else {
+				//gameEngine.hudGroup.sgInfoWindow.predictionValues.text = "Reject" 
+				this.predictionLabel.text = "Reject";
+			}
+					
+			
+			gameEngine.hudGroup.megaUI.revealedPredictions[indexString] = this.predictionLabel.text;
+			
+			//Debug.debug(this, "thing was clicked like, the first time. Index string: " + indexString);
+			responderIntensityLabel.text = LineOfDialogue.toInitialCap(gameEngine.hudGroup.megaUI.currentResponderMotiveStrengthDictionary[indexString]);
+			
+			this.populateInitiatorIntentForResponse(sgc);
+			this.populateInitiatorIntent(sgc);
+			this.populateInitiatorMotives(sgc);
+			this.populateResponderMotives(sgc);
+			this.populateResponse(sgc);
+			
+			
+			updateJuicePointButtonSkinStates();
+			
+			
+			
+			
+			
+			
+			
+			//default to this one
+			this.resultsButton.selected = true;
+			this.resultsClicked();
+			
+			
+		}		
+		
+		
+		
+		
+		
+		/**
+		 * This is the heart of this component -- given a social game name, it populates the window with
+		 * all of the information pertinent to that name (keeping track of what information has already
+		 * been unlocked this turn, and then preventing the user from having to unlock it multiple times!)
+		 * @param	socialGameName the name of the social game to load.
+		 */
+		public function loadSGInfo(socialGameName:String):void 
+		{
+			
+			var castToUse:Vector.<Character>;
+			/*
+			if (gameEngine.currentStory.storyLeadCharacter == "Zack" || gameEngine.currentStory.storyLeadCharacter == "Chloe")
+			{
+				castToUse = gameEngine.currentLevel.cast;
+			}
+			else
+			{
+			
+				castToUse = cif.cast.characters;
+			}
+			*/
+			castToUse = cif.cast.characters;
+			this.sgc = cif.playGame(cif.socialGamesLib.getByName(socialGameName), gameEngine.hudGroup.megaUI.currentPrimaryCharacter, gameEngine.hudGroup.megaUI.currentSecondaryCharacter, null, castToUse, gameEngine.currentLevel.cast, false, dm.getVolitionThreshold("responder"), dm.getResponderBoostFromDictionary(gameEngine.hudGroup.megaUI.currentPrimaryCharacter.characterName, gameEngine.hudGroup.megaUI.currentSecondaryCharacter.characterName, socialGameName));
+
+			gameEngine.hudGroup.megaUI.socialGameContext = sgc; // store this for juice point stuff.
+			
+			gameEngine.hudGroup.megaUI.socialExchangeButtonGameName.text = socialGameName;
+			
+			gameEngine.hudGroup.megaUI.selectedGameName = socialGameName;
+			
+			var indexString:String = gameEngine.hudGroup.megaUI.currentPrimaryCharacter.characterName.toLowerCase() + "-" + gameEngine.hudGroup.megaUI.currentSecondaryCharacter.characterName.toLowerCase() + "-" + socialGameName.toLowerCase();
+			//Debug.debug(this, "inside of sg info");
+			gameEngine.hudGroup.socialGameButtonRing.sgDropDown.ddlDP = gameEngine.hudGroup.megaUI.sgArray; // specify what the data provider is!!?
+			//Populate the 'available sg' dictionary with the games that they COULD have played anyway, by looking at the social game button ring.
+			var availableSocialGameIndex:String = gameEngine.hudGroup.megaUI.currentPrimaryCharacter.characterName.toLowerCase() + "-" + gameEngine.hudGroup.megaUI.currentSecondaryCharacter.characterName.toLowerCase();
+			gameEngine.hudGroup.megaUI.handleInitialAvailableGames(availableSocialGameIndex);
+			gameEngine.hudGroup.megaUI.updateDropDownList(availableSocialGameIndex); // Controls which games the user can still unlock for this init/respon pair.
+			
+			//First, set the values of the buttons to what they need to be based on what has been unlocked.
+			
+			if (jpm.isHintUnlocked(gameEngine.hudGroup.megaUI.currentPrimaryCharacter.characterName, gameEngine.hudGroup.megaUI.currentSecondaryCharacter.characterName, socialGameName, jpm.HINT_RESPONDER_MOTIVE)) {
+				//if responder motive is unlocked.
+				responderMotivesButton.isUnlocked = true;
+			}
+			else {
+				responderMotivesButton.isUnlocked = false;
+				responderMotivesButton.cost = jpm.COST_FOR_UNLOCKING_RESPONDER_MOTIVE;
+				//responderMotivesButton.style
+			}
+			
+			if (jpm.isHintUnlocked(gameEngine.hudGroup.megaUI.currentPrimaryCharacter.characterName, gameEngine.hudGroup.megaUI.currentSecondaryCharacter.characterName, socialGameName, jpm.HINT_SG_OUTCOME)) {
+				
+				
+				
+				
+				resultsButton.isUnlocked = true;
+				//Debug.debug(this, "going into populate response!");
+				populateResponse(sgc);
+				//Debug.debug(this, "Just finished populate response!");
+			}
+			else {
+				resultsButton.isUnlocked = false;
+				resultsButton.cost = jpm.COST_FOR_UNLOCKING_SG_OUTCOME;
+			}
+			
+
+			initiatorIntentButton.isUnlocked = true;
+			initiatorMotivesButton.isUnlocked = true;
+			if ( (responderMotivesButton.selected && !responderMotivesButton._isUnlocked)) {
+				Debug.debug(this, "getting inside of here--responder motives used to be selected");
+				this.juicePointButtonClicked("initiatorMotives");
+				initiatorMotivesGroup.visible = true;
+				
+				initiatorMotivesButton.selected = true;
+				
+			}
+			else if (resultsButton.selected && !resultsButton._isUnlocked) {
+				Debug.debug(this, "getting inside of here--results used to be selected");
+				this.juicePointButtonClicked("initiatorMotives");
+				initiatorMotivesGroup.visible = true;
+				
+				initiatorMotivesButton.selected = true;
+			}
+
+			
+			var castToUse1:Vector.<Character>;
+			/*
+			if (gameEngine.currentStory.storyLeadCharacter == "Zack" || gameEngine.currentStory.storyLeadCharacter == "Chloe")
+			{
+				castToUse1 = gameEngine.currentLevel.cast;
+			}
+			else
+			{
+				castToUse1 = cif.cast.characters;
+			}
+			*/
+			castToUse1 = cif.cast.characters;
+			
+			/*
+			 * BEN COMMENTING THESE OUT ON 8/15/2012 -- We seem to already do these things above, and I don't see why we would need to do them again.
+			 * I wonder if this was just the result of some weird copy and paste error? I think this is the cause of some false predictions of social game outcomes.
+			 * We also never use 'dictionary string' anywhere else in this file, it appears.
+			this.sgc = cif.playGame(cif.socialGamesLib.getByName(socialGameName), gameEngine.hudGroup.megaUI.currentPrimaryCharacter, gameEngine.hudGroup.megaUI.currentSecondaryCharacter, null, castToUse1, gameEngine.currentLevel.cast);
+			gameEngine.hudGroup.megaUI.socialGameContext = sgc; // store this for juice point stuff.
+
+			var dictionaryIndex:String = gameEngine.hudGroup.megaUI.currentPrimaryCharacter.characterName.toLowerCase() + "-" + gameEngine.hudGroup.megaUI.currentSecondaryCharacter.characterName.toLowerCase() + "-" + socialGameName.toLowerCase();
+			*/
+			
+			
+			//Handle the state of the 'switch social game button'
+			if (jpm.isHintUnlocked(gameEngine.hudGroup.megaUI.currentPrimaryCharacter.characterName, gameEngine.hudGroup.megaUI.currentSecondaryCharacter.characterName, socialGameName, jpm.HINT_NEW_RESPONDER_REACTION)) {
+				switchOutcomeButton.isUnlocked = true;
+				if(gameEngine.hudGroup.megaUI.currentResponderMotiveStrengthDictionary[indexString] == gameEngine.hudGroup.megaUI.actualResponderMotiveStrengthDictionary[indexString])
+					switchOutcomeButton.selected = false; // we HAVEN'T swithced things.  Don't make it selected.
+				else
+					switchOutcomeButton.selected = true; //we HAVE switched things.  Make it selected!
+			}
+			else {
+				switchOutcomeButton.isUnlocked = false;
+				switchOutcomeButton.selected = false;
+				switchOutcomeButton.cost = jpm.getCostForSwitchOutcome(sgc);//COST_FOR_OPPOSITE_RESPONDER_REACTION;
+			}
+			
+			
+			
+			
+			this.populateInitiatorIntent(sgc);
+			
+			this.populateInitiatorMotives(sgc);
+			this.populateResponderMotives(sgc);
+			
+			this.populateResponse(sgc);
+			
+			updateJuicePointButtonSkinStates();
+		}
+		
+		public function stringNotInVector(vect:Vector.<String>, str:String):Boolean
+		{
+			for each (var s:String in vect)
+			{
+				if (s == str)
+				{
+					return false;
+				}
+			}
+			
+			return true;
+		}
+		
+		public function populateInitiatorMotives(sgc1:SocialGameContext):void
+		{
+			this.sgc = sgc1;
+			var initMotivesDict:Vector.<Dictionary> = gameEngine.getInitiatorMotives(
+				sgc, 
+				true, 
+				cif.getPredicateRelevance(sgc, 
+				cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder), 
+				cif.cast.getCharByName(sgc.other), "initiator", gameEngine.currentLevel.cast) , 
+				sgc.initiator, 
+				sgc.responder);
+			this.initiatorMotivesText.text = "";
+			var addedSoFar:Vector.<String> = new Vector.<String>();
+			for each (var dictionary:Dictionary in initMotivesDict)
+			{
+				if (this.stringNotInVector(addedSoFar, dictionary["motive"]))
+				{
+					addedSoFar.push(dictionary["motive"]);
+					//this.initiatorMotivesText.text += dictionary["percent"] + "% " + dictionary["motive"] + "\n";
+					this.initiatorMotivesText.text += "- " + LineOfDialogue.preprocessLine(dictionary["motive"]) + "\n";
+				}
+			}
+		}
+		
+		
+		public function initiatorMotivesClicked():void {
+			//Debug.debug(this, "initiator motives clicked!");
+			//if (notSFDBVersion)
+			//{
+			this.juicePointButtonClicked("initiatorMotives");
+			//}
+			initiatorMotivesGroup.visible = true;
+		}
+		
+		public function initiatorIntentClicked():void {
+			//Debug.debug(this, "initiator intent clicked!");
+			//if (notSFDBVersion)
+			//{
+			this.juicePointButtonClicked("initiatorIntentClicked");
+			//}
+			initiatorIntentGroup.visible = true;
+		}
+		
+		
+		public function switchOutcomeClicked(isFreebie:Boolean=false):void {
+			
+			var indexString:String = gameEngine.hudGroup.megaUI.currentPrimaryCharacter.characterName.toLowerCase() + "-" + gameEngine.hudGroup.megaUI.currentSecondaryCharacter.characterName.toLowerCase() + "-" + gameEngine.hudGroup.megaUI.selectedGameName.toLowerCase();
+			
+			if (jpm.isHintUnlocked(gameEngine.hudGroup.megaUI.currentPrimaryCharacter.characterName.toLowerCase(), gameEngine.hudGroup.megaUI.currentSecondaryCharacter.characterName.toLowerCase(), gameEngine.hudGroup.megaUI.selectedGameName, jpm.HINT_NEW_RESPONDER_REACTION)) {
+				switchOutcomeButton._isUnlocked = true;
+				if (gameEngine.hudGroup.megaUI.currentResponderMotiveStrengthDictionary[indexString] == gameEngine.hudGroup.megaUI.actualResponderMotiveStrengthDictionary[indexString])
+					gameEngine.hudGroup.megaUI.currentResponderMotiveStrengthDictionary[indexString] = "changed";
+				else
+					gameEngine.hudGroup.megaUI.currentResponderMotiveStrengthDictionary[indexString] = gameEngine.hudGroup.megaUI.actualResponderMotiveStrengthDictionary[indexString];
+					
+				if (gameEngine.hudGroup.megaUI.currentResponderMotiveStrengthDictionary[indexString])
+				{
+					responderIntensityLabel.text = LineOfDialogue.toInitialCap(gameEngine.hudGroup.megaUI.currentResponderMotiveStrengthDictionary[indexString]);
+				}
+					
+				if (predictionLabel.text.toLowerCase() == "accept" || predictionLabel.text.toLowerCase() == "accepted")
+					predictionLabel.text = "Reject";
+				else
+					predictionLabel.text = "Accept";
+					
+				jpm.switchResponderReaction(gameEngine.hudGroup.megaUI.currentPrimaryCharacter.characterName.toLowerCase(), gameEngine.hudGroup.megaUI.currentSecondaryCharacter.characterName.toLowerCase(), gameEngine.hudGroup.megaUI.selectedGameName, gameEngine.hudGroup.megaUI.socialGameContext);
+				
+				//Debug.debug(this, "switching for free switch outcome clicked()");
+			}
+			else {
+				if (jpm.activateOppositeResponderReaction(gameEngine.hudGroup.megaUI.currentPrimaryCharacter.characterName, gameEngine.hudGroup.megaUI.currentSecondaryCharacter.characterName, gameEngine.hudGroup.megaUI.selectedGameName, gameEngine.hudGroup.megaUI.socialGameContext, isFreebie)) {
+					switchOutcomeButton._isUnlocked = true;
+					switchOutcomeButton.invalidateSkinState();
+					
+					gameEngine.hudGroup.juiceBar.phantomJuiceHide();
+					if (gameEngine.hudGroup.megaUI.currentResponderMotiveStrengthDictionary[indexString] == gameEngine.hudGroup.megaUI.actualResponderMotiveStrengthDictionary[indexString])
+						gameEngine.hudGroup.megaUI.currentResponderMotiveStrengthDictionary[indexString] = "changed";
+					else
+						gameEngine.hudGroup.megaUI.currentResponderMotiveStrengthDictionary[indexString] = gameEngine.hudGroup.megaUI.actualResponderMotiveStrengthDictionary[indexString];
+						
+					this.responderIntensityLabel.text = LineOfDialogue.toInitialCap(gameEngine.hudGroup.megaUI.currentResponderMotiveStrengthDictionary[indexString]);
+						
+					if (predictionLabel.text.toLowerCase() == "accept" || predictionLabel.text.toLowerCase() == "accepted")
+						predictionLabel.text = "Reject";
+					else
+						predictionLabel.text = "Accept";
+						
+					
+					Debug.debug(this, "switching for expensive siwtch outcome clicked()");
+				}
+				else {
+					Debug.debug(this, "not enough juie switchoutcomeclicked()");
+				}
+			}
+		}
+		
+		
+		public function responderMotivesClicked():void {
+			//Debug.debug(this, "responder motives clicked!");
+			
+			if (!responderMotivesButton._isUnlocked) {
+				//the motives are not unlocked!  We need to unlock them!
+				if(jpm.handleResponderMotiveUnlock(gameEngine.hudGroup.megaUI.currentPrimaryCharacter.characterName.toLowerCase(), gameEngine.hudGroup.megaUI.currentSecondaryCharacter.characterName.toLowerCase(), gameEngine.hudGroup.megaUI.selectedGameName, gameEngine.hudGroup.megaUI.socialGameContext)) {
+					//Debug.debug(this, "R MOTIVE oh good, I think there was enough juice!");
+					responderMotivesButton._isUnlocked = true;
+					this.juicePointButtonClicked("responderMotives");
+					responderMotivesGroup.visible = true;
+				}
+				else {
+					//Debug.debug(this, "R MOTIVEoh oh, not enough juice!");
+					return;
+				}
+			}
+			else {
+				this.juicePointButtonClicked("responderMotives");
+				responderMotivesGroup.visible = true;
+			}
+			
+			
+		}
+		
+		public function resultsClicked():void {
+			//Debug.debug(this, "results clicked!");
+			
+			if (!resultsButton._isUnlocked) {
+				//the outcome is not unlocked, we need to unlock them!
+				if (jpm.handleOutcomeUnlock(gameEngine.hudGroup.megaUI.currentPrimaryCharacter.characterName.toLowerCase(), gameEngine.hudGroup.megaUI.currentSecondaryCharacter.characterName.toLowerCase(), gameEngine.hudGroup.megaUI.selectedGameName, gameEngine.hudGroup.megaUI.socialGameContext)) {
+					var indexString:String = gameEngine.hudGroup.megaUI.currentPrimaryCharacter.characterName.toLowerCase() + "-" + gameEngine.hudGroup.megaUI.currentSecondaryCharacter.characterName.toLowerCase() + "-" + gameEngine.hudGroup.megaUI.selectedGameName.toLowerCase();
+					//Debug.debug(this, "RESULTS oh good, I think there was enough juice!");
+					resultsButton._isUnlocked = true;
+					this.juicePointButtonClicked("results");
+					
+					resultsGroup.visible = true;
+
+					switchOutcomeButton.visible = true;
+					
+					if (!gameEngine.hudGroup.megaUI.actualResponderMotiveStrengthDictionary[indexString]) { // we haven't computed this yet, we need to populate it!
+						gameEngine.hudGroup.megaUI.actualResponderMotiveStrengthDictionary[indexString] = gameEngine.getIntensityOfDesireToDoWhatTheCharacterDid("responder", gameEngine.hudGroup.megaUI.socialGameContext);
+						gameEngine.hudGroup.megaUI.currentResponderMotiveStrengthDictionary[indexString] = gameEngine.getIntensityOfDesireToDoWhatTheCharacterDid("responder", gameEngine.hudGroup.megaUI.socialGameContext);
+					}
+					gameEngine.hudGroup.megaUI.revealedPredictions[indexString] = predictionLabel.text;
+					
+					//Debug.debug(this, "thing was clicked like, the first time. Index string: " + indexString);
+					responderIntensityLabel.text = LineOfDialogue.toInitialCap(gameEngine.hudGroup.megaUI.currentResponderMotiveStrengthDictionary[indexString]);
+					//Debug.debug(this, "and the text written down is: " + responderIntensityLabel.text);
+				}
+				else{
+					//Debug.debug(this, "RESULTS oh oh, not enough juice!");
+					return;
+				}
+			}
+			else 
+			{
+				this.juicePointButtonClicked("results");
+
+				switchOutcomeButton.visible = true;
+				
+				resultsGroup.visible = true;
+			}
+			
+		}
+		
+		
+		public function juicePointButtonClicked(buttonClicked:String):void {
+			this.initiatorIntentGroup.visible = false;
+			this.initiatorMotivesGroup.visible = false;
+			this.responderMotivesGroup.visible = false;
+			this.resultsGroup.visible = false;
+			this.forecastGroup.visible = false;
+			this.forecastFailureLabel.visible = false;
+			this.forecastSuccessLabel.visible = false;
+			this.forecastReject.visible = false;
+			this.forecastAccept.visible = false;
+			this.switchOutcomeButton.visible = false;
+			
+			/*
+			initiatorIntentButton.currentState = "";
+			initiatorMotivesButton.currentState = "";
+			responderMotivesButton.currentState = "";
+			resultsButton.currentState = "";
+			forecastButton.currentState = "";
+			*/
+			
+			//Debug.debug(this, "I think this must be where the issue is!");
+			
+			if (buttonClicked.toLowerCase() != "initiatorintentclicked") {
+				this.initiatorIntentButton.selected = false;
+				this.initiatorIntentButton.enabled = true;
+			}
+			else {
+				this.initiatorIntentButton.enabled = false;
+			}
+			
+			if (buttonClicked.toLowerCase() != "initiatormotives") {
+				this.initiatorMotivesButton.selected = false;
+				this.initiatorMotivesButton.enabled = true;
+			}
+			else {
+				this.initiatorMotivesButton.enabled = false;
+			}
+			
+			if (buttonClicked.toLowerCase() != "respondermotives") {
+				this.responderMotivesButton.selected = false;
+				this.responderMotivesButton.enabled = true;
+			}
+			else {
+				this.responderMotivesButton.enabled = false;
+			}
+			
+			if (buttonClicked.toLowerCase() != "results") {
+				this.resultsButton.selected = false;
+				this.resultsButton.enabled = true;
+			}
+			else {
+				this.resultsButton.enabled = false;
+			}
+			/*
+			if (buttonClicked.toLowerCase() != "forecast") {
+				forecastButton.selected = false; 
+				forecastButton.enabled = true;
+			}
+			else {
+				forecastButton.enabled = false;
+			}
+			*/
+			
+		}
+		
+		
+		
+		public function populateResponderMotives(sgc1:SocialGameContext):void
+		{
+			this.sgc = sgc1;
+			var respMotivesDict:Vector.<Dictionary> = gameEngine.getResponderMotives(
+				sgc, 
+				true, 
+				cif.getPredicateRelevance(sgc, 
+				cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder), 
+				cif.cast.getCharByName(sgc.other), "responder", gameEngine.currentLevel.cast,(sgc.responderScore < 0)?"reject":"accept") , 
+				sgc.initiator, 
+				sgc.responder);
+			this.responderMotivesText.text = ""
+			
+			var addedSoFar:Vector.<String> = new Vector.<String>();
+			
+			for each (var dictionary:Dictionary in respMotivesDict)
+			{
+				if (this.stringNotInVector(addedSoFar, dictionary["motive"]))
+				{
+					addedSoFar.push(dictionary["motive"]);
+					//this.responderMotivesText.text += dictionary["percent"] + "% " + dictionary["motive"] + "\n";
+					this.responderMotivesText.text += "- " + LineOfDialogue.preprocessLine(dictionary["motive"]) + "\n";
+				}
+			}
+		}
+		
+		public function populateResponse(sgc1:SocialGameContext,switchResponse:Boolean=false):void
+		{
+			this.sgc = sgc1;
+			var indexString:String = gameEngine.hudGroup.megaUI.currentPrimaryCharacter.characterName.toLowerCase() + "-" + gameEngine.hudGroup.megaUI.currentSecondaryCharacter.characterName.toLowerCase() + "-" + gameEngine.hudGroup.megaUI.selectedGameName.toLowerCase();
+
+			if (gameEngine.hudGroup.megaUI.currentResponderMotiveStrengthDictionary[indexString]) {
+				//Debug.debug(this, "setting responder intensity label! index string is: " + indexString);
+				this.responderIntensityLabel.text = LineOfDialogue.toInitialCap(gameEngine.hudGroup.megaUI.currentResponderMotiveStrengthDictionary[indexString]);
+				//Debug.debug(this, "and this is the new text: " + responderIntensityLabel.text);
+			}
+			
+			if (notSFDBVersion)
+			{
+				this.responderIntentNameLabel.text = gameEngine.hudGroup.megaUI.currentSecondaryCharacter.characterName + " will ";
+			}
+			else
+			{
+				this.responderIntentNameLabel.text = gameEngine.hudGroup.megaUI.currentSecondaryCharacter.characterName + " ";
+			}
+			
+			this.responderIntentLabel.text =  gameEngine.hudGroup.megaUI.currentPrimaryCharacter.characterName + "'s\nAttempt:";
+			
+			this.populateInitiatorIntentForResponse(sgc);
+			
+			
+			//I THINK THIS IS IT
+			//I THINK THIS IS THE CAUSE OF THE BUTTONS HAVING WONKY PREDICTIONS, MAYBE.
+			// gameEngine.hudGroup.megaUI.revealedPredictions[indexString]
+			// SHould instead be using the juice point manager 'currentStateofrevealedprediction' or whatever.
+			Debug.debug(this, "Entering wonky prediction land again?");
+			if(jpm.currentStateOfResponderReaction[indexString]){
+				if (jpm.currentStateOfResponderReaction[indexString].toLowerCase() == "accept" || jpm.currentStateOfResponderReaction[indexString].toLowerCase() == "accepted") {
+					if (notSFDBVersion) {
+						predictionLabel.text = "Accept";
+					}
+					else {
+						predictionLabel.text "Accepted";
+					}
+				}
+				else if (jpm.currentStateOfResponderReaction[indexString].toLowerCase() == "reject" || jpm.currentStateOfResponderReaction[indexString].toLowerCase() == "rejected") {
+					if (notSFDBVersion) {
+						predictionLabel.text = "Reject";
+					}
+					else {
+						predictionLabel.text "Rejected";
+					}
+				}
+			}
+			/*
+			if (gameEngine.hudGroup.megaUI.revealedPredictions[indexString]) {
+				if (gameEngine.hudGroup.megaUI.currentResponderMotiveStrengthDictionary[indexString].toLowerCase() == "na") { // we are in backwards world.
+					//if (gameEngine.hudGroup.megaUI.revealedPredictions[indexString].toLowerCase() == "accept" || gameEngine.hudGroup.megaUI.revealedPredictions[indexString].toLowerCase() == "accepted")
+					if (jpm.currentStateOfResponderReaction[indexString].toLowerCase() == "accept" || jpm.currentStateOfResponderReaction[indexString].toLowerCase() == "accepted")
+					{
+						if (notSFDBVersion)
+						{
+							predictionLabel.text = "Reject";
+						}
+						else
+						{
+							predictionLabel.text = "Rejected";
+						}
+					}
+					else
+					{
+						if (notSFDBVersion)
+						{
+							predictionLabel.text = "Accept";
+						}
+						else
+						{
+							predictionLabel.text = "Accepted";
+						}
+					}
+				}
+				else
+				{
+					if (gameEngine.hudGroup.megaUI.revealedPredictions[indexString].toLowerCase() == "reject" || gameEngine.hudGroup.megaUI.revealedPredictions[indexString].toLowerCase() == "rejected")//we aren't in backwards land
+					{
+						if (notSFDBVersion)
+						{
+							predictionLabel.text = "Reject";
+						}
+						else
+						{
+							predictionLabel.text = "Rejected";
+						}
+					}
+					else
+					{
+						if (notSFDBVersion)
+						{
+							predictionLabel.text = "Accept";
+						}
+						else
+						{
+							predictionLabel.text = "Accepted";
+						}
+					}
+					//predictionLabel.text = gameEngine.hudGroup.megaUI.revealedPredictions[indexString];
+				}
+			}
+			*/
+			
+			if (!switchResponse)
+			{
+				
+			}
+		}
+		
+		public function populateForcast(sgc1:SocialGameContext):void
+		{
+			this.sgc = sgc1;
+			var indexString:String = gameEngine.hudGroup.megaUI.currentPrimaryCharacter.characterName.toLowerCase() + "-" + gameEngine.hudGroup.megaUI.currentSecondaryCharacter.characterName.toLowerCase() + "-" + gameEngine.hudGroup.megaUI.selectedGameName.toLowerCase();
+			
+			
+			gameEngine.hudGroup.megaUI.acceptForecasts[indexString] = forecastAccept.text;
+			gameEngine.hudGroup.megaUI.rejectForecasts[indexString] = forecastReject.text;
+		}
+		
+		private function updateJuicePointButtonSkinStates():void {
+
+			
+			/*
+			initiatorMotivesButton.invalidateSkinState();
+			responderMotivesButton.invalidateSkinState();
+			initiatorIntentButton.invalidateSkinState();
+			resultsButton.invalidateSkinState();
+			forecastButton.invalidateSkinState();
+			*/
+		}
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			this.initiatorIntentButton.setStyleName();
+			this.initiatorMotivesButton.setStyleName();
+			this.responderMotivesButton.setStyleName();
+			this.resultsButton.setStyleName();
+			this.switchOutcomeButton.setStyleName();
+			
+			this.invalidateProperties();
+		}
+		
+		]]>
+	</fx:Script>
+
+	
+</s:Group>

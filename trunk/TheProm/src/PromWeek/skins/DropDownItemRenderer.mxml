@@ -1,0 +1,244 @@
+<?xml version="1.0"?>
+<s:ItemRenderer
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/mx" 
+	xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+	minWidth="21" minHeight="21"
+	width="135"
+	height="25"
+	alpha="1.0"
+	creationComplete="onCreationComplete()"
+	> 
+		
+	<fx:Metadata>
+		
+	</fx:Metadata>
+	
+	    <!--s:HGroup>  
+            <s:Label id="Game" text="Game: {thisGame} cost: {thisCost}" mouseOver="handleMouseOver(event)" />
+			
+        </s:HGroup-->
+	
+	<!--fx:Script>
+            <![CDATA[
+                // Import Event and URLRequest classes.
+                import flash.events.Event;
+				import CiF.Debug; 
+				
+				[Bindable]
+				private var thisGame:String;
+				[Bindable]
+				private var thisCost:int;
+				
+				private function onCreationComplete():void {
+					Debug.debug(this, "inside of creation complete");
+					Debug.debug(this, "data game: " + data.game);
+					Debug.debug(this, "data cost: " + data.cost);
+					thisGame = data.game;
+					thisCost = data.cost;
+				}
+				
+				private function handleMouseOver(eventObj:Event):void {
+					Debug.debug(this, "!!!!!!!!!!!!!!!");
+				}
+				
+            ]]>
+        </fx:Script-->
+    
+	<s:states>
+		<s:State name="normal"/>
+		<s:State name="over"/>
+	</s:states>
+		
+	<!--s:BorderContainer borderWeight="1"
+					   backgroundColor="#0000ff"
+					   top=""
+					   height="100%" width="100%"
+					   -->
+					   
+		<s:Group id="mainGroup" width="100%" height="100%" contentBackgroundColor="#2E0854" mouseOver="onMouseOver(event)" mouseOut="onMouseOut(event)" color="#2E0854">
+			<s:Rect width="100%" height="100%">
+				<s:stroke>
+					<s:SolidColorStroke weight="0" color="#2E0854" />
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor color="#2E0854" />
+				</s:fill>
+			</s:Rect>
+			<!-- The rectangle as it appears normally -->
+			<s:Rect width="100%" height="100%" radiusX="15" includeIn="normal">
+				<s:stroke>
+					<s:SolidColorStroke weight="3" color="#000033" id="buttonBorder" />
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor color="{data.backgroundColor}" />
+				</s:fill>
+			</s:Rect>
+				<!-- The rectangle as it appears when the mouse is hovering over it -->
+			<s:Rect width="100%" height="100%" radiusX="15" includeIn="over">
+				<s:stroke>
+					<s:SolidColorStroke weight="3" color="#FF0000" />
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor color="{data.backgroundColor}" />
+				</s:fill>
+			</s:Rect>
+			<s:HGroup width="100%" height="100%" paddingLeft="5" paddingTop="5" paddingBottom="5" paddingRight="5"> 
+				<util:SmoothImage id="lock" visible="{data.isLocked}" width="15" height="15" />
+				<s:RichText id="gameNameLabel" text="{data._game + data.directionality}" fontSize="11" color="#000000" height="100%" verticalAlign="middle" />
+				<s:Group id="relIconGroup" visible="{data.showRelationshipIcon}" height="100%">
+					<!--<util:SmoothImage id="relationshipImage" width="15" height="15" visible="true" source="{data.relIcon.relationshipImage.source}" />-->
+					<s:Group id="relationshipIconGroup" width="15" height="15"></s:Group>
+					<s:Line id="line1" xFrom="0" yFrom="0" xTo="15" yTo="15" visible="{data.showNegated}">
+						<s:stroke>
+							<s:SolidColorStroke color="red" alpha=".8" weight="2" />
+						</s:stroke>
+					</s:Line>
+					<s:Line id="line2" xFrom="0" yFrom="15" xTo="15" yTo="0" visible="{data.showNegated}">
+						<s:stroke>
+							<s:SolidColorStroke color="red" alpha=".8" weight="2"/>
+						</s:stroke>
+					</s:Line>
+				</s:Group>
+				
+				<!--prom:RelationshipButtonIcon id="relIcon" visible="{data.showRelationshipIcon}" line1.visible="false"-->
+					
+						<!--line1 visible="{data.showNegated}" /-->
+						<!--prom:line2 visible="{data.showNegated}" /-->
+						<!--prom:relationshipImage  source="{data.relIconSource}"  /-->
+				<!--/prom:RelationshipButtonIcon-->
+			</s:HGroup>
+			<!--s:layout>
+				<s:VerticalLayout horizontalAlign="center"
+					  verticalAlign="middle"/>
+			</s:layout-->
+		</s:Group>
+					
+				
+					   
+
+		
+		<!--s:BitmapImage source="{data.imageFile}"/-->
+		
+	<!--/s:BorderContainer-->
+		
+	<fx:Script>
+		<![CDATA[
+		
+		import CiF.CiFSingleton;
+		import CiF.Predicate;
+		import CiF.RelationshipNetwork;
+		import CiF.SocialGame;
+		import flash.events.MouseEvent;
+		import CiF.Debug;
+		import PromWeek.GameEngine;
+		import PromWeek.assets.ResourceLibrary
+		
+		
+		private var resourceLibrary:PromWeek.assets.ResourceLibrary;
+		
+		override public function set data(value:Object):void 
+		{
+			if (value)
+			{
+				if (value._game)
+				{
+					var sg:SocialGame = CiFSingleton.getInstance().socialGamesLib.getByName(value._game);
+					if (sg != null)
+					{
+						var intentID:int = sg.intents[0].predicates[0].getIntentType();
+						
+						if (intentID == Predicate.INTENT_COOL_UP || intentID == Predicate.INTENT_COOL_DOWN)
+						{
+							this.gameNameLabel.setStyle("color","#FFFFFF");
+						}
+						else
+						{
+							this.gameNameLabel.setStyle("color","#000000");
+						}
+						
+						
+						if (intentID == Predicate.INTENT_FRIENDS || intentID == Predicate.INTENT_END_FRIENDS 
+							|| intentID == Predicate.INTENT_DATING || intentID == Predicate.INTENT_END_DATING
+							|| intentID == Predicate.INTENT_ENEMIES || intentID == Predicate.INTENT_END_ENEMIES)
+						{
+							this.relationshipIconGroup.removeAllElements();
+							var relIconisimo:PromWeek.RelationshipButtonIcon = new PromWeek.RelationshipButtonIcon();
+							relIconisimo.width = this.relationshipIconGroup.width;
+							relIconisimo.height = this.relationshipIconGroup.height;
+							var relID:int;
+							if (intentID == Predicate.INTENT_FRIENDS || intentID == Predicate.INTENT_END_FRIENDS)
+							{
+								relID = RelationshipNetwork.FRIENDS;
+							}
+							else if (intentID == Predicate.INTENT_DATING || intentID == Predicate.INTENT_END_DATING)
+							{
+								relID = RelationshipNetwork.DATING;
+							}
+							else if (intentID == Predicate.INTENT_ENEMIES || intentID == Predicate.INTENT_END_ENEMIES)
+							{
+								relID = RelationshipNetwork.ENEMIES;
+							}
+							
+							relIconisimo.loadRelationshipImagesToIcon(relID);
+							this.relationshipIconGroup.addElement(relIconisimo);
+						}
+					}
+				}
+			}
+			super.data = value;
+		}
+		
+		
+		private function onCreationComplete():void {
+			if (!lock.source) {
+				//Debug.debug(this, "hello, getting inside of here!");
+				resourceLibrary = PromWeek.assets.ResourceLibrary.getInstance();
+				lock.source = this.resourceLibrary.uiIcons['lock'];
+			}
+			
+			
+			/*
+			Debug.debug(this, "onCreationComplete itemRenderer maybe shows up more than I want!");
+			if (data.showRelationshipIcon) {
+				this.relIcon.loadRelationshipImagesToIcon(data.relationshipType, data.showNegated);
+			} 
+			*/
+		}
+		
+		
+		
+		
+		
+		/*
+		private function onRelIconCreationComplete():void {
+			Debug.debug(this, "onCreationComplete rel Iconmaybe shows up more than I want!");
+			if (data.showRelationshipIcon) {
+				this.relIcon.loadRelationshipImagesToIcon(data.relationshipType, data.showNegated);
+			} 
+		}
+		*/
+		
+		private function onMouseOver(e:MouseEvent):void {
+			//Debug.debug(this, "we just moused over: " + data._game + " it costs: " + data.cost);
+			this.currentState = "over";
+			//this.buttonBorder.color = "#FF0000" as uint;
+			//this.mainGroup.invalidateProperties();
+			if(data.isLocked){
+				GameEngine.getInstance().hudGroup.juiceBar.phantomJuiceBar(data.cost);
+			}
+		}
+		
+		private function onMouseOut(e:MouseEvent):void {
+			//this.buttonBorder.color = "#000033" as uint;
+			this.currentState = "normal";
+			
+			GameEngine.getInstance().hudGroup.juiceBar.phantomJuiceHide();
+			
+		}
+		
+		]]>
+	</fx:Script>
+
+    </s:ItemRenderer>

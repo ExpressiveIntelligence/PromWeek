@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 width="780" 
+		 height="600" 
+		 contentBackgroundColor="#FFFFFF" 
+		 creationComplete="onCreationComplete()"
+		 >
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	<s:states>
+	</s:states>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<s:VGroup horizontalAlign="center" width="100%">
+		<s:HGroup horizontalAlign="center" width="100%">
+			<s:Label text="Initiator" color="#ffffff"/>
+			<s:DropDownList id="firstCharacterDropDown" dataProvider="{this.castListProvider}" />
+			<s:Label text="Responder" color="#ffffff"/>
+			<s:DropDownList id="secondCharacterDropDown" dataProvider="{this.castListProvider}" />
+			<s:Button id="runGameButton" label="Run Game" click="onClickRunGameButton(event);" />
+		</s:HGroup>
+		
+		<s:HGroup>
+			<s:VGroup>
+				<s:Label text="Precondition" color="#ffffff"/>
+				<s:List id="preconditionsResultsList" width="380" height="200" dataProvider="{preconditionResultsDP}" />
+			</s:VGroup>
+		</s:HGroup>
+		
+		<s:HGroup>
+			<s:VGroup>
+			<s:Label text="Initiator Influence Rule Set" color="#ffffff"/>
+			<s:List id="initiatorIRSResultsList" width="380" height="200" />
+			</s:VGroup>
+			<s:VGroup>
+				<s:Label text="Responder Influence Rule Set" color="#ffffff"/>
+				<s:List id="responderIRSResultsList" width="380" height="200" />
+			</s:VGroup>
+		</s:HGroup>
+		
+		<s:HGroup>
+			<s:VGroup>
+				<s:Label text="Effects" color="#ffffff"/>
+				<s:List id="effectResultsList" width="380" height="200" />
+			</s:VGroup>
+		</s:HGroup>
+
+	</s:VGroup>
+	
+	
+	
+	<fx:Script>
+		<![CDATA[
+		import CiF.*;
+		import flash.events.Event;
+		import tool.*;
+		import mx.collections.ArrayCollection;
+		import mx.collections.ArrayList;
+		
+		public var cif:CiFSingleton = CiFSingleton.getInstance();
+		public var dte:DesignerToolEngine = DesignerToolEngine.getInstance();
+		
+		public var castListProvider:ArrayCollection;
+		public var preconditionResultsDP:ArrayCollection;
+		public var initiatorIRSResultsDP:ArrayCollection;
+		public var responderIRSResultsDP:ArrayCollection;
+		public var effectResultsDP:ArrayCollection;
+		
+		public function onCreationComplete():void {
+			this.castListProvider = new ArrayCollection;
+			this.preconditionResultsDP = new ArrayCollection;
+			this.initiatorIRSResultsDP= new ArrayCollection;
+			this.responderIRSResultsDP = new ArrayCollection;
+			this.effectResultsDP = new ArrayCollection;
+			updateCastListDP();
+			addEventListener("CiFStateUpdate", updateCastListDP);
+		}
+		
+		public function updatePreconditionResultsDP():void {
+			this.preconditionResultsDP.removeAll();
+			for each (var rule:Rule in this.dte.workingSocialGame.preconditions) {
+				if (rule.evaluate(cif.cast.characters[this.firstCharacterDropDown.selectedIndex], cif.cast.characters[this.secondCharacterDropDown.selectedIndex])) {
+					this.preconditionResultsDP.addItem("True - " + rule.toString());
+				}else {	
+					this.preconditionResultsDP.addItem("False - " + rule.toString());
+				}
+				
+			}
+			this.preconditionsResultsList.dataProvider = this.preconditionResultsDP;
+		}
+		
+		public function updateInitiatorIRSResultsDP():void {
+			this.initiatorIRSResultsDP.removeAll();
+			for each (var ir:InfluenceRule in this.dte.workingSocialGame.initiatorIRS.influenceRules) {
+				if (ir.evaluate(cif.cast.characters[this.firstCharacterDropDown.selectedIndex], cif.cast.characters[this.secondCharacterDropDown.selectedIndex])) {
+					this.initiatorIRSResultsDP.addItem("True " + ir.weight + " - " + ir.toString());
+				}else {	
+					this.initiatorIRSResultsDP.addItem("False " + ir.weight + " - " + ir.toString());
+				}
+				
+			}
+			this.initiatorIRSResultsList.dataProvider = this.initiatorIRSResultsDP;
+		}
+		
+		
+		public function updateResponderIRSResultsDP():void {
+			this.responderIRSResultsDP.removeAll();
+			for each (var ir:InfluenceRule in this.dte.workingSocialGame.responderIRS.influenceRules) {
+				if (ir.evaluate(cif.cast.characters[this.firstCharacterDropDown.selectedIndex], cif.cast.characters[this.secondCharacterDropDown.selectedIndex])) {
+					this.responderIRSResultsDP.addItem("True " + ir.weight + " - " + ir.toString());
+				}else {	
+					this.responderIRSResultsDP.addItem("False " + ir.weight + " - " + ir.toString());
+				}
+				
+			}
+			this.responderIRSResultsList.dataProvider = this.responderIRSResultsDP;
+		}
+
+		public function updateEffectResultsDP():void {
+			this.effectResultsDP.removeAll();
+			for each (var effect:Effect in this.dte.workingSocialGame.effects) {
+				if (effect.condition.evaluate(cif.cast.characters[this.firstCharacterDropDown.selectedIndex], cif.cast.characters[this.secondCharacterDropDown.selectedIndex])) {
+					this.effectResultsDP.addItem("True - " + effect.toString());
+				}else {
+					this.effectResultsDP.addItem("False - " + effect.toString());
+				}
+				
+			}
+			this.effectResultsList.dataProvider = this.effectResultsDP;
+		}
+		
+		public function updateCastListDP(event:Event=null):void {
+			var firstIndex:int = firstCharacterDropDown.selectedIndex;
+			var secondIndex:int = secondCharacterDropDown.selectedIndex;
+			this.castListProvider.removeAll();
+			for each (var c:Character in this.cif.cast.characters) {
+				this.castListProvider.addItem(c.characterName);
+			}
+			firstCharacterDropDown.dataProvider = this.castListProvider;
+			secondCharacterDropDown.dataProvider = this.castListProvider;
+			//this.firstCharacterDropDown.selectedIndex = firstIndex;
+			//this.secondCharacterDropDown.selectedIndex = secondIndex;
+			this.firstCharacterDropDown.selectedIndex = 0;
+			this.secondCharacterDropDown.selectedIndex = 1;
+		}
+		
+		public function onClickRunGameButton(e:Event):void {
+			updatePreconditionResultsDP();
+			updateInitiatorIRSResultsDP();
+			updateResponderIRSResultsDP();
+			updateEffectResultsDP();
+		}
+				
+		]]>
+	</fx:Script>
+</s:Group>

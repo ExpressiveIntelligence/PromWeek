@@ -1,0 +1,96 @@
+<SocialGameLibrary>
+	<SocialGame Name="PickUpLine">
+		<Preconditions>
+			<Rule>
+				<Predicate type="!relationship" first="initiator" second="responder" relationship="dating" />
+			</Rule> 
+		</Preconditions>
+		<InitiatorInfluenceRuleSet>
+			<InfluenceRule weight="20">
+				<Predicate type ="Network" networkType="Romance" first="initiator" second="responder" comparator=">" value = "40" />
+			</InfluenceRule>
+			<InfluenceRule weight="10">
+				<Predicate type="trait" trait="Confidence" first="initiator" />
+			 </InfluenceRule>
+		</InitiatorInfluenceRuleSet>
+					
+		<ResponderInfluenceRuleSet>
+			<InfluenceRule weight="30">
+				<Predicate type="trait" trait="Witty" first="initiator" />
+			</InfluenceRule>
+			<InfluenceRule weight="20">
+					<Predicate type="trait" trait="SexMagnet" first="initiator" />
+					<Predicate type="trait" trait="Shallow" first="responder" />
+			</InfluenceRule>
+			<InfluenceRule weight="20">
+					<Predicate type="CKBEntry" first="initiator" second="responder" firstSubjective="disagree" secondSubjective="disagree" label="Romantic" />
+			</InfluenceRule>
+			<InfluenceRule weight="-20">
+					<Predicate type="status" status="hasCrush" first="initiator" second="responder" />
+			</InfluenceRule>
+			<InfluenceRule weight="-10">
+					<Predicate type="trait" trait="Desperate" first="responder" />
+			</InfluenceRule>
+			<InfluenceRule weight="10">
+					<Predicate type="trait" trait="Confident" first="initiator" />
+			</InfluenceRule>
+			<InfluenceRule weight="-10">
+					<Predicate type="trait" trait="AfraidOfCommitment" first="initiator" />
+			</InfluenceRule>
+		</ResponderInfluenceRuleSet>
+
+		<Effects>
+			<Effect id="1">
+				<ConditionPredicate type="accept" />           
+				<ChangePredicate type="socialStatus" socialStatusType="Dating" first="initiator" second="responder" />
+			</Effect>
+			<Effect id="2">
+				<ConditionPredicate type="accept" />
+				<ConditionPredicate type="trait" trait="SexMagnet" first="responder" />
+				<ChangePredicate type="socialStatus" socialStatusType="Dating" first="initiator" second="responder" />
+				<ChangePredicate type="gainTrait" trait="Confident" first="initiator" />
+			</Effect >
+			<Effect id="3">
+				<ConditionPredicate type="reject" />
+				<ChangePredicate type="Romance" first="responder" second="initiator" amountChanged="-20" />
+				<ChangePredicate type="Buddy" first="responder" second="initiator" amountChanged="-20" />
+				<ChangePredicate type="Cool" first="responder" second="initiator" amountChanged="-20" />
+			</Effect>
+			<Effect id="4">
+				<ConditionPredicate type="reject" />
+				<ConditionPredicate type="trait" trait="Witty" personWithTrait="initiator" />         
+				<ChangePredicate type="gainCharacterState" typeOfState="Shaken" first="initiator"/>
+				<ChangePredicate type="Romance" first="responder" second="initiator" amountChanged="-10" />
+				<ChangePredicate type="Buddy" first="responder" second="initiator" amountChanged="-10" />
+			</Effect>
+		</Effects>
+		<Instantiations>
+			<Instantiation id="1">
+				<LineOfDialogue lineNumber ="1" line="I lost my phone number... can I have yours?" speaker = "initiator" initiatorBodyAnimation="accuse" initiatorFaceAnimation="happy" responderBodyAnimation="accuse" responderFaceAnimation="happy" time="5" />
+				<LineOfDialogue lineNumber = "2" line="Sure thing Tiger!  It’s…" speaker = "responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="happy" responderBodyAnimation="accuse" responderFaceAnimation="happy" time="5" />
+				<LineOfDialogue lineNumber ="3" line="Why don’t we just cut out the middle man… I think you’re something special, (Y NAME). Wanna date?" speaker = "initiator" initiatorBodyAnimation="accuse" initiatorFaceAnimation="happy" responderBodyAnimation="idle" responderFaceAnimation="happy" time="5" />
+				<LineOfDialogue lineNumber = "4" line="Heh, why not." speaker = "responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="happy" responderBodyAnimation="accuse" responderFaceAnimation="happy" time="5" />
+			</Instantiation>
+			<Instantiation id="2">
+				<LineOfDialogue lineNumber ="1" line="I should have brought sunglasses today, because you light up my life!" speaker = "initiator" initiatorBodyAnimation="accuse" initiatorFaceAnimation="happy" responderBodyAnimation="accuse" responderFaceAnimation="happy" time="5" />
+				<LineOfDialogue lineNumber ="2" line="Oh, that’s a sweet thing to say!" speaker = "responder" initiatorBodyAnimation="accuse" initiatorFaceAnimation="happy" responderBodyAnimation="accuse" responderFaceAnimation="happy" time="5" />
+				<LineOfDialogue lineNumber ="3" line="Thanks! Hey, you know, I was wondering, would you be interested in going to Prom with me?" speaker = "initiator" initiatorBodyAnimation="accuse" initiatorFaceAnimation="happy" responderBodyAnimation="accuse" responderFaceAnimation="happy" time="5" />
+				<LineOfDialogue lineNumber ="4" line="I’d love to!" speaker = "responder" initiatorBodyAnimation="accuse" initiatorFaceAnimation="happy" responderBodyAnimation="accuse" responderFaceAnimation="happy" time="5" />
+				<LineOfDialogue lineNumber ="5" line="Hot dog!  I can’t believe I’m going with (RESPONDER NAME)! I bagged a hottie!" speaker = "initiator" initiatorBodyAnimation="accuse" initiatorFaceAnimation="happy" responderBodyAnimation="accuse" responderFaceAnimation="happy" time="5" />
+			</Instantiation>
+			<Instantiation id="3">
+				<LineOfDialogue lineNumber ="1" line="Does your butt hurt?  Because baby, you must’ve fallen from heaven!" speaker = "initiator" initiatorBodyAnimation="accuse" initiatorFaceAnimation="happy" responderBodyAnimation="accuse" responderFaceAnimation="happy" time="5" />
+				<LineOfDialogue lineNumber ="2" line="Oh my God, (INITIATOR NAME), what’s wrong with you?" speaker = "responder" initiatorBodyAnimation="accuse" initiatorFaceAnimation="happy" responderBodyAnimation="accuse" responderFaceAnimation="happy" time="5" />
+				<LineOfDialogue lineNumber ="3" line="I thought maybe you and I could…" speaker = "initiator" initiatorBodyAnimation="accuse" initiatorFaceAnimation="happy" responderBodyAnimation="accuse" responderFaceAnimation="happy" time="5" />
+				<LineOfDialogue lineNumber ="4" line="Errgh! No!  I don’t think of you like that!  Get away from me, freak!" speaker = "responder" initiatorBodyAnimation="accuse" initiatorFaceAnimation="happy" responderBodyAnimation="accuse" responderFaceAnimation="happy" time="5" />
+			</Instantiation>
+			<Instantiation id="4">
+				<LineOfDialogue lineNumber ="1" line="I’ve never had a dream come true until the day I met you, (RESPONDER NAME)" speaker = "initiator" initiatorBodyAnimation="accuse" initiatorFaceAnimation="happy" responderBodyAnimation="accuse" responderFaceAnimation="happy" time="5" />
+				<LineOfDialogue lineNumber ="2" line="What’s that, some kind of pick up line?" speaker = "responder" initiatorBodyAnimation="accuse" initiatorFaceAnimation="happy" responderBodyAnimation="accuse" responderFaceAnimation="happy" time="5" />                                                 <LineOfDialogue lineNumber ="3" line="Ah, yes!  I thought it really captured my feelings for you." speaker = "initiator" initiatorBodyAnimation="accuse" initiatorFaceAnimation="happy" responderBodyAnimation="accuse" responderFaceAnimation="happy" time="5" />      
+				<LineOfDialogue lineNumber ="4" line="What a coincidence.  Because the thought of you and I together is my worst nightmare." speaker = "responder" initiatorBodyAnimation="accuse" initiatorFaceAnimation="happy" responderBodyAnimation="accuse" responderFaceAnimation="happy" time="5" />  
+				<LineOfDialogue lineNumber ="5" line="Wha! But!" speaker = "initiator" initiatorBodyAnimation="accuse" initiatorFaceAnimation="happy" responderBodyAnimation="accuse" responderFaceAnimation="happy" time="5" /> 
+				<LineOfDialogue lineNumber ="6" line=" See ya around, (INITIATOR NAME)" speaker = "responder" initiatorBodyAnimation="accuse" initiatorFaceAnimation="happy" responderBodyAnimation="accuse" responderFaceAnimation="happy" time="5" /> 
+			</Instantiation>
+		</Instantiations>
+	</SocialGame>
+</SocialGameLibrary>

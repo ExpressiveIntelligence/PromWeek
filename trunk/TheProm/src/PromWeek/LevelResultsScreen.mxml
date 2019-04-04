@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 initialize="initializeLevelResultsScreen()"
+		 width="100%"
+		 height="100%"
+		 styleName="classicPromWeek">
+		 
+	<fx:Metadata>
+	</fx:Metadata>
+
+	<fx:Declarations>
+	</fx:Declarations>
+		 
+	<!--<s:Rect id="backgroundRect" width="100%" height="100%">
+		<s:fill>
+			<s:SolidColor color="{getStyle('backgroundColor')}" alpha="1.0" />
+		</s:fill>
+	</s:Rect>-->
+
+	<s:Rect x="0" y="0" width="100%" height="100%" alpha="1.0">
+		<s:fill>
+			<s:LinearGradient rotation="125">
+				<s:entries>
+					<!--<s:GradientEntry color="#EEEEEE" alpha="1.0" ratio="0.0" />-->
+					<s:GradientEntry color="{getStyle('contentAreaAltColor')}" alpha="1.0" />
+					<s:GradientEntry color="{getStyle('backgroundColor')}" alpha="1.0"  />
+				</s:entries>
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+
+	<s:VGroup width="100%" height="100%" paddingTop="50" paddingBottom="20" paddingLeft="30" paddingRight="30" horizontalAlign="center">
+		<s:RichText id="titleText" text="" width="100%" height="20%" color="{getStyle('contentAreaTextColor')}" verticalAlign="top" textAlign="center" styleName="levelEndTitleStyle" fontWeight="bold" />
+		<s:VGroup height="60%" horizontalAlign="center" visible="false">
+			<s:RichText text="Story Goals:" width="100%" height="20%" fontSize="25" color="{getStyle('contentAreaTextColor')}" verticalAlign="middle"  styleName="levelEndTitleStyle"/>
+			<s:Scroller width="100%" height="80%" contentBackgroundColor="{getStyle('contentAreaColor')}" horizontalScrollPolicy="off">
+				<s:Group id="storyGoalGroup" width="100%" height="100%"/>
+			</s:Scroller>
+		</s:VGroup>
+	</s:VGroup>
+	<s:Group id="fireworksGroup" width="100%" height="100%" mouseEnabledWhereTransparent="true" mouseEnabled="false" mouseChildren="false" />
+	<s:Group visible="false"><prom:PromWeekButton id="skipToPromLevelButton" label="Skip to Prom" width="120" height="60" click="skipToPromLevelClicked(event)" /></s:Group>
+	<prom:PromWeekButton id="nextLevelButton" label="Next Level" width="120" height="60" click="nextLevelClicked(event)"/>
+	
+	<fx:Script>
+	<![CDATA[
+		import flash.events.*;
+		import CiF.*;
+		import flash.filters.BlurFilter;
+		import flash.filters.ColorMatrixFilter;
+		import flash.geom.Rectangle;
+		
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import mx.core.UIComponent;
+		import org.flintparticles.twoD.renderers.BitmapRenderer;
+		import PromWeek.assets.ResourceLibrary;
+		import spark.components.Group;
+		import spark.components.RichText;
+		import mx.flash.UIMovieClip;
+		import spark.components.VGroup;
+
+		public var gameEngine:PromWeek.GameEngine;
+		public var resourceLib:ResourceLibrary;
+		public var statisticsManager:StatisticsManager;
+		
+		//this gets shared between components
+		public var tdContainer:VGroup;
+		
+		public function initializeLevelResultsScreen():void 
+		{		
+			gameEngine = PromWeek.GameEngine.getInstance();
+			statisticsManager = StatisticsManager.getInstance();
+			resourceLib = ResourceLibrary.getInstance();
+		}
+		
+		public function updateLevelResultsScreen():void
+		{
+			this.storyGoalGroup.removeAllElements();
+
+			this.skipToPromLevelButton.x = gameEngine.APPLICATION_WIDTH - 265;
+			this.skipToPromLevelButton.y = gameEngine.APPLICATION_HEIGHT - 80;
+			this.nextLevelButton.x = gameEngine.APPLICATION_WIDTH - 140;
+			this.nextLevelButton.y = gameEngine.APPLICATION_HEIGHT - 80;
+			
+			//this.titleText.text = gameEngine.currentLevel.title + " Complete!";
+			var dayCompleted:String = LevelResultsScreen.parseDay(gameEngine.currentLevel.title);
+			this.titleText.text = dayCompleted + " Complete!";
+			
+			this.tdContainer = gameEngine.hudGroup.storyGoalWindow.toDoItemAccordion.tdContainer;
+			gameEngine.hudGroup.storyGoalWindow.toDoItemAccordion.tdContainerHolder.removeAllElements();
+			this.storyGoalGroup.addElement(this.tdContainer);
+			
+			if ((gameEngine.currentLevelIndex + 2) == gameEngine.currentStory.levels.length)
+			{
+				//this.nextLevelButton.visible = false;
+				this.nextLevelButton.label = "Go to Prom!"
+			}
+			else
+			{
+				//this.nextLevelButton.visible = true;
+				this.nextLevelButton.label = "Next Level"
+			}
+			
+			this.fireworksGroup.removeAllElements();
+			
+			var uiComp:UIComponent = new UIComponent();
+			uiComp.width = this.width;
+			uiComp.height = this.height;
+			
+			var emitter:NEW_firework = new NEW_firework();
+			var renderer:BitmapRenderer = new BitmapRenderer( new Rectangle( 0, 0, this.width, this.height) );
+			renderer.addFilter( new BlurFilter( 2, 2, 1 ) );
+			renderer.addFilter( new ColorMatrixFilter( [ 1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0.95,0 ] ) );
+			renderer.addEmitter( emitter );
+			emitter.x = fireworksGroup.width/4;
+			emitter.y = fireworksGroup.height/4;
+			emitter.start();			
+			uiComp.addChild(renderer);
+			
+			emitter = new NEW_firework();
+			renderer = new BitmapRenderer( new Rectangle( 0, 0, this.width, this.height) );
+			renderer.addFilter( new BlurFilter( 2, 2, 1 ) );
+			renderer.addFilter( new ColorMatrixFilter( [ 1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0.95,0 ] ) );
+			renderer.addEmitter( emitter );
+			emitter.x = 3 * fireworksGroup.width/4;
+			emitter.y = fireworksGroup.height/4;
+			emitter.start();			
+			uiComp.addChild(renderer);
+			
+			this.fireworksGroup.addElement(uiComp);
+		}
+		
+		
+		
+		
+		/**
+		 * This function will sort and 
+		 */
+		/*
+		public function updateEndingList():void
+		{
+			endingProgressGroup.removeAllElements();
+			
+			var ending:Ending
+			//create a sorted list of endings
+			for each (ending in gameEngine.currentStory.endings)
+			{
+				ending.scoreCompletionProgress();
+			}
+			function sortEndingsByCompletionProgress(x:Ending, y:Ending):Number 
+			{
+				if (x.completionProgress < y.completionProgress)
+				{
+					return 1.0;
+				}
+				else if (x.completionProgress > y.completionProgress)
+				{
+					return -1.0;
+				}
+				else
+				{
+					return 0;
+				}
+			}
+			gameEngine.currentStory.endings.sort(sortEndingsByCompletionProgress);
+			
+			var endingToDo:PromWeek.ToDoItemComponent;
+			var endingString:String;
+			for each (ending in gameEngine.currentStory.endings)
+			{
+				endingToDo = new ToDoItemComponent();
+				endingToDo.height = 40;
+				//endingRichText.setStyle("color", "yellow");
+				//endingRichText.setStyle("fontSize", "16");
+				endingToDo.todoItemNameLabel.text = ending.name; 
+				endingToDo.setProgressWidthPercent(ending.completionProgress);
+				endingString = gameEngine.currentStory.storyLeadCharacter + "-" + ending.name;
+				this.endingProgressGroup.addElement(endingToDo);
+				if (statisticsManager.endingsSeen[endingString]) {
+					var image:Image = new Image();
+					image.source = resourceLib.uiIcons["check"];
+					//image.x = endingToDo.x;
+					image.y = 5 + ((endingToDo.height + 6)* this.endingProgressGroup.getElementIndex(endingToDo));
+					this.checkMarksGroup.addElement(image);
+				}
+			}
+		}
+		*/
+	
+	
+		public function skipToPromLevelClicked(e:Event = null):void
+		{
+			//make sure we give the goal list back
+			gameEngine.hudGroup.storyGoalWindow.toDoItemAccordion.tdContainerHolder.addElement(this.tdContainer);
+			this.storyGoalGroup.removeAllElements();
+			this.tdContainer = null;
+			
+			this.fireworksGroup.removeAllElements();
+			
+			//skip to 
+			gameEngine.currentLevelIndex = gameEngine.currentStory.levels.length - 2;
+			gameEngine.onClickInEndOfLevelResultState();
+		}
+		
+		public function nextLevelClicked(e:Event = null):void
+		{
+			//make sure we give the goal list back
+			gameEngine.hudGroup.storyGoalWindow.toDoItemAccordion.tdContainerHolder.addElement(this.tdContainer);
+			this.storyGoalGroup.removeAllElements();
+			this.tdContainer = null;
+			
+			
+			gameEngine.hudGroup.megaUI.clear();
+			
+			this.fireworksGroup.removeAllElements();
+			
+			//skip to 
+			gameEngine.onClickInEndOfLevelResultState();
+		}
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			//this.nextLevelButton.setStyleName();
+			//this.skipToPromLevelButton.setStyleName();
+			this.invalidateProperties();
+		}
+		
+		/**
+		 * This function takes a title that will say something like "Monday: Doug is in Trouble!"
+		 * and just parses out the day of the week, so that it wold return "Monday"
+		 * @param	title the actual title of the level
+		 * @return just the day of the week
+		 */
+		public static function parseDay(title:String):String {
+			var tempTitle:String = title.toLowerCase();
+			if (tempTitle.substr(0, 6) == "sunday")
+				return "Sunday";
+			else if (tempTitle.substr(0, 6) == "monday")
+				return "Monday";
+			else if (tempTitle.substr(0, 7) == "tuesday")
+				return "Tuesday";
+			else if (tempTitle.substr(0, 9) == "wednesday")
+				return "Wednesday";
+			else if (tempTitle.substr(0, 8) == "thursday")
+				return "Thursday";
+			else if (tempTitle.substr(0, 6) == "friday")
+				return "The Prom";
+			else if (tempTitle.substr(0, 8) == "saturday")
+				return "Saturday";
+			else // hopefully we never get here!
+				return title;
+		}
+
+	]]>
+	</fx:Script>
+		 
+	
+</s:Group>

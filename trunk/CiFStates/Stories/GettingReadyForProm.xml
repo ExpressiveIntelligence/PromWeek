@@ -1,0 +1,1041 @@
+<PromWeek>
+		<Story title="Social Games" isTutorial="false" screenShot="SocialGame" locked="true">
+		<Description>Learn how the play the Game!</Description>
+			<Levels>
+				<Level title="Sunday - Ego Rising" timeLimit="10" endable="false" useDefinedCastPositions="false" cameraZoom="1" useDefinedCameraPosition="false" cameraX="800" cameraY="1400">
+					<Description>Yep</Description>
+					<Setting>neighborhood</Setting>
+					<Cast>
+						<CharacterName>Oswald</CharacterName>
+						<CharacterName>Lil</CharacterName>
+						<CharacterName>Cassandra</CharacterName>
+						<CharacterName>Lucas</CharacterName>
+					</Cast>
+					<GoalRules>
+						<Rule>
+							<Predicate type="network" networkType="cool" first="Lil" second="Monica" comparator="greaterthan" value="55" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Cassandra" second="Monica" comparator="greaterthan" value="90" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+						</Rule>
+						<Rule>
+							<Predicate type="network" networkType="cool" first="Cassandra" second="Monica" comparator="greaterthan" value="90" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Lucas" second="Monica" comparator="greaterthan" value="30" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+						</Rule>
+						<Rule>
+							<Predicate type="network" networkType="cool" first="Lil" second="Monica" comparator="greaterthan" value="55" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Lucas" second="Monica" comparator="greaterthan" value="30" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+						</Rule>
+					</GoalRules>
+				</Level>
+				<Level title="Tuesday - Stopping the Popular Competition" timeLimit="15" endable="false" useDefinedCastPositions="false" cameraZoom="1" useDefinedCameraPosition="false" cameraX="800" cameraY="1400">
+					<Description>Monica's frenemy Naomi is ruining her Prom fame. Make sure to bring Naomi down by either getting her to break up or cheat with her current boyfriend, get her to stop being friends with Monica, or get 2 people think she is less cool.</Description>
+					<Setting>cornerstore</Setting>
+					<Cast>
+						<CharacterName>Buzz</CharacterName>
+						<CharacterName>Monica</CharacterName>
+						<CharacterName>Naomi</CharacterName>
+						<CharacterName>Nicholas</CharacterName>
+					</Cast>
+					<GoalRules>
+						<Rule>
+							<Predicate type="relationship" first="Naomi" second="Buzz" relationship="dating" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+						<Rule>
+							<Predicate type="relationship" first="Naomi" second="y" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="true" numTimesUniquelyTrue="2" numTimesRoleSlot="first"/>
+						</Rule>
+						<Rule>
+							<Predicate type="relationship" first="Monica" second="Naomi" relationship="friends" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+						<Rule>
+							<Predicate type="network" networkType="cool" first="x" second="Naomi" comparator="lessthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="true" numTimesUniquelyTrue="2" numTimesRoleSlot="second"/>
+							<Predicate type="network" networkType="cool" first="x" second="Naomi" comparator="lessthan" value="50" negated="true" intent="false" isSFDB="true" window="20" numTimesUniquelyTrueFlag="true" numTimesUniquelyTrue="2" numTimesRoleSlot="second"/>
+						</Rule>
+					</GoalRules>
+				</Level>
+				<Level title="Friday - Getting a Date" timeLimit="10" endable="false" useDefinedCastPositions="false" cameraZoom="1" useDefinedCameraPosition="false" cameraX="800" cameraY="1400">
+					<Description>Oh No! The day of the Prom is approaching fast and Monica doesn't have a boyfriend to be Prom King. Monica will have to find a new boyfriend or else it will be the end of the World.</Description>
+					<Setting>lockers</Setting>
+					<Cast>
+						<CharacterName>Monica</CharacterName>
+						<CharacterName>Zack</CharacterName>
+						<CharacterName>Buzz</CharacterName>
+						<CharacterName>Edward</CharacterName>
+					</Cast>
+					<GoalRules>
+						<Rule>
+							<Predicate type="relationship" first="Monica" second="y" relationship="dating" negated="false" intent="false" isSFDB="false" window="" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+						</Rule>
+					</GoalRules>
+				</Level>
+				<Level title="Game Over!" timeLimit="20" endable="false">
+					<Description>Please reload the webpage to restart the demo.</Description>
+					<Setting>cornerstore</Setting>
+					<Cast>
+						<CharacterName>Zack</CharacterName>
+						<CharacterName>Buzz</CharacterName>
+					</Cast>
+					<GoalRules>
+							<Rule>
+								<Predicate type="relationship" first="Zack" second="Monica" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+								<Predicate type="status" status="popular" first="Monica" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							</Rule>
+					</GoalRules>
+				</Level>
+			</Levels>
+		</Story>
+		<Story title="Project Popularstein">
+		<Description>After Naomi's previous FAILED makeover, she must try again on new unpopular blood. Help Naomi complete her new makeover project.</Description>
+			<Levels>
+				<Level title="Operation: Trust Gain" timeLimit="15" endable="false" useDefinedCastPositions="false" cameraZoom="1" useDefinedCameraPosition="false" cameraX="800" cameraY="1400">
+					<Description>In order to begin this popularity makeover, Naomi must gain the trust of the unfashionable Gunter. To stoop that low, she will have to become his friend, or even go as far as date him.</Description>
+					<Setting>park</Setting>
+					<Cast>
+						<CharacterName>Naomi</CharacterName>
+						<CharacterName>Edward</CharacterName>
+						<CharacterName>Gunter</CharacterName>
+					</Cast>
+					<GoalRules>
+						<Rule>
+							<Predicate type="relationship" first="Naomi" second="Gunter" relationship="friends" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+					</GoalRules>
+				</Level>
+				<Level title="Operation: Rise to Power" timeLimit="20" endable="false" useDefinedCastPositions="false" cameraZoom="1" useDefinedCameraPosition="false" cameraX="800" cameraY="1400">
+					<Description>Under Naomi's wing, Gunter must go out and make enough friends in order to become the new popular kid in school.</Description>
+					<Setting>lockers</Setting>
+					<Cast>
+						<CharacterName>Naomi</CharacterName>
+						<CharacterName>Gunter</CharacterName>
+						<CharacterName>Oswald</CharacterName>
+						<CharacterName>Chloe</CharacterName>
+						<CharacterName>Monica</CharacterName>
+					</Cast>
+					<GoalRules>
+						<Rule>
+							<Predicate type="relationship" first="Gunter" second="y" relationship="friends" negated="false" intent="false" isSFDB="false" window="" numTimesUniquelyTrueFlag="true" numTimesUniquelyTrue="5" numTimesRoleSlot="first"/>
+						</Rule>
+					</GoalRules>
+				</Level>
+				<Level title="Operation: Drop the Baggage" timeLimit="15" endable="false" useDefinedCastPositions="false" cameraZoom="1" useDefinedCameraPosition="false" cameraX="800" cameraY="1400">
+					<Description>Naomi's tutelage was going successfully, but a major error has occurred. Being friends with Edward is equivalent to social suicide. Something must be done. Gunter must leave this baggage behind on his own, or socially die trying.</Description>
+					<Setting>neighborhood</Setting>
+					<Cast>
+						<CharacterName>Gunter</CharacterName>
+						<CharacterName>Edward</CharacterName>
+						<CharacterName>Mave</CharacterName>
+					</Cast>
+					<GoalRules>
+						<Rule>
+							<Predicate type="relationship" first="Gunter" second="Edward" relationship="friends" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+					</GoalRules>
+				</Level>
+				<Level title="Game Over!" timeLimit="20" endable="false" useDefinedCastPositions="false" useDefinedCameraPosition="false" cameraX="800" cameraY="1400">
+					<Description>Please reload the webpage to restart the demo.</Description>
+					<Setting>cornerstore</Setting>
+					<Cast>
+						<CharacterName>Zack</CharacterName>
+						<CharacterName>Buzz</CharacterName>
+					</Cast>
+					<GoalRules>
+							<Rule>
+								<Predicate type="relationship" first="Zack" second="Monica" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+								<Predicate type="status" status="popular" first="Monica" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							</Rule>
+					</GoalRules>
+				</Level>
+			</Levels>
+		</Story>
+	<!--<Story title="Buzz Story">
+		<Description>Completely devoid of any description whatsoever!</Description>
+			<Levels>
+				<Level title="Putting them in their Place" timeLimit="15" endable="false">
+					<Description>Life is simple for Buzz. Being MVP of the football team and having a popular girlfriend was just given to him. However things are taking a turn for the worse, since now the geeks of the highschool are trying to bring Buzz down. Help Buzz bully Simon and Zack to put them in their place.</Description>
+					<Setting>neighborhood</Setting>
+					<Cast>
+						<CharacterName>Buzz</CharacterName>
+						<CharacterName>Simon</CharacterName>
+						<CharacterName>Zack</CharacterName>
+					</Cast>
+					<GoalRules>
+						<Rule>
+							<Predicate type="relationship" first="Buzz" second="Zack" relationship="enemies" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="true" numTimesUniquelyTrue="2" numTimesRoleSlot="initiator"/>
+							<Predicate type="relationship" first="Buzz" second="Simon" relationship="enemies" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="true" numTimesUniquelyTrue="2" numTimesRoleSlot="initiator"/>
+						</Rule>
+					</GoalRules>
+				</Level>
+				<Level title="Game Over!" timeLimit="20" endable="false">
+					<Description>Please reload the webpage to restart the demo.</Description>
+					<Setting>cornerstore</Setting>
+					<Cast>
+						<CharacterName>Zack</CharacterName>
+						<CharacterName>Buzz</CharacterName>
+					</Cast>
+					<GoalRules>
+							<Rule>
+								<Predicate type="relationship" first="Zack" second="Monica" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+								<Predicate type="status" status="popular" first="Monica" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							</Rule>
+					</GoalRules>
+				</Level>
+			</Levels>
+		</Story>-->
+		<Story title="FoG">
+		<Description>We make story for Prom Week</Description>
+			<Levels>
+				<Level title="Arm Candy" timeLimit="30" endable="false" useDefinedCastPositions="true" useDefinedCameraPosition="false" cameraX="800" cameraY="1400">
+					<Description>Every king needs a queen. Zack is going to have to score a girlfriend that is totally cool before he stands a chance at becoming prom royalty.</Description>
+					<Setting>lockers</Setting>
+					<Cast>
+						<CharacterName startX="600" startY="1000">Simon</CharacterName>
+						<CharacterName startX="700" startY="1000">Chloe</CharacterName>
+						<CharacterName startX="800" startY="1000">Zack</CharacterName>
+						<CharacterName startX="900" startY="1000">Monica</CharacterName>
+						<CharacterName startX="1000" startY="1000">Buzz</CharacterName>
+					</Cast>
+					<GoalRules>
+						<Rule>
+							<Predicate type="relationship" first="Zack" second="x" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							<Predicate type="status" status="popular" first="x" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+						  <Rule>
+							<Predicate type="relationship" first="Zack" second="Chloe" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Zack" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Monica" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Simon" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Buzz" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+						  </Rule>
+					</GoalRules>
+				</Level>	
+				<Level title="Game Over!" timeLimit="20" endable="false">
+					<Description>Please reload the webpage to restart the demo.</Description>
+					<Setting>cornerstore</Setting>
+					<Cast>
+						<CharacterName>Zack</CharacterName>
+						<CharacterName>Buzz</CharacterName>
+					</Cast>
+					<GoalRules>
+							<Rule>
+								<Predicate type="relationship" first="Zack" second="Monica" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+								<Predicate type="status" status="popular" first="Monica" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							</Rule>
+							<Rule>
+								<Predicate type="relationship" first="Zack" second="Chloe" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+								<Predicate type="status" status="popular" first="Chloe" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							</Rule>
+						  <Rule>
+							<Predicate type="relationship" first="Zack" second="Chloe" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Zack" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Monica" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Simon" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Buzz" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+						  </Rule>
+					</GoalRules>
+				</Level>
+			</Levels>
+		</Story>
+		<Story title="PromKing">
+		<Description>Zack's a l33t dude, but even his friends say he's obnoxious. (His enemies say things we won't repeat here.) Can your deft social maneuvering crown this ubergeek the Prom King?</Description>
+			<Levels>
+				<Level title="Who You Know" timeLimit="29" endable="false">
+					<Description>Getting crowned Prom King isn't just a popularity contest - it's also about playing the judges. Naomi's head of the Prom Committee, so if Zack wants that crown, he'd better make sure she understands how freaking cool he is.</Description>
+					<Setting>lockers</Setting>
+					<Cast>
+						<CharacterName>Zack</CharacterName>
+						<CharacterName>Chloe</CharacterName>
+						<CharacterName>Naomi</CharacterName>
+					</Cast>
+					<GoalRules>
+						<Rule>
+							<Predicate type="network" networkType="cool" first="Naomi" second="Zack" comparator="greaterthan" value="66" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+						<Rule>
+							<Predicate type="network" networkType="romance" first="Naomi" second="Zack" comparator="greaterthan" value="66" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+						<Rule>
+							<Predicate type="relationship" first="Zack" second="Naomi" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+					</GoalRules>
+				</Level>
+				<Level title="Arm Candy" timeLimit="10" endable="false">
+					<Description>Every king needs a queen. Zack is going to have to score a girlfriend that is totally cool before he stands a chance at becoming prom royalty.</Description>
+					<Setting>park</Setting>
+					<Cast>
+						<CharacterName>Chloe</CharacterName>
+						<CharacterName>Lil</CharacterName>
+						<CharacterName>Zack</CharacterName>
+						<CharacterName>Monica</CharacterName>
+						<CharacterName>Jordan</CharacterName>
+					</Cast>
+					<GoalRules>
+						<Rule>
+							<Predicate type="relationship" first="Zack" second="Monica" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							<Predicate type="status" status="popular" first="Monica" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+					  <Rule>
+						<Predicate type="relationship" first="Zack" second="Lil" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						<Predicate type="network" networkType="cool" first="Chloe" second="Lil" comparator="greaterthan" value="66" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+						<Predicate type="network" networkType="cool" first="Jordan" second="Lil" comparator="greaterthan" value="66" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+					  </Rule>
+					  <Rule>
+						<Predicate type="relationship" first="Zack" second="Lil" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						<Predicate type="network" networkType="cool" first="Zack" second="Lil" comparator="greaterthan" value="66" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+						<Predicate type="network" networkType="cool" first="Jordan" second="Lil" comparator="greaterthan" value="66" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+					  </Rule>
+					  <Rule>
+						<Predicate type="relationship" first="Zack" second="x" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						<Predicate type="relationship" first="x" second="responder" relationship="friends" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="true" numTimesUniquelyTrue="2" numTimesRoleSlot="first"/>
+					  </Rule>
+					</GoalRules>
+				</Level>
+				<!--<Level title="Stand a chance..." timeLimit="10" endable="false">
+					<Description>Zack is doomed as long as the popular kids despise him. Get the high school royalty to stop thinking of him as an enemy, and he's one step closer to stealing their crown.</Description>
+					<Setting>neighborhood</Setting>
+					<Cast>
+						<CharacterName>Zack</CharacterName>
+						<CharacterName>Simon</CharacterName>
+						<CharacterName>Buzz</CharacterName>
+						<CharacterName>Nicholas</CharacterName>
+						<CharacterName>Chloe</CharacterName>
+					</Cast>
+					<GoalRules>
+						<Rule>
+							<Predicate type="relationship" first="Zack" second="Nicholas" relationship="enemies" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+						<Rule>
+							<Predicate type="relationship" first="Zack" second="Buzz" relationship="enemies" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+					</GoalRules>
+				</Level>-->
+				<Level title="The Big Night" timeLimit="10" endable="true">
+					<Description>OMG, it's the night of the Prom! Everyone looks swank and the air is thick with anticipation (or maybe just cheap cologne). Zack has one last chance to become the Prom King... but how many hearts must break along the way?</Description>
+					<Setting>prom</Setting>
+					<Cast>
+						<CharacterName>Zack</CharacterName>
+						<CharacterName>Doug</CharacterName>
+						<CharacterName>Jordan</CharacterName>
+						<!--<CharacterName>Buzz</CharacterName>-->
+						<CharacterName>Naomi</CharacterName>
+						<CharacterName>Lil</CharacterName>
+						<CharacterName>Nicholas</CharacterName>
+						<!--<CharacterName>Chloe</CharacterName>-->
+						<!--<CharacterName>Simon</CharacterName>-->
+						<CharacterName>Monica</CharacterName>
+					</Cast>
+					<GoalRules>
+						<Rule>
+							<!--- Magic checking who is Prom King?! -->
+						</Rule>
+					</GoalRules>
+				</Level>			
+			</Levels>
+		<Endings>		
+		<Ending name="Zack Triumphs">
+		<Preconditions>
+			
+        <Rule name="Zack (or Zacklike)" id="0">
+          <Predicate type="trait" trait="arrogant" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="trait" trait="stubborn" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </Rule>
+        <Rule name="dating someone" id="1">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </Rule>
+        <Rule name="done something lame ever" id="3">
+          <Predicate type="SFDB label" first="initiator" second="" label="lame" negated="false" intent="false" isSFDB="true" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </Rule>
+     
+		</Preconditions>
+      <Instantiations>
+        <Instantiation id="0" name="Default Instantiation Name">
+          <LineOfDialogue lineNumber="1" initiatorLine="" responderLine="Oh %i%, you did it! You're the Prom %gender(i,King, Queen)%!" otherLine="" primarySpeaker="responder" initiatorBodyAnimation="dance_cool" initiatorFaceAnimation="null" initiatorFaceState="very happy" responderBodyAnimation="dance_lame" responderFaceAnimation="null" responderFaceState="very happy" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" isOtherChorus="false">
+            <Rule name="Anonymous Rule" id="-1"/>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="0" initiatorLine="But of course, %r%. Did you ever doubt me? I never doubted me." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="talking_medium" initiatorFaceAnimation="null" initiatorFaceState="very happy" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="null" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="null" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" isOtherChorus="false">
+            <Rule name="Anonymous Rule" id="-1"/>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="2" initiatorLine="" responderLine="Well, there was that one time when %toc1%..." otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="talking_long" responderFaceAnimation="null" responderFaceState="very happy" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" isOtherChorus="false">
+            <Rule name="Anonymous Rule" id="-1"/>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="3" initiatorLine="Silence! My first act as king is to strip that from the yearbook record!" responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="accuse" initiatorFaceAnimation="null" initiatorFaceState="angry" responderBodyAnimation="punchReaction" responderFaceAnimation="null" responderFaceState="concerned" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" isOtherChorus="false">
+            <Rule name="Anonymous Rule" id="-1"/>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="4" initiatorLine="For my second act... I think somebody is getting an upgrade." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="brush_hair" initiatorFaceAnimation="null" initiatorFaceState="happy" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="concerned" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" isOtherChorus="false">
+            <Rule name="Anonymous Rule" id="-1"/>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="5" initiatorLine="" responderLine="%i%... you mean...?" otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="gasp" responderFaceAnimation="null" responderFaceState="happy" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" isOtherChorus="false">
+            <Rule name="Anonymous Rule" id="-1"/>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="6" initiatorLine="You know it, gigababe. You're now.... my tera-babe." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="console" initiatorFaceAnimation="null" initiatorFaceState="happy" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" isOtherChorus="false">
+            <Rule name="Anonymous Rule" id="-1"/>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="7" initiatorLine="" responderLine="Best. Prom. Evar." otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="very happy" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" isOtherChorus="false">
+            <Rule name="Anonymous Rule" id="-1"/>
+          </LineOfDialogue>
+          <LineOfDialogue lineNumber="8" initiatorLine="" responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="kiss" initiatorFaceAnimation="null" initiatorFaceState="very happy" responderBodyAnimation="kiss" responderFaceAnimation="null" responderFaceState="very happy" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" isOtherChorus="false">
+            <Rule name="Anonymous Rule" id="-1"/>
+          </LineOfDialogue>
+          <ToC1>%SFDB_(lame,i,,0)%</ToC1>
+          <ToC2/>
+          <ToC3/>
+          <ConditionalRules/>
+        </Instantiation>
+	</Instantiations>
+	</Ending>
+	<Ending name="The Popular Reign">
+				  <Preconditions>
+					<Rule name="Royalty ending precondition" id="0">
+					  <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+					  <Predicate type="status" status="popular" first="initiator" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+					  <Predicate type="status" status="popular" first="responder" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+					</Rule>
+				  </Preconditions>
+				  <Instantiations>
+					<Instantiation id="0" name="Ending Royalty">
+					  <LineOfDialogue lineNumber="0" initiatorLine="Alright!!" responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="toss_hands_up" initiatorFaceAnimation="surprised_action" initiatorFaceState="very happy" responderBodyAnimation="toss_hands_up" responderFaceAnimation="no action" responderFaceState="very happy" otherBodyAnimation="null" otherFaceAnimation="null" otherFaceState="null" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" isOtherChorus="false">
+						<Rule name="Anonymous Rule" id="-1"/>
+					  </LineOfDialogue>
+					  <LineOfDialogue lineNumber="1" initiatorLine="Come, my %gender(r,king,queen)%, let's wave to the little people..." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="handing" initiatorFaceAnimation="null" initiatorFaceState="very happy" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" isOtherChorus="false">
+						<Rule name="Anonymous Rule" id="-1"/>
+					  </LineOfDialogue>
+					  <LineOfDialogue lineNumber="4" initiatorLine="" responderLine="They look so small from over here..." otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="wave" responderFaceAnimation="surprised_action" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" isOtherChorus="false">
+						<Rule name="Anonymous Rule" id="-1"/>
+					  </LineOfDialogue>
+					  <LineOfDialogue lineNumber="2" initiatorLine="" responderLine="Oh, %i%,  who would have thought the first time we met that one day we'd be crowned prom royalty!" otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="talking_long" responderFaceAnimation="null" responderFaceState="anxious" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" isOtherChorus="false">
+						<Rule name="Anonymous Rule" id="-1"/>
+					  </LineOfDialogue>
+					  <LineOfDialogue lineNumber="6" initiatorLine="Well... I couldn't say for both of us, but...." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="console" initiatorFaceAnimation="" initiatorFaceState="concerned" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="happy" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" isOtherChorus="false">
+						<Rule name="Anonymous Rule" id="-1"/>
+					  </LineOfDialogue>
+					  <LineOfDialogue lineNumber="3" initiatorLine="I always knew that %if(0,I'd)else(you'd)% be." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="talking_short" initiatorFaceAnimation="" initiatorFaceState="happy" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" isOtherChorus="false">
+						<Rule name="Anonymous Rule" id="-1"/>
+					  </LineOfDialogue>
+					  <LineOfDialogue lineNumber="5" initiatorLine="" responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="kiss" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="kiss" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" isOtherChorus="false">
+						<Rule name="Anonymous Rule" id="-1"/>
+					  </LineOfDialogue>
+					  <ToC1/>
+					  <ToC2/>
+					  <ToC3/>
+					  <ConditionalRules>
+						<Rule name="i is arrogant" id="0">
+						  <Predicate type="trait" trait="arrogant" first="null" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+					  </ConditionalRules>
+					</Instantiation>
+				  </Instantiations>
+				</Ending>
+				<Ending name="The King's Leap">
+				  <Preconditions>
+					<Rule name="Coronation proposal ending precondition" id="2">
+					  <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+					  <Predicate type="relationship" first="initiator" second="other" relationship="dating" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+					  <Predicate type="network" networkType="romance" first="initiator" second="responder" comparator="greaterthan" value="66" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+					  <Predicate type="network" networkType="romance" first="responder" second="initiator" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+					</Rule>
+				  </Preconditions>
+				  <Instantiations>
+					<Instantiation id="0" name="Ending Coronation Proposal">
+					  <LineOfDialogue lineNumber="0" initiatorLine="I'm the Prom %gender(i,King, Queen)%!  This is everything I ever wanted." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="dance_cool" initiatorFaceAnimation="null" initiatorFaceState="very happy" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="happy" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" isOtherChorus="false">
+						<Rule name="Anonymous Rule" id="-1"/>
+					  </LineOfDialogue>
+					  <LineOfDialogue lineNumber="1" initiatorLine="Except.... I always thought I'd have a Prom %if(0,princess)elseif(1,prince)elseif(3,king)else(queen)%..." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="talking_short" initiatorFaceAnimation="null" initiatorFaceState="sad" responderBodyAnimation="idle" responderFaceAnimation="anxious" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" isOtherChorus="false">
+						<Rule name="Anonymous Rule" id="-1"/>
+					  </LineOfDialogue>
+					  <LineOfDialogue lineNumber="2" initiatorLine="" responderLine="You will. There must be someone out there for you..." otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="hug" responderFaceAnimation="null" responderFaceState="anxious" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" isOtherChorus="false">
+						<Rule name="Anonymous Rule" id="-1"/>
+					  </LineOfDialogue>
+					  <LineOfDialogue lineNumber="3" initiatorLine="Maybe that someone is closer than either of us realize." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="casual_talking" initiatorFaceAnimation="null" initiatorFaceState="happy" responderBodyAnimation="" responderFaceAnimation="null" responderFaceState="concerned" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" isOtherChorus="false">
+						<Rule name="Anonymous Rule" id="-1"/>
+					  </LineOfDialogue>
+					  <LineOfDialogue lineNumber="4" initiatorLine="%r%, will you be my Prom %if(0,princess)elseif(1,prince)elseif(3,king)else(queen)%?" responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="console" initiatorFaceAnimation="null" initiatorFaceState="happy" responderBodyAnimation="blush" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" isOtherChorus="false">
+						<Rule name="Anonymous Rule" id="-1"/>
+					  </LineOfDialogue>
+					  <LineOfDialogue lineNumber="5" initiatorLine="" responderLine="Oh, %i%.  There are a million reasons to say no, and only one reason to say yes!" otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="excited_talk" responderFaceAnimation="null" responderFaceState="concerned" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" isOtherChorus="false">
+						<Rule name="Anonymous Rule" id="-1"/>
+					  </LineOfDialogue>
+					  <LineOfDialogue lineNumber="6" initiatorLine="Then say yes." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="shrug" initiatorFaceAnimation="null" initiatorFaceState="very happy" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" isOtherChorus="false">
+						<Rule name="Anonymous Rule" id="-1"/>
+					  </LineOfDialogue>
+					  <LineOfDialogue lineNumber="7" initiatorLine="" responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="kiss" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="kiss" responderFaceAnimation="null" responderFaceState="very happy" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" isOtherChorus="false">
+						<Rule name="Anonymous Rule" id="-1"/>
+					  </LineOfDialogue>
+					  <ToC1/>
+					  <ToC2/>
+					  <ToC3/>
+					  <ConditionalRules>
+						<Rule name="i is female, r is female" id="0">
+						  <Predicate type="trait" trait="female" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot="first"/>
+						  <Predicate type="trait" trait="female" first="responder" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+						<Rule name="i is male, r is male" id="1">
+						  <Predicate type="trait" trait="male" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot="first"/>
+						  <Predicate type="trait" trait="male" first="responder" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+						<Rule name="i is female, r is male" id="3">
+						  <Predicate type="trait" trait="female" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot="first"/>
+						  <Predicate type="trait" trait="male" first="responder" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+					  </ConditionalRules>
+					</Instantiation>
+				  </Instantiations>
+				</Ending>
+				<Ending name="And the winner is...">
+				  <Preconditions>
+					<Rule name="Coronation generic precondition" id="0">
+					  <Predicate type="network" networkType="buddy" first="initiator" second="responder" comparator="greaterthan" value="66" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+					</Rule>
+				  </Preconditions>
+				  <Instantiations>
+					<Instantiation id="0" name="Ending Generic">
+					  <LineOfDialogue lineNumber="0" initiatorLine="Alright, I'm the Prom %gender(i,King,Queen)%!  %positiveadj%!" responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="toss_hands_up" initiatorFaceAnimation="null" initiatorFaceState="very happy" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" isOtherChorus="false">
+						<Rule name="Anonymous Rule" id="-1"/>
+					  </LineOfDialogue>
+					  <LineOfDialogue lineNumber="1" initiatorLine="" responderLine="Woo-hoo!" otherLine="" primarySpeaker="responder" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="" responderBodyAnimation="toss_hands_up" responderFaceAnimation="null" responderFaceState="very happy" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" isOtherChorus="false">
+						<Rule name="Anonymous Rule" id="-1"/>
+					  </LineOfDialogue>
+					  <LineOfDialogue lineNumber="2" initiatorLine="I'd like to thank everyone who helped make this moment possible, the Prom Selection Committee, my friends, %random(whoever invented proms back in the 1960s or whatever,the president of the United States,German expressionism,tofu products in general)%, %random(astronaut ice cream,Superman ice cream,the internet,the Academy)%, %random(the Police Academy,my barber,the circus,the dairy section at our local supermarket)%, %random(our high school,our team mascot,modern medicine,the letter Q)%..." responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="talking_long" initiatorFaceAnimation="null" initiatorFaceState="happy" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" isOtherChorus="false">
+						<Rule name="Anonymous Rule" id="-1"/>
+					  </LineOfDialogue>
+					  <LineOfDialogue lineNumber="3" initiatorLine="" responderLine="Wrap it up!" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="idle" initiatorFaceAnimation="null" initiatorFaceState="resentful" responderBodyAnimation="shocked" responderFaceAnimation="disinterest_action" responderFaceState="disinterested" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" isOtherChorus="false">
+						<Rule name="Anonymous Rule" id="-1"/>
+					  </LineOfDialogue>
+					  <LineOfDialogue lineNumber="4" initiatorLine="And, uh, my parents and, of course, Mr. Al Garcia!  Thank you, good night!" responderLine="" otherLine="" primarySpeaker="initiator" initiatorBodyAnimation="talking_short" initiatorFaceAnimation="null" initiatorFaceState="happy" responderBodyAnimation="idle" responderFaceAnimation="null" responderFaceState="" otherBodyAnimation="idle" otherFaceAnimation="null" otherFaceState="" time="0" initiatorIsThought="false" responderIsThought="false" otherIsThought="false" initiatorIsDelayed="false" responderIsDelayed="false" otherIsDelayed="false" initiatorIsPicture="false" responderIsPicture="false" otherIsPicture="false" initiatorAddressing="responder" responderAddressing="initiator" otherAddressing="initiator" isOtherChorus="false">
+						<Rule name="Anonymous Rule" id="-1"/>
+					  </LineOfDialogue>
+					  <ToC1/>
+					  <ToC2/>
+					  <ToC3/>
+					  <ConditionalRules/>
+					</Instantiation>
+				  </Instantiations>
+				</Ending>
+			</Endings>
+		</Story>
+		<Story title="The Return of Fake Story">
+		<Description>Probably shouldn't hit this one either.</Description>
+			<Levels>
+				<Level title="Arm Candy" timeLimit="30" endable="false">
+					<Description>Every king needs a queen. Zack is going to have to score a girlfriend that is totally cool before he stands a chance at becoming prom royalty.</Description>
+					<Setting>lockers</Setting>
+					<Cast>
+						<CharacterName>Simon</CharacterName>
+						<CharacterName>Chloe</CharacterName>
+						<CharacterName>Zack</CharacterName>
+						<CharacterName>Monica</CharacterName>
+						<CharacterName>Buzz</CharacterName>
+					</Cast>
+					<GoalRules>
+						<Rule>
+							<Predicate type="relationship" first="Zack" second="x" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							<Predicate type="status" status="popular" first="x" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+						  <Rule>
+							<Predicate type="relationship" first="Zack" second="Chloe" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Zack" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Monica" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Simon" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Buzz" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+						  </Rule>
+					</GoalRules>
+				</Level>	
+				<Level title="Game Over!" timeLimit="20" endable="false">
+					<Description>Please reload the webpage to restart the demo.</Description>
+					<Setting>cornerstore</Setting>
+					<Cast>
+						<CharacterName>Zack</CharacterName>
+						<CharacterName>Buzz</CharacterName>
+					</Cast>
+					<GoalRules>
+							<Rule>
+								<Predicate type="relationship" first="Zack" second="Monica" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+								<Predicate type="status" status="popular" first="Monica" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							</Rule>
+							<Rule>
+								<Predicate type="relationship" first="Zack" second="Chloe" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+								<Predicate type="status" status="popular" first="Chloe" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							</Rule>
+						  <Rule>
+							<Predicate type="relationship" first="Zack" second="Chloe" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Zack" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Monica" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Simon" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Buzz" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+						  </Rule>
+					</GoalRules>
+				</Level>
+			</Levels>
+		</Story>
+		<Story title="The Bottom HUD" isTutorial="false" screenShot="MegaUI" locked="true">
+		<Description>Learn about the MEGA UI!!!!!11!!!1!1!</Description>
+			<Levels>
+				<Level title="Arm Candy" timeLimit="30" endable="false">
+					<Description>Every king needs a queen. Zack is going to have to score a girlfriend that is totally cool before he stands a chance at becoming prom royalty.</Description>
+					<Setting>lockers</Setting>
+					<Cast>
+						<CharacterName>Buzz</CharacterName>
+						<CharacterName>Chloe</CharacterName>
+						<CharacterName>Zack</CharacterName>
+						<CharacterName>Monica</CharacterName>
+						<CharacterName>Simon</CharacterName>
+					</Cast>
+					<GoalRules>
+						<Rule>
+							<Predicate type="relationship" first="Zack" second="x" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							<Predicate type="status" status="popular" first="x" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+						  <Rule>
+							<Predicate type="relationship" first="Zack" second="Chloe" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Zack" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Monica" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Simon" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Buzz" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+						  </Rule>
+					</GoalRules>
+				</Level>	
+				<Level title="Game Over!" timeLimit="20" endable="false">
+					<Description>Please reload the webpage to restart the demo.</Description>
+					<Setting>cornerstore</Setting>
+					<Cast>
+						<CharacterName>Zack</CharacterName>
+						<CharacterName>Buzz</CharacterName>
+					</Cast>
+					<GoalRules>
+							<Rule>
+								<Predicate type="relationship" first="Zack" second="Monica" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+								<Predicate type="status" status="popular" first="Monica" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							</Rule>
+							<Rule>
+								<Predicate type="relationship" first="Zack" second="Chloe" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+								<Predicate type="status" status="popular" first="Chloe" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							</Rule>
+						  <Rule>
+							<Predicate type="relationship" first="Zack" second="Chloe" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Zack" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Monica" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Simon" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Buzz" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+						  </Rule>
+					</GoalRules>
+				</Level>
+			</Levels>
+		</Story>
+		
+		<!-- REMEMBER, new tutorials also have to be declared in AuthoringLibrary.mxml -->
+		<Story title="Basic Gameplay 1" screenShot="gameplayBasics" storyLeadCharacter="Chloe" isTutorial="true" shouldDisplay="false">
+		<Description>Get started learning to play Prom Week!</Description>
+			<ToDoList>
+			</ToDoList>
+			<Levels>
+				<Level title="Basic Gameplay 1" timeLimit="30" cameraZoom="1" useDefinedCameraPosition="false" cameraX="800" cameraY="1400" endable="false" isTutorial="true" shouldDisplay="false" tutorialScript="OvertureOne">
+					<Description>Get started learning to play Prom Week!</Description>
+					<Setting>lockers</Setting>
+					<Cast>
+						<CharacterName>Chloe</CharacterName>
+						<CharacterName>Zack</CharacterName>
+					</Cast>
+					<GoalRules>
+					</GoalRules>
+				</Level>	
+			</Levels>
+		</Story>
+		<Story title="Basic Gameplay 2" screenShot="gameplayBasics" storyLeadCharacter="Zack" isTutorial="true" shouldDisplay="false">
+				<Description>How to help characters achieve their goals.</Description>
+			<ToDoList>
+				<ToDoItem name="Zack is Single">
+					<Condition>
+						<Rule>
+						  <Predicate type="relationship" first="initiator" second="other" relationship="dating" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="true" numTimesUniquelyTrue="1" numTimesRoleSlot="first"/>
+						</Rule>
+					</Condition>
+				</ToDoItem>
+			</ToDoList>
+			<Levels>
+				<Level title="Basic Gameplay 2" timeLimit="30" cameraZoom="1" useDefinedCameraPosition="false" cameraX="800" cameraY="1400" endable="false" isTutorial="true" shouldDisplay="false" tutorialScript="OvertureTwo">
+					<Description>How to help characters achieve their goals.</Description>
+					<Setting>lockers</Setting>
+					<Cast>
+						<CharacterName>Zack</CharacterName>
+						<CharacterName>Chloe</CharacterName>
+					</Cast>
+					<GoalRules>
+					</GoalRules>
+				</Level>	
+			</Levels>
+		</Story>
+		<Story title="Lesson 3: Feelings and Stuff" screenShot="gameplayBasics" storyLeadCharacter="Edward" isTutorial="true" shouldDisplay="false">
+		<Description>Learn how to see and change how characters feel about each other.</Description>
+			<ToDoList>
+			</ToDoList>
+			<Levels>
+				<Level title="Lesson 3: Feelings and Stuff" timeLimit="30" cameraZoom="1" useDefinedCameraPosition="false" cameraX="800" cameraY="1400" endable="false" isTutorial="true" shouldDisplay="false" tutorialScript="Tutorial3">
+					<Description>Learn how to see and change how characters feel about each other.</Description>
+					<Setting>lockers</Setting>
+					<Cast>
+						<CharacterName>Edward</CharacterName>
+						<CharacterName>Mave</CharacterName>
+						<CharacterName>Oswald</CharacterName>
+					</Cast>
+					<GoalRules>
+					</GoalRules>
+				</Level>	
+			</Levels>
+		</Story>
+		<Story title="Lesson 4: Character Motives" screenShot="gameplayBasics" storyLeadCharacter="Oswald" isTutorial="true" shouldDisplay="false">
+		<Description>Learn why characters want to do things and how to surf the social state.</Description>
+			<ToDoList>
+			</ToDoList>
+			<Levels>
+				<Level title="Lesson 4: Character Motives" timeLimit="30" cameraZoom="1" useDefinedCameraPosition="false" cameraX="800" cameraY="1400" endable="false" isTutorial="true" shouldDisplay="false" tutorialScript="Tutorial4">
+					<Description>Learn why characters want to do things and how to surf the social state.</Description>
+					<Setting>lockers</Setting>
+					<Cast>
+						<CharacterName>Oswald</CharacterName>
+						<CharacterName>Lucas</CharacterName>
+						<CharacterName>Buzz</CharacterName>
+					</Cast>
+					<GoalRules>
+					</GoalRules>
+				</Level>	
+			</Levels>
+		</Story>
+		<!--<Story title="Lesson 5: Achieving Your Goals" screenShot="gameplayBasics" storyLeadCharacter="Jordan" isTutorial="true" shouldDisplay="false">
+		<Description>Become a highly successful Prom Player by pursuing goals like a pro.</Description>
+			<ToDoList>
+				<ToDoItem name="Jordan Makes Two Friends">
+					<Condition>
+						<Rule>
+							<Predicate type="relationship" first="initiator" second="responder" relationship="friends" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="true" numTimesUniquelyTrue="2" numTimesRoleSlot=""/>
+						</Rule>
+					</Condition>
+				</ToDoItem>
+				<ToDoItem name="Jordan Does Two Nice Things">
+					<Condition>
+						<Rule>
+							<Predicate type="SFDB label" first="initiator" second="" label="cat: positive" negated="false" intent="false" isSFDB="true" window="0" numTimesUniquelyTrueFlag="true" numTimesUniquelyTrue="2" numTimesRoleSlot="first"/>
+						</Rule>
+					</Condition>
+				</ToDoItem>
+				<ToDoItem name="Jordan Does Two Mean Things">
+					<Condition>
+						<Rule>
+							<Predicate type="SFDB label" first="initiator" second="" label="cat: negative" negated="false" intent="false" isSFDB="true" window="0" numTimesUniquelyTrueFlag="true" numTimesUniquelyTrue="2" numTimesRoleSlot="first"/>
+						</Rule>
+					</Condition>
+				</ToDoItem>
+				<ToDoItem name="Jordan Starts Dating">
+					<Condition>
+						<Rule>
+							<Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+					</Condition>
+				</ToDoItem>
+			</ToDoList>
+			<Levels>
+				<Level title="Lesson 5: Achieving Your Goals" timeLimit="30" cameraZoom="1" useDefinedCameraPosition="false" cameraX="800" cameraY="1400" endable="false" isTutorial="true" shouldDisplay="false" tutorialScript="Tutorial5">
+					<Description>Become a highly successful Prom Player by pursuing goals like a pro.</Description>
+					<Setting>lockers</Setting>
+					<Cast>
+						<CharacterName>Jordan</CharacterName>
+						<CharacterName>Doug</CharacterName>
+						<CharacterName>Monica</CharacterName>
+					</Cast>
+					<GoalRules>
+					</GoalRules>
+				</Level>	
+			</Levels>
+		</Story>-->
+		<Story title="Fake Story: The Last Battle">
+		<Description>This time, it's personal. Really, don't press it.</Description>
+			<Levels>
+				<Level title="Arm Candy" timeLimit="30" endable="false">
+					<Description>Every king needs a queen. Zack is going to have to score a girlfriend that is totally cool before he stands a chance at becoming prom royalty.</Description>
+					<Setting>lockers</Setting>
+					<Cast>
+						<CharacterName>Simon</CharacterName>
+						<CharacterName>Chloe</CharacterName>
+						<CharacterName>Zack</CharacterName>
+						<CharacterName>Monica</CharacterName>
+						<CharacterName>Buzz</CharacterName>
+					</Cast>
+					<GoalRules>
+						<Rule>
+							<Predicate type="relationship" first="Zack" second="x" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							<Predicate type="status" status="popular" first="x" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+						  <Rule>
+							<Predicate type="relationship" first="Zack" second="Chloe" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Zack" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Monica" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Simon" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Buzz" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+						  </Rule>
+					</GoalRules>
+				</Level>	
+				<Level title="Game Over!" timeLimit="20" endable="false">
+					<Description>Please reload the webpage to restart the demo.</Description>
+					<Setting>cornerstore</Setting>
+					<Cast>
+						<CharacterName>Zack</CharacterName>
+						<CharacterName>Buzz</CharacterName>
+					</Cast>
+					<GoalRules>
+							<Rule>
+								<Predicate type="relationship" first="Zack" second="Monica" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+								<Predicate type="status" status="popular" first="Monica" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							</Rule>
+							<Rule>
+								<Predicate type="relationship" first="Zack" second="Chloe" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+								<Predicate type="status" status="popular" first="Chloe" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							</Rule>
+						  <Rule>
+							<Predicate type="relationship" first="Zack" second="Chloe" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Zack" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Monica" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Simon" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Buzz" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+						  </Rule>
+					</GoalRules>
+				</Level>
+			</Levels>
+		</Story>
+		<Story title="Fake Story: Something of the Something">
+		<Description>I think we might have missed something there.</Description>
+			<Levels>
+				<Level title="You pressed it didn't you?" timeLimit="30" endable="false">
+					<Description>Why did you do that?</Description>
+					<Setting>lockers</Setting>
+					<Cast>
+						<CharacterName>Simon</CharacterName>
+						<CharacterName>Chloe</CharacterName>
+						<CharacterName>Zack</CharacterName>
+						<CharacterName>Monica</CharacterName>
+						<CharacterName>Buzz</CharacterName>
+					</Cast>
+					<GoalRules>
+						<Rule>
+							<Predicate type="relationship" first="Zack" second="x" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							<Predicate type="status" status="popular" first="x" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+						  <Rule>
+							<Predicate type="relationship" first="Zack" second="Chloe" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Zack" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Monica" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Simon" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Buzz" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+						  </Rule>
+					</GoalRules>
+				</Level>	
+				<Level title="Game Over!" timeLimit="20" endable="false">
+					<Description>Please reload the webpage to restart the demo.</Description>
+					<Setting>cornerstore</Setting>
+					<Cast>
+						<CharacterName>Zack</CharacterName>
+						<CharacterName>Buzz</CharacterName>
+					</Cast>
+					<GoalRules>
+							<Rule>
+								<Predicate type="relationship" first="Zack" second="Monica" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+								<Predicate type="status" status="popular" first="Monica" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							</Rule>
+							<Rule>
+								<Predicate type="relationship" first="Zack" second="Chloe" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+								<Predicate type="status" status="popular" first="Chloe" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							</Rule>
+						  <Rule>
+							<Predicate type="relationship" first="Zack" second="Chloe" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Zack" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Monica" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Simon" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Buzz" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+						  </Rule>
+					</GoalRules>
+				</Level>
+			</Levels>
+		</Story>
+		<Story title="Fake Story: Part 27">
+		<Description>This could go on for awhile.</Description>
+			<Levels>
+				<Level title="Arm Candy" timeLimit="30" endable="false">
+					<Description>Every king needs a queen. Zack is going to have to score a girlfriend that is totally cool before he stands a chance at becoming prom royalty.</Description>
+					<Setting>lockers</Setting>
+					<Cast>
+						<CharacterName>Simon</CharacterName>
+						<CharacterName>Chloe</CharacterName>
+						<CharacterName>Zack</CharacterName>
+						<CharacterName>Monica</CharacterName>
+						<CharacterName>Buzz</CharacterName>
+					</Cast>
+					<GoalRules>
+						<Rule>
+							<Predicate type="relationship" first="Zack" second="x" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							<Predicate type="status" status="popular" first="x" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+						  <Rule>
+							<Predicate type="relationship" first="Zack" second="Chloe" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Zack" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Monica" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Simon" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Buzz" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+						  </Rule>
+					</GoalRules>
+				</Level>	
+				<Level title="Game Over!" timeLimit="20" endable="false">
+					<Description>Please reload the webpage to restart the demo.</Description>
+					<Setting>cornerstore</Setting>
+					<Cast>
+						<CharacterName>Zack</CharacterName>
+						<CharacterName>Buzz</CharacterName>
+					</Cast>
+					<GoalRules>
+							<Rule>
+								<Predicate type="relationship" first="Zack" second="Monica" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+								<Predicate type="status" status="popular" first="Monica" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							</Rule>
+							<Rule>
+								<Predicate type="relationship" first="Zack" second="Chloe" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+								<Predicate type="status" status="popular" first="Chloe" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							</Rule>
+						  <Rule>
+							<Predicate type="relationship" first="Zack" second="Chloe" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Zack" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Monica" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Simon" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Buzz" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+						  </Rule>
+					</GoalRules>
+				</Level>
+			</Levels>
+		</Story>
+		<Story title="That Other Fake Story">
+		<Description>We have a lot of campaigns to write.</Description>
+			<Levels>
+				<Level title="Arm Candy" timeLimit="30" endable="false">
+					<Description>Every king needs a queen. Zack is going to have to score a girlfriend that is totally cool before he stands a chance at becoming prom royalty.</Description>
+					<Setting>lockers</Setting>
+					<Cast>
+						<CharacterName>Simon</CharacterName>
+						<CharacterName>Chloe</CharacterName>
+						<CharacterName>Zack</CharacterName>
+						<CharacterName>Monica</CharacterName>
+						<CharacterName>Buzz</CharacterName>
+					</Cast>
+					<GoalRules>
+						<Rule>
+							<Predicate type="relationship" first="Zack" second="x" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							<Predicate type="status" status="popular" first="x" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+						  <Rule>
+							<Predicate type="relationship" first="Zack" second="Chloe" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Zack" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Monica" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Simon" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Buzz" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+						  </Rule>
+					</GoalRules>
+				</Level>	
+				<Level title="Game Over!" timeLimit="20" endable="false">
+					<Description>Please reload the webpage to restart the demo.</Description>
+					<Setting>cornerstore</Setting>
+					<Cast>
+						<CharacterName>Zack</CharacterName>
+						<CharacterName>Buzz</CharacterName>
+					</Cast>
+					<GoalRules>
+							<Rule>
+								<Predicate type="relationship" first="Zack" second="Monica" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+								<Predicate type="status" status="popular" first="Monica" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							</Rule>
+							<Rule>
+								<Predicate type="relationship" first="Zack" second="Chloe" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+								<Predicate type="status" status="popular" first="Chloe" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							</Rule>
+						  <Rule>
+							<Predicate type="relationship" first="Zack" second="Chloe" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Zack" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Monica" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Simon" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Buzz" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+						  </Rule>
+					</GoalRules>
+				</Level>
+			</Levels>
+		</Story>
+		<Story title="Almost There: A Fake Story Tale">
+		<Description>Stories... so delicious.</Description>
+			<Levels>
+				<Level title="Arm Candy" timeLimit="30" endable="false">
+					<Description>Every king needs a queen. Zack is going to have to score a girlfriend that is totally cool before he stands a chance at becoming prom royalty.</Description>
+					<Setting>lockers</Setting>
+					<Cast>
+						<CharacterName>Simon</CharacterName>
+						<CharacterName>Chloe</CharacterName>
+						<CharacterName>Zack</CharacterName>
+						<CharacterName>Monica</CharacterName>
+						<CharacterName>Buzz</CharacterName>
+					</Cast>
+					<GoalRules>
+						<Rule>
+							<Predicate type="relationship" first="Zack" second="x" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							<Predicate type="status" status="popular" first="x" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+						  <Rule>
+							<Predicate type="relationship" first="Zack" second="Chloe" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Zack" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Monica" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Simon" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Buzz" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+						  </Rule>
+					</GoalRules>
+				</Level>	
+				<Level title="Game Over!" timeLimit="20" endable="false">
+					<Description>Please reload the webpage to restart the demo.</Description>
+					<Setting>cornerstore</Setting>
+					<Cast>
+						<CharacterName>Zack</CharacterName>
+						<CharacterName>Buzz</CharacterName>
+					</Cast>
+					<GoalRules>
+							<Rule>
+								<Predicate type="relationship" first="Zack" second="Monica" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+								<Predicate type="status" status="popular" first="Monica" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							</Rule>
+							<Rule>
+								<Predicate type="relationship" first="Zack" second="Chloe" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+								<Predicate type="status" status="popular" first="Chloe" second="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							</Rule>
+						  <Rule>
+							<Predicate type="relationship" first="Zack" second="Chloe" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Zack" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Monica" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Simon" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+							<Predicate type="network" networkType="cool" first="Buzz" second="Chloe" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="" numTimesRoleSlot=""/>
+						  </Rule>
+					</GoalRules>
+				</Level>
+			</Levels>
+		</Story>
+		<Story title="They're waiting for you, Gordon. In the TEST Chamber." storyLeadCharacter="Buzz" locked="true" toUnlock="5">
+		<Description>Funny that you'd show up today, Gordon. It's a Red Letter Day!</Description>
+		<ToDoList>
+			</ToDoList>
+			<Levels>
+				<Level title="AperatureDay: In the Testing Labs" timeLimit="99" endable="true" useDefinedCastPositions="false" cameraZoom="1" useDefinedCameraPosition="false" cameraX="800" cameraY="1400" startTip="" isTutorial="false" tutorialScript="">
+					<Description>Oh, it's *you*... It's been a looong time. How have you been? I've been *really* busy being dead. You know, after you MURDERED me. Okay, look. We both said a lot of things that you're going to regret. But I think we can put our differences behind us. For Science. You Monster.</Description>
+						<Setting>lockers</Setting>
+						<Cast>
+							<!--Note from GladOS: Place your testing subjects in the skeleton form below...
+												  Simply increment the X value by 100, for each character you add.
+												  Remember also to change storyLeadCharacter in the Story tag above to the first character below!-->
+							<CharacterName startX="600" startY="1000">Buzz</CharacterName>
+							<CharacterName startX="700" startY="1000">Cassandra</CharacterName>
+							<CharacterName startX="800" startY="1000">Nicholas</CharacterName>
+							<CharacterName startX="900" startY="1000">Monica</CharacterName>
+							<CharacterName startX="1000" startY="1000">Chloe</CharacterName>
+							<CharacterName startX="1100" startY="1000">Oswald</CharacterName>
+						</Cast>
+					<GoalRules>
+					</GoalRules>
+				</Level>
+			</Levels>
+			<Endings>
+			</Endings>
+		</Story>
+	</PromWeek>

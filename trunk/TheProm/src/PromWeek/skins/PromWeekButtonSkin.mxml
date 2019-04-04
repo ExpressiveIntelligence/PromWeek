@@ -1,0 +1,138 @@
+<s:Skin 
+    xmlns:fx="http://ns.adobe.com/mxml/2009" 
+    xmlns:mx="library://ns.adobe.com/flex/mx" 
+    xmlns:s="library://ns.adobe.com/flex/spark"
+	styleName="classicPromWeek"
+	alpha="1.0"
+	alpha.disabled="0.1">
+
+	<fx:Metadata> 
+		[HostComponent("PromWeek.PromWeekButton")] 
+	</fx:Metadata>
+	
+	
+	<s:states> 
+		<s:State name="up" /> 
+		<s:State name="over" /> 
+		<s:State name="down" /> 
+		<s:State name="disabled" /> 
+	</s:states>
+	<s:Group width="{hostComponent.width}" height="{hostComponent.height}">
+		
+		<!-- up and disabled states-->
+		<s:Rect width="{hostComponent.width}" height="{hostComponent.height}" radiusX="{hostComponent.cornerRoundness}" radiusY="{hostComponent.cornerRoundness}" includeIn="up,disabled" 
+				visible="{getStyle('pwButtonUseSolidFill')}"  includeInLayout="{getStyle('pwButtonUseSolidFill')}" >
+			<s:stroke>
+				<s:SolidColorStroke weight="{getStyle('buttonStrokeWeight')}" color="{getStyle('backgroundStroke')}" />
+			</s:stroke>
+			<s:fill>
+				<s:SolidColor color="{getStyle('buttonColor')}" />
+			</s:fill>
+		</s:Rect>
+		
+		<s:Rect width="{hostComponent.width}" height="{hostComponent.height}" radiusX="{hostComponent.cornerRoundness}" radiusY="{hostComponent.cornerRoundness}" includeIn="up,disabled" 
+				visible="{getStyle('pwButtonUseGradient')}"  includeInLayout="{getStyle('pwButtonUseGradient')}">
+			<s:stroke>
+				<s:SolidColorStroke weight="{getStyle('buttonStrokeWeight')}" color="{getStyle('backgroundStroke')}" />
+			</s:stroke>
+			<s:fill>
+				<s:LinearGradient rotation="90">
+					<s:entries>
+						<s:GradientEntry color="#FFFFFF" alpha=".3" />
+						<s:GradientEntry color="{getStyle('buttonColor')}" ratio=".5" alpha=".6" />
+					</s:entries>
+				</s:LinearGradient>
+			</s:fill>
+		</s:Rect>
+
+		<!--<s:Rect width="{borderPatrol.width - 5}" height="{borderPatrol.height - 5}" includeIn="up">
+			<s:fill>
+				<s:LinearGradient rotation="90">
+					<s:entries>
+						<s:GradientEntry color="#FFFFFF" alpha="0.3"/>
+						<s:GradientEntry color="#000000" alpha="0.3"/>
+					</s:entries>
+				</s:LinearGradient>
+			</s:fill>
+		</s:Rect>-->
+		
+		<!-- over state -->
+		<s:Rect width="{hostComponent.width}" height="{hostComponent.height}" radiusX="{hostComponent.cornerRoundness}" radiusY="{hostComponent.cornerRoundness}" includeIn="over" 
+				visible="{getStyle('pwButtonUseSolidFill')}"  includeInLayout="{getStyle('pwButtonUseSolidFill')}">
+			<s:fill>
+
+				<s:SolidColor color="{getStyle('buttonColorOver')}" />
+			</s:fill>
+			<s:stroke>
+				<s:SolidColorStroke weight="{getStyle('buttonStrokeWeight')}" color="{getStyle('backgroundStroke')}" />
+			</s:stroke>
+		</s:Rect>
+		
+		<s:Rect width="{hostComponent.width}" height="{hostComponent.height}" radiusX="{hostComponent.cornerRoundness}" radiusY="{hostComponent.cornerRoundness}" includeIn="over" 
+				visible="{getStyle('pwButtonUseGradient')}"  includeInLayout="{getStyle('pwButtonUseGradient')}">
+			<s:fill>
+				<s:LinearGradient rotation="90">
+					<s:entries>
+						<s:GradientEntry color="#FFFFFF" alpha="0.1"/>
+						<s:GradientEntry color="#AAAAAA" alpha="0.1"/>
+					</s:entries>
+				</s:LinearGradient>
+			</s:fill>
+			<s:stroke>
+				<s:SolidColorStroke weight="{getStyle('buttonStrokeWeight')}" color="{getStyle('backgroundStroke')}" />
+			</s:stroke>
+		</s:Rect>
+		
+		<!-- down state -->
+		<s:Rect width="{hostComponent.width}" height="{hostComponent.height}" radiusX="{hostComponent.cornerRoundness}" radiusY="{hostComponent.cornerRoundness}" includeIn="down" 
+				visible="{getStyle('pwButtonUseSolidFill')}"  includeInLayout="{getStyle('pwButtonUseSolidFill')}">
+			<s:fill>
+				<s:SolidColor color="{getStyle('buttonColorDown')}" />
+			</s:fill>
+			<s:stroke>
+				<s:SolidColorStroke weight="{getStyle('buttonStrokeWeight')}" color="{getStyle('backgroundStroke')}" />
+			</s:stroke>
+		</s:Rect>
+		
+		<s:Rect width="{hostComponent.width}" height="{hostComponent.height}" radiusX="{hostComponent.cornerRoundness}" radiusY="{hostComponent.cornerRoundness}" includeIn="down" 
+				visible="{getStyle('pwButtonUseGradient')}"  includeInLayout="{getStyle('pwButtonUseGradient')}">
+			<s:fill>
+				<s:LinearGradient rotation="90">
+					<s:entries>
+						<s:GradientEntry color="#AAAAAA" alpha="0.1"/>
+						<s:GradientEntry color="#FFFFFF" alpha="0.1"/>
+					</s:entries>
+				</s:LinearGradient>
+			</s:fill>
+			<s:stroke>
+				<s:SolidColorStroke weight="{getStyle('buttonStrokeWeight')}" color="{getStyle('backgroundStroke')}" />
+			</s:stroke>
+		</s:Rect>
+		
+		
+		<s:VGroup width="{hostComponent.width}" height="{hostComponent.height}">
+			<s:RichText id="title" width="{hostComponent.width}" height="{hostComponent.height}" fontWeight="{getStyle('fontWeight')}" fontSize="{getStyle('fontSize')}"  textAlign="center" verticalAlign="middle" styleName="promWeekButtonStyle"
+			color="{getStyle('textColor')}">
+			<!--color="{(hostComponent.shouldTextBeBlack)?0x000000:0xFFFFFF}">-->
+				<s:text>{hostComponent.label}</s:text>
+			</s:RichText>
+			<!--<s:Label minWidth="0" width="100%" id="description" fontSize="14" lineHeight="140%" color="#FFFFFF">
+				<s:text>{hostComponent.description}</s:text>
+			</s:Label>-->
+		</s:VGroup>
+	</s:Group>
+	
+	
+	<fx:Script>
+
+		
+	<![CDATA[	 
+	
+	
+		//override protected function commitProperties():void {
+			//trace("Oy!");
+			//super.commitProperties();
+		//}	
+	]]>
+	</fx:Script>
+</s:Skin>

@@ -1,0 +1,441 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 preinitialize="onPreinitialize()"
+		 initialize="onInitialization()"
+		 width="100%"
+		 height="100%"
+		 styleName="classicPromWeek">
+		 
+		<fx:Metadata>
+		</fx:Metadata>
+		 
+		<prom:AuthoringLibrary id="aL"/>
+		
+		<fx:Declarations>
+			
+		</fx:Declarations>
+		
+		<s:Rect id="background" width="100%" height="100%">
+			<s:fill>
+				<s:SolidColor id="backgroundFill" color="{getStyle('backgroundColor')}" />
+			</s:fill>
+		</s:Rect>
+		
+		<!-- Choose a story text right above the portraits. -->
+		<!--<s:Label color="{getStyle('textColor')}" fontSize="28" left="150" top="200">
+			<s:text>Choose a tutorial:</s:text>
+		</s:Label>-->
+		
+		<!-- The frame around the description and title. -->
+		<!--<s:Rect id="DescriptionFrame" width="350" left="350" top="60" height="215">
+			<s:stroke>
+				<s:SolidColorStroke weight="{getStyle('windowStrokeWeight')}" color="{getStyle('backgroundStroke')}" />
+			</s:stroke>
+			<s:fill>
+				<s:SolidColor color="{getStyle('backgroundColor')}" />
+			</s:fill>
+		</s:Rect>-->
+		<!-- The box that contains the description and title of the campaign that is moused over. -->
+		<!--<s:VGroup id="storyInfoGroup" width="350" top="60" height="215" left="350" paddingTop="10" paddingLeft="20" paddingRight="20">
+			<s:RichText id="storyTitle" width="100%" fontWeight="bold" fontSize="22" color="{getStyle('textColor')}" paddingBottom="10" />
+			<s:TextArea id="storyDescription" height="90%" width="100%" contentBackgroundColor="{getStyle('contentAreaColor')}" color="{getStyle('textColor')}" fontSize="14" editable="false" selectable="false"/>
+		</s:VGroup>-->
+		
+			
+		<s:VGroup width="100%" height="100%" paddingBottom="60" paddingTop="35" paddingLeft="35" paddingRight="35" gap="0">
+			<s:Label color="{getStyle('textColor')}" fontSize="38" text="Tutorials:" />
+			<!-- The scroller area for all the tutorials. -->
+			<s:Scroller id="tutorialScroller" width="100%" height="67%">
+				<s:Group id="checkMarksNProgress" width="100%" height="100%">
+					<s:Rect id="DescriptionFrame" width="100%" height="100%">
+						<s:stroke>
+							<s:SolidColorStroke weight="{getStyle('windowStrokeWeight')}" color="{getStyle('backgroundStroke')}" />
+						</s:stroke>
+					</s:Rect>
+					<s:HGroup width="100%" height="100%" paddingBottom="20" paddingTop="20" paddingLeft="20" paddingRight="20">
+						<s:Group id="checkMarksGroup" width="5%" />
+						<s:VGroup id="tutorialBox" width="95%" />
+					</s:HGroup>
+				</s:Group>
+			</s:Scroller>
+			
+			<s:Group id="descriptionArea" width="100%" height="33%">
+				<s:Rect width="100%" height="100%">
+					<s:stroke>
+						<s:SolidColorStroke weight="{getStyle('windowStrokeWeight')}" color="{getStyle('backgroundStroke')}" />
+					</s:stroke>
+					<s:fill>
+						<s:SolidColor color="{getStyle('backgroundColor')}" />
+					</s:fill>
+				</s:Rect>
+				<s:HGroup width="100%" height="100%" paddingBottom="15" paddingTop="15" paddingLeft="15" paddingRight="15">
+					<s:VGroup width="75%" height="100%">
+						<s:RichText id="tutorialTitle" height="25%" width="100%" fontWeight="bold" fontSize="22" color="{getStyle('textColor')}" paddingBottom="10" />
+						<s:TextArea id="tutorialDescription" height="75%" width="100%" contentBackgroundColor="{getStyle('contentAreaColor')}" color="{getStyle('textColor')}" fontSize="14" editable="false" selectable="false"/>
+					</s:VGroup>
+					<s:VGroup width="25%" height="100%">
+						<util:SmoothImage id="tutorialImage" width="100%" height="100%" />
+					</s:VGroup>
+				</s:HGroup>
+			</s:Group>		
+		</s:VGroup>
+		
+		<s:Group id="backButtonSpot" left="35" top="545">
+		</s:Group>
+		
+		 <fx:Script>
+			 <![CDATA[
+		
+		import CiF.Debug;
+		import CiF.Effect;
+		import CiF.Predicate;
+		import CiF.SocialGame;
+		import flash.events.MouseEvent;
+		import flash.utils.Dictionary;
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import CiF.CiFSingleton;
+		import PromWeek.Story;
+		import PromWeek.StoryButton;
+		import PromWeek.MainMenuButton;
+		import PromWeek.assets.ResourceLibrary;
+		import spark.components.Group;
+		
+		private var rL:PromWeek.assets.ResourceLibrary;
+		//private var aL:AuthoringLibrary;
+		private var cif:CiFSingleton;
+		private var gameEngine:GameEngine;
+		private var statisticsManager:StatisticsManager;
+		public var selectedStory:Story;
+		public var endingsCount:Number;
+		public var tutorialStories:Vector.<Story> = new Vector.<Story>;
+		public var possibleActions:Vector.<String> = new Vector.<String>;
+		
+		private function onPreinitialize():void {
+			Debug.debug(this, "onPreinitialize()");
+			cif = CiFSingleton.getInstance();
+			this.gameEngine = GameEngine.getInstance();
+			rL = PromWeek.assets.ResourceLibrary.getInstance();
+			statisticsManager = StatisticsManager.getInstance();
+		}
+		
+		//override protected function createChildren():void {
+			//Debug.debug(this, "createChildren()");
+			//
+			//super.createChildren();
+		//}
+		
+		public function onInitialization():void {
+			Debug.debug(this, "Tutorial Screen Initialization!!!!!");
+			setStyleName();
+			sortTutorials();
+			
+			changeTutorialDescription(tutorialStories[0]);
+			selectedStory = tutorialStories[0];
+			
+			this.loadStorySelection();
+		}
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			/*if(gameEngine.classicPromColors) {
+				this.setStyle("styleName", "classicPromWeek");
+			}
+			else if(gameEngine.greenPromColors) {
+				this.setStyle("styleName", "greenColor");
+			}
+			else if(gameEngine.redPromColors) {
+				this.setStyle("styleName", "redColor");
+			}*/
+			this.invalidateProperties();
+		}
+		
+		public function loadStorySelection():void {
+			for (var i:int = 0; i < tutorialStories.length; i++) 
+			{
+				if (!tutorialStories[i].shouldDisplay)
+				{//only add the tutorials that aren't stories too
+					this.addTutorialButton(tutorialStories[i], i);
+				}
+			}
+			/*
+			for (var i:int = 0; i < gameEngine.stories.length; i++) {
+				if(gameEngine.stories[i].istutorial) {
+					this.addTutorialButton(gameEngine.stories[i], i);
+				}
+			}
+			*/
+			addBackButton("Return to Main Menu");
+			//addPlayButton("Play!");
+		}
+		
+		/* Creates a new vector that only deals with tutorial stories
+		 */
+		public function sortTutorials():void {
+			for each (var story:Story in gameEngine.stories) {
+				if(story.istutorial) {
+					switch(story.storyLeadCharacter) {
+						case "Chloe":
+							story.storySelectionLocation = 0;
+							break;
+						case "Zack":
+							story.storySelectionLocation = 1;
+							break;
+						case "Edward":
+							story.storySelectionLocation = 2;
+							break;
+						case "Oswald":
+							story.storySelectionLocation = 3;
+							break;
+						case "Nicholas":
+							story.storySelectionLocation = 4;
+							break;
+						case "Lil":
+							story.storySelectionLocation = 5;
+							break;
+						case "Lucas":
+							story.storySelectionLocation = 6;
+							break;
+						case "Pheobe":
+							story.storySelectionLocation = 7;
+							break;
+						case "Cassandra":
+							story.storySelectionLocation = 8;
+							break;
+						case "Monica":
+							story.storySelectionLocation = 9;
+							break;
+						case "Naomi":
+							story.storySelectionLocation = 10;
+							break;
+						case "Gunter":
+							story.storySelectionLocation = 11;
+							break;
+						case "Simon":
+							story.storySelectionLocation = 12;
+							break;
+						case "Kate":
+							story.storySelectionLocation = 13;
+							break;
+						case "Mave":
+							story.storySelectionLocation = 14;
+							break;
+						case "Doug":
+							story.storySelectionLocation = 15;
+							break;
+						case "Buzz":
+							story.storySelectionLocation = 16;
+							break;
+						case "Jordan":
+							story.storySelectionLocation = 17;
+							break;
+						case "no lead":
+							story.storySelectionLocation = 20;
+							break;
+						default:
+							story.storySelectionLocation = 21;
+							break;
+					}
+					tutorialStories.push(story);
+				}
+			}
+			tutorialStories.sort(sortStoryLocation);
+		}
+		
+		//Used to sort the story location properly after they are each given a number
+		public function sortStoryLocation(x:Story, y:Story):Number {
+			if (x.storySelectionLocation > y.storySelectionLocation) {
+				return 1.0;
+			}
+			else if (x.storySelectionLocation < y.storySelectionLocation) {
+				return -1.0;
+			}
+			else {
+				return 0;
+			}
+		}
+		
+		//This function is called when you click on one of the tutorials
+		public function changeTutorialDescription(storyTutorial:Story):void {
+			tutorialTitle.text = storyTutorial.title;
+			tutorialDescription.text = storyTutorial.description;
+			tutorialImage.source = rL.tutorialScreenshots[storyTutorial.tutorialScreenShot];
+		}
+		
+		//Adds the backbutton, uses the main menu button set up and skin and places it in the lower left corner. Goes back to main menu.
+		public function addBackButton(buttonText:String):void {
+			var button:MainMenuButton = new MainMenuButton();
+			button.title = buttonText;
+			button.width = 270;
+			button.height = 45;
+			
+			var self:Object = this;
+			button.addEventListener("click", function(event:MouseEvent):void {
+				self.gameEngine.hudGroup.tutorialSelectionScreen.visible = false;
+				self.gameEngine.currentState = "MainMenu";
+			});
+			backButtonSpot.addElement(button);
+		}
+		
+		//Adds the play button, which starts teh story
+		/*
+		public function addPlayButton(buttonText:String):void {
+			var button:MainMenuButton = new MainMenuButton();
+			button.title = buttonText;
+			button.width = 64;
+			button.height = 40;
+			
+			var self:Object = this;
+			button.addEventListener("click", startStory);
+			playButtonSpot.addElement(button);
+		}
+		*/
+		
+		public function startStory(event:MouseEvent):void {
+			//Let's set up CIF to use a special starting tutorial state!
+			Debug.debug(this, "onPreinitialize()");
+			gameEngine.resetGameStateForTutorial();
+			/*
+			aL.loadCifStates();
+			
+			Debug.debug(this, "onPreinitialize()");
+			gameEngine.intitialState = aL.cifStartStates["tutorialCifStateXML"];
+			this.cif.parseCiFState(aL.cifStartStates["tutorialCifStateXML"]);
+			
+			aL.loadXMLGames()
+			for each(var value:XML in aL.games) {
+				this.cif.parseCiFState(value)
+			}
+			
+			aL.loadXMLStories();
+			for each(value in aL.stories) {
+				gameEngine.loadStories(value);
+			}
+			*/
+			
+			var self:Object = this;
+			self.gameEngine.currentStory = selectedStory;
+			self.gameEngine.activateLevel(0);
+			self.visible = false;
+			//self.gameEngine.setDimensions(gameEngine.APPLICATION_WIDTH, gameEngine.APPLICATION_HEIGHT);
+		
+			self.gameEngine.hudGroup.updatesGroup.visible = true;
+		
+			if (gameEngine.hudGroup.megaUI.megaUIExpanded)
+			{
+				gameEngine.hudGroup.megaUI.onMinimizeButtonClicked();
+			}
+			gameEngine.hudGroup.megaUI.clear();
+			
+			var cameraStartX:Number = Setting.settings[self.gameEngine.currentStory.levels[0].settingName].viewableWidth/4;
+			var cameraStartY:Number = Setting.settings[self.gameEngine.currentStory.levels[0].settingName].horizonHeight;
+			gameEngine.camera.absolutePosition(cameraStartX, cameraStartY, gameEngine.currentLevel.startZoom);
+			
+			//this gets set to true after the first turn. Setting it false here is a sort of hack to make it so the
+			//tasks that are are already true don't bombard the player on the first turn
+			gameEngine.displayGoalProgressNotifications = false;
+			
+			gameEngine.hudGroup.storyGoalWindow.toDoItemAccordion.storyLeadName = "the lead character";
+			
+			for each (var toDoItem:ToDoItem in self.gameEngine.currentStory.todoList)
+			{
+				toDoItem.predTruthValuesPerResponderOtherPair = new Vector.<Dictionary>();
+				for each (var pred:Predicate in toDoItem.condition.predicates)
+				{
+					toDoItem.predTruthValuesPerResponderOtherPair.push(new Dictionary());
+				}
+			}
+			
+			for each(var sg:SocialGame in CiFSingleton.getInstance().socialGamesLib.games) 
+			{
+				for each(var e:Effect in sg.effects) {
+					e.lastSeenTime = -1;
+				}
+			}
+			
+			self.gameEngine.tutorialAvatarName = "";
+			self.gameEngine.tutorial.tutorialStepCounter = 0;
+			self.gameEngine.tutorialFilterFollowing = null;
+			self.gameEngine.tutorialStopped = false;
+			
+			
+			//reset the top bar's "active quest" thingy
+			//self.gameEngine.hudGroup.topBar.toDoItemComponent.responderFace.visible = false;
+			//self.gameEngine.hudGroup.topBar.toDoItemComponent.otherFace.visible = false;
+			//self.gameEngine.hudGroup.topBar.toDoItemComponent.todoItemNameLabel.text = "";
+			//self.gameEngine.hudGroup.topBar.toDoItemComponent.setProgressWidthPercent(0);
+			//self.gameEngine.hudGroup.topBar.toDoButton.enabled = false;
+			
+			
+			self.gameEngine.hudGroup.storyGoalWindow.toDoItemAccordion.populateToDoList(selectedStory);
+		}
+		
+		public function addTutorialButton(story:Story, location:int):void {
+			var button:MainMenuButton = new MainMenuButton();
+			button.title = story.title;
+			button.width = 600;
+			button.height = 35;
+			
+			button.addEventListener("click", function(event:MouseEvent):void {
+					if (selectedStory == story) { // if the story was already selected, make it play automatically when you click on it again.
+						startStory(event);
+					}
+			});
+			
+			
+			button.addEventListener(MouseEvent.ROLL_OVER, function(event:MouseEvent):void {
+					if (selectedStory != story) 
+					{ // if the story was already selected, make it play automatically when you click on it again.
+						selectedStory = story;
+						changeTutorialDescription(story);
+					}
+			});			
+			
+			
+			tutorialBox.addElement(button);
+			if (statisticsManager.tutorialsDone[button.title]) {
+					var image:SmoothImage = new SmoothImage();
+					image.width = 35;
+					image.height = 35;
+					image.source = rL.uiIcons["check"];
+					image.y = 5 + ((button.height)* this.tutorialBox.getElementIndex(button));
+					this.checkMarksGroup.addElement(image);
+			}
+		}
+		
+		/**
+		 * Given the name of the tutorial, finds the appropriate button and adds
+		 * a checkmark next to it.  Right now, the way we do it is kind of drastic
+		 * and doesn't even require the input -- it just removes all of the elements 
+		 * in the box, and recreates them again (and since the appropriate thing has now been
+		 * set in the statistics manager, the checkbox should appear as you would expect!)
+		 * @param	buttonTitle the title of the lesson that was just completed
+		 */
+		public function updateTutorialButton(buttonTitle:String):void {
+			for (var i:int = 0; i < tutorialBox.numElements; i++) {
+				var temp:MainMenuButton;
+				temp = tutorialBox.getElementAt(i) as MainMenuButton;
+				if (temp.title.toLowerCase() == buttonTitle.toLowerCase()) {
+					if (statisticsManager.tutorialsDone[temp.title]) {
+						var image:SmoothImage = new SmoothImage();
+						image.source = rL.uiIcons["check"];
+						image.width = 35;
+						image.height = 35;
+						image.y = 5 + ((temp.height) * i);
+						this.checkMarksGroup.addElement(image);
+					}
+				}
+			}
+			//checkMarksNProgress.removeAllElements();
+			//this.onInitialization();
+		}
+			 
+			 ]]>
+		 </fx:Script>
+</s:Group>

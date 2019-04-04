@@ -1,0 +1,1200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 initialize="worldGroupInitialize()"
+		 creationComplete="onCreationComplete()">
+	
+		 
+	<fx:Metadata>
+	</fx:Metadata>
+		
+	<fx:Declarations>
+	</fx:Declarations>
+	
+	<!--<s:Rect id="characterSpaceBorder" x="0" y="0" width="100%" height="100%">
+		<s:stroke>
+			<s:SolidColorStroke weight="10" color="#AADDFF"/>
+		</s:stroke>
+	</s:Rect>-->
+	
+	<prom:SelectionCircle id="primarySelectionCircle" visible="false" />
+	<prom:SelectionCircle id="secondarySelectionCircle" visible="false" />
+	
+	<!--<prom:DebugGroup id="debugGroup" />-->
+	
+	<fx:Script>
+		<![CDATA[
+		import CiF.BuddyNetwork;
+		import CiF.Cast;
+		import CiF.Character;
+		import CiF.Debug;
+		import CiF.Rule;
+		import CiF.Trait
+		import CiF.Status;
+		import CiF.CiFSingleton;
+		import CiF.RelationshipNetwork;
+		import CiF.SocialGameContext;
+		import CiF.SocialGame;
+		import CiF.Predicate;
+		import CiF.SocialFactsDB;
+		import org.flintparticles.common.events.EmitterEvent;
+		import flash.display.MovieClip;
+		import flash.events.Event;
+		import flash.filters.BlurFilter;
+		import flash.filters.ColorMatrixFilter;
+		import flash.geom.Point;
+		import flash.geom.Rectangle;
+		import flash.ui.Mouse;
+		import flash.utils.Dictionary;
+		import flash.utils.getTimer;
+		import mx.collections.ArrayCollection;
+		import mx.graphics.Stroke;
+		import spark.components.Group;
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import mx.flash.UIMovieClip;
+		import flash.events.MouseEvent;
+		import spark.core.SpriteVisualElement;
+		import PromWeek.assets.ResourceLibrary;
+		import spark.primitives.Rect;
+		
+		
+		
+		
+		
+import org.flintparticles.common.actions.*;
+import org.flintparticles.common.counters.*;
+import org.flintparticles.common.displayObjects.Dot;
+import org.flintparticles.common.easing.Quadratic;
+import org.flintparticles.common.events.EmitterEvent;
+import org.flintparticles.common.initializers.*;
+import org.flintparticles.twoD.actions.*;
+import org.flintparticles.twoD.emitters.Emitter2D;
+import org.flintparticles.twoD.initializers.*;
+import org.flintparticles.twoD.renderers.*;
+import org.flintparticles.twoD.zones.*;  
+		
+		
+		
+		
+		
+		//import PromWeek.assets.settings.*;
+
+		/**
+		 * The time in milliseconds between the MOUSE_DOWN and MOUSE_UP events to
+		 * decide between panning and character deselection.
+		 * 
+		 * 100ms is too slow.
+		 * 250 seems ok.
+		 * Higher may be good.
+		 */
+		public const CHARACTER_DESELECTION_INTERVAL:int = 150;
+		
+		//locks and state keeping for mouse drag panning and character deselection
+		private var _mouseMovedSinceMouseDown:Boolean;
+		private var mouseDownTime:int;
+		private var _panning:Boolean;
+		private var _mouseDownCoords:Point;
+		private var _lastPanTime:int;
+		public var _lastGlobalCoords:Point;
+		
+		public const USE_ZONES:Boolean = true;
+		
+		public var currentSetting:Setting;
+		
+		private var resourceLibrary:PromWeek.assets.ResourceLibrary = PromWeek.assets.ResourceLibrary.getInstance();
+
+		private var gameEngine:GameEngine;
+		
+		public var networkGroup:NetworkRepresentation;
+		
+		public var avatars:Dictionary = new Dictionary();
+
+		private var selectionCircleOffsetX:Number =  -75;
+		private var selectionCircleOffsetY:Number = 112;
+		
+		public static const ZONE_SUPER_CLOSE_THRESHOLD:int = 10;
+		public static const ZONE_KINDA_CLOSE_THRESHOLD:int = 0;
+		public static const ZONE_KINDA_FAR_THRESHOLD:int = -10;
+		public static const ZONE_SUPER_FAR_THRESHOLD:int = -20;
+		
+		public var DEBUG_GRID:Boolean = false;
+		
+		
+		private var _panningEnabled:Boolean = false;
+		
+		private var cif:CiFSingleton = CiFSingleton.getInstance();
+		/**
+		 * If true, clicking on the background will deselect all characters. If false,
+		 * clicking on the background will deselect one character at a time.
+		 */
+		private var deselectAllOnBGClick:Boolean = true;
+		
+		
+		public function onCreationComplete():void
+		{
+			resourceLibrary = PromWeek.assets.ResourceLibrary.getInstance();
+			
+			//this.addEventListener("CLICKED_ON_INITIATORSELECTEDCOMPONENT", onClickOnInitiatorSelectedComponent);
+		}
+		
+		//private function onClickOnInitiatorSelectedComponent(e:MouseEvent):void 
+		//{
+			//this.dispatchEvent(new MouseEvent(MouseEvent.CLICK, e.bubbles, e.cancelable, e.localX, e.localY, e.relatedObject));
+			//trace("ggggg");
+		//}
+		
+		public function worldGroupInitialize():void
+		{
+			gameEngine = GameEngine.getInstance();
+		}
+		
+		/**
+		 * Returns an array of all the avatars. Used for the camera.
+		 * 
+		 * @return
+		 */
+		public function fetchCharacters():ArrayCollection
+		{
+			var a:ArrayCollection = new ArrayCollection();
+			for each(var char:Avatar in avatars)
+			{
+				a.addItem(char);
+				//a.push(char);
+			}
+			return a;
+		}
+		
+		public function update(elapsedTime:Number):void
+		{
+			//Debug.debug(this, "****NEW ITERATION OF UPDATE****");
+			for each (var char:Avatar in avatars)
+			{
+				char.update(elapsedTime);
+				//Lets do a little test here to see if two avatars are standing on top of each other.
+				//For now, let us only care if an avatar who is WALKING steps on an avatar who is STANDING.
+				
+				/*
+				if (char.state == Avatar.WALKING) {
+					for each (var standing:Avatar in avatars) {
+						//Debug.debug(this, standing.characterName + " has state: " + standing.state);
+						if (standing.state == Avatar.STANDING) {
+							if (standing.avatarIsBeingWalkedOn(char)) {
+								//Play the animation.
+							}
+						}
+					}
+				}
+				*/
+				
+			}
+			
+			updateNetworkLines();
+			
+			//update selection circles
+			if (gameEngine.primaryAvatarSelection != null)
+			{
+				//selectionCircleOffsetY = avatars[gameEngine.primaryAvatarSelection].clip.height / 2 - primarySelectionCircle.circle.height / 2;
+				this.primarySelectionCircle.setLocation(avatars[gameEngine.primaryAvatarSelection].locX + selectionCircleOffsetX, avatars[gameEngine.primaryAvatarSelection].locY + selectionCircleOffsetY);
+				this.primarySelectionCircle.draw();
+			}
+			if (gameEngine.secondaryAvatarSelection != null)
+			{
+				this.secondarySelectionCircle.setLocation(avatars[gameEngine.secondaryAvatarSelection].locX + selectionCircleOffsetX, avatars[gameEngine.secondaryAvatarSelection].locY + selectionCircleOffsetY);
+				this.secondarySelectionCircle.draw();
+			}
+			if (DEBUG_GRID)
+			{
+				//debugGroup.update();
+			}
+
+			currentSetting.updateCollisionGrid();
+			
+			arrangeZOrders();
+		}
+		
+		
+		public function updateNetworkLines():void
+		{
+			if (networkGroup)
+			{
+				if (gameEngine.currentNetworkSelection == "clear")
+				{
+					networkGroup.visible = false;
+				}
+				else
+				{
+					networkGroup.visible = true;
+					networkGroup.update();
+				}
+			}
+		}
+		
+		
+		public function initializeNewLevel():void {
+			
+		}
+		
+
+		public function cleanUp():void {
+			//Debug.debug(this, "onElementRemoveEventHandler() I'm removed: " + this);
+			for each (var a:Avatar in this.avatars) {
+				a.clip.removeEventListener(MouseEvent.CLICK, a.onClick);
+				this.removeElement(a);
+				delete this.avatars[a.characterName.toLowerCase()];
+			}
+			avatars = new Dictionary();
+			for each(var aan:AutonomousActionNotifier in gameEngine.hudGroup.autonomousIcons) {
+				aan = null
+			}
+			gameEngine.hudGroup.autonomousIcons = new Dictionary()
+			this.removeElement(this.currentSetting.background);
+		}
+		
+		/**
+		 * Loads a ScenarioDescription, which contains avatars, background, etc. and gets the data from resourceLibrary
+		 * 
+		 * @param	scenario A ScenarioDescription that contains the names of all characters, the location info and goal
+		 */
+		public function loadLevel(level:Level):void
+		{
+			currentSetting = Setting.settings[level.settingName];
+			currentSetting.clearZoneGrid(); // Makes sure that people can stand anywhere that they would care to.
+			currentSetting.background.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
+			
+			currentSetting.background.x = currentSetting.offsetX;//-800;
+			currentSetting.background.y = currentSetting.offsetY;//-100;
+			addElement(currentSetting.background);
+			
+			
+			//border to check the space in which characters can move (OUTER BORDER)
+			/*
+			var characterSpaceBorder:Rect = new Rect();
+			characterSpaceBorder.x = currentSetting.leftBuffer;
+			characterSpaceBorder.y = currentSetting.horizonHeight;
+			characterSpaceBorder.width = currentSetting.viewableWidth - currentSetting.leftBuffer - currentSetting.rightBuffer;
+			characterSpaceBorder.height = currentSetting.viewableHeight - currentSetting.horizonHeight - currentSetting.bottomBuffer;
+			characterSpaceBorder.stroke = new Stroke(0xaaF0FF, 10);
+			this.addElement(characterSpaceBorder);
+			*/
+			
+			
+			//Let's make some borders for the zone GRID!
+			if(currentSetting.showZoneGrid){
+				var zoneRectangles:Vector.<Rect> = new Vector.<Rect>();
+				for (var i:int = 0; i < currentSetting.NUM_ZONE_ROWS; i++) {
+					for (var j:int = 0; j < currentSetting.NUM_ZONE_COLS; j++) {
+						var tempRect:Rect = new Rect();
+						tempRect.x = currentSetting.zoneGrid[i][j].leftBoundary;
+						tempRect.y = currentSetting.zoneGrid[i][j].topBoundary;
+						tempRect.width = currentSetting.zoneGrid[i][j].width;
+						tempRect.height = currentSetting.zoneGrid[i][j].height;
+						tempRect.stroke = new Stroke(0xaaF0FF, 2);
+						zoneRectangles.push(tempRect);
+					}
+				}
+				
+				//Now let's actually add the rectangles to the space...
+				for each(var paintRect:Rect in zoneRectangles) {
+					this.addElement(paintRect);
+				}
+			}
+			
+			this.avatars = new Dictionary();
+
+			
+			var sideBuffer:Number = 300;
+			var offsetForFirstLocation:Number = - Math.PI / 2;
+			var iterativeOffset:Number = Math.PI / (level.cast.length - 1);
+			var radx:Number = (currentSetting.viewableWidth - sideBuffer*2)/2;
+			var rady:Number = ((currentSetting.viewableHeight - (currentSetting.viewableHeight - currentSetting.horizonHeight))/2) * .8;
+			
+			//create the characters
+			var numChar:int = 0;
+			var tempCount:int = 0;
+			var char:Character;
+			var name:String;
+			
+			//level.endable = true;
+			
+			for each (char in level.cast) 
+			{	
+				
+				name = char.characterName.toLowerCase();
+				
+				
+				var clipName:String = name;
+				
+				if (level.endable)
+				{
+					clipName += "Prom";
+				}
+				
+				avatars[name] = new Avatar(resourceLibrary.characterClips[clipName]);
+				avatars[name].characterName = name;
+				//we want to listen for click mouse events on both the bubble and capture event propogation phases.
+				avatars[name].clip.addEventListener(MouseEvent.MOUSE_DOWN, avatars[name].onClick, false);
+				avatars[name].clip.addEventListener(MouseEvent.ROLL_OVER, avatars[name].onRollOver, false);
+				avatars[name].clip.addEventListener(MouseEvent.ROLL_OUT, avatars[name].onRollOut, false);
+				//avatars[name].clip.addEventListener(MouseEvent.CLICK, avatars[name].onClick, true);
+				//figure out where on the outside of the semi-circle they belong
+				
+				//trace("am I getting here?");
+				//trace("info on char: " + char.toXMLString());
+				name = char.characterName.toLowerCase();
+				var locX:Number;
+				var locY:Number;
+				//trace("but not am I getting here?");
+				
+				//procedurally place the characters.
+				
+				if(!level.useDefinedCastPositions){
+					if(!USE_ZONES){
+						locX = radx * Math.sin(offsetForFirstLocation - numChar * iterativeOffset);
+						locY = -1 * rady * Math.cos(offsetForFirstLocation - numChar * iterativeOffset);
+						
+						//add a small offset so they are not at the far end
+						locX += currentSetting.viewableWidth/2// + sideBuffer/2;
+						//add the vertical offset
+						locY += currentSetting.horizonHeight + (currentSetting.viewableHeight - currentSetting.horizonHeight) / 2;// - avatars[name].clip.height;
+						
+						if (locY > currentSetting.viewableHeight)
+						{
+							locY = currentSetting.viewableHeight - avatars[name].clip.height/2;
+						}
+					}
+					else {
+						//Debug.debug(this, "I am placing characters here!  This is where I need to do my fancy judgement! for where they live!");
+						var zoneGridRows:int = currentSetting.NUM_ZONE_ROWS;
+						var zoneGridCols:int = currentSetting.NUM_ZONE_COLS;
+						var myNewRow:int;
+						
+						//first assign the location of the starting lead character.
+						//have to break the purity of the for loop a little, but whatever.
+						
+						
+						if (avatars[gameEngine.currentStory.storyLeadCharacter.toLowerCase()].needsToBeAssignedANewZone) {
+							if(!currentSetting.placeAvatarInZone(avatars[gameEngine.currentStory.storyLeadCharacter.toLowerCase()],
+								zoneGridRows / 2, zoneGridCols / 2)) {
+									//Debug.debug(this, "loadCharacters(), assigning zone for " + gameEngine.currentStory.storyLeadCharacter.toLowerCase() + " failed");
+								}
+								
+							//locX = avatars[gameEngine.currentStory.storyLeadCharacter.toLowerCase()].currentZone.center.x;
+							locX = avatars[gameEngine.currentStory.storyLeadCharacter.toLowerCase()].currentZone.getRandomXWithinZone(avatars[gameEngine.currentStory.storyLeadCharacter.toLowerCase()]);
+							locY = avatars[gameEngine.currentStory.storyLeadCharacter.toLowerCase()].currentZone.center.y - (avatars[gameEngine.currentStory.storyLeadCharacter.toLowerCase()].clip.height / 2);							
+							//avatars[gameEngine.currentStory.storyLeadCharacter.toLowerCase()].currentZone = resourceLibrary.settings[currentSetting].zoneGrid[resourceLibrary.settings[currentSetting].NUM_ZONE_ROWS / 2][resourceLibrary.settings[currentSetting].NUM_ZONE_ROWS / 2];
+							avatars[gameEngine.currentStory.storyLeadCharacter.toLowerCase()].needsToBeAssignedANewZone = false;
+						}
+						
+						//main character got special treatment already -- now we are dealing with ONLY the other characters.
+						if (char.characterName.toLowerCase() != gameEngine.currentStory.storyLeadCharacter.toLowerCase()) {
+							//This is where fancy 'how close am I to you logic' will go.
+							
+							//OK, so by this point we definitely have at least one other character placed (and maybe lots more)
+							//Algorithm:
+							//For the current character we need to 
+							//1.)find their preferred distance from every other character.
+							//2.) Then we need to find a spot that captures that distance.
+							//To find 1, we go through the current state, and find a 'number' that will undoubtedly need to be tuned a lot between each pair of characters.
+							var distanceDictionary:Dictionary = new Dictionary();
+							for each(var potentiallyAlreadyPlacedCharacter:Character in level.cast) {
+								if (potentiallyAlreadyPlacedCharacter.characterName.toLowerCase() == char.characterName.toLowerCase())
+									continue; // don't bother finding the distance between a character with themselves.
+								if (avatars[potentiallyAlreadyPlacedCharacter.characterName.toLowerCase()] && !avatars[potentiallyAlreadyPlacedCharacter.characterName.toLowerCase()].needsToBeAssignedANewZone) {
+									//We are comparing the current character to place (char) with a character that has already been placed charAvatar.
+									var rawDistance:int = getPreferredZoneDistance(potentiallyAlreadyPlacedCharacter, char);
+									var actualDistance:int = turnRawDistanceIntoAStarDistance(avatars[potentiallyAlreadyPlacedCharacter.characterName.toLowerCase()], avatars[char.characterName.toLowerCase()], rawDistance, level);
+									var indexName:String = char.characterName.toLowerCase() + "to" + potentiallyAlreadyPlacedCharacter.characterName.toLowerCase();
+									distanceDictionary[indexName] = actualDistance;
+									
+									//findAppropriateZone(avatars[potentiallyAlreadyPlacedCharacter.characterName.toLowerCase()], avatars[char.characterName.toLowerCase()], distance, level);
+								}
+								
+							}
+						/*	Debug.debug(this, "can I just print out a dictionary I hope so: " + distanceDictionary);
+							for (var k:String in distanceDictionary) {
+								  var value:Number=distanceDictionary[k];
+								  var key:String = k;
+								  Debug.debug(this, "key is: " + key + " and value is: " + value);
+							}
+							*/
+							var bestZone:Zone = findBestZone(distanceDictionary, level);
+							currentSetting.placeAvatarInZone(avatars[char.characterName.toLowerCase()], bestZone.row, bestZone.col);
+							
+							
+							//And now I use all of the distances that I found out before to figure out WHERE they should
+							//be standing.  For now, just put them in the middle I guess.
+							//currentSetting.placeAvatarInZone(avatars[char.characterName.toLowerCase()], 2, 2);
+							avatars[char.characterName.toLowerCase()].needsToBeAssignedANewZone = false;
+							
+							/*
+							//but for now, lets just assign people randomly.
+							var randomRow:int = Math.floor(Math.random() * Setting.NUM_ZONE_ROWS);
+							var randomCol:int = Math.floor(Math.random() * Setting.NUM_ZONE_COLS);
+							
+							if (char.characterName.toLowerCase() == "monica") continue;
+							if (char.characterName.toLowerCase() == "zack") { Debug.debug(this, "WAAAH ZACK");  myNewRow = 0; tempCount = 0}
+							if (char.characterName.toLowerCase() == "jordan") { Debug.debug(this, "WAAAH JORDAN");  myNewRow = 1; tempCount = 1;}
+							if (char.characterName.toLowerCase() == "edward") {  Debug.debug(this, "WAAAH EDWARDS");  myNewRow = 3; tempCount = 3;}
+							if (char.characterName.toLowerCase() == "mave") {  Debug.debug(this, "WAAAH MAVE");  myNewRow = 4; tempCount = 4;}
+							currentSetting.placeAvatarInZone(avatars[char.characterName.toLowerCase()], myNewRow, tempCount);
+							avatars[char.characterName.toLowerCase()].needsToBeAssignedANewZone = false;
+							Debug.debug(this, "placing" + char.characterName.toLowerCase() + " at row: " + myNewRow + " col:" +tempCount);
+							*/
+							
+							//locX = avatars[char.characterName.toLowerCase()].currentZone.center.x;
+							locX = avatars[char.characterName.toLowerCase()].currentZone.getRandomXWithinZone(avatars[char.characterName.toLowerCase()]);
+							locY = avatars[char.characterName.toLowerCase()].currentZone.center.y - (avatars[char.characterName.toLowerCase()].clip.height / 2); // Pushes them up a little bit so that their FEET are in the center of the zone.
+							
+							/*
+							//currentSetting.placeAvatarInZone(avatars[char.characterName.toLowerCase()], randomRow, randomCol);
+							//avatars[char.characterName.toLowerCase()].needsToBeAssignedANewZone = false;
+							
+							//locX = avatars[char.characterName.toLowerCase()].currentZone.center.x;
+							//locY = avatars[char.characterName.toLowerCase()].currentZone.center.y - (avatars[char.characterName.toLowerCase()].clip.height / 2); // Pushes them up a little bit so that their FEET are in the center of the zone.
+							*/
+						}
+						else {
+							Debug.debug(this, "loadLevel() Dealing with the main character again, but we've assigned them already");
+						}
+					}
+					//Debug.debug(this, name + " located at " + locX + " " + locY);
+					
+				}else {
+					//place the character's in their authored locations.
+					locX = level.characterPositionsX[name];
+					locY = level.characterPositionsY[name];
+					//Debug.debug(this, "loadLevel() character postion from xml: " + name + " <" + locX + ", " + locY +">");
+				}
+		
+			
+				avatars[name].homeLocX = locX;
+				avatars[name].homeLocY = locY;
+				avatars[name].setLocation(locX, locY);
+				avatars[name].moveToLocation(locX, locY);
+				avatars[name].destinationX = locX;
+				avatars[name].destinationY = locY;
+				if (numChar < level.cast.length / 2)
+				{
+					avatars[name].lookingAtTarget = "right"
+					avatars[name].facing = Avatar.RIGHT;
+					avatars[name].homeTargetLookingDirection = "right";
+				}
+				else
+				{
+					avatars[name].lookingAtTarget = "left";
+					avatars[name].facing = Avatar.LEFT;
+					avatars[name].homeTargetLookingDirection = "left";
+				}
+				
+				this.addElement(avatars[name]);
+				
+				numChar++;
+		
+				
+			//And while we are at it, let's put down some rectangle for the avatar themselves so I know where they think they are standing...
+			for each(var a:Avatar in this.avatars) {
+				if(a.showLocationDot){
+					Debug.debug(this, "Do I get into HEREEEEE in world group?!");
+					a.zoneLocationRect = new Rect();
+					a.zoneLocationRect.x = a.locX;
+					a.zoneLocationRect.y = a.locY + a.clip.height / 2;
+					var characterCentricYOffset:Number = a.adjustYBasedOnCharacter(a.zoneLocationRect.y);
+					a.zoneLocationRect.y = characterCentricYOffset;
+					a.zoneLocationRect.width = 2;
+					a.zoneLocationRect.height = 2;
+					a.zoneLocationRect.stroke = new Stroke(0x0000FF, 2);
+					this.addElement(a.zoneLocationRect);
+				}
+			}
+			}
+			
+			//create the network lines between each character
+			networkGroup = new NetworkRepresentation();
+			networkGroup.createNetworkLines();
+			
+			addElement(networkGroup);
+			
+			if (DEBUG_GRID)
+			{
+				//debugGroup.createCollisionGrid(currentSetting);
+			}
+			
+		}
+		
+		/**
+		 * Handles the z-ordering for all avatars in avatars according to their y position
+		 * The greater the y, the greater the z
+		 */
+		public function arrangeZOrders():void
+		{
+			//look at all three Z depths and rank them
+			var allAvatars:Vector.<Avatar> = new Vector.<Avatar>();
+			for each (var char:Avatar in avatars)
+			{
+				allAvatars.push(char);
+			}
+			function comp(x:Avatar, y:Avatar):Number 
+			{
+				if (x.locY < y.locY)
+				{
+					return 1.0;
+				}
+				else if (x.locY > y.locY)
+				{
+					return -1.0;
+				}
+				else
+				{
+					return 0;
+				}
+			}
+			allAvatars.sort(comp);
+		
+			//set the locations of the selectionCircles
+			this.setElementIndex(primarySelectionCircle, this.numChildren - 1);
+			this.setElementIndex(secondarySelectionCircle, this.numChildren - 1);
+			
+			//set all the locations of the avatars
+			var i:int;
+			for (i = allAvatars.length - 1; i >= 0; i--)
+			{
+				setElementIndex(avatars[allAvatars[i].characterName], this.numChildren - 1);
+			}
+			
+			
+			//now place the foreground on top of all of em
+			//setElementIndex(currentSetting.foreground, this.numChildren - 1);
+			
+			if (DEBUG_GRID)
+			{
+				//setElementIndex(debugGroup, this.numChildren - 1);
+			}
+		}
+
+		/**
+		 * Handles the MouseEvent.MOUSE_DOWN event. This event initiates two things:
+		 * 1) Panning
+		 * 2) character deselection
+		 * 
+		 * Character deselection is determined when the MOUSE_DOWN is followed by a MOUSE_UP
+		 * in a very short time interval (50-150ms?).
+		 * 
+		 * Panning is recognized when the interval is longer than the deselection interval.
+		 * 
+		 * @param	e The MouseEvent
+		 */
+		public function onMouseDown(e:MouseEvent):void {
+			this.mouseDownTime = getTimer();
+			this._lastPanTime = this.mouseDownTime;
+			this._mouseMovedSinceMouseDown = false;
+			this._lastGlobalCoords = new Point(e.stageX, e.stageY)
+			this._mouseDownCoords = this.globalToLocal(new Point(e.stageX, e.stageY));
+			//Debug.debug(this, "onMouseDown() current mouse X: " + _mouseDownCoords.x + " Y: " + _mouseDownCoords.y);
+			//Debug.debug(this, "onMouseDown() e: " + e.toString() )
+			
+			
+			this.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
+			this.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+			
+		}
+		
+		/**
+		 * When panning, we want to update the camera to perform panning.
+		 * 
+		 * @param	e
+		 */
+		public function onMouseMove(e:MouseEvent):void 
+		{
+			
+			
+			//Debug.debug(this, "onMouseMove() entered.");
+			this._mouseMovedSinceMouseDown = true;
+			
+			var mouseMoveTime:int = getTimer();
+			if (e.buttonDown && CHARACTER_DESELECTION_INTERVAL < (mouseMoveTime - this.mouseDownTime)) {
+				//out of the interval and in the panning case.
+				if (!this._panning && this._panningEnabled)
+				{
+						this.startPan();
+				}
+			}
+			
+			if (e.buttonDown && this._panning && this._panningEnabled && _lastGlobalCoords) {
+				var curGlobalCoords:Point = new Point(e.stageX, e.stageY);
+				var delta:Point;
+				var local:Point = this.contentToLocal(new Point(e.stageX, e.stageY));
+				var lastLocal:Point = this.contentToLocal(this._lastGlobalCoords);
+				
+				if ( this.gameEngine.invertedPan) {
+					//delta = lastLocal.subtract(local);
+					//delta = this._mouseDownCoords.subtract(local);
+					delta = this._lastGlobalCoords.subtract(curGlobalCoords)
+				}else {
+					//delta = local.subtract(lastLocal);
+					//delta = local.subtract(this._mouseDownCoords);
+					delta = curGlobalCoords.subtract(this._lastGlobalCoords)
+				}
+			
+				//point the camera to where the mouse is?
+				this.gameEngine.camera.translate(delta.x/this.gameEngine.camera.zoom, delta.y/this.gameEngine.camera.zoom);
+			
+				//this.gameEngine.camera.absolutePosition( e.localX, e.localY);
+				//Debug.debug(this, "onMouseMove() currentTarget" + e.currentTarget);
+				//Debug.debug(this, "onMouseMove() target" + e.target);
+				//Debug.debug(this, "onMouseMove() local " + local);
+				//Debug.debug(this, "onMouseMove() delta " + delta);
+				
+				this._lastPanTime = mouseMoveTime;
+				_lastGlobalCoords = new Point(e.stageX, e.stageY)
+			}
+			
+			if (this.gameEngine.currentState != "Interaction")
+				this.stopPan();
+		}
+		
+		
+		/**
+		 * Handler for Event.MOUSE_LEAVE. This is primarily used to stop panning when panning is
+		 * active and the mouse leaves the application's area.
+		 * 
+		 * @param	e	The MOUSE_LEAVE event.
+		 */
+		public function onMouseLeave(e:Event):void {
+			//Debug.debug(this, "onMouseLeave() entered.");
+			
+			this.stopPan();
+		}
+		
+		/**
+		 * Handler for the MouseEvent.MOUSE_UP event. 
+		 * 
+		 * @param	e	The incoming MouseEvent.
+		 */
+		public function onMouseUp(e:MouseEvent):void 
+		{
+			
+			
+			
+			//Debug.debug(this, "onMouseUp() entered.");
+			var mouseUpTime:int = getTimer();
+			if (CHARACTER_DESELECTION_INTERVAL > (mouseUpTime - this.mouseDownTime)) {
+				//in the interaval and the character deselection case.
+				this.characterDeselection();
+			}else if (!this._mouseMovedSinceMouseDown) {
+				//also deselect if the mouse has not moved since MOUSE_DOWN regardless of the deselection time interval
+				this.characterDeselection();
+			} else {
+					//out of the interval and in the panning case.
+					this.stopPan();
+			}
+		}
+		
+		/**
+		 * This function stops the panning process and removes the appropriate event handlers.
+		 */
+		public function stopPan():void {
+			//There's no panning in the new interface. Totally on prupose.
+			if (!VisibilityManager.getInstance().useOldInterface)
+			{			
+				return;
+			}
+			this._panning = false;
+			
+		}
+		
+		/**
+		 * This function starts the panning process.
+		 */
+		public function startPan():void {
+			//There's no panning in the new interface. Totally on prupose.
+			if (!VisibilityManager.getInstance().useOldInterface)
+			{			
+				return;
+			}
+
+			this._panning = true;
+		}
+			
+		
+
+		/**
+		 * Handles character deselection by setting the avatar selection variables, visiblity
+		 * of the selection circles, clearing opinion lines, visiblity of character sheets, and
+		 * the SFDB visualizer settings.
+		 */
+		public function characterDeselection():void 
+		{	
+			//this is here to prevent people from clicking the background when the tutorial is not wanting to allow it
+			if (gameEngine.tutorialDisallowBackgroundClicks) return;
+			
+			if (gameEngine.hudGroup.postSGSFDBEntry.visible)
+			{
+				gameEngine.hudGroup.postSGSFDBEntry.visible = false;
+			}
+			
+			
+			  //var emitter:NEW_firework = new NEW_firework();
+			  //
+			  //var renderer:BitmapRenderer = new BitmapRenderer( new Rectangle( 0, 0, 500, 400 ) );
+			  //renderer.addFilter( new BlurFilter( 2, 2, 1 ) );
+			  //renderer.addFilter( new ColorMatrixFilter( [ 1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0.95,0 ] ) );
+			  //renderer.addEmitter( emitter );
+			  //gameEngine.hudGroup.fireworksGroup.addChild( renderer );
+			  //
+			  //emitter.x = 250;
+			  //emitter.y = 150;
+			  //emitter.start();
+			
+			
+			if (this.deselectAllOnBGClick) 
+			{
+				this.deslectSecondaryAvatar();
+				this.deselectPrimaryAvatar();
+				
+				if (!VisibilityManager.getInstance().useOldInterface)
+				{
+					gameEngine.hudGroup.initSelectGroup.deselectAll();
+
+					if (!gameEngine.hudGroup.initSelectedCurrentlyFading)
+					{
+						gameEngine.hudGroup.initiatorSelectedComponent.visible = false;
+					}
+					gameEngine.hudGroup.initiatorSelectedComponent.initiatorThoughtBubble.visible = false;
+					//gameEngine.hudGroup.selectInitiatorGroup.visible = true;
+					
+					gameEngine.hudGroup.initiatorSelectedComponent.turnOffCharacterSheet();
+					
+					gameEngine.hudGroup.responderThoughtBubble.visible = false;
+					gameEngine.hudGroup.responderPreResponseThoughtBubble.visible = false;
+					gameEngine.hudGroup.responderSubjectiveThoughtBubble.visible = false;
+					gameEngine.hudGroup.responderSubjectiveThoughtBubble.thoughtBubbleImageStem.visible = true;
+					
+					
+					
+					gameEngine.camera.centerOnAllCharacters();
+				}
+			}
+			else 
+			{
+				if (gameEngine.secondaryAvatarSelection != null)
+				{
+					this.deslectSecondaryAvatar()
+				} 
+				else if (gameEngine.primaryAvatarSelection != null) 
+				{
+					this.deselectPrimaryAvatar();
+					
+					if (!VisibilityManager.getInstance().useOldInterface)
+					{
+						gameEngine.hudGroup.initSelectGroup.deselectAll();
+						if (!gameEngine.hudGroup.initSelectedCurrentlyFading)
+						{
+							gameEngine.hudGroup.initiatorSelectedComponent.visible = false;
+						}
+						//gameEngine.hudGroup.selectInitiatorGroup.visible = true;
+					}
+				}
+			}
+			
+			//Turn off Character Sheet if visible.
+			if (gameEngine.hudGroup.characterSheet.visible == true) {
+				gameEngine.hudGroup.characterSheet.visible = false;
+			}
+			if (gameEngine.hudGroup.storyGoalWindow.visible)
+			{
+				gameEngine.hudGroup.megaUI.fadeOut.play([this.gameEngine.hudGroup.storyGoalWindow]);
+				//gameEngine.hudGroup.topBar.goalButtonClicked();
+			}
+			gameEngine.hudGroup.newStoryGoalWindow.visible = false;
+			//gameEngine.hudGroup.storyGoalWindow.visible = false;
+			
+			gameEngine.hudGroup.ssuVisualizer.visible = false;
+			//gameEngine.hudGroup.sfdbVisualizer.visible = false;
+			
+			//gameEngine.hudGroup.megaUI.socialStatusUpdateButton.selected = !gameEngine.hudGroup.ssuVisualizer.visible;
+			//gameEngine.hudGroup.megaUI.socialHistoryButton.selected = !gameEngine.hudGroup.sfdbVisualizer.visible;
+		}
+		
+		public function deselectPrimaryAvatar():void {
+			gameEngine.primaryAvatarSelection  = null;
+			this.primarySelectionCircle.visible = false;
+			
+			gameEngine.hudGroup.megaUI.currentPrimaryCharacter = null;
+			gameEngine.hudGroup.megaUI.initiatorCharButton.visible = false;
+			//gameEngine.hudGroup.megaUI.initiatorCharButton.enabled = false;
+			//gameEngine.hudGroup.megaUI.initiatorCharButton.selected = true;
+			gameEngine.hudGroup.megaUI.setButtonsToAppropriateEnabledState();
+			//gameEngine.hudGroup.megaUI.setToMiniMap();
+			
+			gameEngine.hudGroup.megaUI.onMinimizeButtonClicked();
+			
+			gameEngine.hudGroup.megaUI.populateFilterButtons();
+			
+			/*if (gameEngine.charInfoUIMode)
+			{
+				gameEngine.hudGroup.charInfoUI.visible = false;
+			}*/
+			
+			gameEngine.currentNetworkSelection = "clear";
+			
+			//go through and remove all of the relationship icons
+			for each (var iconToRemove:RelationshipIcon in gameEngine.hudGroup.relationshipIcons) {
+				gameEngine.hudGroup.removeElement(iconToRemove);
+			}
+			gameEngine.hudGroup.relationshipIcons = new Vector.<RelationshipIcon>();
+		}
+		
+		public function deslectSecondaryAvatar():void {
+			gameEngine.secondaryAvatarSelection  = null;
+				
+			gameEngine.hudGroup.megaUI.currentSecondaryCharacter = null;
+			gameEngine.hudGroup.megaUI.responderCharButton.visible = false;
+			gameEngine.hudGroup.megaUI.socialGameButtonGroup.visible = false;
+			gameEngine.hudGroup.megaUI.socialExchangeButtonGameName.text = "Social Exchange";
+			gameEngine.hudGroup.megaUI.selectedGameName = "";
+			gameEngine.hudGroup.megaUI.setRelationshipButton("miniMapIcon");
+			
+			
+			gameEngine.hudGroup.socialGameButtonRing.clearGlow();
+			gameEngine.hudGroup.socialGameButtonRing.visible = false;
+			
+			
+			gameEngine.hudGroup.socialGameButtonRing.sgDropDown.close();
+			
+			for each(var b:SocialGameButton in gameEngine.hudGroup.socialGameButtonRing.socialGameButtons) {
+				b.isSelected = false;
+				b.skin.invalidateProperties();
+			}
+			if (gameEngine.hudGroup.megaUI.megaUIExpanded)
+			{
+				gameEngine.hudGroup.megaUI.setToSingleCharacterView("initiator");
+				gameEngine.hudGroup.megaUI.updateSingleCharacterToggleButtons();
+			}
+			gameEngine.hudGroup.megaUI.setButtonsToAppropriateEnabledState();
+			gameEngine.hudGroup.megaUI.populateFilterButtons();
+			
+			gameEngine.resetSocialGameInfoWindowAndSelections();
+			
+			this.secondarySelectionCircle.visible = false;
+			
+			/*if (gameEngine.charInfoUIMode)
+			{
+				gameEngine.hudGroup.charInfoUI.single = true;
+			}*/
+			
+			gameEngine.hudGroup.clearOpinionLines();
+			
+			networkGroup.visible = true;
+		}
+		
+		public function set panningEnabled(isEnabled:Boolean):void {
+			if (isEnabled != this._panningEnabled) {
+				//we're either enabling panning from being disabled or disabling it from enabled.
+				this._panningEnabled = isEnabled;
+				if (this._panningEnabled) {
+					// time to enable 
+					this.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
+					this.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+					this.addEventListener(Event.MOUSE_LEAVE, onMouseLeave);
+				}else {
+					// time to disable
+					this.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
+					this.removeEventListener(Event.MOUSE_LEAVE, onMouseLeave);
+					this.removeEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+				}
+				this._panning = false;
+			}
+		}
+		
+		public function get panningEnabled():Boolean {
+			return this._panningEnabled;
+		}
+		
+		/**
+		 * Translates the dictionary of avatars to a vector and returns it.
+		 * @return The avatars.
+		 */
+		public function getVectorOfAvatars():Vector.<Avatar> {
+			var vect:Vector.<Avatar> = new Vector.<Avatar>();
+			for each (var a:Avatar in this.avatars) {
+				vect.push(a);
+			}
+			return vect;
+		}
+		
+		/**
+		 * This function looks at the current state between two different characters,
+		 * and uses that to determine how far apart they wish to stand from each other
+		 * when being assigned zone locations dynamically.
+		 * @param	alreadyPlaced the name of the character that has already been placed.
+		 * @param	toBePlaced the name of the character that we are disovering where they should be placed.
+		 * @return a number indicating how far away they want to be standing from each other.  Bigger Number = CLOSER Away.
+		 */
+		public function getPreferredZoneDistance(alreadyPlaced:Character, toBePlaced:Character, sgc:SocialGameContext=null):int {
+			var currentAffinity:int = 0; // start off in a 'neutral' spot.
+			var defaultTraitBoost:int = 2;
+			var defaultStatusBoost:int = 4;
+			var defaultNetworkBoost:int = 6;
+			var defaultRelationshipBoost:int = 8;
+			var defaultSGCBoost:int = 20; // we're going to give this a HUGE boost.
+			
+			//First, let's go through the traits that the character has:
+			for each(var traitID:Number in toBePlaced.traits) {
+				switch(traitID) {
+					//First, the traits that make you want to stand closer to someone:
+					case (Trait.ATTENTION_HOG): currentAffinity += defaultTraitBoost; break;
+					case (Trait.IMPULSIVE): currentAffinity += defaultTraitBoost; break;
+					case (Trait.LOYAL): currentAffinity += defaultTraitBoost; break;
+					case (Trait.LOVING): currentAffinity += defaultTraitBoost; break;
+					case (Trait.SYMPATHETIC): currentAffinity += defaultTraitBoost; break;
+					case (Trait.CONFIDENT): currentAffinity += defaultTraitBoost; break;
+					case (Trait.SMOOTH_TALKER): currentAffinity += defaultTraitBoost; break;
+					case (Trait.SEX_MAGNET): currentAffinity += defaultTraitBoost; break;
+					case (Trait.DOMINEERING): currentAffinity += defaultTraitBoost; break;
+					case (Trait.ARROGANT): currentAffinity += defaultTraitBoost; break;
+					case (Trait.FORGIVING): currentAffinity += defaultTraitBoost; break;
+					case (Trait.EMOTIONAL): currentAffinity += defaultTraitBoost; break;
+					case (Trait.SWINGER): currentAffinity += defaultTraitBoost; break;
+					case (Trait.WITTY): currentAffinity += defaultTraitBoost; break;
+					case (Trait.OBLIVIOUS): currentAffinity += defaultTraitBoost; break;
+					case (Trait.COMPETITIVE): currentAffinity += defaultTraitBoost; break;
+					case (Trait.HONEST): currentAffinity += defaultTraitBoost; break;
+					case (Trait.OUTGOING): currentAffinity += defaultTraitBoost; break;
+					
+					//Now let's deal with traits that make you want to stand far away from someone.
+					case (Trait.SHY): currentAffinity -= defaultTraitBoost; break;
+					case (Trait.COLD): currentAffinity -= defaultTraitBoost; break;
+					case (Trait.IRRITABLE): currentAffinity -= defaultTraitBoost; break;
+					case (Trait.MEAN): currentAffinity -= defaultTraitBoost; break;
+					case (Trait.INSECURE): currentAffinity -= defaultTraitBoost; break;
+					case (Trait.MOPEY): currentAffinity -= defaultTraitBoost; break;
+					case (Trait.INARTICULATE): currentAffinity -= defaultTraitBoost; break;
+					case (Trait.DEFENSIVE): currentAffinity -= defaultTraitBoost; break;
+					case (Trait.JEALOUS): currentAffinity -= defaultTraitBoost; break;
+					case (Trait.VENGEFUL): currentAffinity -= defaultTraitBoost; break;
+					case (Trait.STUBBORN): currentAffinity -= defaultTraitBoost; break;
+					case (Trait.DISHONEST): currentAffinity -= defaultTraitBoost; break;
+					
+					default: currentAffinity += 0; break; // don't do anything for the default case!
+				}
+			}
+			
+			//Now let's go through the statuses they have!
+			for each(var statusID:Number in toBePlaced.statuses) {
+				switch(statusID) {
+					//Directed Statuses that make you want to stand close to someone
+					case (Status.HAS_A_CRUSH_ON): if (toBePlaced.hasStatus(statusID, alreadyPlaced)) currentAffinity += defaultStatusBoost; break;
+					case (Status.WANTS_TO_PICK_ON): if (toBePlaced.hasStatus(statusID, alreadyPlaced)) currentAffinity += defaultStatusBoost; break;
+					case (Status.PITIES): if (toBePlaced.hasStatus(statusID, alreadyPlaced)) currentAffinity += defaultStatusBoost; break;
+					case (Status.GRATEFUL_TOWARD): if (toBePlaced.hasStatus(statusID, alreadyPlaced)) currentAffinity += defaultStatusBoost; break;
+					case (Status.TRUSTS): if (toBePlaced.hasStatus(statusID, alreadyPlaced)) currentAffinity += defaultStatusBoost; break;
+					case (Status.FEELS_SUPERIOR_TO): if (toBePlaced.hasStatus(statusID, alreadyPlaced)) currentAffinity += defaultStatusBoost; break;
+					
+					//Directed statuses that make you want to stand ar away from someone.
+					case (Status.ANGRY_AT): if (toBePlaced.hasStatus(statusID, alreadyPlaced)) currentAffinity -= defaultStatusBoost; break;
+					case (Status.ANNOYED_WITH): if (toBePlaced.hasStatus(statusID, alreadyPlaced)) currentAffinity -= defaultStatusBoost; break;
+					case (Status.SCARED_OF): if (toBePlaced.hasStatus(statusID, alreadyPlaced)) currentAffinity -= defaultStatusBoost; break;
+					case (Status.ENVIES): if (toBePlaced.hasStatus(statusID, alreadyPlaced)) currentAffinity -= defaultStatusBoost; break;
+					case (Status.CHEATING_ON): if (toBePlaced.hasStatus(statusID, alreadyPlaced)) currentAffinity -= defaultStatusBoost; break;
+					case (Status.CHEATED_ON_BY): if (toBePlaced.hasStatus(statusID, alreadyPlaced)) currentAffinity -= defaultStatusBoost; break;
+					case (Status.HOMEWRECKED): if (toBePlaced.hasStatus(statusID, alreadyPlaced)) currentAffinity -= defaultStatusBoost; break;
+				}
+			}
+			
+			//Let's take their network values into account, too!
+			var buddyWeight:int = cif.buddyNetwork.getWeight(toBePlaced.networkID, alreadyPlaced.networkID);
+			if (buddyWeight > 66) currentAffinity += defaultNetworkBoost; // high buddies stand close to each other!
+			else if (buddyWeight < 34) currentAffinity -= defaultNetworkBoost; // low buddies stand far away!
+			
+			var romanceWeight:int = cif.romanceNetwork.getWeight(toBePlaced.networkID, alreadyPlaced.networkID);
+			if (romanceWeight > 66) currentAffinity += defaultNetworkBoost; // high  stand close to each other!
+			else if (romanceWeight < 34) currentAffinity -= defaultNetworkBoost; // low  stand far away!
+			
+			var coolWeight:int = cif.coolNetwork.getWeight(toBePlaced.networkID, alreadyPlaced.networkID);
+			if (coolWeight > 66) currentAffinity += defaultNetworkBoost; // high  stand close to each other!
+			else if (coolWeight < 34) currentAffinity -= defaultNetworkBoost; // low  stand far away!
+			
+			//Now let's look at relationships, too!
+			if (cif.relationshipNetwork.getRelationship(RelationshipNetwork.FRIENDS, toBePlaced, alreadyPlaced)) currentAffinity += defaultRelationshipBoost;
+			if (cif.relationshipNetwork.getRelationship(RelationshipNetwork.DATING, toBePlaced, alreadyPlaced)) currentAffinity += defaultRelationshipBoost;
+			if (cif.relationshipNetwork.getRelationship(RelationshipNetwork.ENEMIES, toBePlaced, alreadyPlaced)) currentAffinity -= defaultRelationshipBoost;
+			
+			if (sgc) {
+				//We won't have an sgc when assigning initial locations, but otherwise we WILL have one!  
+				//we want this to have a big impact--if something nice just happened between the two of them, then
+				//they really want to stand close to each other!  If something bad, then they want to stand far away!
+				var sg:SocialGame = cif.socialGamesLib.getByName(sgc.gameName);
+				for each(var p:Predicate in sg.getEffectByID(sgc.effectID).change.predicates) {
+					if (p.type == Predicate.SFDBLABEL) {
+						if (SocialFactsDB.doesMatchLabelOrCategory(p.sfdbLabel, SocialFactsDB.CAT_POSITIVE)) {
+							//OK, so, there WAS a positive thing that happened.  We now need to check that it happened
+							//between the two people that we are currently looking at (maybe doesn't matter the order of the
+							//roles though.
+							if ((sgc.initiator.toLowerCase() == toBePlaced.characterName.toLowerCase() && sgc.responder.toLowerCase() == alreadyPlaced.characterName.toLowerCase()) ||
+								sgc.responder.toLowerCase() == toBePlaced.characterName.toLowerCase() && sgc.initiator.toLowerCase() == alreadyPlaced.characterName.toLowerCase()){
+									currentAffinity += defaultSGCBoost;
+									//Debug.debug(this, "getPreferredZoneDistance() BIG POSITIVE BOOST just happeend alreadyPlaced: " + alreadyPlaced.characterName + " tobePlaced: " + toBePlaced.characterName);
+							}
+						}
+						else if (SocialFactsDB.doesMatchLabelOrCategory(p.sfdbLabel, SocialFactsDB.CAT_NEGATIVE)) {
+							//Debug.debug(this, "getPreferredZoneDistance() I'm pretty sure something MEAN just happeend");
+							if ((sgc.initiator.toLowerCase() == toBePlaced.characterName.toLowerCase() && sgc.responder.toLowerCase() == alreadyPlaced.characterName.toLowerCase()) ||
+								sgc.responder.toLowerCase() == toBePlaced.characterName.toLowerCase() && sgc.initiator.toLowerCase() == alreadyPlaced.characterName.toLowerCase()) {
+									currentAffinity -= defaultSGCBoost;
+									//Debug.debug(this, "getPreferredZoneDistance() BIG NEGATIVE BOOST just happeend alreadyPlaced: " + alreadyPlaced.characterName + " tobePlaced: " + toBePlaced.characterName);
+							}
+						}
+							
+					}
+				}
+			}
+		
+			
+			//Debug.debug(this, "want to place " + toBePlaced.characterName + " some distance from " + alreadyPlaced.characterName + " value we came up with was: " + currentAffinity);
+			
+			return currentAffinity;
+		}
+		
+		/**
+		 * This function takes two characters, and the computed raw preferred distance score between them, and
+		 * finds an unoccupied zone for the new character to live in.
+		 * @param	alreadyPlaced the character that has already been positioned.
+		 * @param	toBePlaced the character that we are trying to find a home for.
+		 * @param	distance the raw distance between alreadyPlaced and toBePlaced. 
+		 */
+		public function turnRawDistanceIntoAStarDistance(alreadyPlaced:Avatar, toBePlaced:Avatar, distance:int, level:Level):int {
+			var preferredDistance:int; // actual grid spaces away (e.g. 1 away, 2 away, etc.)
+			if (distance >= ZONE_SUPER_CLOSE_THRESHOLD)
+				preferredDistance = 1;
+			else if (distance >= ZONE_KINDA_CLOSE_THRESHOLD)
+				preferredDistance = 2;
+			else if (distance >= ZONE_KINDA_FAR_THRESHOLD)
+				preferredDistance = 3;
+			else if (distance >= ZONE_SUPER_FAR_THRESHOLD)
+				preferredDistance = 4;
+			else 
+				preferredDistance = 5; // Very far away!
+				
+			return preferredDistance;	
+		}
+		
+		/**
+		 * This method takes in a dictionary that has all of the 'ideal distances', and the
+		 * current level (primarily for the setting it has), and then uses that to find the
+		 * best zone available!  
+		 * @param	dictionary contains all of the 'perfect distances'
+		 * @param	level contains the setting we care about, which in turn contains the zone grid we care about.
+		 * @return the zone that we want to assign a character to.
+		 */
+		public function findBestZone(dictionary:Dictionary, level:Level, sgc:SocialGameContext=null):Zone {
+			var setting:Setting = Setting.settings[level.settingName];
+			var currentScore:int = 0;
+			var maxScore:int = 0;
+			var winningRow:int = -1;
+			var winningCol:int = -1;
+			var atLeastItsEmptyRow:int = 0;
+			var atLeastItsEmptyCol:int = 0;
+			for (var i:int = 0; i < setting.zoneGrid.length; i++) {
+				for (var j:int = 0; j < setting.zoneGrid[i].length; j++) {
+					if (setting.zoneGrid[i][j].isOccupied) continue; // don't bother with spaces that are full.
+					//we are now looking at a specific zone.
+					//See how this zone handles all of the characters that we have currently placed by
+					//looping through the dictionary.
+					currentScore = 0;
+					atLeastItsEmptyRow = i;
+					atLeastItsEmptyCol = j;
+					for (var k:String in dictionary) {
+						  var idealDistance:Number=dictionary[k];
+						  var key:String = k;
+						  //Debug.debug(this, "key is: " + key + " and value is: " + value);
+						  var contentArray:Array = k.split("to");
+						  var personToPlace:String = contentArray[0];
+						  var personToConsider:String = contentArray[1];
+						  var actualDistance:int = Math.abs(i - avatars[personToConsider].currentZone.row) + Math.abs(j - avatars[personToConsider].currentZone.col);
+						  //Debug.debug(this, "I think this is the value we care about: " + contentArray[1] + " and this we probably never even needed: " + contentArray[0]);
+						  
+						  if (idealDistance == actualDistance) {
+							  //GREAT!  This is the best!  this is a 'good zone!'
+							  currentScore += 3;
+						  }
+						  else {
+							  //This is not as good.  We weren't exactly what we were looking for.
+							  var howFarOff:int = Math.abs(idealDistance - actualDistance);
+							  if (howFarOff == 1) {
+								  // we weren't TOO far off... maybe give a point anyway for being close.
+								  currentScore += 1;
+							  }
+						  }
+						  
+						  //all other things being equal, characters like to stay in the game zone that they were in last time.
+						  if (avatars[personToPlace.toLowerCase()].currentZone) { // if the person already lives in a zone.
+							  if(avatars[personToPlace.toLowerCase()].currentZone.row == i && avatars[personToPlace.toLowerCase()].currentZone.col == j) {
+								  currentScore += 1; //we are looking at the zone they are already living in!  Why not give them a little bit of a boost!
+							  }
+						  }		  
+						  
+						  //However, we do have a special case:
+						  //if *I* am the initiator, and the person I'm comparing is the *responder* of a recently played social game
+						  //AND the preferred distance is 1 (i.e. I want to be standing RIGHT next to you)
+						  //do a check to find out what side the initiator is on (i.e. is the responder to the left of them or to the right?)
+						  //if responder is to the left, then the spot to the right gets a BIG SCORE BOOST
+						  //if the responder is to the right, then the spot to the left gets a BIG SCORE BOOST
+						  //This will prevent awkward crosses thave have the same net result of people standing next to each other.
+						  if (sgc) {
+							  if (sgc.initiator.toLowerCase() == personToPlace.toLowerCase()) {
+								  if (sgc.responder.toLowerCase() == personToConsider.toLowerCase()) {
+									  if (idealDistance == 1) { // we are placing the initiator, we are comparing their distance to responder, and they WANT to stand right next to them.
+										  //Find out if responder is facing left or right.
+										  //Debug.debug(this, "findBestZone() the init and the respond really want to be standing next to each other! i is " + i + " j is: " + j + "personToConsider is looking at target: " + avatars[personToConsider].lookingAtTarget + " respX: " + avatars[personToConsider].locX + " initX: " + avatars[personToPlace].locX);
+										  if (avatars[personToConsider].locX > avatars[personToPlace].locX) { //init is to the left, want to be in resp col - 1
+											  if (i == avatars[personToConsider].currentZone.row && j == (avatars[personToConsider].currentZone.col - 1)) { // and this method doesn't run the risk of out of bounds! cool.
+												  currentScore += 15; // really big boost!
+												 // Debug.debug(this, "I really think the init should stand to the LEFT of the respond!")
+											  }
+										  }
+										  else if (avatars[personToConsider].locX < avatars[personToPlace].locX) { // init is to the right, want to be in resp col + 1
+											  if (i == avatars[personToConsider].currentZone.row && j == (avatars[personToConsider].currentZone.col + 1)) { // and this method doesn't run the risk of out of bounds! cool.
+												  currentScore += 15; // really big boost!
+												  //Debug.debug(this, "I really think the init should stand to the RIGHT of the respond!")
+											  }
+										  }
+									  }
+								  }
+							  }
+						  }
+					}
+					if (currentScore > maxScore) {
+						//We found a new winner!
+						maxScore = currentScore;
+						winningRow = i;
+						winningCol = j;
+					}
+					else if (currentScore == maxScore) {
+						//so, this spot is EQUALLY good. Maybe, just to keep people from
+						//ending up in the upper left all the time, we should have a chance
+						//of switching which one is best.
+						if (Math.random() < .5) {
+							winningRow = i;
+							winningCol = j;
+						}
+					}
+					
+				}
+			}
+			if (winningRow != -1 && winningCol != -1) {
+				//Debug.debug(this, "the perfect zone, it was decided, was row " + winningRow + " and col: " + winningCol);
+				return setting.zoneGrid[winningRow][winningCol];
+			}
+			else {
+				//err, we didn't find an acceptable spot for them.
+				return setting.zoneGrid[atLeastItsEmptyRow][atLeastItsEmptyCol];
+			}
+		}
+		
+		]]>
+	</fx:Script>
+		
+	
+</s:Group>

@@ -1,0 +1,26 @@
+TODO:
+1) makeDir(UUID)
+ #COMPLETE! makeDir.php
+2) insert a level trace into the DB. Arguments can be all the fields of the SQL table
+ #COMPLETE! insertLevelTrace.php
+3) add a user to the USERS table, and ++PlayCount if they already exist
+  #COMPLETE! updatePlayCount.php
+4) Insert a new Achievement into the achievements table (disregard LTID on first input)
+  #COMPLETE! insertNewAchievement.php
+5) function that receives an XML file and handles it appropriately (moves it into it's directory and then inserts an entry into the LevelTraces db)
+ #COMPLETE! can use curltest-receiveLevelTrace.php to test. Code is located in receiveLevelTrace.php. You can change some parameters around to make new files or folders, otherwise it'll just overwrite the one I put in there.
+ 
+Function needs:
+    userinfo(UUID) - getting the basic user information (first time?)
+    update user info - 
+    get all achievements (UUID)
+    escape all the inputs
+    
+PromWeek API:
+## userinfo.php - UUID - unique visits, plays
+##  getachievements.php - UUID - list of achievements
+##  unlockachievement.php - UUID, AID - unlocks an achievement 
+    receiveLevelTrace.php - UUID,TURNS,STORY,LEVEL,RULESTRUE, leveltrace.xml - stores the trace and updates all 3 tables (USERS::playcount, the rest)
+    getLevelTrace.php - UUID, achievement range - returns header with which achievement was on what trace and all associated traces 
+                        UUID - returns all traces associated with this UUID
+                        

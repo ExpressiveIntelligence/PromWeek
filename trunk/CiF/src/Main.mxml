@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication 
+  xmlns:fx="http://ns.adobe.com/mxml/2009" 
+  xmlns:s="library://ns.adobe.com/flex/spark"
+  xmlns:mx = "library://ns.adobe.com/flex/halo"
+  xmlns:tt = "*"
+  creationComplete="onCreationComplete()"
+  width="1280"
+  height="800">
+	  
+	
+	
+	<fx:Script>
+	  <![CDATA[
+	  import adobe.utils.CustomActions;
+	  import CiF.*;
+	  
+	  public function onCreationComplete():void {
+		var cif:CiFSingleton = CiFSingleton.getInstance();
+		cif.defaultState();
+		//Debug.debug(this, cif.cast.length.toString());
+		var lod:LineOfDialogue = new LineOfDialogue();
+		//lod.initiatorLine = "omg %i%, wtf did you do %CKB_((i,likes),(r,dislikes),(lame))% to %r% for?";
+		lod.initiatorLine = "omg Why does %i% like %CKB_((i,likes),(mean))% so much! They are so mean!! And Have you Heard that %SFDB_cool(r, 70)% and %SFDB_negative(i,r, 10)%?";
+//		cif.parseCiFState(StateXML);
+		var theCast:Cast = Cast.getInstance();
+		lod.createLocutionVectors();
+		Debug.debug(this, "testing all initiator locutions: ");
+		var i:int = 0;
+		for (i = 0; i < lod.initiatorLocutions.length; i++ ) {
+			Debug.debug(this, i + ": " + lod.initiatorLocutions[i].renderText(theCast.characters[0], theCast.characters[0], theCast.characters[0]));
+		}
+
+		var ckb:CulturalKB = CulturalKB.getInstance();
+		
+		cif.formIntentForAll();
+		
+		//trace("Number of social games in the library: " + cif.socialGamesLib.games.length);
+		
+		for each (var c:Character in cif.cast.characters) {
+			trace(c.characterName + " " + c.prospectiveMemory.toString());
+		}
+		
+		var initiator:Character = cif.cast.getCharByName("edward");
+		var responder:Character = cif.cast.getCharByName("debbie");
+		
+		
+		
+		/*		
+		for each (var initiator:Character in cif.cast.characters) {
+			for each (var responder:Character in cif.cast.characters) {
+				for each(var gs:GameScore in initiator.prospectiveMemory.scores) {
+					cif.playGameByName(gs.name, initiator, responder);
+					cif.time++;
+					//trace((cif.sfdb.contexts[cif.sfdb.contexts.length - 1] as SocialGameContext).toXMLString());
+				}
+			}
+		}
+		*/
+		//var rob:Character = cif.cast.getCharByName("Robert");
+		//var karen:Character = cif.cast.getCharByName("Karen");
+		//trace(rob.prospectiveMemory.scores[0].name);
+		//Debug.debug(this, ckb.toXMLString());
+		//
+		//cif.playGameByName("Rough Up", rob, karen);
+		
+		//var s:String= (cif.sfdb.contexts[0] as StatusContext).toXMLString();
+		//trace(cif.sfdb.toXMLString());
+		initiator = cif.cast.getCharByName("edward");
+		responder = cif.cast.getCharByName("debbie");
+		
+		cif.playGameByName("Pick Up Line", initiator, responder);
+		
+		var scores:Vector.<GameScore> = initiator.prospectiveMemory.getHighestGameScoresTo("Debbie", 6);
+		trace("scores: " + scores.length);
+		
+		//test rendering a line of dialogue
+		var context:SocialGameContext = cif.sfdb.contexts[cif.sfdb.contexts.length -1] as SocialGameContext;
+		trace("SGContext: " + context.gameName + " effect: " + context.effectIndex);
+		cif.prepareLocutions();
+		var inst:Instantiation = cif.instantiationFromContext(context);
+		
+		trace("instantiation: " + inst.toXMLString());
+		
+		for each (lod in inst.lines) {
+			var temp:LineOfDialogue = lod.realizeDialogue(initiator, responder)
+			trace("line:");
+			trace("\ti: " + temp.initiatorLine);
+			trace("\tr: " + temp.responderLine);
+			trace("\to: " + temp.otherLine);
+		}
+		
+		var ptest:Predicate = new Predicate();
+		var pchange:Predicate = new Predicate();
+		ptest.setRelationshipPredicate("initiator", "responder", RelationshipNetwork.FRIENDS);
+		pchange.setRelationshipPredicate("initiator", "responder", RelationshipNetwork.FRIENDS, true);
+		
+		trace(ptest.evaluate(cif.cast.getCharByName("robert"),cif.cast.getCharByName("edward")));
+		pchange.valuation(cif.cast.getCharByName("robert"), cif.cast.getCharByName("edward"));
+
+		trace(ptest.evaluate(cif.cast.getCharByName("robert"),cif.cast.getCharByName("edward")));
+		
+		
+		//trace("CKB: " + cif.ckb.findItem(responder.characterName));
+		trace("CKB: " + cif.ckb.findFullCKBPaths(responder.characterName));
+		//trigger testing
+		/*
+		var t:Trigger = new Trigger();
+		t.id = 3;
+		t.isAccept = true;
+		t.referenceAsNaturalLanguage = "when %i% was very, very naughty to %r%";
+		var p:Predicate = new Predicate;
+		p.setByTypeDefault(Predicate.NETWORK);
+		p.primary = "y";
+		p.secondary = "x";
+		t.condition.predicates.push(p.clone());
+		p.setByTypeDefault(Predicate.STATUS);
+		p.primary = "x";
+		p.secondary = "z";
+		t.change.predicates.push(p.clone());
+		
+		trace(t.toString());
+		trace(t.toXMLString());
+		trace(t.makeTriggerContext(34, cif.cast.characters[0], cif.cast.characters[1], cif.cast.characters[2]).toXMLString());
+		*/
+		
+		
+		
+		/*
+		 * TESTING CKB NEGATION BUG
+		 * Seems to be working now! - Ben
+		 * 
+		 var ckbTest:XML = new XML(<Predicate type="CKBEntry" first="initiator" second="responder" firstSubjective="likes" secondSubjective="likes" label="lame" negated="false" isSFDB="false" window="0" />);
+			var ckbTest2:XML = new XML(<Predicate type="CKBEntry" first="initiator" second="responder" firstSubjective="likes" secondSubjective="likes" label="lame" negated="true" isSFDB="false" window="0" />);
+		
+		Debug.debug(this, "should have negated=false: " + ckbTest.toXMLString());
+		//OK! Something very bad is happening in predicate parse, to make the ckb thing negated!!
+		Debug.debug(this, "after parsing: " + ParseXML.predicateParse(ckbTest).toXMLString());
+		Debug.debug(this, "should have negated=true: " + ckbTest2.toXMLString());
+		//OK! Something very bad is happening in predicate parse, to make the ckb thing negated!!
+		Debug.debug(this, "after parsing: " + ParseXML.predicateParse(ckbTest2).toXMLString());
+		*/
+	  }
+	  
+	  ]]>
+	</fx:Script>
+	  
+</s:WindowedApplication>

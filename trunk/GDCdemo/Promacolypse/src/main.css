@@ -1,0 +1,51 @@
+﻿@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+@namespace cx "eis.*";
+
+
+.SocialNetworkButton {
+	color: #FFE600;
+	
+	font-family: "Helvetica Condensed";
+	
+	font-size: 15px;
+	font-weight: bold;
+	alpha:0.7;
+	
+	skinClass: ClassReference("eis.skins.SocialNetworkButtonSkin");
+	
+	over: ClassReference("eis.skins.SocialNetworkButtonSkin");
+	up: ClassReference("eis.skins.SocialNetworkButtonSkin");
+	down: ClassReference("eis.skins.SocialNetworkButtonSkin");
+}
+
+
+cx|SocialGameButton {
+	color: #FFE600;
+	
+	font-family: "Helvetica Condensed";
+	
+	font-size: 15px;
+	font-weight: bold;
+	alpha:0.7;
+	
+	skinClass: ClassReference("eis.skins.SocialGameButtonSkin");
+	
+	over: ClassReference("eis.skins.SocialGameButtonSkin");
+	up: ClassReference("eis.skins.SocialGameButtonSkin");
+	down: ClassReference("eis.skins.SocialGameButtonSkin");
+}
+
+.MainUI {
+	color: #FFE600;
+	font-family: "Helvetica Condensed";
+	font-size: 20px;
+	font-weight: bold;
+}
+
+.GoalLabel {
+	color: #FFE600;
+	font-family: "Helvetica Condensed";
+	font-size: 18px;
+	font-weight: bold;
+}

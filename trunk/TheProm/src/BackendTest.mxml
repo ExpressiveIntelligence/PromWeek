@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+				xmlns:s="library://ns.adobe.com/flex/spark"
+				xmlns:mx="library://ns.adobe.com/flex/mx"
+				creationComplete="onCreationComplete()"
+				width="100%"
+				height="100%">
+
+	<fx:Script>
+	<![CDATA[
+		import PromWeek.*;
+		import CiF.*;
+		
+		public function onCreationComplete():void 
+		{
+			var backend:Backend = new Backend("http://localhost:3005");
+			var levelTrace:XML =
+				<level>foobar</level>;
+				
+			var fbId:Number = 100000069919361;
+			
+			var callback:Function = function(xml:XML):void {
+				if (xml == null) {
+					// error
+					trace("Backend request failed.");
+					return;
+				}
+				
+				// process data
+			};
+			
+			backend.getUserinfo(fbId, callback);
+			backend.getAchievements(fbId, callback);
+			backend.sendLevelTrace(fbId, levelTrace, 10, "Prom King", "At the Prom", "cool(Zach)", callback);
+			backend.unlockAchievement(fbId, 5);//, callback);
+		}
+	]]>
+	</fx:Script>
+</s:Application>

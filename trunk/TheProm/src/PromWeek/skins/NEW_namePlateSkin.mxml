@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Skin 
+    xmlns:fx="http://ns.adobe.com/mxml/2009" 
+    xmlns:s="library://ns.adobe.com/flex/spark"  
+	creationComplete="onCreationComplete()"
+	preinitialize="onPreinitialize()"
+	xmlns:util="com.util.*"
+    alpha.disabled="0.5"> 
+ 
+     <fx:Metadata> 
+        [HostComponent("PromWeek.NEW_timeLeftButton")] 
+    </fx:Metadata> 
+ 
+	<fx:Declarations>	
+	</fx:Declarations>
+	
+    <s:states> 
+        <s:State name="up" enterState="onEnterState(event)" /> 
+        <s:State name="over" enterState="onEnterState(event)"/> 
+        <s:State name="down" enterState="onEnterState(event)"/> 
+        <s:State name="disabled" enterState="onEnterState(event)"/> 
+    </s:states>  
+
+    <!--<util:SmoothImage id="upImage" visible="false" width="{hostComponent.width}" height="{hostComponent.height}" maintainAspectRatio="false"/>
+    <util:SmoothImage id="overImage" visible="false" width="{hostComponent.width}" height="{hostComponent.height}" maintainAspectRatio="false"/>
+    <util:SmoothImage id="downImage" visible="false" width="{hostComponent.width}" height="{hostComponent.height}" maintainAspectRatio="false"/>-->
+    
+    <s:Rect id="upRect" width="100%" height="100%" radiusX="10" radiusY="10">
+        <s:stroke>
+            <s:SolidColorStroke color="#000000" alpha="1" 
+                    weight="5" pixelHinting="true"/>
+        </s:stroke>
+        <s:fill>
+            <s:SolidColor color="#ffffff" alpha="1"/>
+        </s:fill>
+    </s:Rect>
+    
+	<s:Rect id="overRect" width="100%" height="100%" radiusX="10" radiusY="10">
+        <s:stroke>
+            <s:SolidColorStroke color="#000000" alpha="1" 
+                    weight="5" pixelHinting="true"/>
+        </s:stroke>
+        <s:fill>
+            <s:SolidColor color="#d8d8d8" alpha="1"/>
+        </s:fill>
+    </s:Rect>
+	
+	<s:Rect id="downRect" width="100%" height="100%" radiusX="10" radiusY="10">
+        <s:stroke>
+            <s:SolidColorStroke color="#000000" alpha="1" 
+                    weight="5" pixelHinting="true"/>
+        </s:stroke>
+        <s:fill>
+            <s:SolidColor color="#c0c0c0" alpha="1"/>
+        </s:fill>
+    </s:Rect>
+
+	<s:HGroup width="100%" height="100%" paddingLeft="10" paddingRight="15" paddingTop="10" paddingBottom="10">
+		<s:Label id="labelDisplay" width="100%" height="75%" textAlign="center" verticalAlign="middle" color="0x000000" styleName="namePlateStyle" />
+	</s:HGroup>
+
+    <fx:Script> 
+        <![CDATA[
+			import CiF.LineOfDialogue;
+			import flash.events.Event;
+			import flash.filters.GlowFilter;
+			import PromWeek.assets.ResourceLibrary;
+		
+			//public var rL:ResourceLibrary;
+		
+			
+			private function onPreinitialize():void 
+			{
+				//rL = ResourceLibrary.getInstance();
+			}
+			
+			public function onCreationComplete():void 
+			{
+				
+			}
+			
+			
+			
+			public function onEnterState(e:Event):void
+			{	
+				if (e.currentTarget.name == "up")
+				{
+					this.upRect.visible = true;
+					this.downRect.visible = false;
+					this.overRect.visible = false;
+				}
+				else if (e.currentTarget.name == "down")
+				{
+					this.upRect.visible = false;
+					this.downRect.visible = true;
+					this.overRect.visible = false;
+				}
+				else if (e.currentTarget.name == "over")
+				{
+					this.upRect.visible = false;
+					this.downRect.visible = false;
+					this.overRect.visible = true;
+				}
+			}
+           
+        ]]>
+    </fx:Script> 
+	
+	
+</s:Skin >

@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 initialize="socialChangeInitialize()">
+	
+		 
+	<fx:Metadata>
+	</fx:Metadata>
+		
+	<fx:Declarations>
+	</fx:Declarations>
+		
+	
+	<fx:Script>
+		<![CDATA[
+		
+		import CiF.CiFSingleton;
+		import CiF.SFDBContext;
+		import CiF.SocialFactsDB;
+		import CiF.Trigger;
+		import CiF.TriggerContext;
+		import CiF.Predicate;
+		import CiF.Status;
+		import CiF.SocialNetwork;
+		import CiF.RelationshipNetwork;
+		import CiF.SocialGameContext;
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import mx.messaging.channels.StreamingAMFChannel;
+		
+		public static var currentGroup:int;
+		
+		public var pred:Predicate; // the actual predicate used to populate this social change.
+		
+		public var type:String; // Status, Buddyup, friends,etc.
+		public var typeID:int; // the id of the status, the id of the relationship, etc.
+		public var networkValue:int; // for networks, how much the network changed.
+		public var comparator:String;
+		public var groupID:int;
+		
+		//The Roles of people involved in this social change.
+		public var primary:String; 
+		public var secondary:String; 
+		public var tertiary:String;
+		
+		//The Names of People Involved
+		public var primaryName:String;
+		public var secondaryName:String;
+		public var tertiaryName:String;
+		
+		public var icon:SmoothImage; // the picture that shows up
+		public var hoverText:String; // The text that appears when someone hovers over the picture!
+		public var context:SFDBContext; // The action that cuased this social game to occur (either a trigger or a social game)
+		
+		
+		public var negated:Boolean;
+		public var whyText:String; //this stores all the reasons why the change happened. 
+		
+		//Store the information for what change transpired.
+		public var perfromanceRealizationString:String;
+		public var whatHappenedString:String;
+		public var whatHappenedListString:String;
+		public var whyDidInitDoThatString:String;
+		public var whyDidInitDoThatListString:String;
+		public var whyDidRespDoThatString:String;
+		public var whydidRespDoThatListString:String;
+		
+		
+		public function onCreationComplete():void
+		{
+			
+		}
+		
+		public function socialChangeInitialize():void
+		{
+			//Default values -- none of these are really what we want.
+			type = "status";
+			typeID = 8;
+			
+			primary = "primary not set yet";
+			secondary = "secondary not set yet";
+			tertiary = "tertiary not set yet";
+			
+			icon = new SmoothImage();
+			icon.source = "datingIcon.png";
+			hoverText = "hover text not yet set";
+			//context = new SFDBContext();
+		}
+		
+		/**
+		 * Given a SocialGameContext and a predicate, fill in all of the fields that I
+		 * care about in this data structure!
+		 * @param	context
+		 * @param	pred
+		 */
+		public function populateFromSGContext(context:SocialGameContext, pred:Predicate):void {
+			this.pred = pred;
+			
+			this.negated = pred.negated;
+			
+			this.context = context;
+			this.primary = pred.primary; // will be 'initiator' or 'responder' -- NOT the person's name.
+			this.secondary = pred.secondary;
+			this.tertiary = pred.tertiary;
+			var hoverText:String = "";
+			
+			var modifier:String = "";
+			switch(pred.type) {
+				case Predicate.SFDBLABEL:
+					this.type = "sfdb";
+					this.typeID = pred.sfdbLabel;
+					this.hoverText = SocialFactsDB.getLabelByNumber(this.typeID);
+					
+					//Primary Stuff
+					if (this.primary.toLowerCase() == "initiator") {
+						primaryName = context.initiator;
+					}
+					if (this.primary.toLowerCase() == "responder") {
+						primaryName = context.responder;
+					}
+					if (this.primary.toLowerCase() == "other") {
+						primaryName = context.other;
+					}
+					
+					//Secondary Stuff
+					if (this.secondary.toLowerCase() == "initiator") {
+						secondaryName = context.initiator;
+					}
+					if (this.secondary.toLowerCase() == "responder") {
+						secondaryName = context.responder;
+					}
+					if (this.secondary.toLowerCase() == "other") {
+						secondaryName = context.other;
+					}
+					
+					break;
+				case Predicate.STATUS:
+					this.type = "status";
+					this.typeID = pred.status;
+					this.hoverText = Status.getStatusNameByNumber(this.typeID);
+					
+					//Primary Stuff
+					if (this.primary.toLowerCase() == "initiator") {
+						primaryName = context.initiator;
+					}
+					if (this.primary.toLowerCase() == "responder") {
+						primaryName = context.responder;
+					}
+					if (this.primary.toLowerCase() == "other") {
+						primaryName = context.other;
+					}
+					
+					//Secondary Stuff
+					if (this.secondary.toLowerCase() == "initiator") {
+						secondaryName = context.initiator;
+					}
+					if (this.secondary.toLowerCase() == "responder") {
+						secondaryName = context.responder;
+					}
+					if (this.secondary.toLowerCase() == "other") {
+						secondaryName = context.other;
+					}
+					
+					break;
+				case Predicate.NETWORK:
+					this.type = "network";
+					this.typeID = pred.networkType;
+					this.networkValue = pred.networkValue
+					
+					if (this.primary.toLowerCase() == "initiator") {
+						hoverText += context.initiator;
+						primaryName = context.initiator;
+					}
+					if (this.primary.toLowerCase() == "responder") {
+						hoverText += context.responder;
+						primaryName = context.responder;
+					}
+					if (this.primary.toLowerCase() == "other") {
+						hoverText += context.other;
+						primaryName = context.other;
+					}
+					
+					hoverText += " " + SocialNetwork.getNameFromType(this.typeID);
+					
+					this.comparator = pred.comparator;
+					
+					if (pred.comparator =="+") modifier = " up "; else if (pred.comparator == "-") modifier = " down ";
+					hoverText += modifier;
+
+					if (this.secondary.toLowerCase() == "initiator") {
+						hoverText += context.initiator;
+						secondaryName = context.initiator;
+					}
+					if (this.secondary.toLowerCase() == "responder") {
+						hoverText += context.responder;
+						secondaryName = context.responder;
+					}
+					if (this.secondary.toLowerCase() == "other") {
+						hoverText += context.other;
+						secondaryName = context.other;
+					}
+					
+					this.hoverText = hoverText;
+					
+					break;
+				case Predicate.RELATIONSHIP:
+					this.type = "relationship";
+					this.typeID = pred.relationship;
+					this.hoverText = RelationshipNetwork.getRelationshipNameByNumber(this.typeID);
+					
+					//Primary Stuff
+					if (this.primary.toLowerCase() == "initiator") {
+						//hoverText += context.initiator;
+						primaryName = context.initiator;
+					}
+					if (this.primary.toLowerCase() == "responder") {
+						//hoverText += context.responder;
+						primaryName = context.responder;
+					}
+					if (this.primary.toLowerCase() == "other") {
+						//hoverText += context.other;
+						primaryName = context.other;
+					}
+					
+					//Secondary Stuff
+					if (this.secondary.toLowerCase() == "initiator") {
+						//hoverText += context.initiator;
+						secondaryName = context.initiator;
+					}
+					if (this.secondary.toLowerCase() == "responder") {
+						//hoverText += context.responder;
+						secondaryName = context.responder;
+					}
+					if (this.secondary.toLowerCase() == "other") {
+						//hoverText += context.other;
+						secondaryName = context.other;
+					}
+					
+					break;
+				default:
+					this.type = "NOT status, not network, not relationship";
+			}
+			
+			this.whyText = "";
+		}
+		
+		/**
+		 * Given a TriggerContext and a predicate, fill in all of the fields that I
+		 * care about in this data structure!
+		 * I think Trigger's can only be statuses?  Maybe?  I am going to leave the other types 
+		 * (Relationships, Networks) in for now, but will plan on changing them later on.
+		 * @param	context
+		 * @param	pred
+		 */
+		public function populateFromTriggerContext(context:TriggerContext, pred:Predicate):void {
+			this.pred = pred;
+			
+			this.negated = pred.negated;
+			
+			this.context = context;
+			this.primary = pred.primary; // will be 'initiator' or 'responder' -- NOT the person's name.
+			this.secondary = pred.secondary;
+			this.tertiary = pred.tertiary;
+			var hoverText:String = "";
+			
+			
+			
+			var modifier:String = "";
+			switch(pred.type) {
+				case Predicate.STATUS:
+					this.type = "status";
+					this.typeID = pred.status;
+					this.hoverText = Status.getStatusNameByNumber(this.typeID);
+					
+					primaryName = this.primary.toLowerCase();
+					secondaryName = this.secondary.toLowerCase();
+					this.hoverText += " " + primaryName + " and " + secondaryName;
+					
+					//Primary Stuff
+					if (this.primary == "initiator") {
+						primaryName = context.initiator;
+					}
+					if (this.primary == "responder") {
+						primaryName = context.responder;
+					}
+					if (this.primary == "other") {
+						primaryName = context.other;
+					}
+					
+					//Secondary Stuff
+					if (this.secondary == "initiator") {
+						secondaryName = context.initiator;
+					}
+					if (this.secondary == "responder") {
+						secondaryName = context.responder;
+					}
+					if (this.secondary == "other") {
+						secondaryName = context.other;
+					}
+					break;
+				case Predicate.NETWORK:
+					this.type = "network";
+					this.typeID = pred.networkType;
+					this.networkValue = pred.networkValue
+					
+					primaryName = this.primary.toLowerCase();
+					secondaryName = this.secondary.toLowerCase();
+					this.hoverText += primaryName + " and " + secondaryName;
+					
+					
+					if (this.primary == "initiator") {
+						hoverText += context.initiator;
+						primaryName = context.initiator;
+					}
+					if (this.primary == "responder") {
+						hoverText += context.responder;
+						primaryName = context.responder;
+					}
+					if (this.primary == "other") {
+						hoverText += context.other;
+						primaryName = context.other;
+					}
+					
+					hoverText += " " + SocialNetwork.getNameFromType(this.typeID);
+					
+					this.comparator = pred.comparator;
+					
+					if (pred.comparator =="+") modifier = " up "; else if (pred.comparator == "-") modifier = " down ";
+					hoverText += modifier;
+
+					if (this.secondary == "initiator") {
+						hoverText += context.initiator;
+						secondaryName = context.initiator;
+					}
+					if (this.secondary == "responder") {
+						hoverText += context.responder;
+						secondaryName = context.responder;
+					}
+					if (this.secondary == "other") {
+						hoverText += context.other;
+						secondaryName = context.other;
+					}
+					
+					this.hoverText = hoverText;
+					
+					break;
+				case Predicate.RELATIONSHIP:
+					this.type = "relationship";
+					this.typeID = pred.relationship;
+					this.hoverText = RelationshipNetwork.getRelationshipNameByNumber(this.typeID);
+					
+					primaryName = this.primary.toLowerCase();
+					secondaryName = this.secondary.toLowerCase();
+					this.hoverText += primaryName + " and " + secondaryName;
+					
+					//Primary Stuff
+					if (this.primary == "initiator") {
+						//hoverText += context.initiator;
+						primaryName = context.initiator;
+					}
+					if (this.primary == "responder") {
+						//hoverText += context.responder;
+						primaryName = context.responder;
+					}
+					if (this.primary == "other") {
+						//hoverText += context.other;
+						primaryName = context.other;
+					}
+					
+					//Secondary Stuff
+					if (this.secondary == "initiator") {
+						//hoverText += context.initiator;
+						secondaryName = context.initiator;
+					}
+					if (this.secondary == "responder") {
+						//hoverText += context.responder;
+						secondaryName = context.responder;
+					}
+					if (this.secondary == "other") {
+						//hoverText += context.other;
+						secondaryName = context.other;
+					}
+					
+					break;	
+				default:
+					this.type = "NOT status, not network, not relationship";
+			}
+			
+			// add reason why that trigger fired
+			this.whyText = "Because...\n"
+			var shouldAdd:Boolean;
+			var first:String;
+			var second:String;
+			var third:String;
+			if (context.id == Trigger.STATUS_TIMEOUT_TRIGGER_ID)
+			{
+				//this means that we are dealing with a timeout status trigger context
+				this.whyText += "   Time passed.";
+			}
+			else
+			{
+				//this means we are dealing with one of the normal triggers
+				for each (var pred1:Predicate in context.getCondition().predicates)
+				{
+					shouldAdd = true;
+					if (pred1.type == Predicate.STATUS)
+					{
+						if (pred1.status >= Status.FIRST_TO_IGNORE_NON_DIRECTED && pred1.status < Status.FIRST_DIRECTED_STATUS)
+						{
+							shouldAdd = false;
+						}
+					}
+					if (shouldAdd)
+					{
+						if (pred1.primary == "initiator") first = context.initiator;
+						else if (pred1.primary == "responder") first = context.responder;
+						else if (pred1.primary == "other") first = context.other;
+						
+						if (pred1.secondary == "initiator") second = context.initiator;
+						else if (pred1.secondary == "responder") second = context.responder;
+						else if (pred1.secondary == "other") second = context.other;
+
+						if (pred1.tertiary == "initiator") third = context.initiator;
+						else if (pred1.tertiary == "responder") third = context.responder;
+						else if (pred1.tertiary == "other") third = context.other;
+
+						this.whyText += "   ";
+						this.whyText += pred1.toNaturalLanguageString(first, second, third);
+						this.whyText += "\n"
+					}
+				}
+			}
+		}
+		
+		]]>
+	</fx:Script>
+	
+</s:Group>

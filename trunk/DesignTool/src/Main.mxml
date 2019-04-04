@@ -1,0 +1,736 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:ui="UI.*"
+			   xmlns:MicrotheoryUI="MicrotheoryUI.*"
+			   xmlns:ScenarioUI="ScenarioUI.*"
+			   width="1280" height="950"
+			   scaleX="{applicationScaleSlider.value}" scaleY="{applicationScaleSlider.value}"
+			   creationComplete="onCreationComplete()">
+			   
+	<fx:Metadata>
+		[Event(name="socialGameLibraryUpdate", type="flash.events.Event")] 
+	</fx:Metadata>
+
+	<s:Rect width="100%" height="50">
+		<s:fill>
+				<s:LinearGradient rotation="90">
+				<s:entries>
+					<s:GradientEntry color="#000000" ratio="0.0" alpha="1.0"/>
+					<s:GradientEntry color="#880000" ratio="1.0" alpha="1.0"/>
+					<!--<s:GradientEntry color="0x336699" ratio="1.0" alpha="0.5"/>-->
+				</s:entries>
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+
+	<s:HGroup top="10" left="10">
+		<!--<s:Label text=""-->
+		<s:Button label="Load CiF Libraries" id="loadCiFLibrariesButton" click="onLoadCiFLibrariesButtonClick(event)" />
+		<s:Button label="Save CiF Libraries" id="saveCiFLibrariesButton" click="onSaveGameButton(event)" />
+		
+		<s:HGroup right="315" top="10" verticalAlign="middle">
+            <s:Label text="Application Scale:" color="#ffffff"/>
+            <s:HSlider id="applicationScaleSlider"
+                       minimum="0.5"
+                       maximum="1.5"
+                       value="1.0"
+					   stepSize="0.01"
+                       liveDragging="false" />
+        </s:HGroup>
+		<s:CheckBox id="tabAndAccordianLinkBox" label="Link Tabs with Accordian" color="#ffffff" selected="true" click="onLinkClick();" />
+	</s:HGroup>
+	
+	
+	
+	<s:HGroup top="10" right="10">
+		<!--<s:Label text=""-->
+		<s:Button label="Load CiF State" id="loadCiFStateButton" click="onLoadCiFStateButtonClick(event)" />
+		<s:Button label="Save CiF State" id="saveCiFStateButton" click="onSaveCiFStateButtonClick(event)" />
+	</s:HGroup>
+	
+	
+	<!-- height="850" Before Ben changed everything to 100%-->
+	<mx:Accordion id="toolStateAccordian" height="100%" top="40" creationPolicy="all" width="100%" >
+			<!--<mx:VBox label="Trigger Authoring" width="100%" height="100%">
+				<ui:TriggerAuthoringUI id="triggerUI" width="100%" height="100%" />
+			</mx:VBox>-->
+			<mx:VBox label="Microtheory Authoring" width="100%" height="100%">
+				<MicrotheoryUI:MicrotheoryAuthoringUI id="microtheoryUI" width="100%" height="100%" />
+			</mx:VBox>
+			<mx:VBox label="Social Game Editor" width="100%" height="100%">
+				<ui:GameAuthoringUI id="gameEd"  width="100%" height="100%"/>
+			</mx:VBox>
+			<mx:VBox label="Rule Search" width="100%" height="100%">
+				<ui:RuleSearchUI id="ruleSearchUI"  width="100%" height="100%"/>
+			</mx:VBox>
+			<mx:VBox label="Scenario Simulation Tool" width="100%" height="100%">
+				<ScenarioUI:designSimulationUI id="designUI" width="100%"  height="100%"/>
+			</mx:VBox>
+	</mx:Accordion>
+	<!--
+	<mx:TabNavigator id="toolStateTabNavigator" creationPolicy="all" top="50" width="100%" height="850" color="0x323232" >
+		<s:NavigatorContent label="Microtheory Authoring">
+			<mx:VBox label="Microtheory Authoring">
+				<MicrotheoryUI:MicrotheoryAuthoringUI id="microtheoryUI" />
+			</mx:VBox>
+		</s:NavigatorContent>
+		<s:NavigatorContent label="Social Game Editor">
+			<mx:VBox label="Social Game Editor">
+				<ui:GameAuthoringUI id="gameEd"/>
+			</mx:VBox>
+		</s:NavigatorContent>
+		<s:NavigatorContent label="Scenario Simulation Tool">
+			<mx:VBox label="Scenario Simulation Tool">
+				<ScenarioUI:designSimulationUI id="designUI" />
+			</mx:VBox>
+		</s:NavigatorContent>
+	</mx:TabNavigator>
+	-->
+	
+		
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<!--<fx:XML id="configXML" source="DesignToolConfig.xml" />-->
+		<fx:String id="designToolConfigXMLFileName">DesignToolConfig.xml</fx:String>
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+		import CiF.*;
+		import flash.events.Event;
+		import flash.events.MouseEvent;
+		import flash.filesystem.File;
+		import flash.filesystem.FileStream;
+		import flash.net.FileFilter;
+		import mx.collections.ArrayCollection;
+		import mx.controls.Alert;
+		import mx.controls.Menu;
+		import mx.events.CloseEvent;
+		import mx.events.MenuEvent;
+		import ScenarioUI.CharacterRepresentationSelectedEvent;
+		import ScenarioUI.Level;
+		import ScenarioUI.Story;
+		import tool.*;
+		[Bindable] public var dte:DesignerToolEngine = DesignerToolEngine.getInstance();
+		
+		private var cif:CiFSingleton = CiFSingleton.getInstance();
+		
+		public var workingFile:File;
+		/**
+		 * True if loaded library files are to be appended to the information already loaded
+		 * into CiF. If false, CiF information is cleared on xml loading.
+		 */
+		private var appendCiF:Boolean = false;
+				
+		public function onCreationComplete():void {
+			
+			//TODO: This may be a problem if we are using the simulation functionality inside of the design tool?
+			cif.shouldTriggerGamesBeIncludedInSocialGames = true; // we are in the design tool! We WANT trigger games to show up!
+			
+			
+			// initializing all the stuff in the tabs
+			var i:int;
+			for (i = 0; i < 4; ++i) 
+			{
+				toolStateAccordian.selectedIndex = i;
+				toolStateAccordian.selectedChild.createDeferredContent();
+			}
+			for (i = 0; i <= 5; ++i) {
+				gameEd.tabNav.selectedIndex = i;
+				gameEd.tabNav.selectedChild.createDeferredContent();
+			}
+			for (i = 0; i < 2; ++i) {
+				microtheoryUI.tabNav.selectedIndex = i;
+				microtheoryUI.tabNav.selectedChild.createDeferredContent();
+			}
+
+			//gameEd.tabNav.selectedIndex = 0;
+			//gameEd.preconditionEd.dte = dte;
+			toolStateAccordian.selectedIndex = 0;
+			
+			//initialize the DTE
+			dte.initializeDataProviders();
+			
+			//microtheoryUI.definitionEd.ruleUI.predicateEd.executeBindings();
+
+			loadDesignToolConfigFile();
+			//load the design tool's defaults.
+			
+			
+			this.gameEd.dispatchEvent(new Event("socialGameLibraryUpdate", true));
+			this.microtheoryUI.dispatchEvent(new Event("socialGameLibraryUpdate", true));
+			
+			//this is a kludge as the socialGameLibraryUpdate event dispatched to the microtheoryUI seems to be broken
+			this.microtheoryUI.onSocialGameLibraryUpdate();
+			// end initialize
+
+			this.addEventListener(CharacterRepresentationSelectedEvent.CHARACTER_REPRESENTATION_SELECTED, onCharRepSelection);
+			
+			//event handlers
+			//addEventListener("socialGameLibraryUpdate", this.triggerUI.onTriggerListUpdate);
+			addEventListener("socialGameLibraryUpdate", this.gameEd.onSocialGameLibraryUpdate);
+			addEventListener("socialGameLibraryUpdate", this.microtheoryUI.onSocialGameLibraryUpdate);
+		}
+		
+		/**
+		 * Loads the design tool's default configuration file.
+		 */
+		public function loadDesignToolConfigFile():void {
+			var stream:FileStream = new FileStream();
+			var file:File;
+			var xml:XML;
+			var configXML:XML;
+			
+			try {
+				file = File.applicationDirectory;
+				//Debug.debug(this, "loadDesignToolConfigFile() applicationDirectory: " + file.url);
+				file = file.resolvePath(this.designToolConfigXMLFileName);
+				//Debug.debug(this, "loadDesignToolConfigFile() resolved file path: " + file.url);
+			}catch (e:Error) {
+				Debug.debug(this, "loadDesignToolConfigFile(): file object creation error: " + e.message);
+				return;
+			}
+			
+			try {
+				stream.open(file, FileMode.READ);
+			}catch(e:Error) {
+				Debug.debug(this, "loadDesignToolConfigFile(): stream.open error: " + e.message);
+				return;
+			}
+			
+			configXML = new XML(stream.readUTFBytes(stream.bytesAvailable));
+			stream.close();
+			
+			//Debug.debug(this, "loadDesignToolConfigFile() configXML: " + configXML.AuthoringView + " filename " + this.designToolConfigXMLFileName);
+		
+			
+			//state file - if the file exists, load it.
+			try{
+				file = file.resolvePath(configXML.State);
+				stream.open(file, FileMode.READ);
+				xml = new XML(stream.readUTFBytes(stream.bytesAvailable));
+				this.cif.parseCiFState(xml, appendCiF);
+				stream.close();
+				this.designUI.characterState.dispatchEvent(new Event("CiFStateUpdate", true));
+				this.gameEd.gameSimulation.dispatchEvent(new Event("CiFStateUpdate", true));
+				this.gameEd.dispatchEvent(new Event("socialGameLibraryUpdate", true));
+				this.microtheoryUI.dispatchEvent(new Event("socialGameLibraryUpdate"));
+			}catch (e:Error) {
+				Debug.debug(this, "loadDesignToolConfigFile(): error in loading the default state XML file : " + e.message);
+			}
+			
+			//library file - if the file exists, load it.
+			try{
+				file = file.resolvePath(configXML.Library);
+				stream.open(file, FileMode.READ);
+				xml = new XML(stream.readUTFBytes(stream.bytesAvailable));
+				this.cif.parseCiFState(xml, appendCiF);
+				stream.close();
+				this.designUI.characterState.dispatchEvent(new Event("CiFStateUpdate", true));
+				this.gameEd.gameSimulation.dispatchEvent(new Event("CiFStateUpdate", true));
+				this.gameEd.dispatchEvent(new Event("socialGameLibraryUpdate", true));
+				this.microtheoryUI.dispatchEvent(new Event("socialGameLibraryUpdate"));
+			}catch (e:Error) {
+				Debug.debug(this, "loadDesignToolConfigFile() error in loading the default library XML file: " + e.message);
+			}
+			
+			//game config- if the file exists, load it.
+			try{
+				file = file.resolvePath(configXML.GameConfig);
+				stream.open(file, FileMode.READ);
+				xml = new XML(stream.readUTFBytes(stream.bytesAvailable));
+				//this.cif.parseCiFState(xml, appendCiF);
+				//Debug.debug(this, "loadDeignToolConfigFile() gameConfig.xml's stories: " + xml..Stories[0]..Story);
+
+				var story:Story;
+				this.designUI.stories = new Vector.<Story>();
+				for each (var storyXML:XML in xml..Stories[0]..Story) {
+					story = new Story();
+					story.loadFromXML(storyXML);
+					this.designUI.stories.push(story);
+				}
+				
+				//load in the first level encountered
+				this.designUI.curStory = this.designUI.stories[0];
+				this.designUI.curLevel = this.designUI.stories[0].levels[0];
+				//get available cast
+				stream.close();
+				Debug.debug(this, "loadDesignToolConfigFile() finished loading level and setting cast. Sending LevelLoaded Event. The level's cast: " + this.designUI.curLevel.cast.toString() );
+				
+				Debug.debug(this, "loadDesignToolConfigFile() was the LoadLevel Event dispatched successfully? " + this.designUI.dispatchEvent(new Event("LevelLoaded", true)));
+				this.designUI.dispatchEvent(new Event("GameConfigUpdate", true));
+				this.gameEd.gameSimulation.dispatchEvent(new Event("GameConfigUpdate", true));
+				this.gameEd.dispatchEvent(new Event("GameConfigUpdate", true));
+				this.microtheoryUI.dispatchEvent(new Event("GameConfigUpdate"));
+			}catch (e:Error) {
+				Debug.debug(this, "loadDesignToolConfigFile() error in loading the default gameconfig XML file: " + e.message);
+			}
+
+			
+			//trace(cif.microtheories.length);
+			this.dte.initializeDataProviders();
+			
+			//default authoring view, <!-- Default authoring view of the tool: microtheory, socialgame, rulesearch, or scenario. -->
+			//toolStateAccordian.selectedIndex = 1;\
+			//mt, sg, rule search, scenario
+			var str:String = configXML.AuthoringView;
+			switch (str.toLowerCase()) {
+				case "microtheory":
+					this.toolStateAccordian.selectedIndex = 0;
+					break;
+				case "socialgame":
+					this.toolStateAccordian.selectedIndex = 1;
+					break;
+				case "rulesearch":
+					this.toolStateAccordian.selectedIndex = 2;
+					break;
+				case "scenario":
+					this.toolStateAccordian.selectedIndex = 3;
+					break;
+			}
+			
+			if(configXML.Scale > 0.1) {
+				this.scaleX = configXML.Scale;
+				this.scaleY = configXML.Scale;
+			}else {
+				this.scaleX = this.scaleY = 1.0;	
+			}
+		}
+		
+		
+		public function onCharRepSelection(event:CharacterRepresentationSelectedEvent):void {
+			Debug.debug(this, "onCharRepSelection() reached at top level");
+			//traceDisplayList(this);
+			//this.designUI.dispatchEvent(new CharacterRepresentationSelectedEvent());
+			this.designUI.availableGames.onSelectedCharacterChange(event.selectedChar);
+		}
+		
+		/**
+		 * The click event handler for the saveCiFStateButton. It opens the
+		 * browseForSave dialog and sets up  an event with callback to handle
+		 * the user's file choice.
+		 * @param	e	The incoming mouse event.
+		 */
+		public function onSaveCiFStateButtonClick(e:MouseEvent):void {
+			this.workingFile = new File();
+			//this.onSaveGameButton(e);
+
+			//var txtFilter:FileFilter = new FileFilter("XML", "*.xml");
+			
+			try {
+				//this.workingFile.browseForSave("Save CiF State", [txtFilter]);
+				this.workingFile.browseForSave("Save CiF State");
+				this.workingFile.addEventListener(Event.SELECT, onBrowseForSaveStateSelect);
+			}catch(error:Error) {
+				Debug.debug(this, "Failed to open CiF state file for saving: " + error.message);
+			}
+		}
+		
+		
+		
+		/**
+		 * The callback for the File.browseForOpen dialog functionality. The
+		 * chosen file path is will be filled with the XML of CiF's current
+		 * libraries.
+		 * @param	event	The incoming event.
+		 */
+		public function onBrowseForSaveLibrariesSelect(event:Event):void {
+			this.workingFile = event.target as File;
+			
+			var stream:FileStream = new FileStream();
+			var outXML:XML;
+			var confirmAlert:Alert = new Alert();
+			if (this.workingFile.type == null) { // make unspecified type .xml
+				var xmlFile:File = new File(this.workingFile.nativePath + ".xml");
+				var txtFile:File = new File(this.workingFile.nativePath + ".txt");
+								
+				//if the user wishes to overwrite the file, they are warned in the save dialog
+				//if (!this.workingFile.exists) {
+				try{
+					stream.open(xmlFile, FileMode.WRITE);
+					outXML = new XML(this.cif.librariesToXMLString());
+					stream.writeUTFBytes(outXML); 	
+					//stream.writeUTFBytes(this.cif.toXMLString());
+					stream.close();
+					this.dte.initializeDataProviders();
+				}
+				catch (errObject:Error) {
+						Debug.debug(this, "Design tool did not save your file!  The XML was probably malformed!  It used to crash here and you would lose everything, but maybe now it hasn't actually crashed?");
+						Debug.debug(this, "Here is the error name: " + errObject.name + " and error message: " + errObject.message);
+						Alert.show("YIKES--there was some awful problem! Look at the debug output for the error!  Your XML file didn't save! There SHOULD be a .txt file with all of your stuff that you can look at!", "ERROR ERROR file not saved!");
+						stream.open(txtFile, FileMode.WRITE);
+						var outString:String = "";
+						outString = new String(this.cif.librariesToXMLString());
+						stream.writeUTFBytes(outString); 	
+						//stream.writeUTFBytes(this.cif.toXMLString());
+						stream.close();
+						this.dte.initializeDataProviders();
+				}
+			}
+			else if(this.workingFile.type.toLocaleLowerCase() == ".xml"){			
+				//if the user wishes to overwrite the file, they are warned in the save dialog
+				//if (!this.workingFile.exists) {
+				try{
+					stream.open(this.workingFile, FileMode.WRITE);
+					outXML = new XML(this.cif.librariesToXMLString());
+					stream.writeUTFBytes(outXML); 	
+					//stream.writeUTFBytes(this.cif.toXMLString());
+					stream.close();
+					this.dte.initializeDataProviders();
+				}
+					
+				catch (errObject:Error) {
+						Debug.debug(this, "Design tool did not save your file!  The XML was probably malformed!  It used to crash here and you would lose everything, but maybe now it hasn't actually crashed?");
+						Debug.debug(this, "Here is the error name: " + errObject.name + " and error message: " + errObject.message);
+						Alert.show("YIKES--there was some awful problem! Look at the debug output for the error!  Your XML file didn't save! There SHOULD be a .txt file with all of your stuff that you can look at!", "ERROR ERROR file not saved!");
+						stream.open(txtFile, FileMode.WRITE);
+						outString = "";
+						outString = new String(this.cif.librariesToXMLString());
+						stream.writeUTFBytes(outString); 	
+						//stream.writeUTFBytes(this.cif.toXMLString());
+						stream.close();
+						this.dte.initializeDataProviders();
+				}
+					
+				/*}else {
+					Alert.yesLabel = "Yes";
+					Alert.noLabel = "No";
+					Alert.show("Do you wish to overwrite the CiF state file " + this.workingFile.name + "?", "Overwrite CiF State File?", 3, this, confirmOverwriteClickHandler);
+				}*/
+			}
+			else { // some extension that isn't xml!  This is a problem!  Shouldn't be around!
+			Debug.debug(this, "ERROR! UNRECOGNIZED FILE EXTENSION! .XML IS ONLY ACCEPTABLE FILE TYPE");
+			}
+		}
+		
+		public function onBrowseForSaveSelect(event:Event):void {
+			this.workingFile = event.target as File;
+			
+			var stream:FileStream = new FileStream();
+			var outXML:XML;
+			var confirmAlert:Alert = new Alert();
+			if (this.workingFile.type == null) { // make unspecified type .xml
+				var xmlFile:File = new File(this.workingFile.nativePath + ".xml");
+								
+				//if the user wishes to overwrite the file, they are warned in the save dialog
+				//if (!this.workingFile.exists) {
+					stream.open(xmlFile, FileMode.WRITE);
+					outXML = new XML(this.cif.toXMLString());
+					stream.writeUTFBytes(outXML); 	
+					//stream.writeUTFBytes(this.cif.toXMLString());
+					stream.close();
+					this.dte.initializeDataProviders();
+			}
+			else if(this.workingFile.type.toLocaleLowerCase() == ".xml"){			
+				//if the user wishes to overwrite the file, they are warned in the save dialog
+				//if (!this.workingFile.exists) {
+					stream.open(this.workingFile, FileMode.WRITE);
+					outXML = new XML(this.cif.toXMLString());
+					stream.writeUTFBytes(outXML); 	
+					//stream.writeUTFBytes(this.cif.toXMLString());
+					stream.close();
+					this.dte.initializeDataProviders();
+				/*}else {
+					Alert.yesLabel = "Yes";
+					Alert.noLabel = "No";
+					Alert.show("Do you wish to overwrite the CiF state file " + this.workingFile.name + "?", "Overwrite CiF State File?", 3, this, confirmOverwriteClickHandler);
+				}*/
+			}
+			else { // some extension that isn't xml!  This is a problem!  Shouldn't be around!
+			Debug.debug(this, "ERROR! UNRECOGNIZED FILE EXTENSION! .XML IS ONLY ACCEPTABLE FILE TYPE");
+			}
+		}
+		
+		public function onBrowseForSaveStateSelect(event:Event):void 
+		{
+			this.workingFile = event.target as File;
+			
+			var stream:FileStream = new FileStream();
+			var outXML:XML;
+			var confirmAlert:Alert = new Alert();
+			if (this.workingFile.type == null) { // make unspecified type .xml
+				var xmlFile:File = new File(this.workingFile.nativePath + ".xml");
+								
+				//if the user wishes to overwrite the file, they are warned in the save dialog
+				//if (!this.workingFile.exists) {
+					stream.open(xmlFile, FileMode.WRITE);
+					outXML = new XML(this.cif.stateToXMLString());
+					stream.writeUTFBytes(outXML); 	
+					//stream.writeUTFBytes(this.cif.toXMLString());
+					stream.close();
+					this.dte.initializeDataProviders();
+			}
+			else if(this.workingFile.type.toLocaleLowerCase() == ".xml"){			
+				//if the user wishes to overwrite the file, they are warned in the save dialog
+				//if (!this.workingFile.exists) {
+					stream.open(this.workingFile, FileMode.WRITE);
+					outXML = new XML(this.cif.stateToXMLString());
+					stream.writeUTFBytes(outXML); 	
+					//stream.writeUTFBytes(this.cif.toXMLString());
+					stream.close();
+					this.dte.initializeDataProviders();
+				/*}else {
+					Alert.yesLabel = "Yes";
+					Alert.noLabel = "No";
+					Alert.show("Do you wish to overwrite the CiF state file " + this.workingFile.name + "?", "Overwrite CiF State File?", 3, this, confirmOverwriteClickHandler);
+				}*/
+			}
+			else { // some extension that isn't xml!  This is a problem!  Shouldn't be around!
+			Debug.debug(this, "ERROR! UNRECOGNIZED FILE EXTENSION! .XML IS ONLY ACCEPTABLE FILE TYPE");
+			}
+		}
+		
+		
+		/*private function confirmOverwriteClickHandler(event:CloseEvent):void {
+			var stream:FileStream = new FileStream();
+			var outXML:XML;
+			if (event.detail == Alert.YES) {
+				stream.open(this.workingFile, FileMode.WRITE);
+				outXML = new XML(this.cif.toXMLString());
+				stream.writeUTFBytes(outXML);
+				//stream.writeUTFBytes(this.cif.toXMLString());
+				stream.close();
+				this.dte.initializeDataProviders();
+			}
+		}*/
+			
+		
+		/**
+		 * The click event handler for the loadCiFStateButton. It opens the
+		 * browseForOpen dialog and sets up an event with callback to handle
+		 * the user's file choice.
+		 * @param	e	The incoming mouse event.
+		 */
+		public function onLoadCiFStateButtonClick(e:MouseEvent):void {
+			this.workingFile = new File();
+			var txtFilter:FileFilter = new FileFilter("XML", "*.xml");
+			
+			try {
+				this.workingFile.browseForOpen("Open CiF State", [txtFilter]);
+				this.workingFile.addEventListener(Event.SELECT, onBrowseForOpenSelect);
+			}catch(error:Error) {
+				Debug.debug(this, "Failed to open CiF state file for loading: " + error.message);
+			}
+		}
+		
+		/**
+		 * The callback for the File.browseForOpen dialog functionality. The
+		 * chosen file is read as XML and parsed into CiF.
+		 * @param	event	The Event.SELECT fired by File's browseForOpen().
+		 */
+		public function onBrowseForOpenSelect(event:Event):void {
+			var stream:FileStream = new FileStream();
+			stream.open(event.target as File, FileMode.READ);
+			var stateXML:XML = new XML(stream.readUTFBytes(stream.bytesAvailable));
+			this.cif.parseCiFState(stateXML, appendCiF);
+			//this.dte.initializeDataProviders();
+			this.designUI.characterState.dispatchEvent(new Event("CiFStateUpdate", true));
+			this.gameEd.gameSimulation.dispatchEvent(new Event("CiFStateUpdate", true));
+			this.gameEd.dispatchEvent(new Event("socialGameLibraryUpdate", true));
+			
+			//designUI.setStateForNextRound();
+		}
+		
+		
+		public function onBrowseForOpenLibrariesSelect(event:Event):void {
+			var stream:FileStream = new FileStream();
+			stream.open(event.target as File, FileMode.READ);
+			var stateXML:XML = new XML(stream.readUTFBytes(stream.bytesAvailable));
+			this.cif.parseCiFState(stateXML, appendCiF);
+			this.dte.initializeDataProviders();
+			this.designUI.characterState.dispatchEvent(new Event("CiFStateUpdate", true));
+			this.gameEd.gameSimulation.dispatchEvent(new Event("CiFStateUpdate", true));
+			this.gameEd.dispatchEvent(new Event("socialGameLibraryUpdate", true));
+			this.microtheoryUI.dispatchEvent(new Event("socialGameLibraryUpdate", true));
+		}
+		
+		/**
+		 * LIFTED  FROM GameAuthoringUI.mxml
+		 * Intention being that we want 'Save CiF State to ALSO save the
+		 * current progress made on the current social game.  However
+		 * some modifications have been made so that it works correctly
+		 * in this new scope, since immedietely after the alert
+		 * it will then proceed into the actual saving of the
+		 * social game into an xml file.
+		 * Original comments follow:
+		 * ==================================================================
+		 * The click event handler for the saveGameButton. It determines if a 
+		 * social game of the same name exists in the social games library. If
+		 * there is no game corresponding to the name specified in the
+		 * saveGameNameTextInput, a new game is pushed to the library. If there
+		 * exists a game with the name in the library, the user is presented with
+		 * a prompt asking if they wish to replace the game.
+		 * @param	event	The incoming event.
+		 */
+		public function onSaveGameButton(event:MouseEvent):void {
+			
+			
+			//First, we need to test whether or not we are dealing with a micro theory or 
+			//a social game.  We do this through looking at the value of the accordian
+			//toolStateAccordian.selectedIndex == 0 :: Microtheory
+			//toolStateAccordian.selectedIndex == 1 :: Social Game
+			
+			if (toolStateAccordian.selectedIndex == 0) {
+				//Dealing With Microtheories
+				var microtheoryName:String = this.microtheoryUI.saveMicrotheoryNameTextInput.text;
+				//Debug.debug(this, "the name of the microtheory is: " + microtheoryName);
+				var mt:Microtheory = this.dte.cif.getMicrotheoryByName(microtheoryName);
+				if (!mt) {
+					//if the microtheory is not present in the library, add it.
+					mt = this.dte.workingMicrotheory.clone();
+					mt.name = microtheoryName;
+					this.dte.cif.microtheories.push(mt);
+					dispatchEvent(new Event("socialGameLibraryUpdate", true));
+					
+					//Prompt for new XML creation
+					var e2MT:MouseEvent;
+					onSaveCiFLibrariesButtonClick(e2MT);
+					//onSaveCiFStateButtonClick(e2);
+				}
+				else {
+					//If the microtheory is prsent, prompt to replace it.
+					var alertTextMT:String = "Do you wish to replace the microtheory '" + microtheoryName + "' in the microtheory library with the microtheory currently being edited? Please note this is ONLY saving the microtheory -- if you worked on a social game, you will need to explicitly save it (by opening the 'social game editor' accordian tab and pushing the 'save game' button) before it will be saved to file.";
+					var alertTitleMT:String = "Replace Microtheory?";
+					Alert.yesLabel = "Yes";
+					Alert.noLabel = "No";
+					Alert.show(alertTextMT, alertTitleMT, Alert.YES | Alert.NO, this, confirmReplaceMicrotheoryClickHandler);// confirmOverwriteClickHandler);
+				}
+			}
+			else if(toolStateAccordian.selectedIndex == 1){
+				var name:String = this.gameEd.saveGameNameTextInput.text;
+				//Debug.debug(this, "the name of the social game is: " + name);
+				//var name:String = this.dte.workingSocialGameName;
+				var sg:SocialGame = this.dte.cif.socialGamesLib.getByName(name);
+				/*if(!sg) {
+					Debug.debug(this, "onSaveGameButton(): game is null");
+				} else {
+					Debug.debug(this, "onSaveGameButton(): save game name is " + sg.name);
+				}*/
+				//determine if game of the same name is already in the library
+				if (!sg) {
+					//if the game is not present in the library, add it.
+					//Debug.debug(this, "onSaveGameButton(): adding social game " + name);
+					sg = this.dte.workingSocialGame.clone();
+					sg.name = name;
+					this.dte.cif.socialGamesLib.addGame(sg);
+					dispatchEvent(new Event("socialGameLibraryUpdate", true));
+					
+					//Prompt for new XML creation
+					var e2:MouseEvent;
+					onSaveCiFLibrariesButtonClick(e2);
+					//onSaveCiFStateButtonClick(e2);
+				} else {
+					//if the game is present, prompt to replace it
+					var alertText:String = "Do you wish to replace the social game '" + name + "' in the social game library with the game currently being edited?  Please note this is ONLY saving the social game -- if you worked on a microtheory, you will need to explicitly save it (by opening the 'microtheory authoring' accordian tab and pushing the 'save microtheory' button) before it will be saved to file.";
+					var alertTitle:String = "Replace social game?";
+					Alert.yesLabel = "Yes";
+					Alert.noLabel = "No";
+					Alert.show(alertText, alertTitle, Alert.YES | Alert.NO, this, confirmReplaceSocialGameClickHandler);// confirmOverwriteClickHandler);
+					//if the user chooses to replace it, get the reference to the game
+					//and point it to the new game instance.
+					//if the user decides not to replace it, do nothing.	
+				}
+			}
+		}
+		
+		
+		
+		/**
+		 * Like onSaveGameButton, this is mostly lifted from GameAuthoringUI.mxml
+		 * but altered slightly to work in this scope.
+		 * ==============================================================
+		 * The close event handler for the saveGameButton's replace alert
+		 * dialog box. If the user selected yes, the game in the social games
+		 * library is replaced with the game in the editor. If the user selects
+		 * no, the social games library remains unchanged.
+		 * @param	event	The incoming event.
+		 */
+		private function confirmReplaceSocialGameClickHandler(event:CloseEvent):void {
+			if (Alert.YES == event.detail ) {
+				//replace game
+				var sgIndex:int = this.dte.cif.socialGamesLib.getIndexByName(this.gameEd.saveGameNameTextInput.text);
+				//Debug.debug(this, "confirmReplaceSocialGameClickHandler(): sgIndex " + sgIndex);
+				var sg:SocialGame = this.dte.workingSocialGame.clone();	
+				sg.name = this.gameEd.saveGameNameTextInput.text;	
+				this.dte.cif.socialGamesLib.games[sgIndex] = sg;
+				dispatchEvent(new Event("socialGameLibraryUpdate", true));
+			}
+			//leave unchanged But either way, create a new XML file
+			var e2:MouseEvent;
+			onSaveCiFLibrariesButtonClick(e2);
+			//onSaveCiFStateButtonClick(e2);
+		}
+		
+		/**
+		 * The close event handler for the save Library Button's replace alert
+		 * dialog box, when dealing with microtheories.  If the user selected yes, the MT in the microtheory
+		 * library is replaced with the MT in the editor. If the user selects
+		 * no, the Microtheory library remains unchanged.
+		 * @param	event	The incoming event.
+		 */
+		private function confirmReplaceMicrotheoryClickHandler(event:CloseEvent):void {
+			if (Alert.YES == event.detail ) {
+				//replace MT
+				var mtIndex:int = this.dte.cif.getMicrotheoryIndexByName(this.microtheoryUI.saveMicrotheoryNameTextInput.text);
+				var mt:Microtheory = this.dte.workingMicrotheory.clone();	
+				mt.name = this.microtheoryUI.saveMicrotheoryNameTextInput.text
+				this.dte.cif.microtheories[mtIndex] = mt;
+				dispatchEvent(new Event("socialGameLibraryUpdate", true));
+			}
+			//leave unchanged But either way, create a new XML file
+			var e2:MouseEvent;
+			onSaveCiFLibrariesButtonClick(e2);
+			//onSaveCiFStateButtonClick(e2);
+		}
+		
+		
+		public function onLoadCiFLibrariesButtonClick(event:MouseEvent):void 
+		{
+			this.workingFile = new File();
+			var txtFilter:FileFilter = new FileFilter("XML", "*.xml");
+			
+			try {
+				this.workingFile.browseForOpen("Open CiF Library", [txtFilter]);
+				this.workingFile.addEventListener(Event.SELECT, onBrowseForOpenLibrariesSelect);
+			}catch(error:Error) {
+				Debug.debug(this, "Failed to open CiF state file for loading: " + error.message);
+			}
+		}
+		
+		public function onSaveCiFLibrariesButtonClick(event:MouseEvent):void 
+		{
+			this.workingFile = new File();
+
+			try {
+				//this.workingFile.browseForSave("Save CiF State", [txtFilter]);
+				this.workingFile.browseForSave("Save CiF State");
+				this.workingFile.addEventListener(Event.SELECT, onBrowseForSaveLibrariesSelect);
+			}catch(error:Error) {
+				Debug.debug(this, "Failed to open CiF library file for saving: " + error.message);
+			}
+		}
+		
+		///**
+		 //* The global click handler -- it responds to every click in the
+		 //* application.
+		 //* @param	e	The incoming mouse event.
+		 //*/
+		//public function onClick(e:MouseEvent):void {
+			//switch(e.target.id) {
+				//case "addPredicateBtn":
+					//dte.insertPredicateIntoWorkingPreconditionRule("");
+					//break;
+				//default:
+					//Debug.debug(this, "button click target not recognized");
+			//}
+		//}
+		
+		public function onLinkClick():void {
+			dte.tabAndAccordianLinkBoxValue = this.tabAndAccordianLinkBox.selected;
+		}
+		
+		]]>
+	</fx:Script>
+</s:Application>

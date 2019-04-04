@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+               xmlns:s="library://ns.adobe.com/flex/spark" 
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+			   creationComplete="onCreationComplete()">
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<fx:Number id="animTime">200</fx:Number>
+		<mx:Fade id="fadeOut" duration="{animTime}" alphaFrom="1.0" alphaTo="0.0"/>
+		<mx:Fade id="fadeIn" duration="{animTime}" alphaFrom="0.0" alphaTo="1.0"/>
+		<mx:Move id="comeInStageLeft" duration="{animTime}" xFrom="0" xTo="0"/>
+		<mx:Move id="leaveToStageLeft" duration="{animTime}" xFrom="0" xTo="0"/>
+	</fx:Declarations>
+	
+	<!--<s:Rect width="100%" height="100%" >
+		<s:stroke>
+			<s:SolidColorStroke weight="10" color="#000000" />
+		</s:stroke>
+	</s:Rect>-->
+	
+	<s:VGroup id="layoutGroup">
+		
+		<prom:PromWeekButton id="toggler" click="visibleToggle()" label="More..." width="50" height="30" toolTip="Use Social Influence Points to buy more options" />
+		<s:DropDownList id="ddl" alpha="0" mouseChildren="false" mouseEnabled="false" dataProvider="{this.ddlDP}" itemRenderer="PromWeek.skins.DropDownItemRenderer" labelField="_game" change="dropDownItemChosen()" width="140" open="ddl.scroller.setStyle('horizontalScrollPolicy', 'off');"/>
+		<!-- prom:CollapsiblePanel id="ddl" height="0" width="50" defSize="100" open="false" /-->
+	</s:VGroup>
+	
+	<fx:Script>
+		<![CDATA[
+		import CiF.Character;
+		import mx.collections.ArrayCollection;
+		import CiF.Debug;
+		import CiF.SocialGameContext;
+		import CiF.CiFSingleton;
+		
+		private var isShowing:Boolean = false;
+		private var cif:CiFSingleton;
+		
+		[Bindable]
+		public var ddlDP:ArrayCollection
+		private var gameEngine:GameEngine;
+		private var jpm:JuicePointManager;
+		private var dm:DifficultyManager;
+		
+		public function onCreationComplete():void {
+			comeInStageLeft.xFrom = layoutGroup.x
+			comeInStageLeft.xTo = ddl.x
+			leaveToStageLeft.xFrom = ddl.x
+			leaveToStageLeft.xTo = layoutGroup.x
+			gameEngine = GameEngine.getInstance();
+			jpm = JuicePointManager.getInstance();
+			cif = CiFSingleton.getInstance();
+			dm = DifficultyManager.getInstance();
+			
+			this.toggler.setDimentions(60,25);
+		}
+		
+		// just a force closed function, adding to the functionality of this mofo
+		public function close():void {
+			if(isShowing) visibleToggle()
+		}
+		
+		// just foreces it open
+		public function open():void {
+			if (!isShowing) visibleToggle()
+		}
+		
+		/**
+		 * Calls the fade in and the mover when it's toggled and such
+		 */
+		public function visibleToggle():void {
+			if (isShowing) {
+				isShowing = false
+				// close it and run the animations!
+				fadeOut.play([ddl])
+				leaveToStageLeft.play([ddl])
+				// have to disable the mouse on it, for Z issues :/
+				ddl.mouseChildren = false
+				ddl.mouseEnabled = false
+				//ddl.includeInLayout = false;
+			} else {
+				// open it
+				isShowing = true
+				fadeIn.play([ddl])
+				comeInStageLeft.play([ddl])
+				// gotta re-enable the mouse!
+				ddl.mouseChildren = true
+				ddl.mouseEnabled = true
+				//ddl.includeInLayout = true
+			}
+		}
+		
+/**
+		 * A social game was chosen from the drop down menu.  At least, it is a drop down menu in its current form.
+		 * In real life we might want something else.  HOWEVER, what this represents is the user has selected a normally
+		 * in-accessible social game to now BUY.  Assuming they have sufficient juice points, they can now play it as much
+		 * as they like.
+		 */
+		public function dropDownItemChosen():void {
+			//Debug.debug(this, "item that was chosen: " + sgDropdown.selectedItem);
+			//Some initial set up stuff, including stripping the price of the purchase so that we just have the game name.
+			
+			
+			var dicIndex:String = gameEngine.primaryAvatarSelection.toLowerCase() + "-" + gameEngine.secondaryAvatarSelection.toLowerCase();
+			var ddItem:DropDownItem = new DropDownItem();
+			ddItem = ddl.selectedItem;
+			var gameName:String = ddItem._game;
+			var cost:Number = ddItem.cost;
+			//Debug.debug(this, "base string is: " + gameName + " cost is: " + cost);
+			
+			//The juice point manager figures out if we can successfully purchase this new game.
+			if (!jpm.isNonTopGameUnlocked(gameEngine.primaryAvatarSelection.toLowerCase(), gameEngine.secondaryAvatarSelection.toLowerCase(), gameName)){
+				if(jpm.handleNonTopSocialGameSelection(cost, gameEngine.primaryAvatarSelection.toLowerCase(), gameEngine.secondaryAvatarSelection.toLowerCase(), gameName)){
+					//Debug.debug(this, "handleNonTop success!");
+
+					//Add this social game to the list of available social games.
+					gameEngine.hudGroup.megaUI.availableSocialGames[dicIndex].push(gameName);
+									
+					//Remove this game from the drop down list
+					//gameEngine.hudGroup.megaUI.removeGameFromGamesToUnlockDictionary(dicIndex, gameName); 
+					
+					//We don't want to remove the game from the drop down list anymore,
+					//but we DO want to mark it as no longer being locked.
+					gameEngine.hudGroup.megaUI.markGameAsUnlocked(dicIndex, gameName);
+					
+					//Maybe this is all we need?!!?!?!?!?!?!?!?!?!
+					
+					//I think that we need a social game context in order to successfully populate the 'is the game accepted' thing
+					
+					var castToUse:Vector.<Character>;
+					/*
+					if (gameEngine.currentStory.storyLeadCharacter == "Zack" || gameEngine.currentStory.storyLeadCharacter == "Chloe")
+					{
+						castToUse = gameEngine.currentLevel.cast;
+					}
+					else
+					{
+						castToUse = cif.cast.characters;
+					}
+					*/
+					castToUse = cif.cast.characters;
+					var sgc:SocialGameContext = cif.playGame(cif.socialGamesLib.getByName(gameName), gameEngine.hudGroup.megaUI.currentPrimaryCharacter, gameEngine.hudGroup.megaUI.currentSecondaryCharacter, null, castToUse, gameEngine.currentLevel.cast, false, dm.getVolitionThreshold("responder"), dm.getResponderBoostFromDictionary(gameEngine.primaryAvatarSelection.toLowerCase() , gameEngine.secondaryAvatarSelection.toLowerCase(), gameName) );
+					
+					
+					Debug.debug(this, "********************* responder score is: " + sgc.responderScore + " and threshold is: " + dm.getVolitionThreshold("responder"));
+					if (sgc.responderScore >= dm.getVolitionThreshold("responder")) Debug.debug(this, "should predict accept I think!");
+					else Debug.debug(this, "should predict reject I think!");
+					if (sgc.responderScore >= dm.getVolitionThreshold("responder")) {
+						//gameEngine.hudGroup.sgInfoWindow.predictionValues.text = "Accept"
+						gameEngine.hudGroup.megaUI.sgInfo.predictionLabel.text = "Accept";
+					}
+					else {
+						//gameEngine.hudGroup.sgInfoWindow.predictionValues.text = "Reject"
+						gameEngine.hudGroup.megaUI.sgInfo.predictionLabel.text = "Reject";
+					}
+					
+					
+					var indexString:String = gameEngine.hudGroup.megaUI.currentPrimaryCharacter.characterName.toLowerCase() + "-" + gameEngine.hudGroup.megaUI.currentSecondaryCharacter.characterName.toLowerCase() + "-" + gameName.toLowerCase();
+					
+					if (!gameEngine.hudGroup.megaUI.actualResponderMotiveStrengthDictionary[indexString]) { // we haven't computed this yet, we need to populate it!
+						gameEngine.hudGroup.megaUI.actualResponderMotiveStrengthDictionary[indexString] = gameEngine.getIntensityOfDesireToDoWhatTheCharacterDid("responder", sgc);
+						gameEngine.hudGroup.megaUI.currentResponderMotiveStrengthDictionary[indexString] = gameEngine.getIntensityOfDesireToDoWhatTheCharacterDid("responder", sgc);
+					}
+					
+					jpm.unlockHint(gameEngine.primaryAvatarSelection, gameEngine.secondaryAvatarSelection, gameName, jpm.HINT_SG_OUTCOME);
+					//jpm.unlockHint(gameEngine.primaryAvatarSelection, gameEngine.secondaryAvatarSelection, gameName, jpm.HINT_NEW_RESPONDER_REACTION);
+					gameEngine.hudGroup.megaUI.socialGameContext = sgc;
+					gameEngine.hudGroup.megaUI.selectedGameName = sgc.gameName;
+					gameEngine.hudGroup.megaUI.sgInfo.switchOutcomeClicked(true); // theh true == freebie!
+					gameEngine.hudGroup.megaUI.sgInfo.switchOutcomeClicked(); // change it to ORIGINAL thing!!!!!
+					//jpm.activateOppositeResponderReaction(gameEngine.primaryAvatarSelection, gameEngine.secondaryAvatarSelection, gameName, sgc, true);
+					gameEngine.hudGroup.megaUI.sgInfo.loadSGInfo(gameName);
+					
+					
+					
+					
+					//gameEngine.hudGroup.megaUI.sgInfo.loadSGInfoForSFDBEntryWindow(gameName, gameEngine.hudGroup.megaUI.currentPrimaryCharacter, gameEngine.hudGroup.megaUI.currentSecondaryCharacter);
+					
+					
+					
+					//And heck, let's ALSO mark it as being free to switch reactions for!
+					//This means that we also want to make 'see results' free as well!
+					
+					//I think that we need a social game context in order to successfully populate the 'is the game accepted' thing
+					/*
+					var sgc:SocialGameContext = cif.playGame(cif.socialGamesLib.getByName(gameName), gameEngine.hudGroup.megaUI.currentPrimaryCharacter, gameEngine.hudGroup.megaUI.currentSecondaryCharacter, null, gameEngine.currentLevel.cast, gameEngine.currentLevel.cast);
+					
+					if (sgc.responderScore >= 0) {
+						//gameEngine.hudGroup.sgInfoWindow.predictionValues.text = "Accept"
+						gameEngine.hudGroup.megaUI.sgInfo.predictionLabel.text = "Accept";
+					}
+					else {
+						//gameEngine.hudGroup.sgInfoWindow.predictionValues.text = "Reject"
+						gameEngine.hudGroup.megaUI.sgInfo.predictionLabel.text = "Reject";
+					}
+					*/
+					
+					
+					
+					
+					
+					
+					//Have the window jump to the newly purchased game.
+					/*
+					gameEngine.hudGroup.megaUI.singleCharacterInfoGroup.visible = false;
+					gameEngine.hudGroup.megaUI.miniMapGroup.visible = false;
+					gameEngine.hudGroup.megaUI.relationshipInfoGroup.visible = false;
+					gameEngine.hudGroup.megaUI.socialGameInfoGroup.visible = true;
+					*/
+					
+					
+					
+					//Make sure that all of the 'normal' games don't have anything special or shiny associated with them.
+					for each(var b:SocialGameButton in gameEngine.hudGroup.socialGameButtonRing.socialGameButtons) {
+						b.isSelected = false;
+					}
+					
+					for each(b in gameEngine.hudGroup.socialGameButtonRing.socialGameButtons) {
+						b.skin.invalidateProperties();
+					}
+					
+					//make sure that the selected game appears in the drop down label
+					var tempIndex:int = 0;
+					gameEngine.hudGroup.socialGameButtonRing.sgDropDown.ddl.selectedIndex = -1; // need to do this to help fix some weird display bug in the dropdown box.
+					for each (var dropDownItem:DropDownItem in gameEngine.hudGroup.socialGameButtonRing.sgDropDown.ddlDP) {
+						if (dropDownItem._game.toLowerCase() == gameName.toLowerCase()) {
+							gameEngine.hudGroup.socialGameButtonRing.sgDropDown.ddl.selectedIndex = tempIndex;
+							break;
+						}
+						tempIndex++;
+					}
+					
+					gameEngine.currentlySelectedSG = gameName;
+					this.gameEngine.hudGroup.megaUI.sgInfo.loadSGInfo(gameName);
+					if (this.gameEngine.hudGroup.megaUI.megaUIExpanded)
+					{
+						this.gameEngine.hudGroup.megaUI.setToSocialGameInfo();
+					}
+					gameEngine.hudGroup.megaUI.socialGameButtonGroup.visible = true;
+					gameEngine.hudGroup.megaUI.singleCharacterToggleButtonsGroup.visible = false;
+					gameEngine.hudGroup.megaUI.setButtonsToAppropriateEnabledState();
+				}
+				else{
+					//Debug.debug(this, "handleNonTop fail! Probably not enough juice points");
+					ddl.selectedItem = "";
+				}
+			}
+			else {
+				//Debug.debug(this, "this game was already unlocked!  I guess they don't need to do anything special for it!");
+				/*
+				gameEngine.hudGroup.megaUI.singleCharacterInfoGroup.visible = false;
+				gameEngine.hudGroup.megaUI.miniMapGroup.visible = false;
+				gameEngine.hudGroup.megaUI.relationshipInfoGroup.visible = false;
+				gameEngine.hudGroup.megaUI.socialGameInfoGroup.visible = true;
+				*/
+				
+				//Make sure that all of the 'normal' games don't have anything special or shiny associated with them.
+				for each(b in gameEngine.hudGroup.socialGameButtonRing.socialGameButtons) {
+					b.isSelected = false;
+				}
+				
+				for each(b in gameEngine.hudGroup.socialGameButtonRing.socialGameButtons) {
+					b.skin.invalidateProperties();
+				}
+				
+				
+				//PREDICTION LABEL CODE
+				//I think that we need a social game context in order to successfully populate the 'is the game accepted' thing
+				var castToUse1:Vector.<Character>;
+				/*
+				if (gameEngine.currentStory.storyLeadCharacter == "Zack" || gameEngine.currentStory.storyLeadCharacter == "Chloe")
+				{
+					castToUse1 = gameEngine.currentLevel.cast;
+				}
+				else
+				{
+					castToUse1 = cif.cast.characters;
+				}
+				*/
+				castToUse1 = cif.cast.characters;
+				sgc = cif.playGame(cif.socialGamesLib.getByName(gameName), gameEngine.hudGroup.megaUI.currentPrimaryCharacter, gameEngine.hudGroup.megaUI.currentSecondaryCharacter, null, castToUse1, gameEngine.currentLevel.cast, false, dm.getVolitionThreshold("responder"), dm.getResponderBoostFromDictionary(gameEngine.primaryAvatarSelection.toLowerCase() , gameEngine.secondaryAvatarSelection.toLowerCase(), gameName));
+					
+				indexString = gameEngine.hudGroup.megaUI.currentPrimaryCharacter.characterName.toLowerCase() + "-" + gameEngine.hudGroup.megaUI.currentSecondaryCharacter.characterName.toLowerCase() + "-" + gameName.toLowerCase();
+				
+				if (jpm.currentStateOfResponderReaction[indexString].toLowerCase() == "accept") {
+					gameEngine.hudGroup.megaUI.sgInfo.predictionLabel.text = "Accept";
+				}
+				else {
+					gameEngine.hudGroup.megaUI.sgInfo.predictionLabel.text = "Reject";
+				}
+				
+				/*
+				if (sgc.responderScore >= 0) {
+					//gameEngine.hudGroup.sgInfoWindow.predictionValues.text = "Accept"
+					gameEngine.hudGroup.megaUI.sgInfo.predictionLabel.text = "Accept";
+				}
+				else {
+					//gameEngine.hudGroup.sgInfoWindow.predictionValues.text = "Reject"
+					gameEngine.hudGroup.megaUI.sgInfo.predictionLabel.text = "Reject";
+				}
+				*/
+				//END PREDICTION LABEL CDE
+				
+				gameEngine.hudGroup.megaUI.sgInfo.loadSGInfo(gameName);
+				
+				tempIndex = 0;
+				gameEngine.hudGroup.socialGameButtonRing.sgDropDown.ddl.selectedIndex = -1; // need to do this to help fix some weird display bug in the dropdown box.
+				for each (dropDownItem in gameEngine.hudGroup.socialGameButtonRing.sgDropDown.ddlDP) {
+					if (dropDownItem._game.toLowerCase() == gameName.toLowerCase()) {
+						
+						gameEngine.hudGroup.socialGameButtonRing.sgDropDown.ddl.selectedIndex = tempIndex;
+						//gameEngine.hudGroup.socialGameButtonRing.sgDropDown.ddl.
+						//gameEngine.hudGroup.socialGameButtonRing.sgDropDown.ddl.validateNow();
+						Debug.debug(this, "I believe I should be re-setting the value of the drop down box to what I want. this is what temp index is: " + tempIndex);
+						break;
+					}
+					tempIndex++;
+				}
+				
+				//Debug.debug(this, "I believe this is the case where I am re-selecting an already unlocked social game from the 'more' drop down!");
+				//OK! YES!
+				//I'm right about that.  But I was wrong about the nature of the problem--it is still 'getting populated up' as it were, but it is just the UI component
+				//doesn't become visible.
+				//That, AND the other social game button's don't have their display lists invalidated or whatever (they stay glowy).
+				//How do we handle this in 'normal' situations (i.e. when a normal button is selected?)
+				
+				gameEngine.currentlySelectedSG = gameName;
+				
+				gameEngine.hudGroup.megaUI.sgInfo.loadSGInfo(gameName);
+				
+				gameEngine.hudGroup.megaUI.socialGameButtonGroup.visible = true;
+				gameEngine.hudGroup.megaUI.singleCharacterToggleButtonsGroup.visible = false;
+				
+				this.gameEngine.hudGroup.megaUI.setToSocialGameInfo();
+				gameEngine.hudGroup.megaUI.setButtonsToAppropriateEnabledState();
+			}
+			
+		}
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			this.toggler.setStyleName();
+			this.invalidateProperties();
+		}
+		
+		]]>
+	</fx:Script>
+	
+</s:Group>

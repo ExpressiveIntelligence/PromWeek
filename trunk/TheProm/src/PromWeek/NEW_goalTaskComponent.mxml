@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 styleName="classicPromWeek"
+		 width="100%" height="{this.numRows * this.origHeight}"> 
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+			 <fx:Number id="numRows">1</fx:Number>
+			 <fx:Number id="origHeight">45</fx:Number>
+		 </fx:Declarations>
+		 
+		<s:Rect id="unselectedBG" width="100%" height="100%" radiusX="20" radiusY="20" visible="true">
+			<s:stroke>
+				<s:SolidColorStroke color="{getStyle('backgroundStroke')}" weight="3"/>
+			</s:stroke>
+			<s:fill>
+				<s:SolidColor color="{getStyle('backgroundColor')}" alpha="0.9"/>
+			</s:fill>
+		</s:Rect>
+		
+		<s:Rect id="selectedBG" width="100%" height="100%" radiusX="20" radiusY="20" visible="false">
+			<s:stroke>
+				<s:SolidColorStroke color="{getStyle('backgroundStroke')}" weight="5"/>
+			</s:stroke>
+			<s:fill>
+				<s:SolidColor color="0xffffff" alpha="0.9"/>
+			</s:fill>
+		</s:Rect>
+		
+		<s:HGroup width="100%" height="100%" verticalAlign="middle" paddingTop="5" paddingBottom="5" paddingLeft="10" paddingRight="10">
+			<util:SmoothImage id="isTaskCompletedImage" width="35" y="{(this.origHeight * this.numRows) / 2 - 35/2}" />
+			<s:HGroup id="taskGroup" width="280" height="100%" />
+		</s:HGroup>
+		 
+	<fx:Script>
+		<![CDATA[
+		import CiF.CiFSingleton;
+		import CiF.LineOfDialogue;
+		import CiF.Predicate;
+		import CiF.SocialGame;
+		import CiF.SocialGameContext;
+		import flash.events.MouseEvent;
+		import flash.geom.Point;
+		import flash.utils.Dictionary;
+		import PromWeek.assets.ResourceLibrary;
+		import flash.filters.GlowFilter;
+		import spark.components.VGroup;
+
+		private var rL:ResourceLibrary;
+		private var cif:CiFSingleton;
+		private var gameEngine:GameEngine;
+		private var dm:DifficultyManager;
+		private var jpm:JuicePointManager;
+		
+		public var goalSelectionButtons:Vector.<NEW_storyGoalSelectionButton>;
+		
+		public function onCreationComplete():void 
+		{
+			cif = CiFSingleton.getInstance();
+			gameEngine = GameEngine.getInstance();
+			dm = DifficultyManager.getInstance();
+			jpm = JuicePointManager.getInstance();
+			rL = ResourceLibrary.getInstance();
+		}
+
+		
+		public function populateTask(taskText:String,truthValue:Boolean):void
+		{
+			if (truthValue)
+			{
+				isTaskCompletedImage.source = ResourceLibrary.getInstance().uiIcons["check"];
+			}
+			else
+			{
+				isTaskCompletedImage.source = ResourceLibrary.getInstance().uiIcons["cross"];
+			}
+			
+			taskGroup.removeAllElements();
+			var groupToAdd:VGroup = VisibilityManager.getInstance().createGroupWithTextAndImages(taskText, "GoalTaskStyle", this.height * 0.75, taskGroup.width);
+			this.numRows = groupToAdd.numElements;
+			
+			this.taskGroup.addElement(groupToAdd);
+		}
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>
+

@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+				xmlns:s="library://ns.adobe.com/flex/spark"
+				xmlns:mx="library://ns.adobe.com/flex/mx"
+			    creationComplete="onCreationComplete()"
+				initialize="initializeCompleteGameEngine()"
+				click="onClick(event)"
+				width="1280"
+				height="720">
+	
+	<fx:Declarations>
+		<fx:XML id="cifStateXML" source="INT3PresentationState.xml" />
+	</fx:Declarations>
+	
+	<fx:Style source="main.css"/>
+	
+	
+	
+	<fx:Script>
+	<![CDATA[
+		import flash.events.Event;
+		import flash.geom.Point;
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import PromWeek.*;
+		import CiF.*;
+		
+		private var cif:CiFSingleton;
+		private var gameEngine:GameEngine;
+		
+		private var clickCounter:int = 0;
+		
+		private var initBubble:PromWeek.DialogueBubble;
+		private var resBubble:PromWeek.DialogueBubble;
+		
+		private var initWalkingToStartLocations:Boolean = true;
+		private var resWalkingToStartLocations:Boolean = true;
+		
+		private var turnInitiator:Boolean = false;
+		
+		private var notDating:SmoothImage;
+		
+		public function initializeCompleteGameEngine():void
+		{
+			cif = CiFSingleton.getInstance();
+			gameEngine = GameEngine.getInstance();	
+		}
+		
+		public function onCreationComplete():void 
+		{
+			this.cif.parseCiFState(cifStateXML);
+		
+			//as of now, this will load a scenario based on the xml
+			gameEngine.initializeGameEngine();
+			
+			gameEngine.setDimensions(this.width, this.height);
+			
+			addElement(gameEngine);
+			
+			
+			gameEngine.hudGroup.visible = false;
+			(gameEngine.worldGroup.avatars["edward"] as Avatar).moveToLocation(600, 400);
+			(gameEngine.worldGroup.avatars["debbie"] as Avatar).moveToLocation(800, 400);
+			(gameEngine.worldGroup.avatars["edward"] as Avatar).clip.gotoAndPlay("walking");
+			(gameEngine.worldGroup.avatars["debbie"] as Avatar).clip.gotoAndPlay("walking");
+			
+			
+			
+			initBubble = new PromWeek.DialogueBubble();
+			resBubble = new PromWeek.DialogueBubble();
+			
+			initBubble.height = 200;
+			initBubble.width = 300;
+			initBubble.cornerRadius = 30;
+			initBubble.bubbleFillColor = 0xfbef7e;
+			initBubble.bubbleStrokeColor = 0xc48c3c;
+			initBubble.fontColor = 0xc48c3c;
+			initBubble.fontSize = 24;
+			gameEngine.addElement(initBubble);
+			
+			resBubble.height = 200;
+			resBubble.width = 300;
+			resBubble.cornerRadius = 30;
+			resBubble.bubbleFillColor = 0xe05869;
+			resBubble.bubbleStrokeColor = 0x42210b;
+			resBubble.fontColor = 0x42210b;
+			
+			resBubble.pointRight = true;
+			resBubble.fontSize = 24;
+			
+			gameEngine.addElement(resBubble);
+			//gameEngine.primaryAvatarSelection = "edward";
+			//gameEngine.secondaryAvatarSelection = "debbie";
+			var rl:PromWeek.assets.ResourceLibrary = PromWeek.assets.ResourceLibrary.getInstance();
+			
+			notDating = new SmoothImage();
+			notDating.source = rl.bgClips["notDating"];
+			notDating.scaleX *= .1;
+			notDating.scaleY *= .1;
+			notDating.x = this.width / 2 - 25;
+			notDating.y = this.height / 2 - 25;
+			gameEngine.addElement(notDating);
+			
+			addEventListener(Event.ENTER_FRAME, onEnterFrame);
+			resBubble.visible = false;
+			initBubble.visible = false;
+			notDating.visible = false;
+		}
+
+		public function onEnterFrame(e:Event ):void
+		{
+			gameEngine.onEnterFrame();
+			if (gameEngine.finishedLoading) {
+				if (this.resWalkingToStartLocations && 
+					((gameEngine.worldGroup.avatars["edward"] as Avatar).locX == (gameEngine.worldGroup.avatars["edward"] as Avatar).destinationX) &&
+					((gameEngine.worldGroup.avatars["edward"] as Avatar).locY == (gameEngine.worldGroup.avatars["edward"] as Avatar).destinationY)) {
+					(gameEngine.worldGroup.avatars["edward"] as Avatar).clip.gotoAndPlay("idle");
+					this.resWalkingToStartLocations = false;
+				}
+				if (this.initWalkingToStartLocations && 
+					((gameEngine.worldGroup.avatars["debbie"] as Avatar).locX == (gameEngine.worldGroup.avatars["debbie"] as Avatar).destinationX) &&
+					((gameEngine.worldGroup.avatars["debbie"] as Avatar).locY == (gameEngine.worldGroup.avatars["debbie"] as Avatar).destinationY)) {
+					(gameEngine.worldGroup.avatars["debbie"] as Avatar).clip.gotoAndPlay("idle");
+					this.initWalkingToStartLocations = false;
+				}
+				
+				if ((gameEngine.worldGroup.avatars["edward"] as Avatar).locX < (gameEngine.worldGroup.avatars["debbie"] as Avatar).locX) {
+					var curScale:Number = (gameEngine.worldGroup.avatars["edward"] as Avatar).clip.scaleX;
+					(gameEngine.worldGroup.avatars["edward"] as Avatar).clip.scaleX *= (curScale < 0)? -1:1;
+					curScale = (gameEngine.worldGroup.avatars["debbie"] as Avatar).clip.scaleX;
+					if (turnInitiator) {
+						(gameEngine.worldGroup.avatars["debbie"] as Avatar).clip.scaleX *= (curScale < 0)? -1: 1;
+						
+					}else{
+						(gameEngine.worldGroup.avatars["debbie"] as Avatar).clip.scaleX *= (curScale < 0)? 1: -1;
+					}
+				}else {
+					curScale = (gameEngine.worldGroup.avatars["edward"] as Avatar).clip.scaleX;
+					(gameEngine.worldGroup.avatars["edward"] as Avatar).clip.scaleX *= (curScale < 0)? 1: -1;
+					curScale = (gameEngine.worldGroup.avatars["debbie"] as Avatar).clip.scaleX;
+					(gameEngine.worldGroup.avatars["debbie"] as Avatar).clip.scaleX *= (curScale < 0)? -1:1;
+				}
+				var p:Point = new Point();
+				p.x = (gameEngine.worldGroup.avatars["edward"] as Avatar).locX;
+				p.y = (gameEngine.worldGroup.avatars["edward"] as Avatar).locY;
+				p = (gameEngine.worldGroup.avatars["edward"] as Avatar).localToGlobal(p);
+				this.resBubble.x = p.x - 400;
+				this.resBubble.y = p.y - 300;
+				p.x = (gameEngine.worldGroup.avatars["debbie"] as Avatar).locX;
+				p.y = (gameEngine.worldGroup.avatars["debbie"] as Avatar).locY;
+				p = (gameEngine.worldGroup.avatars["debbie"] as Avatar).localToGlobal(p);
+				this.initBubble.x = p.x + 100;
+				this.initBubble.y = p.y - 300;
+				
+			}
+		}
+		
+		public function onClick(e:MouseEvent):void {
+			trace(this.clickCounter);
+			switch(clickCounter) {
+				case 0:
+					break;
+				case 1:
+					this.initBubble.visible = true;
+					this.initBubble.text = "What was that?";
+					(gameEngine.worldGroup.avatars["debbie"] as Avatar).clip.faceMC.playAnim("sad");
+					//(gameEngine.worldGroup.avatars["debbie"] as Avatar).clip.gotoAndPlay("talking");
+					//first lod
+					break;
+				case 2:
+					this.initBubble.visible = false;
+					this.resBubble.visible = true;
+					this.resBubble.text = "What was what?";
+					(gameEngine.worldGroup.avatars["edward"] as Avatar).clip.gotoAndPlay("talking1");
+					(gameEngine.worldGroup.avatars["edward"] as Avatar).clip.faceMC.playAnim("bored");
+					break;
+				case 4:
+					this.resBubble.visible = false;
+					this.initBubble.visible = true;
+					this.initBubble.text = "I saw you with Lily! How dare you!?!?";
+					(gameEngine.worldGroup.avatars["debbie"] as Avatar).clip.faceMC.playAnim("resentful");
+					(gameEngine.worldGroup.avatars["debbie"] as Avatar).clip.gotoAndPlay("accuse");
+					(gameEngine.worldGroup.avatars["edward"] as Avatar).clip.gotoAndPlay("shocked");
+					break;
+				case 5:
+					this.initBubble.visible = false;
+					this.resBubble.visible = true;
+					(gameEngine.worldGroup.avatars["edward"] as Avatar).clip.faceMC.playAnim("lying");
+					(gameEngine.worldGroup.avatars["edward"] as Avatar).clip.gotoAndPlay("agitated_talk");
+					this.resBubble.text = "We just danced! It meant nothing, I swear!";
+					break;
+				case 6:
+					this.resBubble.visible = false;
+					this.initBubble.visible = true;
+					this.initBubble.text = "Is that so? Well, I've got some news for you...";
+					(gameEngine.worldGroup.avatars["debbie"] as Avatar).clip.faceMC.playAnim("resentful");
+					//(gameEngine.worldGroup.avatars["debbie"] as Avatar).clip.gotoAndPlay("talking2");
+					break;
+				case 7:
+					this.resBubble.visible = false;
+					this.initBubble.visible = true;
+					this.initBubble.text = "Now we're nothing! Take a hike, jerk!";
+					(gameEngine.worldGroup.avatars["debbie"] as Avatar).clip.faceMC.playAnim("angry");
+					(gameEngine.worldGroup.avatars["debbie"] as Avatar).clip.gotoAndPlay("punch");
+					(gameEngine.worldGroup.avatars["edward"] as Avatar).clip.faceMC.playAnim("ow");
+					(gameEngine.worldGroup.avatars["edward"] as Avatar).clip.gotoAndPlay("accuseReaction");
+					break;
+				case 8:
+					notDating.visible = true;
+					this.turnInitiator = true;
+					(gameEngine.worldGroup.avatars["edward"] as Avatar).clip.faceMC.playAnim("sad");
+					(gameEngine.worldGroup.avatars["edward"] as Avatar).clip.gotoAndPlay("idle");
+					this.initBubble.visible = false;
+					this.resBubble.visible = false;
+					break;
+				case 9:
+					
+					this.notDating.visible = false;
+					this.resBubble.visible = false;
+					break;
+				case 9:
+					clickCounter = 0;
+			}
+			++clickCounter;
+		}
+	]]>
+	</fx:Script>
+	
+	
+</s:Application>

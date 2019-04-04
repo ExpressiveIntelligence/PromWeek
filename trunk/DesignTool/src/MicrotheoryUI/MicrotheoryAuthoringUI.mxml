@@ -1,0 +1,451 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:UI="UI.*"
+		 xmlns:MicrotheoryUI="MicrotheoryUI.*"
+		 minWidth="1280" 
+		 minHeight="800" 
+		 
+		 creationComplete="onCreationComplete()">
+		
+	<fx:Metadata>
+		[Event(name="definitionListUpdate", type="flash.events.Event")]
+		[Event(name="onSocialGameLibraryUpdate", type="flash.events.Event")] 
+
+	</fx:Metadata>
+
+	<fx:Binding source="dte.microtheoryDefinitionPRDP" destination="definitionList.dataProvider" />
+	<fx:Binding source="dte.microtheoryInitiatorIRSDP" destination="initiatorIRSList.dataProvider" />
+	<fx:Binding source="dte.microtheoryResponderIRSDP" destination="responderIRSList.dataProvider" />
+
+	
+	
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	<fx:Declarations>
+	</fx:Declarations>
+	
+	<s:Rect width="100%" height="105%">
+		<s:fill>
+				<s:LinearGradient rotation="90">
+				<s:entries>
+					<s:GradientEntry color="#980000" ratio="0.0" alpha="1.0"/>
+					<s:GradientEntry color="#080000" ratio="1.0" alpha="1.0"/>
+					<!--<s:GradientEntry color="0x336699" ratio="1.0" alpha="0.5"/>-->
+				</s:entries>
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+	
+	<s:HGroup height="100%">
+		
+		<mx:TabNavigator x="8" y="10" width="794" height="768" id="tabNav" backgroundColor="#101010" backgroundAlpha="0.6">
+			<s:NavigatorContent label="Definitions" width="100%" height="100%">
+				<MicrotheoryUI:DefinitionAuthoringUI x="6" y="-0.05" id="definitionEd"/>
+			</s:NavigatorContent>
+			<s:NavigatorContent label="Influence Rule Set" width="100%" height="100%">
+				<MicrotheoryUI:MicrotheoryInfluenceSetAuthoringUI x="5.85" y="-0.2" id="influenceEdMT" />
+			</s:NavigatorContent>
+		</mx:TabNavigator>
+		
+		
+		<s:VGroup id="summaries" height="98%" x="812.85" y="15" width="460">
+			<s:VGroup>
+				<s:Label text="Microtheory Overview" fontSize="20" color="#ffffff" />
+				<s:HGroup>
+					<s:Button id="saveMirotheoryButton" label="Save Microtheory" click="onSaveMicrotheoryButton(event)" />
+					<s:TextInput id="saveMicrotheoryNameTextInput" width="125" text="Microtheory Name" />
+					<s:DropDownList id="mtDropDown" color="0x000000" selectedIndex="0" change="onChangeMTClick(event)" alternatingItemColors="[#EEEEEE,#DFDFDF]" open="UIComponent(mtDropDown.dropDown).maxHeight = 600;">
+<!--						<s:layout>
+							<s:VerticalLayout requestedRowCount="20"/>
+						</s:layout>-->
+					</s:DropDownList>
+					<s:Button id="loadMicrotheoryButton" label="Load" click="onLoadMTClick(event);" />
+					<!--<mx:PopUpButton id="loadMicrotheoryPopUpButton" click="onLoadMicrotheoryPopUpButtonClick(event)" />--> 
+					<s:HGroup>
+						
+					</s:HGroup>
+						
+				</s:HGroup>
+			</s:VGroup>
+			
+			<mx:Accordion id="microtheoryOverviewAccordion" height="100%" top="50" backgroundAlpha="0" creationPolicy="all">
+				<mx:VBox label="Definition" height="100%" backgroundAlpha="0">
+					<s:HGroup width="100%" height="100%">
+						<s:List id="definitionList" width="360" height="100%" doubleClickEnabled="true" doubleClick="onDefinitionListDoubleClick();"  />
+						<s:VGroup>
+							<s:Button id="definitionListDeleteButton" label="Delete" click="definitionListDelete();" />
+							<s:CheckBox label="Show Name" color="#000000"  id="definitionShowNames" click="definitionListNameSwitch();" />
+						</s:VGroup>
+					</s:HGroup>
+				</mx:VBox>
+				<mx:VBox label="Initiator Influence Rule Set" height="100%">
+					<s:HGroup width="100%" height="100%">
+						<s:List id="initiatorIRSList" width="360" height="100%" doubleClickEnabled="true" doubleClick="onInitiatorIRSListDoubleClick();" />
+						<s:VGroup>
+							<s:Button id="initiatorIRSListDeleteButton" label="Delete" click="initiatorIRSListDelete();" />
+							<!--s:CheckBox label="Show Name" color="#000000"  id="initiatorIRSShowNames" click="initiatorIRSListNameSwitch();" /-->
+							<s:RadioButton id="straightRuleInitiator" label="Rule" color="#000000" groupName="ruleNamesInitiator" click="initiatorIRSListNameSwitch();" />
+							<s:RadioButton id="handAuthoredNameInitiator" label="Authored" color="#000000" groupName="ruleNamesInitiator" click="initiatorIRSListNameSwitch();" />
+							<s:RadioButton id="generatedNameInitiator" label="Generated" color="#000000" groupName="ruleNamesInitiator" click="initiatorIRSListNameSwitch();" />
+							<s:CheckBox label="Mismatches" color="#000000"  id="initiatorIRSShowMismatches" click="initiatorIRSListNameSwitch();" />
+						</s:VGroup>
+					</s:HGroup>
+				</mx:VBox>
+				<mx:VBox label="Responder Influence Rule Set" height="100%">
+					<s:HGroup width="100%" height="100%">
+						<s:List id="responderIRSList" width="360" height="100%" doubleClickEnabled="true" doubleClick="onResponderIRSListDoubleClick();" />
+						<s:VGroup>
+							<s:Button id="responderIRSListDeleteButton" label="Delete" click="responderIRSListDelete();" />
+							<!--s:CheckBox label="Show Name" color="#000000"  id="responderIRSShowNames" click="responderIRSListNameSwitch();" /-->
+							<s:RadioButton id="straightRuleResponder" label="Rule" color="#000000" groupName="ruleNamesResponder" click="responderIRSListNameSwitch();" />
+							<s:RadioButton id="handAuthoredNameResponder" label="Authored" color="#000000" groupName="ruleNamesResponder" click="responderIRSListNameSwitch();" />
+							<s:RadioButton id="generatedNameResponder" label="Generated" color="#000000" groupName="ruleNamesResponder" click="responderIRSListNameSwitch();" />				
+							<s:CheckBox label="Mismatches" color="#000000"  id="responderIRSShowMismatches" click="responderIRSListNameSwitch();" />
+							</s:VGroup>
+					</s:HGroup>
+				</mx:VBox>
+			</mx:Accordion>
+		</s:VGroup>
+
+
+	</s:HGroup>
+
+	
+	<fx:Script>
+		<![CDATA[
+		import flash.events.Event;
+		import flash.events.MouseEvent;
+		import flash.geom.Rectangle;
+		import mx.events.CloseEvent; 
+		import mx.collections.ArrayCollection;
+		import CiF.*;
+		import mx.controls.Menu;
+		import mx.controls.Alert; 
+		import mx.core.DesignLayer;
+		import mx.core.UIComponent;
+		import mx.events.MenuEvent;
+		import tool.DesignerToolEngine;
+		
+		public var dte:DesignerToolEngine = DesignerToolEngine.getInstance();
+		
+		private var menu:Menu;
+		private var selectedMicrotheoryName:String;
+		
+		public function onCreationComplete():void 
+		{
+			//event handlers
+			addEventListener("onSocialGameLibraryUpdate", onSocialGameLibraryUpdate);
+			addEventListener("definitionListUpdate", definitionListUpdateCallback);
+			addEventListener("irsListUpdate", irsListUpdateCallback);
+			
+			this.addEventListener(MouseEvent.CLICK, reloadDataProviders);
+		}
+		
+		public function reloadDataProviders(e:Event):void
+		{
+			this.definitionListNameSwitch();
+			this.initiatorIRSListNameSwitch();
+			this.responderIRSListNameSwitch();
+			
+			this.removeEventListener(MouseEvent.CLICK, reloadDataProviders);
+		}
+		
+		/*
+		public function onClickTest(e:Event):void
+		{
+			trace(dte.workingMicrotheory.name);
+			trace("def: " + dte.workingMicrotheory.definition);
+			var rule:InfluenceRule
+			for each (rule in dte.workingMicrotheory.initiatorIRS.influenceRules)
+			{
+				trace("INITinfluenceRule: "+rule);
+			}
+			for each (rule in dte.workingMicrotheory.initiatorIRS.influenceRules)
+			{
+				trace("RESPinfluenceRule: "+rule);
+			}
+			
+			this.definitionListNameSwitch();
+			this.initiatorIRSListNameSwitch();
+			this.responderIRSListNameSwitch();
+		}
+*/
+		public function onSocialGameLibraryUpdate(event:Event=null):void {
+			var cif:CiFSingleton = CiFSingleton.getInstance()
+			
+/*			var menuXML:XML = new XML("<root></root>");
+			//Debug.debug(this, this.dte.gameNamesDP.toString());
+			
+			var newNode:XML*/
+			
+			
+			var mt:Microtheory;
+			var mtArrayCollection:ArrayCollection = new ArrayCollection();
+			
+			for each (mt in cif.microtheories) {
+				//newNode = new XML();
+				//newNode = <menuitem label={mt.name} />;
+				//menuXML.appendChild(newNode);
+				
+				mtArrayCollection.addItem(new Array(mt.name))
+			}
+			
+			//menu = new Menu();
+			//menu.dataProvider = menuXML..menuitem;
+			
+			
+			mtDropDown.dataProvider = mtArrayCollection;
+			
+			//Debug.debug(this, "onSocialGameLibrayUpdate() mtArrayCollection: " + mtArrayCollection);
+			
+			//menu.labelField = "@label";
+			//menu.addEventListener("itemClick", onMenuItemClick);
+			//menu.selectedIndex = 0;
+			
+			if (cif.microtheories.length > 0)
+			{
+				this.selectedMicrotheoryName = mtDropDown.selectedItem as String;
+				
+				//this.selectedMicrotheoryName = menuXML.menuitem[0].@label;
+				//
+				//this.loadMicrotheoryPopUpButton.popUp = menu;
+				//this.loadMicrotheoryPopUpButton.label = "Load '" + menuXML.menuitem[0].@label + "'";
+			}else {
+				//Debug.debug(this, "onSocialGameLibraryUpdate() no microtheories found in CiF!");
+			}
+			this.definitionListNameSwitch();
+			this.initiatorIRSListNameSwitch();
+			this.responderIRSListNameSwitch();
+		}
+		
+		/**
+		 * The loadMicrotheoryPopUpButton.menu's itemClick callback. It loads
+		 * the microtheory denoted by the popup button's label from the 
+		 * microtheory library to the dte's working microtheory.
+		 * @param	event	The incoming event.
+		 */
+		public function onMenuItemClick(event:MenuEvent):void {
+/*			this.loadMicrotheoryPopUpButton.label = "Load '" + event.item.@label + "'";
+			this.selectedMicrotheoryName = event.item.@label;
+			this.menu.selectedIndex = event.index;
+			//Debug.debug(this, "selected menu item event: " + event.index);
+			this.loadMicrotheoryPopUpButton.close();*/
+		}
+		
+		public function onChangeMTClick(event:Event):void {
+			this.selectedMicrotheoryName = mtDropDown.dataProvider[event.currentTarget.selectedIndex];
+			//this.menu.selectedIndex = event.index;
+			//Debug.debug(this, "selected menu item event: " + event.index);
+			//this.loadMicrotheoryPopUpButton.close();
+		}
+		
+		public function onLoadMTClick(event:Event):void {
+			//var sgName:String = this.loadGamePopUpButton.selectedField;
+			//Debug.debug(this, "selected menu item index: " + this.menu.selectedIndex);
+			//var sgName:String = this.menu.dataProvider[this.menu.selectedIndex].@label;
+			//this.menu.selectedItem as String;
+			//Debug.debug(this, "selected: " + this.selectedMicrotheoryName);
+			this.dte.workingMicrotheory = this.dte.cif.getMicrotheoryByName(this.selectedMicrotheoryName).clone();
+			
+			for each (var ir:InfluenceRule in this.dte.workingMicrotheory.initiatorIRS.influenceRules) {
+				trace(ir.generateRuleName());
+			}
+			
+			//Debug.debug(this, "onLoadSocialGamePopUpButtonClick(): selected game name " + this.dte.workingSocialGame.name);
+			this.saveMicrotheoryNameTextInput.text = this.dte.workingMicrotheory.name;
+			
+			this.definitionListNameSwitch();
+			this.initiatorIRSListNameSwitch();
+			this.responderIRSListNameSwitch();
+		}
+		
+		
+		/**
+		 * The loadMicrotheoryPopUpButton's on click event handler. It retrieves
+		 * the microtheory corresponding to the button's label from the microtheory
+		 * library and loads it into the dte's working microtheory.
+		 * @param	event	The incoming event.
+		 */
+		public function onLoadMicrotheoryPopUpButtonClick(event:Event):void {
+			//var sgName:String = this.loadGamePopUpButton.selectedField;
+			//Debug.debug(this, "selected menu item index: " + this.menu.selectedIndex);
+			//var sgName:String = this.menu.dataProvider[this.menu.selectedIndex].@label;
+			//this.menu.selectedItem as String;
+			//Debug.debug(this, "selected: " + this.selectedMicrotheoryName);
+			this.dte.workingMicrotheory = this.dte.cif.getMicrotheoryByName(this.selectedMicrotheoryName).clone();
+			//Debug.debug(this, "onLoadSocialGamePopUpButtonClick(): selected game name " + this.dte.workingSocialGame.name);
+			this.saveMicrotheoryNameTextInput.text = this.dte.workingMicrotheory.name;
+			
+			for each (var ir:InfluenceRule in this.dte.workingMicrotheory.initiatorIRS.influenceRules) {
+				trace(ir.generateRuleName());
+			}
+			
+			this.definitionListNameSwitch();
+			this.initiatorIRSListNameSwitch();
+			this.responderIRSListNameSwitch();
+		}
+		
+		/**
+		 * The click event handler for the saveMicrotheoryButton. It determines if a 
+		 * microtheory of the same name exists in the microtheory library. If
+		 * there is no microtheory corresponding to the name specified in the
+		 * saveMicrotheoryNameTextInput, a new microtheory is pushed to the library. If there
+		 * exists a microtheory with the name in the library, the user is presented with
+		 * a prompt asking if they wish to replace the game.
+		 * @param	event	The incoming event.
+		 */
+		public function onSaveMicrotheoryButton(event:MouseEvent):void {
+			var name:String = this.saveMicrotheoryNameTextInput.text;
+			var mt:Microtheory = this.dte.cif.getMicrotheoryByName(name);
+			
+			//determine if game of the same name is already in the library
+			if (!mt) {
+				//if the game is not present in the library, add it.
+				//Debug.debug(this, "onSaveGameButton(): adding social game " + name);
+				mt = this.dte.workingMicrotheory.clone();
+				mt.name = name;
+				this.dte.cif.microtheories.push(mt);
+				dispatchEvent(new Event("onSocialGameLibraryUpdate", true)); 
+			} else {
+				//if the game is present, prompt to replace it
+				var alertText:String = "Do you wish to replace the microtheory '" + name + "' in the microtheory library with the microtheory currently being edited?";
+				var alertTitle:String = "Replace microtheory?";
+				Alert.yesLabel = "Yes";
+				Alert.noLabel = "No";
+				Alert.show(alertText, alertTitle, Alert.YES | Alert.NO, this, confirmReplaceMicrotheoryClickHandler);// confirmOverwriteClickHandler);
+				//if the user chooses to replace it, get the reference to the game
+				//and point it to the new game instance.
+				//if the user decides not to replace it, do nothing.	
+			}
+		}
+		
+		/**
+		 * The close event handler for the saveMicrotheoryButton's replace alert
+		 * dialog box. If the user selected yes, the microtheory in the microtheory
+		 * library is replaced with the microtheory in the editor. If the user selects
+		 * no, the microtheory library remains unchanged.
+		 * @param	event	The incoming event.
+		 */
+		private function confirmReplaceMicrotheoryClickHandler(event:CloseEvent):void {
+			if (Alert.YES == event.detail ) {
+				//replace game
+				var mtIndex:int = this.dte.cif.getMicrotheoryIndexByName(this.saveMicrotheoryNameTextInput.text);
+				//Debug.debug(this, "confirmReplaceSocialGameClickHandler(): sgIndex " + sgIndex);
+				var mt:Microtheory = this.dte.workingMicrotheory.clone();
+				mt.name = this.saveMicrotheoryNameTextInput.text;
+				this.dte.cif.microtheories[mtIndex] = mt;
+				dispatchEvent(new Event("onSocialGameLibraryUpdate", true));
+			}
+			//leave unchanged
+		}
+		
+		//{ Summary Double Click functions
+		public function onDefinitionListDoubleClick():void {
+			tabNav.selectedIndex = 0;
+			definitionEd.ruleUI.rule = dte.workingMicrotheory.definition.clone();
+			definitionEd.ruleUI.dispatchEvent(new Event("ruleChanged", true, true));
+		}
+		
+		public function onInitiatorIRSListDoubleClick():void {
+			var index:int = initiatorIRSList.selectedIndex;
+			var ir:InfluenceRule = dte.workingMicrotheory.initiatorIRS.influenceRules[index].clone() as InfluenceRule;
+			tabNav.selectedIndex = 1;
+			influenceEdMT.ruleUI.rule = ir;
+			influenceEdMT.ruleUI.dispatchEvent(new Event("ruleChanged", true, true));
+			influenceEdMT.isInitiatorRule = true;
+			influenceEdMT.weight = ir.weight;
+		}
+		
+		public function onResponderIRSListDoubleClick():void {
+			var index:int = responderIRSList.selectedIndex;
+			var ir:InfluenceRule = dte.workingMicrotheory.responderIRS.influenceRules[index].clone() as InfluenceRule;
+			tabNav.selectedIndex = 2;
+			influenceEdMT.ruleUI.rule = ir;
+			influenceEdMT.ruleUI.dispatchEvent(new Event("ruleChanged", true, true));
+			influenceEdMT.isResponderRule = true;
+			influenceEdMT.weight = ir.weight;
+		}
+		
+		
+		//{ Event Listener stuffs =D
+		public function definitionListUpdateCallback(e:Event):void {
+			definitionListNameSwitch();
+		}
+		
+		
+		public function irsListUpdateCallback(e:Event):void {
+			initiatorIRSListNameSwitch();
+			responderIRSListNameSwitch();
+		}
+
+		
+		//FIXME: write event listeners for initiator and responder IRS to handle the switching AND update dte's list generators (make the ___NameDP() functions worthless)
+		
+		//{ Summary Name ChkBox functions
+		public function definitionListNameSwitch():void {
+			//dte.microtheoryDefinitionPRDP = dte.microtheoryDefinitionPRDP = dte.generateMicrotheoryDefinitionPRDP(definitionShowNames.selected);
+			dte.microtheoryDefinitionPRDP = dte.generateMicrotheoryDefinitionPRDP(definitionShowNames.selected);
+		}
+		
+		public function initiatorIRSListNameSwitch():void {
+			//dte.microtheoryInitiatorIRSDP = dte.generateMicrotheoryInitiatorIRSDP(initiatorIRSShowNames.selected);
+			dte.microtheoryInitiatorIRSDP = dte.generateMicrotheoryInitiatorIRSDP(this.straightRuleInitiator.selected, this.handAuthoredNameInitiator.selected, this.generatedNameInitiator.selected, this.initiatorIRSShowMismatches.selected);
+		}
+		
+		public function responderIRSListNameSwitch():void {
+			//dte.microtheoryResponderIRSDP = dte.generateMicrotheoryResponderIRSDP(responderIRSShowNames.selected);
+			dte.microtheoryResponderIRSDP = dte.generateMicrotheoryResponderIRSDP(this.straightRuleResponder.selected, this.handAuthoredNameResponder.selected, this.generatedNameResponder.selected, this.responderIRSShowMismatches.selected);
+		}
+		
+		
+		//{ Summary Delete Button functions
+		public function definitionListDelete():void {
+			//var index:int = definitionList.selectedIndex;
+			//dte.workingSocialGame.preconditions.splice(index, 1);
+			dte.workingMicrotheory.definition = null;
+			definitionListNameSwitch();
+		}
+
+		public function definitionListNew():void {			
+			//dte.preconditionPRDP = dte.generatePreconditionPRDP(preconditionShowNames.selected);
+		}
+		
+		public function initiatorIRSListDelete():void {
+			var index:int = initiatorIRSList.selectedIndex;
+			dte.workingMicrotheory.initiatorIRS.influenceRules.splice(index, 1);
+			initiatorIRSListNameSwitch();
+		}
+		
+		public function responderIRSListDelete():void {
+			var index:int = responderIRSList.selectedIndex;
+			dte.workingMicrotheory.responderIRS.influenceRules.splice(index, 1);
+			responderIRSListNameSwitch();
+		}
+		
+
+		
+		/**
+		 * Returns the value of the private variable selectedMicrotheory
+		 * @return The current value of the selectedMicrotheory.
+		 */
+		public function getSelectedMicrotheoryString():String {
+			return selectedMicrotheoryName;
+		}
+		
+		/**
+		 * Sets the value of the private variaable selectedMicrotheory
+		 * @param newMTName the name of the new selectedMicrotheory.
+		 */
+		public function setSelectedMicrotheoryString(newMTName:String):void {
+			selectedMicrotheoryName = newMTName;
+		}
+		
+		//}
+		
+		]]>
+	</fx:Script>
+	
+</s:Group>

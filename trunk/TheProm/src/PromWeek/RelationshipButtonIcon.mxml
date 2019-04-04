@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 width="15"
+		 height="15">
+	
+		 
+	
+	
+	<s:Group>
+		
+	<s:Group id="relationshipImageGroup" width="15" height="15" />
+	
+	
+	<s:Line id="line1" xFrom="0" yFrom="0" xTo="15" yTo="15" visible="false">
+        <s:stroke>
+            <s:SolidColorStroke color="red" alpha=".8" weight="2" />
+        </s:stroke>
+    </s:Line>
+    <s:Line id="line2" xFrom="0" yFrom="15" xTo="15" yTo="0" visible="false">
+        <s:stroke>
+            <s:SolidColorStroke color="red" alpha=".8" weight="2"/>
+        </s:stroke>
+    </s:Line>
+	</s:Group>
+	
+	<fx:Script>
+		<![CDATA[		
+		import CiF.*;
+		import flash.events.Event;
+		import flash.events.MouseEvent;
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import PromWeek.assets.ResourceLibrary;
+		
+		
+		public var relationshipImage:SmoothImage;
+		
+		private var resourceLibrary:PromWeek.assets.ResourceLibrary;
+		
+		public function onCreationComplete():void
+		{
+			resourceLibrary = PromWeek.assets.ResourceLibrary.getInstance();
+		}
+		
+		
+		public function loadRelationshipImagesToIcon(relationshipID:Number = -1, negated:Boolean = false, networkChangeID:int = -1):void
+		{	
+			if (!resourceLibrary) 
+			{
+				resourceLibrary = ResourceLibrary.getInstance();
+			}
+				
+			/*if (this.relationshipImage) {
+				//remove it so we can get a new one.
+				this.getElementIndex(
+				this.removeElement(this.relationshipImage);
+			}*/
+			this.relationshipImageGroup.removeAllElements();
+			
+			this.relationshipImage = new SmoothImage();
+			//this.relationshipIconTowards.visible = false;
+			
+			
+			if (relationshipID != -1)
+			{
+				this.width = 15;
+				this.height = 15;
+				this.relationshipImageGroup.width = 15;
+				this.relationshipImageGroup.height = 15;
+				relationshipImage.width = 15;
+				relationshipImage.height = 15;
+				relationshipImage.source = resourceLibrary.relationshipIcons[RelationshipNetwork.getRelationshipNameByNumber(relationshipID)]
+				if (relationshipID != RelationshipNetwork.DATING)
+				{
+					if (negated)
+					{
+						this.toolTip = "Stop being " + RelationshipNetwork.getRelationshipNameByNumber(relationshipID);
+					}
+					else
+					{
+						this.toolTip = "Become " + RelationshipNetwork.getRelationshipNameByNumber(relationshipID);
+					}
+				}
+				else
+				{
+					if (negated)
+					{
+						this.toolTip = "Stop dating";
+					}
+					else
+					{
+						this.toolTip = "Start dating";
+					}
+				}
+			}
+			else if (networkChangeID != -1)
+			{
+				this.width = 25;
+				this.height = 12;
+				this.relationshipImageGroup.width = 25;
+				this.relationshipImageGroup.height = 12;
+				relationshipImage.width = 25;
+				relationshipImage.height = 12;
+				relationshipImage.scaleX = 1.5;
+				if (networkChangeID == Predicate.INTENT_BUDDY_UP)
+				{
+					relationshipImage.source = resourceLibrary.networkArrowIcons["buddyUp"];
+					this.toolTip = "Raises buddy feelings";
+				}
+				else if (networkChangeID == Predicate.INTENT_BUDDY_DOWN)
+				{
+					relationshipImage.source = resourceLibrary.networkArrowIcons["buddyDown"];
+					this.toolTip = "Lower buddy feelings";
+				}
+				else if (networkChangeID == Predicate.INTENT_ROMANCE_UP)
+				{
+					relationshipImage.source = resourceLibrary.networkArrowIcons["romanceUp"];
+					this.toolTip = "Raises feelings of romance";
+				}
+				else if (networkChangeID == Predicate.INTENT_ROMANCE_DOWN)
+				{
+					relationshipImage.source = resourceLibrary.networkArrowIcons["romanceDown"];
+					this.toolTip = "Lowers feelings of romance";
+				}
+				else if (networkChangeID == Predicate.INTENT_COOL_UP)
+				{
+					relationshipImage.source = resourceLibrary.networkArrowIcons["coolUp"];
+					this.toolTip = "Raises cool feelings";
+				}
+				else if (networkChangeID == Predicate.INTENT_COOL_DOWN)
+				{
+					relationshipImage.source = resourceLibrary.networkArrowIcons["coolDown"];
+					this.toolTip = "Lowers cool feelings";
+				}
+			}
+			
+			
+			
+			this.width = relationshipImage.width;
+			this.height = relationshipImage.height;
+			this.relationshipImageGroup.width = relationshipImage.width;
+			this.relationshipImageGroup.height = relationshipImage.height;
+			
+			
+			
+			this.relationshipImageGroup.addElement(relationshipImage);
+			this.visible = true;
+			
+			if (negated)
+			{
+				line1.visible = true;
+				line2.visible = true;
+			}else {
+				line1.visible = false;
+				line2.visible = false;
+			}
+			
+		}
+		
+		]]>
+	</fx:Script>
+		
+</s:Group>

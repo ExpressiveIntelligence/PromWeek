@@ -1,0 +1,512 @@
+<mx:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+        xmlns:s="library://ns.adobe.com/flex/spark"
+        xmlns:mx="library://ns.adobe.com/flex/mx"
+        title="Title Window" x="168" y="86"
+		width="400" height="400"
+		creationPolicy="all"
+		initialize="onCreationComplete()">
+
+    <fx:Script>
+        <![CDATA[
+            import mx.managers.PopUpManager;
+			import spark.components.TextArea;
+
+			
+			import flash.text.TextField;
+			import flash.text.TextFormat;
+			import mx.collections.ArrayCollection;
+			//import mx.controls.Button;
+			import spark.components.Group;
+			import spark.components.Button;
+			import mx.graphics.SolidColor;
+			import mx.graphics.SolidColorStroke;
+			import spark.components.RichText;
+			import spark.primitives.*;
+			import flash.text.TextField;
+			import spark.components.Label;
+			import mx.controls.Image;  import com.util.SmoothImage;
+			import flash.events.*;
+			import spark.filters.*;
+			import CiF.*;
+			//import flashx.textLayout.property.IntProperty;
+			//import flashx.textLayout.utils.CharacterUtil;
+			import mx.collections.ArrayCollection;
+			//import mx.controls.NumericStepper;
+			import mx.events.DataGridEvent;
+			import mx.controls.Alert;
+			//import mx.events.MouseEvent;
+			//import flare.vis.data.Data;
+			//import flare.vis.Visualization;
+			import flash.events.DataEvent;
+			import flash.events.Event;
+			import flash.events.MouseEvent;
+			//import flash.geom.Rectangle;
+			import flashx.textLayout.conversion.TextConverter;
+			import spark.primitives.Line;
+
+			
+			public var cif:CiFSingleton;
+			
+			public var created:Boolean = false;
+			
+			public var debugInfoText:TextArea;
+			
+			public function onCreationComplete():void
+			{
+				cif = CiFSingleton.getInstance();
+				
+				this.debugInfoText = new TextArea();
+				this.addElement(debugInfoText);
+				this.created = true;
+			}
+/*			
+			public function updateData(sg:SocialGame,initiator:Character,responder:Character,other:Character = null):void
+			{
+				Debug.debug(this,"updateDebugWindow() was called");
+			
+				if (this.created)
+				{
+					Debug.debug(this,"updateData() DebugPopUp has finished being created");
+				}
+				else
+				{
+					Debug.debug(this, "updateData() DebugPopUp has not been created");
+					return;
+				}
+				
+				
+				var gamePlayed:Boolean = true;
+				
+				var htmlText:String = "";
+				//var initiator:Character = this.selectedCharacter;
+				//var responder:Character = this.availableGames.responder;
+				//var other:Character;
+				var cif:CiFSingleton = CiFSingleton.getInstance();
+				//var sg:SocialGame = this.availableGames.selectedSocialGame;
+				//var context:SocialGameContext;
+				var instantiation:Instantiation;
+				var infRule :InfluenceRule;
+				var line:LineOfDialogue;
+				var realizedLine:LineOfDialogue;
+				var primarySpeaker:String;
+				//flag error if we do not have two characters to play with
+				if (!initiator || !responder) {
+					htmlText = "Roles are not fully specified: ";
+					if (!initiator) {
+						htmlText += "initiator ";
+					}
+					if (!responder) {
+						htmlText += "responder";
+					}
+					this.dialogueDisplay.text = htmlText;
+					return;
+				}
+
+				
+				//context = cif.sfdb.contexts[cif.sfdb.contexts.length - 1] as SocialGameContext;
+				//Debug.debug(this, "onCurrentStateChange() effectID: " + context.effectID);
+				//other = cif.getSalientOther(sg,initiator,responder);
+				
+				var theory:Microtheory;
+				var tmpString:String;
+				//var effect:Effect = sg.effects[context.effectID];
+				var responderScore:Number = cif.scoreResponderWithMicrotheories(sg, initiator, responder, other);
+				var initiatorScore:Number = cif.scoreInitiatorWithMicrotheories(sg, initiator, responder, other);
+				
+				var effect:Effect = cif.getSalientEffect(sg, responderScore>=0, initiator, responder, other);
+				
+				var runningSocialGame:SocialGame = sg.clone();
+				var runningMicrotheoryLibrary:Vector.<Microtheory> = new Vector.<Microtheory>();
+				for each(theory in cif.microtheories)
+				{
+					runningMicrotheoryLibrary.push(theory.clone());
+				}
+				
+				//Debug.debug(this, "printGameInfo() salient effect: " + effect.toString() + " with instantiation id: " + effect.id);
+
+				if (sg.instantiations.length > 0)
+				{
+					instantiation = sg.getInstantiationById(effect.instantiationID);
+				}
+				else 
+				{
+					instantiation = null;
+				}
+				
+				
+				if (gamePlayed)
+				{
+					htmlText += "<br><b>--- " + initiator.characterName + " played " + sg.name + " with " + responder.characterName + " ---</b><br><br>";
+				}
+				else
+				{
+					htmlText += "<br><b> Information for " + sg.name + " between " + initiator.characterName + " " + responder.characterName + "</b><br><br>";
+				}
+				
+				htmlText += "<b>*** SFDB Time ***</b> <br>";
+				htmlText += cif.time + "<br><br>";
+				
+				htmlText += "<b>*** Intent ***</b> <br>";
+				for each ( var intent:CiF.Rule in sg.intents)
+				{
+					htmlText += intent.toString() + "<br>";
+				}
+				
+				//Add the logic description of the effect change rule
+				htmlText += "<br>";
+				htmlText += "<b>*** ";
+				if (!gamePlayed) htmlText += "Would be "; 
+				htmlText += "Results *** </b> <br>";
+				//htmlText += effect.change.predicates.length.toString() + "<br>";
+				for each (var predicate:Predicate in effect.change.predicates)
+				{
+					tmpString = replace(predicate.toString(),"responder", responder.characterName);
+					tmpString = replace(tmpString, "initiator", initiator.characterName);
+					htmlText +=  "* " + tmpString + "<br>";
+				}
+				htmlText += "<br>";
+				htmlText += "<b>*** Effect Info ***</b> <br>";
+				if (effect.isAccept)
+				{
+					htmlText += "Accept <br>";
+				}
+				else
+				{
+					htmlText += "Reject <br>";
+				}
+				for each (predicate in effect.condition.predicates)
+				{
+					tmpString = replace(predicate.toString(),"responder", responder.characterName);
+					tmpString = replace(tmpString, "initiator", initiator.characterName);
+					htmlText +=  "* " + tmpString + "<br>";
+				}
+				
+				
+				
+				
+				var i:int = 0;
+				
+				htmlText += "<br>";
+				htmlText += "<b>*** Initiator IRS ***</b> <br>";
+				
+				titleIntentAndEffectsText.textFlow = TextConverter.importToFlow(htmlText, TextConverter.TEXT_FIELD_HTML_FORMAT);
+				htmlText = "";
+				
+				
+				var initTrueEditableSGRuleListDP:ArrayCollection = new ArrayCollection;
+				//for each (infRule in sg.initiatorIRS.influenceRules)
+				for (i = 0; i < sg.initiatorIRS.influenceRules.length; i++)			
+				{
+					infRule = sg.initiatorIRS.influenceRules[i];
+					if (infRule.weight != 0)
+					{
+						if (sg.initiatorIRS.getlastTruthValues()[i])
+						{
+							initTrueEditableSGRuleListDP.addItem( { weightValue:infRule.weight , ruleString:(infRule as Rule).toString(), ruleID:infRule.id } );
+						}
+					}
+				}
+				initTrueEditableSGRuleListDG.dataProvider = initTrueEditableSGRuleListDP;
+				
+				var initFalseEditableSGRuleListDP:ArrayCollection = new ArrayCollection;
+				//for each (infRule in sg.initiatorIRS.influenceRules)
+				for (i = 0; i < sg.initiatorIRS.influenceRules.length; i++)			
+				{
+					infRule = sg.initiatorIRS.influenceRules[i];
+					if (infRule.weight != 0)
+					{
+						if (!sg.initiatorIRS.getlastTruthValues()[i])
+						{
+							initFalseEditableSGRuleListDP.addItem( { weightValue:infRule.weight , ruleString:(infRule as Rule).toString(), ruleID:infRule.id } );
+						}
+					}
+				}
+				initFalseEditableSGRuleListDG.dataProvider = initFalseEditableSGRuleListDP;
+				
+				var initTrueEditableMTRuleListDP:ArrayCollection = new ArrayCollection;
+				for each (theory in cif.microtheories)
+				{
+					for (i = 0; i < theory.initiatorIRS.influenceRules.length; i++)
+					{
+						if (theory.initiatorIRS.influenceRules[i].weight != 0)
+						{
+							if (theory.initiatorIRS.getlastTruthValues()[i])
+							{
+								initTrueEditableMTRuleListDP.addItem( { weightValue:theory.initiatorIRS.lastScores[i] , mtNameString:theory.name, ruleString:(theory.initiatorIRS.influenceRules[i] as Rule).toString(), ruleID:theory.initiatorIRS.influenceRules[i].id } );
+							}
+						}
+					}
+				}
+				initTrueEditableMTRuleListDG.dataProvider = initTrueEditableMTRuleListDP;
+				
+
+				
+				
+				htmlText += "<br>";
+				htmlText += "<b>*** Responder IRS ***</b> <br>";
+				
+				respTitleText.textFlow = TextConverter.importToFlow(htmlText, TextConverter.TEXT_FIELD_HTML_FORMAT);
+				htmlText = "";
+				
+				
+				
+				
+				
+				
+				
+				
+				var respTrueEditableSGRuleListDP:ArrayCollection = new ArrayCollection;
+				//for each (infRule in sg.responderIRS.influenceRules)
+				for (i = 0; i < sg.responderIRS.influenceRules.length; i++)			
+				{
+					infRule = sg.responderIRS.influenceRules[i];
+					if (infRule.weight != 0)
+					{
+						if (sg.responderIRS.getlastTruthValues()[i])
+						{
+							respTrueEditableSGRuleListDP.addItem( { weightValue:infRule.weight , ruleString:(infRule as Rule).toString() , ruleID:infRule.id} );
+						}
+					}
+				}
+				respTrueEditableSGRuleListDG.dataProvider = respTrueEditableSGRuleListDP;
+				
+				var respTrueEditableMTRuleListDP:ArrayCollection = new ArrayCollection
+				for each (theory in cif.microtheories)
+				{
+					for (i = 0; i < theory.responderIRS.influenceRules.length; i++)
+					{
+						if (theory.responderIRS.influenceRules[i].weight != 0)
+						{
+							if (theory.responderIRS.getlastTruthValues()[i])
+							{
+								respTrueEditableMTRuleListDP.addItem( { weightValue:theory.initiatorIRS.influenceRules[i].weight , mtNameString:theory.name, ruleString:(theory.initiatorIRS.influenceRules[i] as Rule).toString(), ruleID:theory.initiatorIRS.influenceRules[i].id } );
+							}
+						}
+					}
+				}
+				respTrueEditableMTRuleListDG.dataProvider = respTrueEditableMTRuleListDP;
+				
+				var respFalseEditableSGRuleListDP:ArrayCollection = new ArrayCollection;
+				//for each (infRule in sg.responderIRS.influenceRules)
+				for (i = 0; i < sg.responderIRS.influenceRules.length; i++)			
+				{
+					infRule = sg.responderIRS.influenceRules[i];
+					if (infRule.weight != 0)
+					{
+						if (!sg.responderIRS.getlastTruthValues()[i])
+						{
+							respFalseEditableSGRuleListDP.addItem( { weightValue:infRule.weight , ruleString:(infRule as Rule).toString(), ruleID:infRule.id } );
+						}
+					}
+				}
+				respFalseEditableSGRuleListDG.dataProvider = respFalseEditableSGRuleListDP;
+		
+				
+				
+				
+				
+				
+				
+				
+				
+
+				htmlText += "<br>";
+				htmlText += "<b>*** Preconditions ***</b> <br>";
+				for (i = 0; i < sg.preconditions.length; i++)
+				{
+						tmpString = sg.preconditions[i].toString().replace("responder", responder.characterName);
+						tmpString = tmpString.replace("initiator", initiator.characterName);
+						htmlText +=  "* " + tmpString + "<br>";
+				}			
+				
+				//dialogue 
+				if (instantiation != null)
+				{
+					htmlText += "<br>";
+					htmlText += "<b>Dialogue:</b>";
+					
+					
+					
+					//var context:SocialGameContext = cif.sfdb.contexts[cif.sfdb.contexts.length - 1] as SocialGameContext;
+					//
+					//if (this.availableGames.socialGamesList.selectedItem.otherCol)
+					//{
+						//Debug.debug(this, (this.availableGames.socialGamesList.selectedItem.otherCol as Character).characterName);
+					//}
+					//else
+					//{
+						//Debug.debug(this,"There is no OTHER");
+					//}
+					
+					var newInstantiation:Instantiation = instantiation.realizeDialogue(initiator, responder, other);
+					
+					//create the formatted display string
+					for each(line in newInstantiation.lines) {
+						//realizedLine = line.realizeDialogue(initiator, responder, other);
+						//Debug.debug(this, "onClickRunSelectedSGButton() line: " + line.toString());
+						//Debug.debug(this, "onClickRunSelectedSGButton() realizedLine: " + realizedLine.toString());
+						//add the primary speaker's line first
+						if (line.primarySpeaker == "initiator") {
+							htmlText += "<p><b>" + initiator.characterName + ":</b> ";
+							//htmlText += realizedLine.initiatorLine + "</p>";
+							htmlText += line.initiatorLine + "</p>";
+						} else if (line.primarySpeaker == "responder") {
+							htmlText += "<p><b>" + responder.characterName + ":</b> ";
+							//htmlText += realizedLine.responderLine + "</p>";
+							htmlText += line.responderLine + "</p>";
+						}else if (other) {
+							if (line.primarySpeaker == "other") {
+								htmlText += "<p><b>" + other.characterName + ":</b> ";
+								//htmlText += realizedLine.otherLine + "</p>";
+								htmlText += line.otherLine + "</p>";
+							}
+						}
+					
+						
+						//add the other lines
+						if ("initiator" != line.primarySpeaker) {
+							htmlText += "<p><i>" + initiator.characterName + ":</i>";
+							htmlText += line.initiatorLine + "</p>";
+						}
+						if ("responder" != line.primarySpeaker) {
+							htmlText += "<p><i>" + responder.characterName + ":</i>";
+							htmlText += line.responderLine + "</p>";
+						}
+						if (other) {
+							if ("other" != line.primarySpeaker) {
+								htmlText += "<p><i>" + other.characterName + ":</i>";
+								htmlText += line.otherLine + "</p>";
+							}
+						}
+						
+						//add a space between the lines
+						htmlText += "<p/>";
+					}
+				}
+							
+				//Debug.debug(this, "onClickRunSelectedSGButton() htmlText: " + htmlText);
+				//htmlText = "<p>The quick brown <b>fox jumps over</b> the lazy dogg.</p>";
+				this.dialogueDisplay.textFlow = TextConverter.importToFlow(htmlText, TextConverter.TEXT_FIELD_HTML_FORMAT);
+			}
+
+			*/
+			public function replace(org:String, fnd:String, rpl:String):String 
+			{
+				return org.split(fnd).join(rpl);
+			}
+
+        ]]>
+    </fx:Script>
+	
+	<!--<s:VGroup>
+		<s:TextArea id="debugInfo" />
+	</s:VGroup>-->
+<!--
+	<s:VGroup id="debugGroup">
+		<s:RichText id="titleIntentAndEffectsText" top="0" left="0" paddingLeft="3" width="425" />
+			
+		<mx:Accordion id="initRulesAccordian" creationPolicy="all" >								
+			<mx:VBox label="MT True" width="100%" height="150">
+				<mx:DataGrid id="initTrueEditableMTRuleListDG" width="415" height="100%" editable="true" horizontalScrollPolicy="on">
+					<mx:columns>
+						<mx:DataGridColumn width="60" dataField="weightValue" editorDataField="value" headerText="Weight" editable="true" >
+							<mx:itemEditor>
+								<fx:Component>
+									<mx:NumericStepper minimum="-100" maximum="100" />
+								</fx:Component>
+							</mx:itemEditor>
+						</mx:DataGridColumn>
+						<mx:DataGridColumn width="140" dataField="mtNameString" headerText="MT Name" editable="false" />
+						<mx:DataGridColumn width="2000" dataField="ruleString" headerText="Rule" editable="false" />
+						<mx:DataGridColumn width="2000" dataField="ruleID" headerText="Rule ID" visible="false" editable="false" />
+					</mx:columns>
+				</mx:DataGrid>
+			</mx:VBox>
+			<mx:VBox label="SG True" width="100%" height="150">
+				<mx:DataGrid id="initTrueEditableSGRuleListDG" width="415" height="100%" editable="true" horizontalScrollPolicy="on">
+					<mx:columns>
+						<mx:DataGridColumn width="60" dataField="weightValue" editorDataField="value" headerText="Weight" editable="true" >
+							<mx:itemEditor>
+								<fx:Component>
+									<mx:NumericStepper minimum="-100" maximum="100" />
+								</fx:Component>
+							</mx:itemEditor>
+						</mx:DataGridColumn>
+						<mx:DataGridColumn width="2000" dataField="ruleString" headerText="Rule" editable="false" />
+						<mx:DataGridColumn width="2000" dataField="ruleID" headerText="Rule ID" visible="false" editable="false" />
+					</mx:columns>
+				</mx:DataGrid>
+			</mx:VBox>
+			<mx:VBox label="SG False" width="100%" height="150">
+				<mx:DataGrid id="initFalseEditableSGRuleListDG" width="415" height="100%" editable="true" horizontalScrollPolicy="on">
+					<mx:columns>
+						<mx:DataGridColumn width="60" dataField="weightValue" editorDataField="value" headerText="Weight" editable="true" >
+							<mx:itemEditor>
+								<fx:Component>
+									<mx:NumericStepper minimum="-100" maximum="100" />
+								</fx:Component>
+							</mx:itemEditor>
+						</mx:DataGridColumn>
+						<mx:DataGridColumn width="2000" dataField="ruleString" headerText="Rule" editable="false" />
+						<mx:DataGridColumn width="2000" dataField="ruleID" headerText="Rule ID" visible="false" editable="false" />
+					</mx:columns>
+				</mx:DataGrid>
+			</mx:VBox>	
+		</mx:Accordion>
+		
+		
+		<s:RichText id="respTitleText" top="0" left="0" paddingLeft="3" width="425" />
+		
+		<mx:Accordion id="RespRulesAccordian" creationPolicy="all" > 
+			<mx:VBox label="MT True" width="100%" height="100%">
+				<mx:DataGrid id="respTrueEditableMTRuleListDG" width="415" height="100%" editable="true" horizontalScrollPolicy="on">
+					<mx:columns>
+						<mx:DataGridColumn width="60" dataField="weightValue" editorDataField="value" headerText="Weight" editable="true" >
+							<mx:itemEditor>
+								<fx:Component>
+									<mx:NumericStepper minimum="-100" maximum="100" />
+								</fx:Component>
+							</mx:itemEditor>
+						</mx:DataGridColumn>
+						<mx:DataGridColumn width="140" dataField="mtNameString" headerText="MT Name" editable="false" />
+						<mx:DataGridColumn width="2000" dataField="ruleString" headerText="Rule" editable="false" />
+						<mx:DataGridColumn width="2000" dataField="ruleID" headerText="Rule ID" visible="false" editable="false" />
+					</mx:columns>
+				</mx:DataGrid>
+			</mx:VBox>
+			<mx:VBox label="SG True" width="100%" height="100%">
+				<mx:DataGrid id="respTrueEditableSGRuleListDG" width="415" height="100%" editable="true" horizontalScrollPolicy="on">
+					<mx:columns>
+						<mx:DataGridColumn width="60" dataField="weightValue" editorDataField="value" headerText="Weight" editable="true" >
+							<mx:itemEditor>
+								<fx:Component>
+									<mx:NumericStepper minimum="-100" maximum="100" />
+								</fx:Component>
+							</mx:itemEditor>
+						</mx:DataGridColumn>
+						<mx:DataGridColumn width="2000" dataField="ruleString" headerText="Rule" editable="false" />
+						<mx:DataGridColumn width="2000" dataField="ruleID" headerText="Rule ID" visible="false" editable="false" />
+					</mx:columns>
+				</mx:DataGrid>
+			</mx:VBox>
+			<mx:VBox label="SG False" width="100%" height="100%">
+				<mx:DataGrid id="respFalseEditableSGRuleListDG" width="415" height="100%" editable="true" horizontalScrollPolicy="on">
+					<mx:columns>
+						<mx:DataGridColumn width="60" dataField="weightValue" editorDataField="value" headerText="Weight" editable="true" >
+							<mx:itemEditor>
+								<fx:Component>
+									<mx:NumericStepper minimum="-100" maximum="100" />
+								</fx:Component>
+							</mx:itemEditor>
+						</mx:DataGridColumn>
+						<mx:DataGridColumn width="2000" dataField="ruleString" headerText="Rule" editable="false" />
+						<mx:DataGridColumn width="2000" dataField="ruleID" headerText="Rule ID" visible="false" editable="false" />
+					</mx:columns>
+				</mx:DataGrid>
+			</mx:VBox>
+		</mx:Accordion>
+			
+		<s:RichText id="dialogueDisplay" top="0" left="0" paddingLeft="3" width="425" />
+	</s:VGroup>
+-->
+</mx:TitleWindow>

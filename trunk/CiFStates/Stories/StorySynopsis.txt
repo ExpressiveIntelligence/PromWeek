@@ -1,0 +1,175 @@
+Puzzling through our current "story"
+
+Let's go through each story and see what, exactly it is, we are asking the player to do:
+
+-------------------
+#1 CHLOE:
+
+Goals:
+Date Doug: Doug and Chloe are Dating
+A Time For Peace: Chloe and Buzz are NOT enemies
+
+Endings:
+Generic
+Prom Night Romance (Date Doug)
+Perfect Night (Date Doug and Time for Peace)
+
+LEVELS
+Choe's Big Moment: LOCKERS (2 -- Chloe, Doug)
+Chloe's Prom Night: PROM (4 -- Chloe, Edward, Doug, Buzz)
+-------------
+
+
+------------------------
+#2 ZACK:
+
+Sweet Talk the Judge: Zack and Naomi are friends
+Sabatage the Competition: Naomi thinks Buzz is seriously uncool (less than 33)
+Smokin' Date: Zack and Lil are Dating
+
+Endings:
+Foiled Again (Generic)
+King For a Day (Sweet Talk the Judge)
+Buzz's Demise (Sabatage the Competition)
+Dream Come True (Smokin' Date and Sweet Talk the Judge)
+
+LEVELS
+After Class: PARKINGLOT (3 -- Zack, Naomi, Monica)
+Zack's Prom Night: PROM (7 -- Zack, Naomi, Monica, Lil, Nicholas, Chloe, Buzz)
+------------------------
+
+--------------------------
+#3 DOUG:
+
+Big Buddy Doug: Doug makes 1 new friend
+Super Nice Guy: Doug did two generally positive things throughout the week
+Kinda Mean Dude: Doug did two generally negative things throughout the week
+
+Endings:
+Kickin' It (Generic)
+Word of Wisdom (Big Buddy Doug)
+Little Kindness Long Way (Super Nice Guy)  (Interesting... Doug can be nice to anyone, but Buzz is the one who plays in the ending scene).
+Burning Bridges (Kinda Mean Dude)
+Shining Armor (Last Minute Date)
+All Around Cool Kid (Big Buddy Doug, Super Nice Guy)
+Bad Boys Get All the Babes (Last Minute Date, Kinda Mean Dude)
+Something Special (Big Buddy Doug, Last Minute Date)
+
+LEVELS
+Last Chance: PARK (5 -- Doug, Jordan, Oswald, Cassandra, Chloe)
+The Prom: PROM (5 -- Doug, Jordan, Oswald, Cassandra, Chloe)
+
+---------------------------
+
+--------------------------
+#4 Simon
+
+Totally Popular: Simon makes 5 new friends, AND Simon is dating someone
+L0V3 in the Air: Simon is dating 1 person.
+Caught Cheating: Simon is dating 2 people, AND Simon is cheating on someone.
+An Ideal Rival: Simon is friends with someone, AND Simon is enemies with that same someone.
+Pitiful Me: 2 Generally Negative things have happened to Simon
+
+Endings:
+All Alone Again (Generic)
+The In Crowd (Totally Popular)
+Heart U Gigababe (Love in the air)
+Major Miscalculation (Caught Cheating)
+Frenemy Mine (Ideal Rival)
+Pity Party (Pitiful Me) (Assumes that there exists someone who isn't enemies with Simon... kind of interesting, but likely that it will always be OK) (Maybe include an sfdb in the ending?)
+
+*Note -- there are no 'joint' endings here, it is simply one ending per goal.
+
+LEVELS
+Homeroom -- CLASSROOM (5 -- Simon, Zack, Jordan, Naomi, Lil)
+At the Cornerstore -- CORNERSTORE (4 -- Simon, Cassandra, Monica, Naomi)
+Prom Night -- PROM (7 -- Simon, Zack, Jordan, Naomi, Cassandra, Monica, Lil)
+------------------------------
+
+
+----------------
+Naomi
+
+
+LEVELS
+Quad -- (Naomi, Gunter, Buzz, Cassandra, Lucas, Zack)
+Park -- (Naomi, Gunter, Buzz, Phoebe, Nicholas)
+Prom -- (Naomi, Gunter, Buzz, Nicholas, Cassandra, Lucas, Phoebe, Zack)
+---------------
+
+------------------------------
+#5 Lil
+
+Queen of Chic: Lil is dating someone AND 4 people think Lil is seriously cool (greater than 65)
+Out with a bang: Lil has 6 enemies
+Clean Break: Lil has no friends, no enemies, and isn't dating anyone
+Emo Angel: Lucas and Phoebe are dating
+Sabotage the populars: Buzz and Nicholas are enemies, Buzz and Cassandra are NOT dating, Monica and cassandra are enemies
+
+Endings
+Punk Coronation (Queen of Chic -- requires the additional precondition of a friend.)
+Firestarter (Sabatage the populars)
+Lil' Devil (Out with a Bang)
+But with a Whimper (Clean Break -- requires someone to be popular)
+Not everybody hurts (Emo Angel 
+Lil Abides (Generic)
+
+LEVELS
+Yearbook Signing -- LOCKERS (5 -- Lil, Nicholas, Chloe, Phoebe, Cassandra)
+Corner Store -- CORNERSTORE (5 -- Lil, Phoebe, Lucas, Mave, Edward)
+Nightmares on Elm Street -- NEIGHBORHOOD (5 -- Lil, Monica, Buzz, Nicholas, Cassandra)
+Last Day in Homeroom -- CLASSROOM (6 -- Lil, Nicholas, Buzz, Mave, Kate, Gunter)
+The PROM -- PROM (9 -- Lil, Lucas,Phoebe, Edward, Mave, Buzz, Nicholas, Chloe, Monica)
+--------------------------------------
+
+-----------------------------------
+#6 Monica
+
+All About the Love: Monica is dating 3 people
+School Enemy #1: (maybe 'public school enemy #1?) -- Monica has 6 enemies (same as Lil's campaign!)
+Life at the bottom: Monica has NO friends, AND 5 people think she is uncool
+Dark Angel: Monica is friends with Edward, Mave, and Gunter
+
+Endings:
+Prom Queen... again (Generic)
+No cake (School enemy #1)
+Life at the Bottom (Life at the Bottom -- same name as to do item?) (extra preconditions: Monica is not enemies with Responder, and is not enemies with Other, AND responder is NOT popular,AND other is NOT popular ... I'm a little worried about this one!) (Also, although I think it 'works', technically speaking the speakers are NOT her friends for this thing to flag true, but they say that they are her friends in the ending).
+Too many to dance with (all about the love) 
+
+LEVELS
+Tuesday -- CLASSROOM (5 -- Monica, Nicholas, Edward, Cassandra, Kate)
+Wednesday -- CORNERSTORE (6 -- Monica, Simon, Edward, Gunter, Buzz, Nicholas)
+Thursday -- QUAD (6 -- Monica, Mave, Gunter, Edward, Buzz, Cassandra)
+Friday -- PROM ( 9 -- Monica, Edward, Mave, Cassandra, Gunter, Nicholas, Buzz, Simon, Kate)
+-------------------------------------
+
+-------------------------------------
+#7 Edward
+
+His Dark Thingamajigs: Edward is not dating anyone, Edward has five enemies, Edward is not popular
+Embracing the light: Edward has five friends AND is dating AT LEAST one of his friends (check the 'second=responder' in the dating predicate -- check the whole thing).
+Dark is the new black: Edward is popular, Mave is popular, Gunter is popular, Buzz is NOT popular, Cassandra is NOT popular, Oswald is NOT popular
+
+Endings:
+An Awkward Ritual (His dark Thingamajigs)
+Back in the swing of things (Embracing the light) (responder thanks Edward for the mysterious but kind sounding word, when it was directed at the other).
+Everything geek is chic again (Dark is the new black)
+Status Woe (Generic) (extra preconditions: there exists someone that is neither Edward's friend nor dating.
+
+LEVELS
+Tuesday PARK -- (5 -- Edward, Mave, Monica, Oswald, Phoebe)
+Wednesday CORNERSTORE -- (5 -- Edward, Monica, Buzz, Gunter, Chloe)
+Thursday LOCKERS -- (5 -- Edward, Mave, Phoebe, Gunter, Oswald)
+Friday PROM -- (8 -- Edward, Mave, Chloe, Phoebe, Gunter, Buzz, Monica, Oswald)
+------------------------------------
+
+-------------------------------------
+#8 Kate
+
+Crossing the line: Kate is friends with someone but is NOT dating them, and that person is NOT romantically interested in Kate, and **check this last one** Kate did a failed romance thing towards this person?
+Joining the in crowd: 
+
+Levels
+Under Construction
+
+

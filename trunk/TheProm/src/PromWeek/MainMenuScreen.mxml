@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 initialize="initializeMainMenuScreen()"
+		 creationComplete="onCreationComplete()"
+		 width="100%"
+		 height="100%"
+		 styleName="classicPromWeek">
+		 
+		<fx:Metadata>
+		</fx:Metadata>
+		 
+		<fx:Declarations>
+			<fx:Number id="centeredTitle">160</fx:Number>
+			<fx:Number id="toTheLeftTitle">60</fx:Number>
+		</fx:Declarations>
+		
+		<s:Rect x="0" y="0" width="100%" height="100%" alpha="1.0">
+			<s:fill>
+				<s:SolidColor color="#42a4ed"/>
+				<!--<s:LinearGradient rotation="90">
+					<s:entries>
+						<s:GradientEntry color="{getStyle('mainMenuLightBackgroundColor')}" alpha="1.0" />
+						<s:GradientEntry color="{getStyle('mainMenuDarkBackgroundColor')}" alpha="1.0"  ratio="0.4" />
+						<s:GradientEntry color="{getStyle('mainMenuLightBackgroundColor')}" alpha="1.0" />
+					</s:entries>
+				</s:LinearGradient>-->
+			</s:fill>
+		</s:Rect>
+		
+		<s:HGroup width="100%" height="100%" horizontalAlign="center">
+			<util:SmoothImage id="background" x="{this.width/2 - background.width/2}" height="100%"/>
+		</s:HGroup>
+		
+		<s:Label id="versionLabel" text="" visible="false" />
+		
+		
+		
+		<s:Group id="characterGroup" width="100%" height="250" x="0" y="510">
+		</s:Group>
+		
+		
+		<!--<util:SmoothImage id="logoImage" x="{width/2.0 - logoImage.width/2.0}" y="70" width="430" height="250" />-->
+		<!-- The frame around the buttons.-->
+		<!--<s:Group id="menuButtonGroup" width="275" x="{this.width - 295}" y="70" height="200" visible="false">-->
+		<s:Group id="menuButtonGroup" width="275" x="{this.width/2 - menuButtonGroup.width/2}" y="{this.height/2}" height="240" >
+			<s:Rect id="buttonBoxFrame" width="100%" height="100%" radiusX="10" radiusY="10">
+				<!--<s:stroke>
+					<s:SolidColorStroke weight="{getStyle('backgroundStrokeWeight')}" color="{getStyle('backgroundStroke')}" />
+				</s:stroke>-->
+				<s:stroke>
+					<s:SolidColorStroke weight="3" color="#1e7ec6" />
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor color="#42a4ed" alpha="0.9" />
+				</s:fill>
+			</s:Rect>
+			<!-- The group that holds the main menu buttons. -->
+			<s:VGroup id="buttonBox" width="100%" height="100%" horizontalAlign="center" paddingTop="10" paddingBottom="10" paddingLeft="10" paddingRight="10"/>
+		</s:Group>
+		
+		<s:Group id="betaSpot" x="{0.63*width}" width="118" y="265" height="40" visible="false">
+			<s:Rect id="BetaSpotBackground" width="100%" height="100%" >
+				<s:fill>
+					<s:LinearGradient rotation="90">
+						<s:entries>
+							<s:GradientEntry color="{getStyle('backgroundColor')}" alpha="{getStyle('backgroundColorAlpha')}"/>
+						</s:entries>
+					</s:LinearGradient>
+				</s:fill>
+			</s:Rect>
+			<s:RichText text="BETA" fontSize="24" color="white" width="100%" height="100%" textAlign="center" verticalAlign="middle" />
+		</s:Group>
+		
+		<!--<prom:ToggleableContainerButton id="startButton" label="Start" width="150" height="50" x="{this.width/2 - 75}" y="425" click="startClicked(event)" roundness="20" toggleable="false" />-->
+		
+		<s:Group id="creditsSpot" x="{width-creditsSpot.width-5}" y="545">
+			
+		</s:Group>
+		 
+		<prom:InGameOptionsComponent id="continuePopUp" isContinue="true" width="250" height="150" x="{this.width/2 - continuePopUp.width/2}" y="{this.height/2 - 3 * continuePopUp.height/4}" visible="false" />
+		
+		 <fx:Script>
+			 <![CDATA[
+		
+		import CiF.Character;
+		import flash.events.MouseEvent;
+		import flash.utils.Dictionary;
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import CiF.CiFSingleton;
+		import mx.flash.UIMovieClip;
+		import PromWeek.MainMenuButton;
+		import PromWeek.assets.ResourceLibrary;
+		import spark.components.RichText;
+		import CiF.Debug;
+		
+		private var rL:PromWeek.assets.ResourceLibrary;
+		private var cif:CiFSingleton;
+		private var gameEngine:GameEngine;
+		private var dm:DifficultyManager;
+		
+		/*****************
+		 * VERSION NUMBER OF PROM
+		 * SHOULD CHANGE THIS EVERY TIME WE PLAN ON PUSHING A NEW VERSION TO THE SERVER
+		 * ....
+		 * I GUESS
+		 * *******************/
+		private var version:String = "2";
+		private var mainMenuButtons:Vector.<MainMenuButton> = new Vector.<MainMenuButton>();
+		private var promWeekButtons:Vector.<PromWeekButton> = new Vector.<PromWeekButton>();;
+		
+		public var avatarsOnScreen:Dictionary;
+		public var continueButton:MainMenuButton;
+		
+		public function onCreationComplete():void {
+			versionLabel.text += "version number: " + version;
+		}
+		
+		public function initializeMainMenuScreen():void {
+			this.gameEngine = GameEngine.getInstance();
+			rL = PromWeek.assets.ResourceLibrary.getInstance();
+			cif = CiFSingleton.getInstance();
+			dm = DifficultyManager.getInstance();
+			background.source = rL.uiIcons["titleScreen"];//rL.mainMenuBackground;
+			
+			this.loadMainMenuButtons();
+			/*
+			var rt:RichText = new RichText();
+			rt.width = startButton.width;
+			rt.height = startButton.height;
+			rt.text = "Start";
+			rt.setStyle("fontSize", "20");
+			rt.setStyle("verticalAlign", "middle");
+			rt.setStyle("textAlign", "center");
+			startButton.mainContainer.addElement(rt);
+			*/
+			//this.logoImage.source = rL.uiIcons["logo"];
+			populateCharacterGroup();
+		}
+		
+		public function populateCharacterGroup():void
+		{
+			if (this.avatarsOnScreen != null)
+			{
+				this.characterGroup.removeAllElements();
+			}
+			this.avatarsOnScreen = new Dictionary();
+
+			//the dimenstions of the area are 250x760
+			//fill spot 1 and two.
+			this.placeNewChar(50,50,"right");
+			this.placeNewChar(150,50,"left");
+			
+		}
+		
+		public function placeNewChar(locX:Number, locY:Number, direction:String):Boolean
+		{
+			var char:Character;
+			var avatar:UIMovieClip;
+			var numTries:int = 0;
+			while (true)
+			{
+				if (numTries > 100)
+				{
+					return false;
+				}
+				
+				char = cif.cast.characters[Utility.randRange(0, cif.cast.characters.length - 1)];
+				numTries++;
+				if (!avatarsOnScreen[char.characterName])
+				{
+					avatar = rL.characterClips[char.characterName.toLowerCase()];
+					
+					this.avatarsOnScreen[char.characterName] = avatar;
+					avatar.x = locX;
+					avatar.y = this.characterGroup.y + locY;
+					
+					avatar.scaleX = 1;
+					avatar.scaleY = 1;
+					if ((direction == "left" && avatar.scaleX > 0) || (direction == "right" && avatar.scaleX < 0))
+					{
+						avatar.scaleX *= -1;
+					}
+					
+					this.characterGroup.addElement(avatar);
+					
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		//where the buttons are placed in the groups up top.
+		public function loadMainMenuButtons():void {
+			addMenuButton("Get Started!");
+			addMenuButton("Continue");
+			addMenuButton("New Story");
+			addMenuButton("Free Play");
+			//addMenuButton("Help");
+			//addMenuButton("Options");
+			addCreditsButton("Credits");
+		}
+		
+		public function startClicked(e:MouseEvent = null):void
+		{
+			menuButtonGroup.visible = true;
+			//logoImage.x = this.toTheLeftTitle;
+			//this.betaSpot.x -= 145;
+			//this.startButton.visible = false;
+			this.creditsSpot.visible = true;
+		}
+		
+		public function addMenuButton(buttonText:String):void {
+			
+			Debug.debug(this, "Inside of 'addMenuButton! Current difficulty level is: " + dm.difficultyToString() );
+			
+			var button:MainMenuButton = new MainMenuButton();
+			button.title = buttonText;
+			button.width = 255;
+			button.height = 50;
+			
+			var self:Object = this;
+			if(buttonText == "New Story") {
+				button.addEventListener("click", function(event:MouseEvent):void {
+					self.gameEngine.hudGroup.mainMenuScreen.visible = false;
+					self.gameEngine.currentState = "StorySelection";
+				});
+			}
+			if(buttonText == "Help") {
+				button.addEventListener("click", function(event:MouseEvent):void {
+					self.gameEngine.hudGroup.mainMenuScreen.visible = false;
+					self.gameEngine.currentState = "TutorialScreen";
+				});
+			}
+			if(buttonText == "Options") {
+				button.addEventListener("click", function(event:MouseEvent):void {
+					self.gameEngine.hudGroup.mainMenuScreen.visible = false;
+					self.gameEngine.currentState = "OptionsMenu";
+				});
+			}
+			if(buttonText == "Achievements") {
+				button.addEventListener("click", function(event:MouseEvent):void {
+					self.gameEngine.hudGroup.mainMenuScreen.visible = false;
+					self.gameEngine.currentState = "AchievementsMenu";
+				});
+			}
+			if(buttonText == "Free Play") {
+				button.addEventListener("click", function(event:MouseEvent):void {
+					self.gameEngine.hudGroup.mainMenuScreen.visible = false;
+					self.gameEngine.currentState = "SandboxMenu";
+				});
+				button.addEventListener(MouseEvent.MOUSE_OVER, function(event:MouseEvent):void {
+					//MonsterDebugger.trace(this, "free play button moused over!");
+					//Debug.debug(this, "free play button moused over debug.debug!");
+				});
+			}
+			if(buttonText == "Credits") {
+				button.addEventListener("click", function(event:MouseEvent):void {
+					self.gameEngine.hudGroup.mainMenuScreen.visible = false;
+					self.gameEngine.currentState = "CreditsMenu";
+				});
+			}
+			if (buttonText == "Get Started!") {
+				button.enabled = true;
+				button.addEventListener("click", function(event:MouseEvent):void {
+					self.gameEngine.hudGroup.mainMenuScreen.visible = false;
+					gameEngine.hudGroup.storySelectionScreen.selectedStory = getQuickPlayStory(1);
+					gameEngine.hudGroup.storySelectionScreen.startStory();
+				});
+			}
+			if (buttonText == "Continue") {
+				button.enabled = false;
+				button.addEventListener("click", continueButtonClicked);
+				this.continueButton = button; 
+			}
+			buttonBox.addElement(button);
+			if(!this.mainMenuButtons)
+				this.mainMenuButtons = new Vector.<MainMenuButton>();
+			
+			this.mainMenuButtons.push(button);
+		}
+		
+		/**
+		 * 
+		 * @param	event
+		 */
+		public function continueButtonClicked(event:MouseEvent):void 
+		{
+			var continueStory:Story;
+			for each (var s:Story in gameEngine.stories) {
+				if (s.storyLeadCharacter == gameEngine.continueLevelTraceXML.@storyName) {
+					continueStory = s;
+				}
+			}
+			
+			this.continuePopUp.populateForContinue(continueStory, gameEngine.continueLevelTraceXML.@name);
+			
+			this.continuePopUp.visible = true;
+		}
+		
+
+		
+		//function to add a credits button. It is seperate so the width can be changed since the button is offset from the rest.
+		public function addCreditsButton(buttonText:String):void {
+			//var button:MainMenuButton = new MainMenuButton();
+			//button.title = buttonText;
+			//button.width = 125;
+			//button.height = 50;
+			
+			
+			var button:PromWeekButton = new PromWeekButton();
+			button.label = buttonText;
+			button.width = 75;
+			button.height = 40;
+			
+			
+			var self:Object = this;
+			button.addEventListener("click", function(event:MouseEvent):void {
+				self.gameEngine.hudGroup.mainMenuScreen.visible = false;
+				self.gameEngine.currentState = "CreditsMenu";
+			});
+			creditsSpot.addElement(button);
+			
+			promWeekButtons.push(button);
+
+		}
+
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			/*if(gameEngine.classicPromColors) {
+				this.setStyle("styleName", "classicPromWeek");
+			}
+			else if(gameEngine.greenPromColors) {
+				this.setStyle("styleName", "greenColor");
+			}
+			else if(gameEngine.redPromColors) {
+				this.setStyle("styleName", "redColor");
+			}*/
+			for each( var mm:MainMenuButton in this.mainMenuButtons) {
+				mm.setStyleName();
+			}
+			for each( var pw:PromWeek.PromWeekButton in this.promWeekButtons) {
+				pw.setStyleName();
+			}
+			//this.startButton.setStyleName();
+			this.invalidateProperties();
+		}
+		
+		/**
+		 * Returns the specified quick play story. Note that uses ordering that starts at ONE
+		 * so the first quick play story would have an index of '1'
+		 * @param	index the quick play story you want to fetch. It uses a numbering schema which starts at '1' 
+		 * @return
+		 */
+		private function getQuickPlayStory(index:Number):Story {
+			for each(var s:Story in gameEngine.stories) {
+				switch(index) {
+					case 1:
+						if (s.title == "QP1") return s;
+					default:
+						continue; // this isn't the right story. Move on to the next one.
+				}
+			}
+			return null; // It definitly should never get to here, I hope!
+		}
+			 
+			 ]]>
+		 </fx:Script>
+</s:Group>

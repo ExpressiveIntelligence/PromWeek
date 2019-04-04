@@ -1,0 +1,1688 @@
+<!-- 0=Doug, 1=Jordan, 2=Buzz, 3=Naomi, 4=Lil, 5=Nicholas, 6=Zack, 7=Chloe, 8=Simon, 9=Monica, 10=oswald, 11=Lucas, 12=Edward, 13=Mave, 14=Gunter, 15=Cassandra, 16=Phoebe  17=Kate --> 
+<CiFState time="0">
+  <Cast>
+	<Character name="Doug" networkID="0" >
+      <Trait type="male"/>
+      <Trait type="shy"/>
+      <Trait type="oblivious"/>
+      <Trait type="pacifist"/>
+      <Trait type="afraid of commitment"/>	  
+	  <Trait type="muscular"/>
+	  <Trait type="wears a hat"/>
+	  <Trait type="doug"/>	  
+	  <Trait type="anyone"/>	  
+	  
+      <Locution type="greeting">sup</Locution>
+      <Locution type="shocked">woah</Locution>
+	  <Locution type="positiveadj">groovy</Locution>
+      <Locution type="pejorative">poser</Locution>
+
+      <Locution type="sweetie">babe</Locution>
+	  <Locution type="buddymale">bro</Locution>
+	  <Locution type="buddyfemale">chica</Locution>	  
+    </Character>
+    <Character name="Simon" networkID="8" >
+	  <Trait type="male"/>
+	  <Trait type="brainy"/>
+	  <Trait type="loyal"/>
+	  <Trait type="irritable"/>
+	  <Trait type="afraid of commitment"/>
+	   <Trait type="simon"/>
+	   <Trait type="anyone"/>
+	  
+	  <Locution type="greeting">hi</Locution>
+	  <Locution type="shocked">impossible</Locution>
+	  <Locution type="positiveadj">perfect</Locution>
+	  <Locution type="pejorative">idiot</Locution>
+	  <Locution type="sweetie">lady love</Locution>
+	  <Locution type="buddymale">brosef</Locution>
+	  <Locution type="buddyfemale">homegirl</Locution>
+	  
+	  <Status type="has a crush on" from="Simon" to="Monica"/>
+	  <Status type="pities" from="Naomi" to="Simon"/>
+	  <Status type="pities" from="Monica" to="Simon"/>
+	  
+    </Character>	
+    <Character name="Monica" networkID="9" >
+	  <Trait type="female"/>
+	  <Trait type="cold"/>
+	  <Trait type="attention hog"/>
+	  <Trait type="sex magnet"/>
+	  <Trait type="vengeful"/>
+	  <Trait type="cares about fashion"/>
+	   <Trait type="monica"/>
+	   <Trait type="anyone"/>
+	  
+	  <Locution type="greeting">oh</Locution>
+	  <Locution type="shocked">shut up</Locution>
+	  <Locution type="positiveadj">super-cute</Locution>
+	  <Locution type="pejorative">nobody</Locution>
+	  <Locution type="sweetie">love-monkey</Locution>
+	  <Locution type="buddymale">boy</Locution>
+	  <Locution type="buddyfemale">girl</Locution>
+	  
+	  <!-- <Status type="has a crush on" from="Monica" to="Oswald"/> -->
+	  <Status type="envies" from="Monica" to="Naomi"/>
+	  <Status type="popular" from="Monica" />	  
+    </Character>	
+
+    <Character name="Zack" networkID="6" >	
+	  <Trait type="male"/>
+	  <Trait type="arrogant"/>
+	  <Trait type="stubborn"/>
+	  <Trait type="outgoing"/>
+	  <Trait type="honest"/>
+	  <Trait type="muscular"/>
+	   <Trait type="zack"/>
+	   <Trait type="anyone"/>
+	  
+	  <Locution type="greeting">oh hai</Locution>
+	  <Locution type="shocked">what teh f</Locution>
+	  <Locution type="positiveadj">roxor</Locution>
+	  <Locution type="pejorative">n00b</Locution>
+	  <Locution type="sweetie">gigababe</Locution>
+	  <Locution type="buddymale">guildie</Locution>
+	  <Locution type="buddyfemale">guildie</Locution>
+	  
+	  <Status type="wants to pick on" from="Zack" to="Lil"/>
+	  
+    </Character>
+	<Character name="Oswald" networkID="10" >
+      <Trait type="male"/>
+      <Trait type="arrogant"/>
+      <Trait type="smooth talker"/>
+      <Trait type="competitive"/>
+      <Trait type="attention hog"/>
+	  <Trait type="muscular"/>
+	  <Trait type="cares about fashion"/>
+	   <Trait type="oswald"/>
+	   <Trait type="anyone"/>
+	  
+      <Locution type="greeting">hi hi</Locution>
+      <Locution type="shocked">ghastly</Locution>
+	  <Locution type="positiveadj">divine</Locution>
+      <Locution type="pejorative">animal</Locution>
+      <Locution type="sweetie">love dove</Locution>
+	  <Locution type="buddymale">good sir</Locution>
+	  <Locution type="buddyfemale">good woman</Locution>
+	  
+	  <Status type="honor roll" from="Oswald" to=""/>
+	  
+    </Character>	
+    <Character name="Nicholas" networkID="5" >	
+	  <Trait type="male"/>
+	  <Trait type="arrogant"/>
+	  <Trait type="swinger"/>
+	  <Trait type="vengeful"/>
+	  <Trait type="witty"/>
+	  <Trait type="cares about fashion"/>
+	   <Trait type="nicholas"/>
+	   <Trait type="anyone"/>
+	  
+	  <Locution type="greeting">greetings</Locution>
+	  <Locution type="shocked">my oh my</Locution>
+	  <Locution type="positiveadj">lovely</Locution>
+	  <Locution type="pejorative">simpering moron</Locution>
+	  <Locution type="sweetie">snookie-wookums</Locution>
+	  <Locution type="buddymale">my man</Locution>
+	  <Locution type="buddyfemale">dahhrling</Locution>
+	  
+    </Character>	
+    <Character name="Lil" networkID="4" >	
+	  <Trait type="female"/>
+	  <Trait type="dishonest"/>
+	  <Trait type="clumsy"/>
+	  <Trait type="takes things slowly"/>
+	  <Trait type="mopey"/>
+	   <Trait type="lil"/>
+	   <Trait type="anyone"/>
+	  
+	  <Locution type="greeting">hello</Locution>
+	  <Locution type="shocked">oh</Locution>
+	  <Locution type="positiveadj">neat</Locution>
+	  <Locution type="pejorative">freakshow</Locution>
+	  <Locution type="sweetie">love</Locution>
+	  <Locution type="buddymale">man</Locution>
+	  <Locution type="buddyfemale">man</Locution>
+    </Character>
+    <Character name="Naomi" networkID="3" >	
+	  <Trait type="female"/>
+	  <Trait type="sympathetic"/>
+	  <Trait type="jealous"/>
+	  <Trait type="self destructive"/>
+	  <Trait type="brainy"/>
+	  <Trait type="cares about fashion"/>
+	   <Trait type="naomi"/>
+	   <Trait type="anyone"/>
+	  
+	  <Locution type="greeting">hey hey</Locution>
+	  <Locution type="shocked">my word</Locution>
+	  <Locution type="positiveadj">amazing</Locution>
+	  <Locution type="pejorative">waste of space</Locution>
+	  <Locution type="sweetie">sugar</Locution>
+	  <Locution type="buddymale">my man</Locution>
+	  <Locution type="buddyfemale">sweetness</Locution>
+	  
+    </Character>		
+    <Character name="Buzz" networkID="2" >
+	  <Trait type="male"/>
+	  <Trait type="mean"/>
+	  <Trait type="inarticulate"/>
+	  <Trait type="ripped"/>
+	  <Trait type="hothead"/>
+	  <Trait type="muscular"/>
+	   <Trait type="buzz"/>
+	   <Trait type="anyone"/>
+	  
+	  <Locution type="greeting">uhhhh</Locution>
+	  <Locution type="shocked">the f?</Locution>
+	  <Locution type="positiveadj">tight</Locution>
+	  <Locution type="pejorative">crapface</Locution>
+	  <Locution type="sweetie">babe</Locution>
+	  <Locution type="buddymale">dude</Locution>
+	  <Locution type="buddyfemale">girl dude</Locution>
+
+    </Character>
+    <Character name="Jordan" networkID="1" >	
+	  <Trait type="female"/>
+	  <Trait type="loyal"/>
+	  <Trait type="confident"/>
+	  <Trait type="competitive"/>
+	  <Trait type="impulsive"/>
+	  <Trait type="wears a hat"/>
+	   <Trait type="jordan"/>
+	   <Trait type="anyone"/>
+	  
+	  <Locution type="greeting">hey</Locution>
+	  <Locution type="shocked">no way</Locution>
+	  <Locution type="positiveadj">nice</Locution>
+	  <Locution type="pejorative">dork</Locution>
+	  <Locution type="sweetie">cutie</Locution>
+	  <Locution type="buddymale">man</Locution>
+	  <Locution type="buddyfemale">man</Locution>
+	  
+	  <!--<Status type="has a crush on" from="Jordan" to="Oswald"/>-->
+    </Character>	
+    <Character name="Chloe" networkID="7" >
+	  <Trait type="female"/>
+	  <Trait type="outgoing"/>
+	  <Trait type="kind"/>
+	  <Trait type="smooth talker"/>
+	  <Trait type="insecure"/>
+	   <Trait type="chloe"/>
+	   <Trait type="anyone"/>
+	  
+	  <Locution type="greeting">what's the latest</Locution>
+	  <Locution type="shocked">wait, what?</Locution>
+	  <Locution type="positiveadj">wicked</Locution>
+	  <Locution type="pejorative">zombie</Locution>
+	  <Locution type="buddymale">punk</Locution>
+	  <Locution type="buddyfemale">punk</Locution>
+	  <Locution type="sweetie">hot stuff</Locution>
+
+    </Character>	
+    <Character name="Cassandra" networkID="15" >
+	  <Trait type="female"/>
+	  <Trait type="pacifist"/>
+	  <Trait type="shallow"/>
+	  <Trait type="dishonest"/>
+	  <Trait type="dumb"/>
+	  <Trait type="cares about fashion"/>
+	   <Trait type="cassandra"/>
+	   <Trait type="anyone"/>
+	  
+	<Status type="envies" from="Cassandra" to="Monica"/>
+	<Status type="desperate" from="Cassandra" to=""/>
+	  
+	  <Locution type="greeting">OH HIiiiii</Locution>
+	  <Locution type="shocked">I feel faint</Locution>
+	  <Locution type="positiveadj">cuuuuuute</Locution>
+	  <Locution type="pejorative">loser</Locution>
+	  <Locution type="buddymale">strong man</Locution>
+	  <Locution type="buddyfemale">girlfriend</Locution>
+	  <Locution type="sweetie">pumpkin dimple</Locution>
+	
+	
+	</Character>
+    <Character name="Lucas" networkID="11" >
+	  <Trait type="male"/>
+	  <Trait type="emotional"/>
+	  <Trait type="mopey"/>
+	  <Trait type="takes things slowly"/>
+	  <Trait type="weakling"/>
+	   <Trait type="lucas"/>
+	   <Trait type="anyone"/>
+	  
+	  <Locution type="greeting">*sigh* Oh, it's you</Locution>
+	  <Locution type="shocked">unreal</Locution>
+	  <Locution type="positiveadj">beautiful</Locution>
+	  <Locution type="pejorative">soulless automaton</Locution>
+	  <Locution type="buddymale">compadre</Locution>
+	  <Locution type="buddyfemale">chica</Locution>
+	  <Locution type="sweetie">rainbow blossom</Locution>
+	  
+	   
+	</Character>
+    <Character name="Edward" networkID="12" >
+	  <Trait type="male"/>
+	  <Trait type="forgiving"/>
+	  <Trait type="weakling"/>
+	  <Trait type="dumb"/>
+	  <!-- <Trait type="competitive"/> -->
+	  <Trait type="self destructive"/>
+	  <Trait type="cares about fashion"/>
+	  <Trait type="wears a hat"/>
+	   <Trait type="edward"/>
+	   <Trait type="anyone"/>
+	  
+	  <Locution type="greeting">saladtations</Locution>
+	  <Locution type="shocked">what the...</Locution>
+	  <Locution type="positiveadj">goth</Locution>
+	  <Locution type="pejorative">emo</Locution>
+	  <Locution type="buddymale">fellow creature</Locution>
+	  <Locution type="buddyfemale">orchid of darkness</Locution>
+	  <Locution type="sweetie">devil dove</Locution>
+	  
+	  <Status type="grateful toward" from="Edward" to="Mave"/>
+	  <Status type="envies" from="Edward" to="Nicholas"/>
+	  
+	</Character>
+    <Character name="Mave" networkID="13" >
+	  <Trait type="female"/>
+	  <Trait type="hothead" />
+	  <Trait type="domineering" />
+	  <Trait type="deep" />
+	  <Trait type="honest" />
+	  <Trait type="cares about fashion"/>
+	   <Trait type="mave"/>
+	   <Trait type="anyone"/>
+	  
+	  <Status type="has a crush on" from="Mave" to="Gunter"/>
+	  <Status type="pities" from="Mave" to="Monica"/>
+	  <Status type="wants to pick on" from="Mave" to="Buzz"/>
+	  
+	  <Locution type="greeting">listen to me</Locution>
+	  <Locution type="shocked">the horror</Locution>
+	  <Locution type="positiveadj">acceptable</Locution>
+	  <Locution type="pejorative">plebeian</Locution>
+	  <Locution type="sweetie">dark angel</Locution>
+	  <Locution type="buddymale">friend</Locution>
+	  <Locution type="buddyfemale">friend</Locution>
+	  
+	  
+	</Character>
+    <Character name="Gunter" networkID="14" >
+	  <Trait type="male"/>
+	  <Trait type="ripped"/>
+	  <Trait type="outgoing"/>
+	  <Trait type="confident"/>
+	  <Trait type="oblivious"/>
+	   <Trait type="gunter"/>
+	   <Trait type="anyone"/>
+	  
+	  <Status type="scared of" from="Cassandra" to="Gunter"/>
+	  
+	  
+	  <Locution type="greeting">...</Locution>
+	  <Locution type="shocked">...</Locution>
+	  <Locution type="positiveadj">(untranslatable)</Locution>
+	  <Locution type="pejorative">wunderstank</Locution>
+	  <Locution type="sweetie">liebewurst</Locution>
+	  <Locution type="buddymale">mannlicher freund</Locution>
+	  <Locution type="buddyfemale">weiblicher freund</Locution>
+	  
+	  
+	</Character>
+    <Character name="Phoebe" networkID="16" >
+	  <Trait type="female"/>
+	  <Trait type="stubborn"/>
+	  <Trait type="shallow"/>
+	  <Trait type="irritable"/>
+	  <Trait type="jealous"/>
+	  <Trait type="cares about fashion"/>
+	   <Trait type="phoebe"/>
+	   <Trait type="anyone"/>
+	  
+	  <Locution type="greeting">Hmmmm</Locution>
+	  <Locution type="shocked">I... I...</Locution>
+	  <Locution type="positiveadj">cute-and-sad</Locution>
+	  <Locution type="pejorative">cheese-head</Locution>
+	  <Locution type="sweetie">teardrop</Locution>
+	  <Locution type="buddymale">companion</Locution>
+	  <Locution type="buddyfemale">companion</Locution>  
+	  
+	  <Status type="lonely" from="Phoebe" to=""/>
+	  
+	</Character>
+    <Character name="Kate" networkID="17" >
+	  <Trait type="female"/>
+	  <Trait type="clumsy"/>
+	  <Trait type="loving"/>
+	  <Trait type="humble"/>
+	  <Trait type="emotional"/>
+	  <Trait type="kate"/>
+	  <Trait type="anyone"/>
+	  
+	  <Status type="feels out of place" from="Kate" to=""/>
+      <Status type="grossed out" from="Kate" to=""/>
+	  
+	  <Locution type="greeting">hiya</Locution>
+	  <Locution type="shocked">well I never...</Locution>
+	  <Locution type="positiveadj">nifty</Locution>
+	  <Locution type="pejorative">skeezebag</Locution>
+	  <Locution type="sweetie">snickerdoodle</Locution>
+	  <Locution type="buddymale">acquaintance</Locution>
+	  <Locution type="buddyfemale">acquaintance</Locution>
+	  
+	</Character>	
+	
+<!--	<Character name="Trip" networkID="18" >
+      <Trait type="male"/>
+      <Trait type="afraid of commitment"/>
+      <Trait type="shallow"/>
+      <Trait type="arrogant"/>
+      <Trait type="defensive"/>	  
+	  
+      <Locution type="greeting">Hey</Locution>
+      <Locution type="shocked">Oh, how European</Locution>
+	  <Locution type="positiveadj">really, uh... pretty great</Locution>
+      <Locution type="pejorative">jerk</Locution>
+
+      <Locution type="sweetie">honey</Locution>
+	  <Locution type="buddymale">buddy</Locution>
+	  <Locution type="buddyfemale">buddy</Locution>	  
+    </Character>
+	
+	<Character name="Grace" networkID="19" >
+      <Trait type="female"/>
+      <Trait type="deep"/>
+      <Trait type="self-destructive"/>
+	  <Trait type="hothead"/>
+	  <Trait type="insecure"/>
+	  
+      <Locution type="greeting">Oh, hello</Locution>
+      <Locution type="shocked">*nervous coughing*</Locution>
+	  <Locution type="positiveadj">really great</Locution>
+      <Locution type="pejorative">child</Locution>
+
+      <Locution type="sweetie">dear</Locution>
+	  <Locution type="buddymale">sweetheart</Locution>
+	  <Locution type="buddyfemale">sweetheart</Locution>	  
+    </Character>
+	
+	<Proposition type="subjective" head="Trip" connection="likes" tail="martini"/>
+	<Proposition type="subjective" head="Trip" connection="has" tail="eight-ball"/>
+	<Proposition type="subjective" head="Grace" connection="dislikes" tail="martini"/>
+	<Proposition type="subjective" head="Trip" connection="has" tail="Italy picture"/>
+	<Proposition type="subjective" head="Grace" connection="dislikes" tail="Italy picture"/>
+	<Proposition type="subjective" head="Grace" connection="has" tail="brass bull"/>
+	<Proposition type="subjective" head="Grace" connection="dislikes" tail="brass bull"/>
+	-->
+	
+	
+  </Cast>
+<SFDB>
+	
+	<!-- NOTE: Each backstoryContext event must be at a unique time. Keep these in order, please! -->
+
+	<BackstoryContext time="-1" initiator="Zack" responder="Lil" other="" SFDBLabel="romantic" PerformanceRealizationString="%i% smooched %r% on the cheek" />
+	<BackstoryContext time="-2" initiator="Gunter" responder="Buzz" other="" SFDBLabel="taboo" PerformanceRealizationString="%i% stared silently into %rp% bedroom window all night" />
+	<BackstoryContext time="-3" initiator="Lil" responder="Zack" other="" SFDBLabel="mean" PerformanceRealizationString="%i% gave %r% a high five so hard that it hurt %pron(r,his/her)% hand" />
+	<BackstoryContext time="-4" initiator="Naomi" responder="Lil" other="" SFDBLabel="nice" PerformanceRealizationString="%i% decided to make %r% %pron(i,his/her)% project" />	
+	<BackstoryContext time="-5" initiator="Nicholas" responder="Monica" other="" SFDBLabel="mean" PerformanceRealizationString="%i% cheated off of %rp% homework" />
+	<BackstoryContext time="-6" initiator="Monica" responder="Nicholas" other="" SFDBLabel="nice" PerformanceRealizationString="%i% offered to let %r% cheat off %pron(i,his/her)% homework" />
+	<BackstoryContext time="-7" initiator="Cassandra" responder="Monica" other="" SFDBLabel="nice" PerformanceRealizationString="%i% got %r% a cute new case for %pron(r,his/her)% cell phone" />
+	<BackstoryContext time="-8" initiator="Gunter" responder="Buzz" other="" SFDBLabel="rude" PerformanceRealizationString="%i% stood in %rp% front lawn all evening, again" />
+	<BackstoryContext time="-9" initiator="Gunter" responder="Kate" other="" SFDBLabel="gross" PerformanceRealizationString="%i% put a banana slug on %rp% head" />
+	<BackstoryContext time="-10" initiator="Doug" responder="Jordan" other="" SFDBLabel="nice" PerformanceRealizationString="%i% walked %r% home from school after %prons(r,he/she)% failed that test" />
+	<BackstoryContext time="-11" initiator="Cassandra" responder="Naomi" other="" SFDBLabel="cool" PerformanceRealizationString="%list(i,r,and)% went shopping at the mall and totally got those amazing prom outfits" />
+	<BackstoryContext time="-12" initiator="Gunter" responder="Buzz" other="" SFDBLabel="funny" PerformanceRealizationString="%i% stood around across the street from %rp% house all day, the first time at least" />
+	<BackstoryContext time="-13" initiator="Jordan" responder="Doug" other="" SFDBLabel="cool" PerformanceRealizationString="%i% showed %r% how to do that awesome skate trick" />
+	<BackstoryContext time="-14" initiator="Buzz" responder="Gunter" other="" SFDBLabel="nice" PerformanceRealizationSting="%i% invited %r% to %pron(i,his/her)% football game" />
+	<BackstoryContext time="-15" initiator="Nicholas" responder="Lil" other="" SFDBLabel="rude" PerformanceRealizationString="%i% told %r% %prons(r,he/she)% dressed like a depressed clown" />
+	<BackstoryContext time="-16" initiator="Doug" responder="Jordan" other="" SFDBLabel="funny" PerformanceRealizationString="%i% did that sweet impression of the assistant principal" />
+	<BackstoryContext time="-17" initiator="Jordan" responder="Doug" other="" SFDBLabel="nice" PerformanceRealizationString="%i% helped %r% out with %pron(r,his/her)% homework" />
+	<BackstoryContext time="-20" initiator="Jordan" responder="Doug" other="" SFDBLabel="funny" PerformanceRealizationString="%i% told %r% that awesome joke about koalas" />
+	<BackstoryContext time="-21" initiator="Lucas" responder="Gunter" other="" SFDBLabel="embarrassing" PerformanceRealizationString="%i% cried the first time %r% tried to speak to %pron(i,him/her)%" />
+	<BackstoryContext time="-22" initiator="Oswald" responder="Nicholas" other="" SFDBLabel="embarrassing" PerformanceRealizationString="%list(i,r,and)% both got up to accept that award for America's most fashionable teenager even though it actually went to that prick from Detroit" />
+	<BackstoryContext time="-23" initiator="Cassandra" responder="Lil" other="" SFDBLabel="rude" PerformanceRealizationString="%i% told %r% %prons(r,he/she)% looked like a possom that got hit by a truck and dropped in a lake of grease" />
+	<BackstoryContext time="-24" initiator="Doug" responder="Jordan" other="" SFDBLabel="cool" PerformanceRealizationString="%i% fixed %rp% bike" />
+	<BackstoryContext time="-25" initiator="Gunter" responder="Cassandra" other="" SFDBLabel="taboo" PerformanceRealizationSting="%i% gave %r% a nude calendar of %pron(i,him/her)%self for %pron(r,his/her)% birthday" />
+	<BackstoryContext time="-26" initiator="Lucas" responder="Edward" other="" SFDBLabel="funny" PerformanceRealizationString="%i% tried to legally change %pron(i,his/her)% name to Crying Hearts but only %rs% would call %pron(i,him/her)% that" />
+	<BackstoryContext time="-30" initiator="Buzz" responder="Simon" other="" SFDBLabel="mean" PerformanceRealizationString="%i% gave %r% a wedgie in gym class" />
+	<BackstoryContext time="-31" initiator="Doug" responder="Phoebe" other="" SFDBLabel="nice" PerformanceRealizationString="%i% bought %r% a banana slug figurine to make up for the crash" />
+	<BackstoryContext time="-32" initiator="Gunter" responder="Zack" other="" SFDBLabel="taboo" PerformanceRealizationSting="%i% stripped naked in %rp% homeroom" />
+	<BackstoryContext time="-33" initiator="Jordan" responder="Doug" other="" SFDBLabel="nice" PerformanceRealizationString="%i% helped %r% out with %pron(r,his/her)% homework" />
+	<BackstoryContext time="-34" initiator="Simon" responder="Zack" other="" SFDBLabel="cool" PerformanceRealizationString="%i% let %r% cheat off %pron(i,his/her)% homework" />
+	<BackstoryContext time="-35" initiator="Zack" responder="Jordan" other="" SFDBLabel="rude" PerformanceRealizationString="%i% unfriended %r% with extreme prejudice" />
+	<BackstoryContext time="-36" initiator="Zack" responder="Naomi" other="" SFDBLabel="embarrassing" PerformanceRealizationString="%i% thought %r% %pron(r,was/were)% flirting with %pron(i,him/her)% when %prons(r,he/she)% beat %pron(i,him/her)% at chess" />
+	<BackstoryContext time="-37" initiator="Buzz" responder="Nicholas" other="" SFDBLabel="mean" PerformanceRealizationString="%i% called %r% a momma's boy" />
+	<BackstoryContext time="-40" initiator="Buzz" responder="Zack" other="" SFDBLabel="mean" PerformanceRealizationString="%i% flushed %rp% homework down the toilet" />
+	<BackstoryContext time="-45" initiator="Monica" responder="Naomi" other="" SFDBLabel="rude" PerformanceRealizationString="%i% told everyone %r% %pron(r,was/were)% the one who farted" />
+	<BackstoryContext time="-50" initiator="Mave" responder="Simon" other="" SFDBLabel="mean" PerformanceRealizationString="%i% kicked %r% out of chess club after 'the B.O. incident'" />
+	<BackstoryContext time="-52" initiator="Cassandra" responder="Lucas" other="" SFDBLabel="rude" PerformanceRealizationString="%r% asked %i% to the Fall Ball and %prons(i,he/she)% laughed in %pron(r,his/her)% face" />
+	<BackstoryContext time="-54" initiator="Doug" responder="Phoebe" other="" SFDBLabel="lame" PerformanceRealizationString="%i% accidentally crashed into %r% with %pron(i,his/her)% skateboard" />
+	<BackstoryContext time="-55" initiator="Monica" responder="Mave" other="" SFDBLabel="mean" PerformanceRealizationString="%i% posted that video online of %rp% fifth grade talent show" />
+	<BackstoryContext time="-56" initiator="Edward" responder="Kate" other="" SFDBLabel="cool" PerformanceRealizationString="%list(i,r,and)% got mistaken by the paparazzi for that couple from that vampire movie" />
+	<BackstoryContext time="-58" initiator="Gunter" responder="Cassandra" other="" SFDBLabel="taboo" PerformanceRealizationSting="%i% %pron(i,was/were)% %rp% home ec partner and brought half a cat" />
+	<BackstoryContext time="-60" initiator="Kate" responder="Chloe" other="" SFDBLabel="cool" PerformanceRealizationString="%i% played a clarinet solo at that one party at %rp% house" />
+	<BackstoryContext time="-61" initiator="Kate" responder="Simon" other="" SFDBLabel="nice" PerformanceRealizationString="%list(i,r,and)% studied for chemistry together" />
+	<BackstoryContext time="-62" initiator="Simon" responder="Kate" other="" SFDBLabel="nice" PerformanceRealizationString="%i% helped %r% learn to program in Java" />
+	<BackstoryContext time="-63" initiator="Kate" responder="Simon" other="" SFDBLabel="cool" PerformanceRealizationString="%list(i,r,and)% dressed up as robots for Halloween" />
+	<BackstoryContext time="-64" initiator="Simon" responder="Kate" other="" SFDBLabel="funny" PerformanceRealizationString="%i% introduced %r% to %pron(r,his/her)% new favorite TV show" />
+	<BackstoryContext time="-65" initiator="Phoebe" responder="Mave" other="" SFDBLabel="embarrassing" PerformanceRealizationString="%i% %pron(i,was/were)% rebuffed for trying to cry on %rp% shoulder" />
+	<BackstoryContext time="-66" initiator="Simon" responder="Mave" other="" SFDBLabel="mean" PerformanceRealizationString="%i% kicked %r% out of poetry club after 'the dead swan incident'" />
+	<BackstoryContext time="-68" initiator="Zack" responder="Doug" other="" SFDBLabel="rude" PerformanceRealizationString="%i% told %r% that %pron(r,his/her)% clothes were so 2000s" />
+	<BackstoryContext time="-70" initiator="Zack" responder="Lil" other="" SFDBLabel="romantic" PerformanceRealizationString="%i% wrote that perl script to ask %r% out" />
+	<BackstoryContext time="-72" initiator="Monica" responder="Lil" other="" SFDBLabel="rude" PerformanceRealizationString="%i% spilled soda all over %r% and pretended it was %pron(r,his/her)% fault" />
+	<BackstoryContext time="-74" initiator="Oswald" responder="Kate" other="" SFDBLabel="mean" PerformanceRealizationString="%i% dated %r% for two weeks at band camp and then pretended not to know %pron(r,him/her)% at school next fall" />
+	<BackstoryContext time="-76" initiator="Zack" responder="Nicholas" other="" SFDBLabel="rude" PerformanceRealizationString="%i% totally stomped on %rp% paper in English class" />
+	<BackstoryContext time="-78" initiator="Buzz" responder="Lil" other="" SFDBLabel="mean" PerformanceRealizationString="%i% made fun of %rp% hair over the PA system" />
+	<BackstoryContext time="-80" initiator="Cassandra" responder="Nicholas" other="" SFDBLabel="embarrassing" PerformanceRealizationString="%list(i,r,and)% did that scene from Who's Afraid of Virginia Woolf in drama and got a little too into it" />
+	<BackstoryContext time="-82" initiator="Zack" responder="Buzz" other="" SFDBLabel="rude" PerformanceRealizationString="%i% posted that embarassing picture of %r% to SkimddIt" />
+	<BackstoryContext time="-84" initiator="Edward" responder="Mave" other="" SFDBLabel="nice" PerformanceRealizationString="%i% convinced %r% to stop moping and become a goth" />
+	<BackstoryContext time="-86" initiator="Buzz" responder="Doug" other="" SFDBLabel="mean" PerformanceRealizationString="%i% broke %rp% skateboard in half" />
+	<BackstoryContext time="-88" initiator="Edward" responder="Mave" other="" SFDBLabel="romantic" PerformanceRealizationString="%i% arranged those dead birds in the shape of a heart for %r%" />
+	<BackstoryContext time="-90" initiator="Lucas" responder="Phoebe" other="" SFDBLabel="lame" PerformanceRealizationString="%list(i,r,and)% read that lame poem about dead swans at the talent show assembly" />
+	<BackstoryContext time="-92" initiator="Monica" responder="Simon" other="" SFDBLabel="rude" PerformanceRealizationString="%i% texted that mortifying video from %rp% blog to everyone" />
+	<BackstoryContext time="-94" initiator="Nicholas" responder="Zack" other="" SFDBLabel="mean" PerformanceRealizationString="%i% broke %rp% glasses in gym class" />
+	<BackstoryContext time="-96" initiator="Oswald" responder="Doug" other="" SFDBLabel="mean" PerformanceRealizationString="%i% had %pron(i,his/her)% father's lawyers serve %r% cease and desist orders for being over the legal limit of hippie" />
+	<BackstoryContext time="-98" initiator="Edward" responder="Monica" other="" SFDBLabel="embarrassing" PerformanceRealizationString="%list(i,r,and)% used to go to the mall together" />
+	<BackstoryContext time="-100" initiator="Edward" responder="Monica" other="" SFDBLabel="rude" PerformanceRealizationString="%i% dissed %r% for totally selling out" />
+	<BackstoryContext time="-110" initiator="Monica" responder="Edward" other="" SFDBLabel="mean" PerformanceRealizationString="%i% dissed %r% for totally selling out" />
+	<BackstoryContext time="-120" initiator="Buzz" responder="Monica" other="" SFDBLabel="mean" PerformanceRealizationString="%i% cheated on %r% with that sophomore chick" />
+	<BackstoryContext time="-130" initiator="Buzz" responder="Monica" other="" SFDBLabel="bad ass" PerformanceRealizationString="%i% asked %r% out in the middle of the homecoming assembly" />
+	<BackstoryContext time="-140" initiator="Monica" responder="Jordan" other="" SFDBLabel="rude" PerformanceRealizationString="%i% pretended not to notice %r% at the mall" />
+	<BackstoryContext time="-150" initiator="Monica" responder="Lil" other="" SFDBLabel="mean" PerformanceRealizationString="%i% made that fake dating profile for %r% and posted the link all over" />
+	<BackstoryContext time="-160" initiator="Oswald" responder="Cassandra" other="" SFDBLabel="mean" PerformanceRealizationString="%i% congratulated %r% at the pep assembly for winning the prize hog award at the state fair" />
+	<BackstoryContext time="-170" initiator="Oswald" responder="Mave" other="" SFDBLabel="mean" PerformanceRealizationString="%i% two-timed on %r% with that sexy three-time squash champion" />
+	<BackstoryContext time="-180" initiator="Cassandra" responder="Oswald" other="" SFDBLabel="mean" PerformanceRealizationString="%i% broke up with %r% in the middle of %pron(r,his/her)% tennis match specifically to make %pron(r,him/her)% lose" />
+	<BackstoryContext time="-190" initiator="Buzz" responder="Cassandra" other="" SFDBLabel="mean" PerformanceRealizationString="%i% dumped %r% right after the football game" />
+	<BackstoryContext time="-200" initiator="Buzz" responder="Cassandra" other="" SFDBLabel="romantic" PerformanceRealizationString="%i% asked %r% out during halftime of the football game" />
+	<BackstoryContext time="-210" initiator="Jordan" responder="Naomi" other="" SFDBLabel="nice" PerformanceRealizationString="%list(i,r,and)% stopped being friends because %rs% %pron(r,was/were)% getting too popular or something" />
+	<BackstoryContext time="-220" initiator="Lil" responder="Lucas" other="" SFDBLabel="cool" PerformanceRealizationString="%ip% parents went to France and %prons(i,he/she)% and %r% had that rave at %pron(i,his/her)% house" />
+	<BackstoryContext time="-300" initiator="Kate" responder="Simon" other="" SFDBLabel="lame" PerformanceRealizationString="%i% made a valentine for every person in %rp% math class" />
+	<BackstoryContext time="-310" initiator="Naomi" responder="Jordan" other="" SFDBLabel="nice" PerformanceRealizationString="%i% became friends with %r%" />
+	<BackstoryContext time="-320" initiator="Simon" responder="Naomi" other="" SFDBLabel="lame" PerformanceRealizationString="%i% invited %r% to chess club by filling %pron(r,his/her)% backpack with pawns" /> 
+	<BackstoryContext time="-500" initiator="Kate" responder="Monica" other="" SFDBLabel="lame" PerformanceRealizationString="%i% asked %r% for help tying %pron(i,his/her) shoes" />
+	<BackstoryContext time="-800" initiator="Zack" responder="Simon" other="" SFDBLabel="funny" PerformanceRealizationString="%list(i,r,and)% hacked the school's network together in eighth grade" />
+	<BackstoryContext time="-1000" initiator="Buzz" responder="Lucas" other="" SFDBLabel="mean" PerformanceRealizationString="%i% used to beat %r% up in third grade all the time" />
+	<BackstoryContext time="-1500" initiator="Zack" responder="Simon" other="" SFDBLabel="nice" PerformanceRealizationString="%list(i,r,and)% became best friends in like third grade" />	
+
+	  
+  </SFDB>	  
+
+		
+  <!--
+  
+  *****************************************************************************************
+  BUDDY - BUDDY - BUDDY - BUDDY - BUDDY 
+  *****************************************************************************************
+	Buzz	  2
+	Cassandra 15
+	Chloe	  7
+	Doug	  0
+	Edward	  12
+	Gunter	  14
+	Jordan	  1
+	Kate	  17
+	Lil		  4
+	Lucas	  11
+	Mave	  13
+	Monica	  9
+	Naomi 	  3
+	Nicholas  5
+	Oswald 	  10
+	Phoebe 	  16
+	Simon 	  8
+	Zack	  6
+  
+  -->
+		
+  
+  <Network type="buddy" numChars="18">
+    <edge from="0" to="1" value="75"/>
+	<edge from="0" to="10" value="15"/>
+	<edge from="0" to="9" value="15"/>
+	<edge from="0" to="12" value="10"/>
+	<edge from="0" to="7" value="70"/> <!-- Doug and Chloe are friends because of new Tutorial 1. -->
+	<edge from="5" to="6" value="50"/>
+	
+	<edge from="1" to="3" value="55"/>
+	
+	<edge from="2" to="11" value="55"/>
+	<edge from="2" to="10" value="45"/>
+	<edge from="2" to="9" value="50"/>
+	<edge from="6" to="16" value="100"/>
+	<edge from="2" to="6" value="20"/>
+	<edge from="2" to="7" value="80"/> <!-- Buzz likes Chloe to make it easier to demonstrate Chloe's secondary tutorial goal. -->
+	
+	<edge from="3" to="1" value="55"/>
+	<!-- <edge from="3" to="6" value="55"/> --> <!-- This is form QP6 as Aaron made it-->
+	<edge from="3" to="6" value="70"/> <!-- This is form QP6 as Mike Indiecade twekaed it-->
+	<edge from="3" to="4" value="80"/>  <!-- Naomi has made Lil her "project." -->
+		
+	<edge from="4" to="3" value="35"/>
+	<edge from="4" to="10" value="10"/>
+	<edge from="4" to="5" value="10"/>
+
+   
+	<edge from="6" to="8" value="80"/>
+	<edge from="6" to="2" value="10"/>
+	<edge from="6" to="5" value="10"/>
+	
+	<edge from="7" to="6" value="75"/> <!-- Chloe likes most people -->
+	<edge from="7" to="0" value="70"/> <!-- Chloe and Doug are friends because of new Tutorial 1. -->
+	<edge from="7" to="1" value="70"/>
+	<edge from="7" to="2" value="70"/>
+	<edge from="7" to="3" value="70"/>
+	<edge from="7" to="4" value="70"/>
+	<edge from="7" to="8" value="70"/>
+	
+	<edge from="8" to="6" value="85"/> 
+	
+	<edge from="9" to="3" value="10"/>
+	<edge from="9" to="2" value="50"/>
+	<edge from="9" to="6" value="10"/>
+	
+	
+	<!-- 13 == Mave (Buddy) -->
+	<edge from="13" to="0" value="20"/>
+	<edge from="13" to="1" value="40"/>
+	<edge from="13" to="2" value="5"/>
+	<edge from="13" to="3" value="20"/>
+	<edge from="13" to="4" value="50"/>
+	<edge from="13" to="5" value="20"/>
+	<edge from="13" to="6" value="5"/>
+	<edge from="13" to="7" value="20"/>
+	<edge from="13" to="8" value="5"/>
+	<edge from="13" to="9" value="20"/>
+	<edge from="13" to="10" value="5"/>
+	<edge from="13" to="11" value="20"/>
+	<edge from="13" to="12" value="60"/>
+	<edge from="13" to="14" value="20"/>
+	<edge from="13" to="15" value="5"/>
+	<edge from="13" to="16" value="20"/>
+	<edge from="13" to="17" value="20"/>
+	
+	<!-- 14 == Gunter (Buddy) -->
+	<edge from="14" to="0" value="50"/>
+	<edge from="14" to="1" value="50"/>
+	<edge from="14" to="2" value="50"/>
+	<edge from="14" to="3" value="50"/>
+	<edge from="14" to="4" value="50"/>
+	<edge from="14" to="5" value="50"/>
+	<edge from="14" to="6" value="50"/>
+	<edge from="14" to="7" value="50"/>
+	<edge from="14" to="8" value="50"/>
+	<edge from="14" to="9" value="50"/>
+	<edge from="14" to="10" value="50"/>
+	<edge from="14" to="11" value="50"/>
+	<edge from="14" to="12" value="70"/>
+	<edge from="14" to="13" value="70"/>
+	<edge from="14" to="15" value="50"/>
+	<edge from="14" to="16" value="50"/>
+	<edge from="14" to="17" value="50"/>
+	
+	<!-- 12 == Edward (Buddy) -->
+	<edge from="12" to="0" value="60"/>
+	<edge from="12" to="1" value="60"/>
+	<edge from="12" to="2" value="60"/>
+	<edge from="12" to="3" value="60"/>
+	<edge from="12" to="4" value="40"/>
+	<edge from="12" to="5" value="60"/>
+	<edge from="12" to="6" value="40"/>
+	<edge from="12" to="7" value="80"/>
+	<edge from="12" to="8" value="60"/>
+	<edge from="12" to="9" value="80"/>
+	<edge from="12" to="10" value="60"/>
+	<edge from="12" to="11" value="80"/>
+	<edge from="12" to="13" value="60"/>
+	<edge from="12" to="14" value="80"/>
+	<edge from="12" to="15" value="60"/>
+	<edge from="12" to="16" value="60"/>
+	<edge from="12" to="17" value="60"/>
+	
+	<!-- 11 == Lucas (Buddy) -->
+	<edge from="11" to="0" value="20"/>
+	<edge from="11" to="1" value="20"/>
+	<edge from="11" to="2" value="5"/>
+	<edge from="11" to="3" value="25"/>
+	<edge from="11" to="4" value="20"/>
+	<edge from="11" to="5" value="5"/>
+	<edge from="11" to="6" value="20"/>
+	<edge from="11" to="7" value="20"/>
+	<edge from="11" to="8" value="20"/>
+	<edge from="11" to="9" value="5"/>
+	<edge from="11" to="10" value="5"/>
+	<edge from="11" to="13" value="5"/>
+	<edge from="11" to="12" value="5"/>
+	<edge from="11" to="14" value="5"/>
+	<edge from="11" to="15" value="5"/>
+	<edge from="11" to="16" value="60"/>
+	<edge from="11" to="17" value="20"/>
+	
+	<!-- 17 == Kate (Buddy) -->
+	<edge from="17" to="0" value="80"/>
+	<edge from="17" to="1" value="80"/>
+	<edge from="17" to="2" value="60"/>
+	<edge from="17" to="3" value="60"/>
+	<edge from="17" to="4" value="80"/>
+	<edge from="17" to="5" value="20"/><!-- Kate is in a terrible relationship with Nicholas. -->
+	<edge from="17" to="6" value="80"/>
+	<edge from="17" to="7" value="80"/>
+	<edge from="17" to="8" value="80"/>
+	<edge from="17" to="9" value="70"/>
+	<edge from="17" to="10" value="70"/>
+	<edge from="17" to="11" value="80"/>
+	<edge from="17" to="12" value="80"/>
+	<edge from="17" to="13" value="80"/>
+	<edge from="17" to="14" value="20"/>
+	<edge from="17" to="15" value="60"/>
+	<edge from="17" to="16" value="80"/>	
+	
+	<!-- 16 == Phoebe (Buddy) -->
+	<edge from="16" to="0" value="30"/>
+	<edge from="16" to="1" value="30"/>
+	<edge from="16" to="2" value="30"/>
+	<edge from="16" to="3" value="30"/>
+	<edge from="16" to="4" value="80"/>
+	<edge from="16" to="5" value="30"/>
+	<edge from="16" to="6" value="30"/>
+	<edge from="16" to="7" value="50"/>
+	<edge from="16" to="8" value="30"/>
+	<edge from="16" to="9" value="30"/>
+	<edge from="16" to="10" value="30"/>
+	<edge from="16" to="11" value="80"/>
+	<edge from="16" to="12" value="20"/>
+	<edge from="16" to="13" value="20"/>
+	<edge from="16" to="14" value="20"/>
+	<edge from="16" to="15" value="30"/>
+	<edge from="16" to="17" value="30"/>	
+	
+	<!-- 15 == Cassandra (Buddy) -->
+	<edge from="15" to="0" value="20"/>
+	<edge from="15" to="1" value="20"/>
+	<edge from="15" to="2" value="80"/>
+	<edge from="15" to="3" value="80"/>
+	<edge from="15" to="4" value="80"/>
+	<edge from="15" to="5" value="80"/>
+	<edge from="15" to="6" value="20"/>
+	<edge from="15" to="7" value="60"/>
+	<edge from="15" to="8" value="20"/>
+	<edge from="15" to="9" value="80"/>
+	<edge from="15" to="10" value="80"/>
+	<edge from="15" to="11" value="80"/>
+	<edge from="15" to="12" value="20"/>
+	<edge from="15" to="13" value="20"/>
+	<edge from="15" to="14" value="20"/>
+	<edge from="15" to="16" value="20"/>
+	<edge from="15" to="17" value="20"/>	
+	
+	<!-- Oswald -->
+	<edge from="10" to="0" value="20"/>
+	<edge from="10" to="1" value="20"/>
+	<edge from="10" to="2" value="40"/>
+	<edge from="10" to="3" value="50"/>
+	<edge from="10" to="4" value="10"/>
+	<edge from="10" to="5" value="40"/>
+	<edge from="10" to="6" value="20"/>
+	<edge from="10" to="7" value="10"/>
+	<edge from="10" to="8" value="20"/>
+	<edge from="10" to="9" value="40"/>
+	<edge from="10" to="11" value="10"/>
+	<edge from="10" to="12" value="10"/>
+	<edge from="10" to="13" value="10"/>	
+	<edge from="10" to="14" value="10"/>
+	<edge from="10" to="15" value="40"/>
+	<edge from="10" to="16" value="10"/>
+	<edge from="10" to="17" value="20"/>
+	<edge from="10" to="18" value="20"/>	
+	
+  </Network>
+  <!--
+  
+  *****************************************************************
+  ROMANCE - ROMANCE - ROMANCE - ROMANCE - ROMANCE 
+  *****************************************************************
+	Buzz	  2
+	Cassandra 15
+	Chloe	  7
+	Doug	  0
+	Edward	  12
+	Gunter	  14
+	Jordan	  1
+	Kate	  17
+	Lil		  4
+	Lucas	  11
+	Mave	  13
+	Monica	  9
+	Naomi 	  3
+	Nicholas  5
+	Oswald 	  10
+	Phoebe 	  16
+	Simon 	  8
+	Zack	  6
+  -->
+  
+  <Network type="romance" numChars="18">
+    <edge from="0" to="7" value="75"/> <!-- Doug has high romance for Chloe because of new Tutorial 1 -->
+	
+	<edge from="1" to="0" value="70"/>
+	<edge from="1" to="10" value="75"/>
+	
+	<edge from="2" to="3" value="40"/>
+	<edge from="2" to="9" value="50"/>
+	<edge from="2" to="5" value="15"/>
+	<edge from="2" to="0" value="0"/>
+	<edge from="2" to="8" value="0"/>
+	<edge from="2" to="6" value="0"/>
+	
+	<edge from="3" to="2" value="70"/>
+	<edge from="3" to="6" value="25"/>
+	
+	
+	<edge from="4" to="6" value="25"/>
+	<edge from="4" to="7" value="75"/>
+	<edge from="4" to="9" value="25"/>
+		
+	<edge from="6" to="0" value="5"/>
+	<edge from="6" to="8" value="5"/>
+	<edge from="6" to="5" value="5"/>
+	<edge from="6" to="2" value="5"/>
+
+	<edge from="0" to="6" value="5"/>
+	<edge from="0" to="8" value="5"/>
+	<edge from="0" to="5" value="5"/>
+	<edge from="0" to="2" value="5"/>
+	
+	<edge from="8" to="0" value="5"/>
+	<edge from="8" to="6" value="5"/>
+	<edge from="8" to="5" value="5"/>
+	<edge from="8" to="2" value="5"/>
+	<edge from="8" to="3" value="85"/>	
+	<edge from="8" to="9" value="85"/>	
+
+	<edge from="7" to="3" value="60"/>
+	<edge from="7" to="0" value="80"/> <!-- Chloe has high romance for Doug because of new Tutorial 1 -->
+	
+	
+	
+	<edge from="9" to="5" value="80"/>
+	<edge from="9" to="8" value="15"/>
+	<edge from="5" to="9" value="80"/>
+	
+	<edge from="11" to="16" value="20"/>
+	<edge from="11" to="7" value="60"/>
+	<edge from="11" to="4" value="75"/>
+	<edge from="11" to="9" value="60"/>
+	
+	<!-- Oswald -->
+	<edge from="10" to="5" value="40"/>	
+	<edge from="10" to="9" value="40"/>
+	<edge from="10" to="7" value="40"/>
+	<edge from="10" to="17" value="50"/>
+	
+	<!-- 13 == Mave (Romance) -->
+	<edge from="13" to="0" value="20"/>
+	<edge from="13" to="1" value="20"/>
+	<edge from="13" to="2" value="20"/>
+	<edge from="13" to="3" value="20"/>
+	<edge from="13" to="4" value="20"/>
+	<edge from="13" to="5" value="20"/>
+	<edge from="13" to="6" value="20"/>
+	<edge from="13" to="7" value="20"/>
+	<edge from="13" to="8" value="20"/>
+	<edge from="13" to="9" value="20"/>
+	<edge from="13" to="10" value="20"/>
+	<edge from="13" to="11" value="20"/>
+	<edge from="13" to="12" value="50"/>
+	<edge from="13" to="14" value="80"/>
+	<edge from="13" to="15" value="20"/>
+	<edge from="13" to="16" value="20"/>
+	<edge from="13" to="17" value="20"/>
+	<edge from="13" to="18" value="20"/>
+
+	<!-- 13 == Gunter (Romance) -->
+	<edge from="14" to="0" value="10"/>
+	<edge from="14" to="1" value="10"/>
+	<edge from="14" to="2" value="90"/>
+	<edge from="14" to="3" value="10"/>
+	<edge from="14" to="4" value="10"/>
+	<edge from="14" to="5" value="10"/>
+	<edge from="14" to="6" value="10"/>
+	<edge from="14" to="7" value="10"/>
+	<edge from="14" to="8" value="10"/>
+	<edge from="14" to="9" value="10"/>
+	<edge from="14" to="10" value="10"/>
+	<edge from="14" to="11" value="10"/>
+	<edge from="14" to="12" value="10"/>
+	<edge from="14" to="13" value="10"/>
+	<edge from="14" to="15" value="90"/>
+	<edge from="14" to="16" value="10"/>
+	<edge from="14" to="17" value="10"/>
+	<edge from="14" to="18" value="10"/>
+	
+	<!-- 12 == Edward (Romance) -->
+	<edge from="12" to="0" value="30"/>
+	<edge from="12" to="1" value="30"/>
+	<edge from="12" to="2" value="20"/>
+	<edge from="12" to="3" value="30"/>
+	<edge from="12" to="4" value="30"/>
+	<edge from="12" to="5" value="30"/>
+	<edge from="12" to="6" value="20"/>
+	<edge from="12" to="7" value="60"/>
+	<edge from="12" to="8" value="20"/>
+	<edge from="12" to="9" value="60"/>
+	<edge from="12" to="10" value="30"/>
+	<edge from="12" to="11" value="30"/>
+	<edge from="12" to="13" value="10"/>
+	<edge from="12" to="14" value="30"/>
+	<edge from="12" to="15" value="30"/>
+	<edge from="12" to="16" value="45"/>
+	<edge from="12" to="17" value="77"/>
+	<edge from="12" to="18" value="30"/>
+	
+	<!-- 17 == Kate (Romance) -->
+	<edge from="17" to="0" value="80"/>
+	<edge from="17" to="1" value="5"/>
+	<edge from="17" to="2" value="90"/>
+	<edge from="17" to="3" value="90"/>
+	<edge from="17" to="4" value="80"/>
+	<edge from="17" to="5" value="30"/>
+	<edge from="17" to="6" value="80"/>
+	<edge from="17" to="7" value="5"/>
+	<edge from="17" to="8" value="80"/>
+	<edge from="17" to="9" value="10"/>
+	<edge from="17" to="10" value="90"/>
+	<edge from="17" to="11" value="80"/>
+	<edge from="17" to="12" value="70"/>
+	<edge from="17" to="13" value="70"/>
+	<edge from="17" to="14" value="5"/>
+	<edge from="17" to="15" value="5"/>
+	<edge from="17" to="16" value="5"/>	
+	
+	<!-- 16 == Phoebe (romance) -->
+	<edge from="16" to="0" value="70"/>
+	<edge from="16" to="1" value="20"/>
+	<edge from="16" to="2" value="20"/>
+	<edge from="16" to="3" value="20"/>
+	<edge from="16" to="4" value="40"/>
+	<edge from="16" to="5" value="20"/>
+	<edge from="16" to="6" value="20"/>
+	<edge from="16" to="7" value="20"/>
+	<edge from="16" to="8" value="20"/>
+	<edge from="16" to="9" value="20"/>
+	<edge from="16" to="10" value="20"/>
+	<edge from="16" to="11" value="40"/>
+	<edge from="16" to="12" value="40"/>
+	<edge from="16" to="13" value="20"/>
+	<edge from="16" to="14" value="10"/>
+	<edge from="16" to="15" value="20"/>
+	<edge from="16" to="17" value="20"/>
+	
+	<!-- 15 == Cassandra (Romance) -->
+	<edge from="15" to="0" value="20"/>
+	<edge from="15" to="1" value="20"/>
+	<edge from="15" to="2" value="80"/>
+	<edge from="15" to="3" value="20"/>
+	<edge from="15" to="4" value="20"/>
+	<edge from="15" to="5" value="50"/>
+	<edge from="15" to="6" value="20"/>
+	<edge from="15" to="7" value="20"/>
+	<edge from="15" to="8" value="20"/>
+	<edge from="15" to="9" value="20"/>
+	<edge from="15" to="10" value="50"/>
+	<edge from="15" to="11" value="20"/>
+	<edge from="15" to="12" value="20"/>
+	<edge from="15" to="13" value="20"/>
+	<edge from="15" to="14" value="20"/>
+	<edge from="15" to="16" value="20"/>
+	<edge from="15" to="17" value="20"/>
+	
+  </Network>
+ 
+  <!--
+  
+  *****************************************************************************************
+  COOL - COOL - COOL - COOL - COOL - COOL 
+  *****************************************************************************************
+ 	Buzz	  2
+	Cassandra 15
+	Chloe	  7
+	Doug	  0
+	Edward	  12
+	Gunter	  14
+	Jordan	  1
+	Kate	  17
+	Lil		  4
+	Lucas	  11
+	Mave	  13
+	Monica	  9
+	Naomi 	  3
+	Nicholas  5
+	Oswald 	  10
+	Phoebe 	  16
+	Simon 	  8
+	Zack	  6
+  -->  
+  
+  <Network type="cool" numChars="18">
+	
+	
+    <edge from="0" to="1" value="75"/>
+    <edge from="0" to="7" value="75"/>
+	
+	<edge from="2" to="5" value="70"/>
+	<edge from="2" to="10" value="70"/>
+	
+	<edge from="3" to="4" value="40"/>
+	<edge from="3" to="6" value="70"/> <!-- Mike: makeing Naomi like Zack more for Indoescae build-->
+	<edge from="3" to="8" value="15"/>
+	
+	<edge from="0" to="6" value="30"/> <!-- Almost everyone thinks Zack is uncool. -->
+	<edge from="1" to="6" value="40"/>
+	<edge from="2" to="6" value="10"/>
+	<edge from="4" to="6" value="80"/>
+	<edge from="5" to="6" value="10"/>
+	<edge from="8" to="6" value="50"/>
+	<edge from="6" to="10" value="80"/>
+	
+	<edge from="7" to="0" value="70"/>
+	<edge from="7" to="6" value="70"/>
+	<edge from="7" to="4" value="70"/>
+	<edge from="7" to="2" value="70"/>
+	<edge from="7" to="2" value="70"/>
+	<edge from="7" to="9" value="70"/>
+	
+	<edge from="8" to="1" value="60"/>
+	
+	<edge from="9" to="0" value="10"/> <!-- Monica thinks most people are uncool. -->
+	<edge from="9" to="1" value="10"/>
+	<edge from="9" to="2" value="70"/> 
+	<edge from="9" to="4" value="10"/>
+	<edge from="9" to="5" value="25"/>
+	<edge from="9" to="6" value="50"/>
+	<edge from="9" to="7" value="20"/>
+	<edge from="9" to="8" value="10"/>	
+	<edge from="9" to="10" value="80"/>	
+	
+	
+	<!-- 13 == Mave (Cool) -->
+	<edge from="13" to="0" value="20"/>
+	<edge from="13" to="1" value="20"/>
+	<edge from="13" to="2" value="5"/>
+	<edge from="13" to="3" value="5"/>
+	<edge from="13" to="4" value="20"/>
+	<edge from="13" to="5" value="5"/>
+	<edge from="13" to="6" value="20"/>
+	<edge from="13" to="7" value="20"/>
+	<edge from="13" to="8" value="20"/>
+	<edge from="13" to="9" value="5"/>
+	<edge from="13" to="10" value="5"/>
+	<edge from="13" to="11" value="5"/>
+	<edge from="13" to="12" value="10"/>
+	<edge from="13" to="14" value="75"/>
+	<edge from="13" to="15" value="4"/>
+	<edge from="13" to="16" value="5"/>
+	<edge from="13" to="17" value="20"/>
+	<edge from="13" to="18" value="20"/>
+	
+	<!-- 13 == Gunter (Cool) -->
+	<edge from="14" to="0" value="50"/>
+	<edge from="14" to="1" value="50"/>
+	<edge from="14" to="2" value="90"/>
+	<edge from="14" to="3" value="50"/>
+	<edge from="14" to="4" value="50"/>
+	<edge from="14" to="5" value="50"/>
+	<edge from="14" to="6" value="50"/>
+	<edge from="14" to="7" value="50"/>
+	<edge from="14" to="8" value="50"/>
+	<edge from="14" to="9" value="50"/>
+	<edge from="14" to="10" value="70"/>
+	<edge from="14" to="11" value="50"/>
+	<edge from="14" to="12" value="50"/>
+	<edge from="14" to="13" value="50"/>
+	<edge from="14" to="15" value="50"/>
+	<edge from="14" to="16" value="50"/>
+	<edge from="14" to="17" value="50"/>
+	<edge from="14" to="18" value="50"/>
+	
+	<!-- Oswald -->
+	<edge from="10" to="0" value="10"/>
+	<edge from="10" to="1" value="10"/>
+	<edge from="10" to="2" value="60"/>
+	<edge from="10" to="3" value="60"/>
+	<edge from="10" to="4" value="10"/>
+	<edge from="10" to="5" value="60"/>
+	<edge from="10" to="6" value="10"/>
+	<edge from="10" to="7" value="10"/>
+	<edge from="10" to="8" value="10"/>
+	<edge from="10" to="9" value="75"/>
+	<edge from="10" to="11" value="10"/>
+	<edge from="10" to="12" value="20"/>
+	<edge from="10" to="13" value="10"/>	
+	<edge from="10" to="14" value="10"/>
+	<edge from="10" to="15" value="60"/>
+	<edge from="10" to="16" value="10"/>
+	<edge from="10" to="17" value="10"/>
+	<edge from="10" to="18" value="10"/>		
+	
+	<!-- 12 == Edward (Cool) -->
+	<edge from="12" to="0" value="20"/>
+	<edge from="12" to="1" value="20"/>
+	<edge from="12" to="2" value="50"/>
+	<edge from="12" to="3" value="50"/>
+	<edge from="12" to="4" value="15"/>
+	<edge from="12" to="5" value="50"/>
+	<edge from="12" to="6" value="20"/>
+	<edge from="12" to="7" value="20"/>
+	<edge from="12" to="8" value="20"/>
+	<edge from="12" to="9" value="50"/>
+	<edge from="12" to="10" value="50"/>
+	<edge from="12" to="11" value="15"/>
+	<edge from="12" to="13" value="70"/>
+	<edge from="12" to="14" value="70"/>
+	<edge from="12" to="15" value="50"/>
+	<edge from="12" to="16" value="15"/>
+	<edge from="12" to="17" value="30"/>
+	<edge from="12" to="18" value="30"/>
+	
+	<!-- 17 == Kate (Cool) -->
+	<edge from="17" to="0" value="60"/>
+	<edge from="17" to="1" value="60"/>
+	<edge from="17" to="2" value="90"/>
+	<edge from="17" to="3" value="90"/>
+	<edge from="17" to="4" value="40"/>
+	<edge from="17" to="5" value="40"/>
+	<edge from="17" to="6" value="60"/>
+	<edge from="17" to="7" value="60"/>
+	<edge from="17" to="8" value="60"/>
+	<edge from="17" to="9" value="90"/>
+	<edge from="17" to="10" value="90"/>
+	<edge from="17" to="11" value="60"/>
+	<edge from="17" to="12" value="70"/>
+	<edge from="17" to="13" value="70"/>
+	<edge from="17" to="14" value="10"/>
+	<edge from="17" to="15" value="60"/>
+	<edge from="17" to="16" value="80"/>	
+	
+	<!-- 16 == Phoebe (Cool) -->
+	<edge from="16" to="0" value="30"/>
+	<edge from="16" to="1" value="30"/>
+	<edge from="16" to="2" value="30"/>
+	<edge from="16" to="3" value="20"/>
+	<edge from="16" to="4" value="50"/>
+	<edge from="16" to="5" value="30"/>
+	<edge from="16" to="6" value="30"/>
+	<edge from="16" to="7" value="50"/>
+	<edge from="16" to="8" value="30"/>
+	<edge from="16" to="9" value="20"/>
+	<edge from="16" to="10" value="30"/>
+	<edge from="16" to="11" value="50"/>
+	<edge from="16" to="12" value="20"/>
+	<edge from="16" to="13" value="20"/>
+	<edge from="16" to="14" value="10"/>
+	<edge from="16" to="15" value="20"/>
+	<edge from="16" to="17" value="30"/>
+	
+	<!-- 15 == Cassandra (Cool) -->
+	<edge from="15" to="0" value="20"/>
+	<edge from="15" to="1" value="60"/>
+	<edge from="15" to="2" value="80"/>
+	<edge from="15" to="3" value="80"/>
+	<edge from="15" to="4" value="80"/>
+	<edge from="15" to="5" value="80"/>
+	<edge from="15" to="6" value="20"/>
+	<edge from="15" to="7" value="60"/>
+	<edge from="15" to="8" value="20"/>
+	<edge from="15" to="9" value="80"/>
+	<edge from="15" to="10" value="80"/>
+	<edge from="15" to="11" value="80"/>
+	<edge from="15" to="12" value="20"/>
+	<edge from="15" to="13" value="20"/>
+	<edge from="15" to="14" value="10"/>
+	<edge from="15" to="16" value="20"/>
+	<edge from="15" to="17" value="20"/>
+	
+	<!-- Lucas (Cool) -->
+	<edge from="11" to="0" value="20"/>
+	<edge from="11" to="1" value="20"/>
+	<edge from="11" to="2" value="20"/>
+	<edge from="11" to="3" value="20"/>
+	<edge from="11" to="4" value="70"/>
+	<edge from="11" to="5" value="20"/>
+	<edge from="11" to="6" value="20"/>
+	<edge from="11" to="7" value="20"/>
+	<edge from="11" to="8" value="20"/>
+	<edge from="11" to="9" value="20"/>
+	<edge from="11" to="10" value="20"/>
+	<edge from="11" to="13" value="5"/>
+	<edge from="11" to="12" value="5"/>
+	<edge from="11" to="14" value="5"/>
+	<edge from="11" to="15" value="20"/>
+	<edge from="11" to="16" value="70"/>
+	<edge from="11" to="17" value="20"/>	
+	
+  </Network>
+  <Relationships>	 
+		
+    <!--<Relationship type="friends" from="Doug" to="Jordan"/>--> <!-- to allow Doug to make a "new" friend in his campaign -->
+	<Relationship type="friends" from="Doug" to="Lil"/>
+	<Relationship type="enemies" from="Doug" to="Zack"/>
+	<Relationship type="enemies" from="Doug" to="Simon"/>
+	
+	<Relationship type="friends" from="Jordan" to="Doug"/>
+	<Relationship type="enemies" from="Jordan" to="Buzz"/>
+	
+	<Relationship type="friends" from="Buzz" to="Nicholas"/> 
+	<Relationship type="friends" from="Buzz" to="Oswald"/> 
+	<Relationship type="dating" from="Buzz" to="Naomi"/> 
+	<Relationship type="enemies" from="Buzz" to="Mave"/>
+		
+	<Relationship type="friends" from="Naomi" to="Chloe"/>
+	<Relationship type="friends" from="Naomi" to="Nicholas"/>
+	<!-- <Relationship type="friends" from="Naomi" to="Monica"/> --> <!-- Zack's tutorial level needs Naomi to be just enemies w/Monica. -->
+	<Relationship type="friends" from="Naomi" to="Oswald"/>
+	<!-- <Relationship type="dating" from="Naomi" to="Buzz"/> --> <!-- Mike: got rid of this at indiecade, I think Buzz's hatrad of Zack is making it so Naomi always rejects stuff with him-->
+	
+	<Relationship type="enemies" from="Lil" to="Oswald"/>
+	<Relationship type="enemies" from="Lil" to="Nicholas"/>
+	
+	<Relationship type="friends" from="Nicholas" to="Oswald"/>  
+	<Relationship type="friends" from="Nicholas" to="Buzz"/>
+	<Relationship type="enemies" from="Nicholas" to="Oswald"/>	
+	
+	<Relationship type="friends" from="Zack" to="Simon"/>  
+	<Relationship type="friends" from="Zack" to="Jordan"/>
+	<!-- <Relationship type="friends" from="Zack" to="Monica"/> -->
+	<!-- <Relationship type="friends" from="Zack" to="Naomi"/> --> <!-- Zack and Naomi can't be friends b/c of Zack's tutorial level -->
+	
+	
+	<!-- <Relationship type="dating" from="Zack" to="Chloe"/> --> <!-- Chloe must be single for new Tutorial 1. -->
+	<Relationship type="enemies" from="Buzz" to="Chloe"/> <!-- For Chloe's "A time for peace" goal in tutorial 1. -->
+	<Relationship type="enemies" from="Zack" to="Buzz"/>
+	<Relationship type="enemies" from="Zack" to="Jordan"/>
+	<Relationship type="enemies" from="Zack" to="Nicholas"/>
+	
+	<Relationship type="friends" from="Chloe" to="Naomi"/>
+	<Relationship type="friends" from="Chloe" to="Doug"/> <!-- Chloe and Doug are friends because of new Tutorial 1. -->
+	<Relationship type="friends" from="Chloe" to="Jordan"/>
+	<Relationship type="friends" from="Chloe" to="Lil"/>
+	<!--<Relationship type="dating" from="Chloe" to="Simon"/>-->
+
+		
+	<Relationship type="friends" from="Simon" to="Zack"/>
+	<Relationship type="friends" from="Simon" to="Naomi"/>
+	<Relationship type="enemies" from="Simon" to="Buzz"/>
+	<Relationship type="enemies" from="Simon" to="Nicholas"/>
+	
+	<Relationship type="dating" from="Kate" to="Nicholas"/>
+	<Relationship type="enemies" from="Monica" to="Naomi"/>
+
+
+	<Relationship type="dating" from="Mave" to="Edward"/>
+	
+	<Relationship type="enemies" from="Mave" to="Buzz"/>
+	<Relationship type="enemies" from="Mave" to="Monica"/>
+	<Relationship type="enemies" from="Mave" to="Cassandra"/>
+	<Relationship type="enemies" from="Mave" to="Oswald"/>
+	<Relationship type="enemies" from="Mave" to="Simon"/>
+	<Relationship type="enemies" from="Mave" to="Zack"/>
+	
+	<!-- Gunter -->
+	
+	<Relationship type="friends" from="Gunter" to="Zack"/>
+	
+	<!-- Edward -->
+	
+	<Relationship type="friends" from="Edward" to="Chloe"/>
+	<Relationship type="friends" from="Edward" to="Monica"/>
+	
+	<Relationship type="dating" from="Edward" to="Mave"/>
+	
+	<Relationship type="enemies" from="Edward" to="Monica"/>
+	<Relationship type="enemies" from="Edward" to="Zack"/>
+	<Relationship type="enemies" from="Edward" to="Lil"/>
+
+	<!-- Lucas -->
+	<Relationship type="friends" from="Lucas" to="Phoebe"/>
+	<Relationship type="enemies" from="Lucas" to="Oswald"/>
+	
+	
+	<!-- Kate -->
+	<!-- Kate starts with no relationships -->
+	
+	<!-- Phoebe -->
+	<Relationship type="friends" from="Phoebe" to="Lil"/>
+	<Relationship type="friends" from="Phoebe" to="Lucas"/>
+	<Relationship type="friends" from="Phoebe" to="Doug"/>
+	<Relationship type="enemies" from="Phoebe" to="Mave"/>
+	
+	<!-- Cassandra -->
+	<Relationship type="friends" from="Cassandra" to="Monica"/>
+	<Relationship type="friends" from="Cassandra" to="Naomi"/>
+	<Relationship type="dating" from="Cassandra" to="Oswald"/>
+	
+	<!-- Oswald -->
+	
+	
+  </Relationships>
+  <CulturalKB>
+	  <!-- CKB SHOULD BE SINGULAR, NOT IRREGULARLY PLURAL, AND NOT START WITH A VOWEL. You must be able to have a X, want a X, hold a X behind your back, be into Xs before they were cool, ask someone to give you their X, show someone your awesome X collection. -->
+
+    <Proposition type="truth" head="skateboard" connection="are" tail="cool"/>
+	<Proposition type="truth" head="class ring" connection="are" tail="cool"/>
+	<Proposition type="truth" head="leather jacket" connection="are" tail="cool"/>
+	<Proposition type="truth" head="cheezeytoos snack pack" connection="are" tail="cool"/>
+    <Proposition type="truth" head="calculus book" connection="are" tail="lame"/>
+	<Proposition type="truth" head="retro phone" connection="are" tail="lame"/>
+	<Proposition type="truth" head="top hat" connection="are" tail="lame"/>
+	<Proposition type="truth" head="lightsaber" connection="are" tail="lame"/>	
+    <Proposition type="truth" head="diamond" connection="are" tail="romantic"/>
+	<Proposition type="truth" head="glass rose" connection="are" tail="romantic"/>
+	<Proposition type="truth" head="candy heart" connection="are" tail="romantic"/>
+    <Proposition type="truth" head="banana slug" connection="are" tail="gross"/>
+	<Proposition type="truth" head="vegan burger" connection="are" tail="gross"/>
+	<Proposition type="truth" head="gooberball" connection="are" tail="gross"/>
+    <Proposition type="truth" head="bobblehead" connection="are" tail="funny"/>
+	<Proposition type="truth" head="laughy candy joke" connection="are" tail="funny"/>
+	<Proposition type="truth" head="webcomic" connection="are" tail="funny"/>
+    <Proposition type="truth" head="Japanese sword" connection="are" tail="bad ass"/>
+	<Proposition type="truth" head="smoking jacket" connection="are" tail="bad ass"/>
+	<Proposition type="truth" head="zombie movie" connection="are" tail="bad ass"/>
+    <Proposition type="truth" head="fart machine" connection="are" tail="mean"/>
+	<Proposition type="truth" head="hand zapper" connection="are" tail="mean"/>
+	<Proposition type="truth" head="dodgeball" connection="are" tail="mean"/>
+    <Proposition type="truth" head="dead bug" connection="are" tail="taboo"/>
+	<Proposition type="truth" head="chainsaw" connection="are" tail="taboo"/>
+	<Proposition type="truth" head="codpiece" connection="are" tail="taboo"/>
+	
+	<!-- And now, the definitions: has, wants, likes, dislikes -->		
+	
+	<Proposition type="subjective" head="Phoebe" connection="wants" tail="top hat"/>		
+	<Proposition type="subjective" head="Phoebe" connection="likes" tail="bobblehead"/>
+	<Proposition type="subjective" head="Phoebe" connection="dislikes" tail="fart machine"/>
+	<Proposition type="subjective" head="Phoebe" connection="dislikes" tail="retro phone"/>
+	<Proposition type="subjective" head="Phoebe" connection="dislikes" tail="glass rose"/>
+	<Proposition type="subjective" head="Phoebe" connection="dislikes" tail="hand zapper"/>
+	<Proposition type="subjective" head="Phoebe" connection="has" tail="fart machine"/>
+	<Proposition type="subjective" head="Phoebe" connection="has" tail="vegan burger"/>
+	<Proposition type="subjective" head="Phoebe" connection="likes" tail="cheezeytoos snack pack"/>
+	<Proposition type="subjective" head="Phoebe" connection="dislikes" tail="vegan burger"/>
+	<Proposition type="subjective" head="Phoebe" connection="dislikes" tail="laughy candy joke"/>
+	<Proposition type="subjective" head="Phoebe" connection="likes" tail="Japanese sword"/>
+	<Proposition type="subjective" head="Phoebe" connection="likes" tail="candy heart"/>
+	<Proposition type="subjective" head="Phoebe" connection="has" tail="candy heart"/>
+	<Proposition type="subjective" head="Phoebe" connection="dislikes" tail="gooberball"/>
+	<Proposition type="subjective" head="Phoebe" connection="dislikes" tail="webcomic"/>
+	<Proposition type="subjective" head="Phoebe" connection="likes" tail="zombie movie"/>
+	
+	<Proposition type="subjective" head="Cassandra" connection="wants" tail="diamond"/>	
+	<Proposition type="subjective" head="Cassandra" connection="wants" tail="class ring"/>
+	<Proposition type="subjective" head="Cassandra" connection="likes" tail="diamond"/>
+	<Proposition type="subjective" head="Cassandra" connection="has" tail="bobblehead"/>
+	<Proposition type="subjective" head="Cassandra" connection="likes" tail="bobblehead"/>
+	<Proposition type="subjective" head="Cassandra" connection="dislikes" tail="glass rose"/>
+	<Proposition type="subjective" head="Cassandra" connection="dislikes" tail="calculus book"/>
+	<Proposition type="subjective" head="Cassandra" connection="dislikes" tail="fart machine"/>
+	<Proposition type="subjective" head="Cassandra" connection="dislikes" tail="dead bug"/>
+	<Proposition type="subjective" head="Cassandra" connection="dislikes" tail="banana slug"/>
+	<Proposition type="subjective" head="Cassandra" connection="dislikes" tail="laughy candy joke"/>
+	<Proposition type="subjective" head="Cassandra" connection="dislikes" tail="vegan burger"/>
+	<Proposition type="subjective" head="Cassandra" connection="dislikes" tail="candy heart"/>
+	<Proposition type="subjective" head="Cassandra" connection="dislikes" tail="gooberball"/>
+	<Proposition type="subjective" head="Cassandra" connection="dislikes" tail="webcomic"/>
+	<Proposition type="subjective" head="Cassandra" connection="likes" tail="zombie movie"/>
+	<Proposition type="subjective" head="Cassandra" connection="dislikes" tail="chainsaw"/>
+		
+	<Proposition type="subjective" head="Oswald" connection="has" tail="skateboard"/>
+	<Proposition type="subjective" head="Oswald" connection="has" tail="diamond"/>
+	<Proposition type="subjective" head="Oswald" connection="has" tail="class ring"/>
+	<Proposition type="subjective" head="Oswald" connection="has" tail="leather jacket"/>
+	<Proposition type="subjective" head="Oswald" connection="has" tail="glass rose"/>
+	<Proposition type="subjective" head="Oswald" connection="has" tail="calculus book"/>	
+	<Proposition type="subjective" head="Oswald" connection="likes" tail="diamond"/>
+	<Proposition type="subjective" head="Oswald" connection="dislikes" tail="calculus book"/>
+	<Proposition type="subjective" head="Oswald" connection="dislikes" tail="cheezeytoos snack pack"/>
+	<Proposition type="subjective" head="Oswald" connection="dislikes" tail="bobblehead"/>	
+	<Proposition type="subjective" head="Oswald" connection="dislikes" tail="fart machine"/>
+	<Proposition type="subjective" head="Oswald" connection="dislikes" tail="dead bug"/>
+	<Proposition type="subjective" head="Oswald" connection="likes" tail="laughy candy joke"/>
+	<Proposition type="subjective" head="Oswald" connection="wants" tail="laughy candy joke"/>
+	<Proposition type="subjective" head="Oswald" connection="likes" tail="vegan burger"/>
+	<Proposition type="subjective" head="Oswald" connection="has" tail="smoking jacket"/>
+	<Proposition type="subjective" head="Oswald" connection="has" tail="hand zapper"/>
+	<Proposition type="subjective" head="Oswald" connection="likes" tail="hand zapper"/>
+	<Proposition type="subjective" head="Oswald" connection="dislikes" tail="candy heart"/>
+	<Proposition type="subjective" head="Oswald" connection="dislikes" tail="gooberball"/>
+	<Proposition type="subjective" head="Oswald" connection="likes" tail="webcomic"/>
+	<Proposition type="subjective" head="Oswald" connection="has" tail="dodgeball"/>
+	<Proposition type="subjective" head="Oswald" connection="has" tail="codpiece"/>
+	
+	<Proposition type="subjective" head="Lucas" connection="has" tail="skateboard"/>
+	<Proposition type="subjective" head="Lucas" connection="has" tail="retro phone"/>
+	<Proposition type="subjective" head="Lucas" connection="dislikes" tail="skateboard"/>
+	<Proposition type="subjective" head="Lucas" connection="likes" tail="glass rose"/>
+	<Proposition type="subjective" head="Lucas" connection="wants" tail="glass rose"/>
+	<Proposition type="subjective" head="Lucas" connection="dislike" tail="retro phone"/>
+	<Proposition type="subjective" head="Lucas" connection="dislikes" tail="laughy candy joke"/>
+	<Proposition type="subjective" head="Lucas" connection="wants" tail="bobblehead"/>
+	<Proposition type="subjective" head="Lucas" connection="likes" tail="dead bug"/>
+	<Proposition type="subjective" head="Lucas" connection="likes" tail="vegan burger"/>
+	<Proposition type="subjective" head="Lucas" connection="wants" tail="vegan burger"/>
+	<Proposition type="subjective" head="Lucas" connection="dislikes" tail="smoking jacket"/>
+	<Proposition type="subjective" head="Lucas" connection="dislikes" tail="hand zapper"/>
+	<Proposition type="subjective" head="Lucas" connection="dislikes" tail="leather jacket"/>
+	<Proposition type="subjective" head="Lucas" connection="wants" tail="candy heart"/>
+	<Proposition type="subjective" head="Lucas" connection="likes" tail="candy heart"/>
+	<Proposition type="subjective" head="Lucas" connection="dislikes" tail="gooberball"/>
+	<Proposition type="subjective" head="Lucas" connection="likes" tail="webcomic"/>
+	<Proposition type="subjective" head="Lucas" connection="likes" tail="zombie movie"/>
+	<Proposition type="subjective" head="Lucas" connection="wants" tail="zombie movie"/>
+	<Proposition type="subjective" head="Lucas" connection="dislikes" tail="dodgeball"/>
+		
+	<Proposition type="subjective" head="Kate" connection="has" tail="retro phone"/>
+	<Proposition type="subjective" head="Kate" connection="wants" tail="diamond"/>
+	<Proposition type="subjective" head="Kate" connection="wants" tail="class ring"/>
+	<Proposition type="subjective" head="Kate" connection="likes" tail="glass rose"/>
+	<Proposition type="subjective" head="Kate" connection="wants" tail="glass rose"/>
+	<Proposition type="subjective" head="Kate" connection="wants" tail="leather jacket"/>
+	<Proposition type="subjective" head="Kate" connection="dislikes" tail="fart machine"/>
+	<Proposition type="subjective" head="Kate" connection="dislikes" tail="dead bug"/>
+	<Proposition type="subjective" head="Kate" connection="dislikes" tail="Japanese sword"/>
+	<Proposition type="subjective" head="Kate" connection="dislikes" tail="banana slug"/>
+	<Proposition type="subjective" head="Kate" connection="dislikes" tail="skateboard"/>
+	<Proposition type="subjective" head="Kate" connection="dislikes" tail="calculus book"/>
+	<Proposition type="subjective" head="Kate" connection="likes" tail="bobblehead"/>
+	<Proposition type="subjective" head="Kate" connection="has" tail="cheezeytoos snack pack"/>
+	<Proposition type="subjective" head="Kate" connection="likes" tail="cheezeytoos snack pack"/>
+	<Proposition type="subjective" head="Kate" connection="has" tail="bobblehead"/>
+	<Proposition type="subjective" head="Kate" connection="likes" tail="laughy candy joke"/>
+	<Proposition type="subjective" head="Kate" connection="has" tail="laughy candy joke"/>
+	<Proposition type="subjective" head="Kate" connection="dislikes" tail="hand zapper"/>
+	<Proposition type="subjective" head="Kate" connection="wants" tail="candy heart"/>
+	<Proposition type="subjective" head="Kate" connection="likes" tail="candy heart"/>
+	<Proposition type="subjective" head="Kate" connection="dislikes" tail="gooberball"/>
+	<Proposition type="subjective" head="Kate" connection="dislikes" tail="zombie movie"/>
+	<Proposition type="subjective" head="Kate" connection="dislikes" tail="dodgeball"/>
+	
+	<Proposition type="subjective" head="Edward" connection="likes" tail="bobblehead"/>
+	<Proposition type="subjective" head="Edward" connection="has" tail="bobblehead"/>
+	<Proposition type="subjective" head="Edward" connection="dislikes" tail="glass rose"/>
+	<Proposition type="subjective" head="Edward" connection="dislikes" tail="class ring"/>
+	<Proposition type="subjective" head="Edward" connection="has" tail="top hat"/>
+	<Proposition type="subjective" head="Edward" connection="likes" tail="top hat"/>
+	<Proposition type="subjective" head="Edward" connection="wants" tail="fart machine"/>
+	<Proposition type="subjective" head="Edward" connection="dislikes" tail="banana slug"/>
+	<Proposition type="subjective" head="Edward" connection="dislikes" tail="calculus book"/>
+	<Proposition type="subjective" head="Edward" connection="dislikes" tail="retro phone"/>
+	<Proposition type="subjective" head="Edward" connection="likes" tail="vegan burger"/>
+	<Proposition type="subjective" head="Edward" connection="dislikes" tail="laughy candy joke"/>
+	<Proposition type="subjective" head="Edward" connection="wants" tail="smoking jacket"/>
+	<Proposition type="subjective" head="Edward" connection="likes" tail="smoking jacket"/>
+	<Proposition type="subjective" head="Edward" connection="dislikes" tail="hand zapper"/>
+	<Proposition type="subjective" head="Edward" connection="dislikes" tail="leather jacket"/>
+	<Proposition type="subjective" head="Edward" connection="has" tail="candy heart"/>
+	<Proposition type="subjective" head="Edward" connection="dislikes" tail="gooberball"/>
+	<Proposition type="subjective" head="Edward" connection="likes" tail="zombie movie"/>
+	<Proposition type="subjective" head="Edward" connection="has" tail="zombie movie"/>
+	<Proposition type="subjective" head="Edward" connection="dislikes" tail="dodgeball"/>
+	<Proposition type="subjective" head="Edward" connection="likes" tail="chainsaw"/>
+	<Proposition type="subjective" head="Edward" connection="wants" tail="chainsaw"/>
+	
+	<!--Gunter -->
+	<Proposition type="subjective" head="Gunter" connection="likes" tail="dead bug"/>
+	<Proposition type="subjective" head="Gunter" connection="likes" tail="Japanese sword"/>
+	<Proposition type="subjective" head="Gunter" connection="likes" tail="banana slug"/>
+	<Proposition type="subjective" head="Gunter" connection="likes" tail="fart machine"/>
+	<Proposition type="subjective" head="Gunter" connection="has" tail="dead bug"/>
+	<Proposition type="subjective" head="Gunter" connection="has" tail="Japanese sword"/>
+	<Proposition type="subjective" head="Gunter" connection="has" tail="banana slug"/>
+	<Proposition type="subjective" head="Gunter" connection="has" tail="fart machine"/>
+	<Proposition type="subjective" head="Gunter" connection="wants" tail="glass rose"/>
+	<Proposition type="subjective" head="Gunter" connection="wants" tail="dead bug"/>
+	<Proposition type="subjective" head="Gunter" connection="wants" tail="diamond"/>
+	<Proposition type="subjective" head="Gunter" connection="dislikes" tail="bobblehead"/>
+	<Proposition type="subjective" head="Gunter" connection="likes" tail="laughy candy joke"/>
+	<Proposition type="subjective" head="Gunter" connection="wants" tail="laughy candy joke"/>
+	<Proposition type="subjective" head="Gunter" connection="has" tail="smoking jacket"/>
+	<Proposition type="subjective" head="Gunter" connection="has" tail="leather jacket"/>
+	<Proposition type="subjective" head="Gunter" connection="dislikes" tail="leather jacket"/>
+	<Proposition type="subjective" head="Gunter" connection="has" tail="gooberball"/>
+	<Proposition type="subjective" head="Gunter" connection="likes" tail="zombie movie"/>
+	<Proposition type="subjective" head="Gunter" connection="wants" tail="zombie movie"/>
+	<Proposition type="subjective" head="Gunter" connection="has" tail="chainsaw"/>
+	<Proposition type="subjective" head="Gunter" connection="likes" tail="chainsaw"/>
+	<Proposition type="subjective" head="Gunter" connection="has" tail="codpiece"/>
+	<Proposition type="subjective" head="Gunter" connection="has" tail="cheezeytoos snack pack"/>
+	<Proposition type="subjective" head="Gunter" connection="likes" tail="cheezeytoos snack pack"/>
+	
+	<!-- Mave -->
+	<Proposition type="subjective" head="Mave" connection="likes" tail="dead bug"/>
+	<Proposition type="subjective" head="Mave" connection="likes" tail="calculus book"/>
+	<Proposition type="subjective" head="Mave" connection="likes" tail="top hat"/>
+	<Proposition type="subjective" head="Mave" connection="has" tail="banana slug"/>
+	<Proposition type="subjective" head="Mave" connection="wants" tail="retro phone"/>
+	<Proposition type="subjective" head="Mave" connection="wants" tail="glass rose"/>
+	<Proposition type="subjective" head="Mave" connection="dislikes" tail="skateboard"/>
+	<Proposition type="subjective" head="Mave" connection="dislikes" tail="class week"/>
+	<Proposition type="subjective" head="Mave" connection="dislikes" tail="fart machine"/>
+	<Proposition type="subjective" head="Mave" connection="dislikes" tail="bobblehead"/>
+	<Proposition type="subjective" head="Mave" connection="dislikes" tail="vegan burger"/>
+	<Proposition type="subjective" head="Mave" connection="dislikes" tail="laughy candy joke"/>
+	<Proposition type="subjective" head="Mave" connection="dislikes" tail="leather jacket"/>
+	<Proposition type="subjective" head="Mave" connection="dislikes" tail="candy heart"/>
+	<Proposition type="subjective" head="Mave" connection="likes" tail="webcomic"/>	
+	<Proposition type="subjective" head="Mave" connection="has" tail="zombie movie"/>
+	<Proposition type="subjective" head="Mave" connection="dislikes" tail="zombie movie"/>
+	<Proposition type="subjective" head="Mave" connection="dislikes" tail="dodgeball"/>
+	<Proposition type="subjective" head="Mave" connection="likes" tail="chainsaw"/>
+	<Proposition type="subjective" head="Mave" connection="dislikes" tail="codpiece"/>
+		
+    <Proposition type="subjective" head="Doug" connection="likes" tail="skateboard"/>
+	<Proposition type="subjective" head="Doug" connection="has" tail="skateboard"/>
+	<Proposition type="subjective" head="Doug" connection="has" tail="glass rose"/>
+	<Proposition type="subjective" head="Doug" connection="likes" tail="skateboard"/>
+	<Proposition type="subjective" head="Doug" connection="likes" tail="retro phone"/>
+	<Proposition type="subjective" head="Doug" connection="wants" tail="retro phone"/>
+	<Proposition type="subjective" head="Doug" connection="wants" tail="bobblehead"/>
+	<Proposition type="subjective" head="Doug" connection="dislikes" tail="fart machine"/>
+	<Proposition type="subjective" head="Doug" connection="dislikes" tail="banana slug"/>
+	<Proposition type="subjective" head="Doug" connection="has" tail="vegan burger"/>
+	<Proposition type="subjective" head="Doug" connection="likes" tail="vegan burger"/>
+	<Proposition type="subjective" head="Doug" connection="dislikes" tail="hand zapper"/>
+	<Proposition type="subjective" head="Doug" connection="wants" tail="leather jacket"/>
+	<Proposition type="subjective" head="Doug" connection="likes" tail="leather jacket"/>
+	<Proposition type="subjective" head="Doug" connection="has" tail="gooberball"/>
+	<Proposition type="subjective" head="Doug" connection="likes" tail="gooberball"/>
+	<Proposition type="subjective" head="Doug" connection="likes" tail="webcomic"/>
+	<Proposition type="subjective" head="Doug" connection="likes" tail="zombie movie"/>
+	<Proposition type="subjective" head="Doug" connection="dislikes" tail="dodgeball"/>
+	<Proposition type="subjective" head="Doug" connection="wants" tail="cheezeytoos snack pack"/>
+	<Proposition type="subjective" head="Doug" connection="likes" tail="cheezeytoos snack pack"/>
+	
+	<Proposition type="subjective" head="Jordan" connection="likes" tail="skateboard"/>
+	<Proposition type="subjective" head="Jordan" connection="likes" tail="glass rose"/>
+	<Proposition type="subjective" head="Jordan" connection="wants" tail="skateboard"/>
+	<Proposition type="subjective" head="Jordan" connection="dislikes" tail="Japanese sword"/>
+	<Proposition type="subjective" head="Jordan" connection="has" tail="bobblehead"/>
+	<Proposition type="subjective" head="Jordan" connection="has" tail="calculus book"/>
+	<Proposition type="subjective" head="Jordan" connection="dislikes" tail="calculus book"/>
+	<Proposition type="subjective" head="Jordan" connection="wants" tail="vegan burger"/>
+	<Proposition type="subjective" head="Jordan" connection="likes" tail="vegan burger"/>
+	<Proposition type="subjective" head="Jordan" connection="likes" tail="laughy candy joke"/>
+	<Proposition type="subjective" head="Jordan" connection="has" tail="laughy candy joke"/>
+	<Proposition type="subjective" head="Jordan" connection="wants" tail="hand zapper"/>
+	<Proposition type="subjective" head="Jordan" connection="wants" tail="leather jacket"/>
+	<Proposition type="subjective" head="Jordan" connection="likes" tail="leather jacket"/>
+	<Proposition type="subjective" head="Jordan" connection="has" tail="candy heart"/>
+	<Proposition type="subjective" head="Jordan" connection="wants" tail="gooberball"/>
+	<Proposition type="subjective" head="Jordan" connection="likes" tail="gooberball"/>
+	<Proposition type="subjective" head="Jordan" connection="dislikes" tail="zombie movie"/>
+	<Proposition type="subjective" head="Jordan" connection="dislikes" tail="dodgeball"/>
+	<Proposition type="subjective" head="Jordan" connection="has" tail="cheezeytoos snack pack"/>
+	
+	<Proposition type="subjective" head="Buzz" connection="likes" tail="Japanese sword"/>
+	<Proposition type="subjective" head="Buzz" connection="has" tail="Japanese sword"/>
+	<Proposition type="subjective" head="Buzz" connection="wants" tail="class ring"/>
+	<Proposition type="subjective" head="Buzz" connection="likes" tail="fart machine"/>
+	<Proposition type="subjective" head="Buzz" connection="wants" tail="fart machine"/>
+	<Proposition type="subjective" head="Buzz" connection="has" tail="banana slug"/>
+	<Proposition type="subjective" head="Buzz" connection="dislikes" tail="skateboard"/>
+	<Proposition type="subjective" head="Buzz" connection="dislikes" tail="glass rose"/>
+	<Proposition type="subjective" head="Buzz" connection="dislikes" tail="calculus book"/>
+	<Proposition type="subjective" head="Buzz" connection="dislikes" tail="vegan burger"/>
+	<Proposition type="subjective" head="Buzz" connection="wants" tail="dead bug"/>
+	<Proposition type="subjective" head="Buzz" connection="wants" tail="hand zapper"/>
+	<Proposition type="subjective" head="Buzz" connection="has" tail="leather jacket"/>
+	<Proposition type="subjective" head="Buzz" connection="likes" tail="leather jacket"/>
+	<Proposition type="subjective" head="Buzz" connection="likes" tail="gooberball"/>
+	<Proposition type="subjective" head="Buzz" connection="wants" tail="gooberball"/>
+	<Proposition type="subjective" head="Buzz" connection="likes" tail="dodgeball"/>
+	<Proposition type="subjective" head="Buzz" connection="has" tail="dodgeball"/>
+	<Proposition type="subjective" head="Buzz" connection="wants" tail="cheezeytoos snack pack"/>
+	
+	<Proposition type="subjective" head="Naomi" connection="likes" tail="diamond"/>
+	<Proposition type="subjective" head="Naomi" connection="wants" tail="diamond"/>
+	<Proposition type="subjective" head="Naomi" connection="has" tail="class ring"/>
+	<Proposition type="subjective" head="Naomi" connection="likes" tail="class ring"/>
+	<Proposition type="subjective" head="Naomi" connection="likes" tail="glass rose"/>
+	<Proposition type="subjective" head="Naomi" connection="has" tail="glass rose"/>
+	<Proposition type="subjective" head="Naomi" connection="dislikes" tail="Japanese sword"/>
+	<Proposition type="subjective" head="Naomi" connection="dislikes" tail="dead bug"/>
+	<Proposition type="subjective" head="Naomi" connection="dislikes" tail="banana slug"/>
+	<Proposition type="subjective" head="Naomi" connection="has" tail="calculus book"/>
+	<Proposition type="subjective" head="Naomi" connection="dislikes" tail="vegan burger"/>
+	<Proposition type="subjective" head="Naomi" connection="dislikes" tail="smoking jacket"/>
+	<Proposition type="subjective" head="Naomi" connection="dislikes" tail="hand zapper"/>
+	<Proposition type="subjective" head="Naomi" connection="likes" tail="candy heart"/>
+	<Proposition type="subjective" head="Naomi" connection="has" tail="candy heart"/>
+	<Proposition type="subjective" head="Naomi" connection="dislikes" tail="gooberball"/>
+	<Proposition type="subjective" head="Naomi" connection="dislikes" tail="zombie movie"/>
+	<Proposition type="subjective" head="Naomi" connection="dislikes" tail="chainsaw"/>
+	<Proposition type="subjective" head="Naomi" connection="likes" tail="cheezeytoos snack pack"/>
+	
+	<Proposition type="subjective" head="Lil" connection="likes" tail="retro phone"/>
+	<Proposition type="subjective" head="Lil" connection="has" tail="retro phone"/>
+	<Proposition type="subjective" head="Lil" connection="dislikes" tail="skateboard"/>
+	<Proposition type="subjective" head="Lil" connection="dislikes" tail="diamond"/>
+	<Proposition type="subjective" head="Lil" connection="dislikes" tail="glass rose"/>
+	<Proposition type="subjective" head="Lil" connection="has" tail="glass rose"/>
+	<Proposition type="subjective" head="Lil" connection="dislikes" tail="class ring"/>
+	<Proposition type="subjective" head="Lil" connection="dislikes" tail="calculus book"/>
+	<Proposition type="subjective" head="Lil" connection="dislikes" tail="bobblehead"/>
+	<Proposition type="subjective" head="Lil" connection="dislikes" tail="fart machine"/>
+	<Proposition type="subjective" head="Lil" connection="dislikes" tail="Japanese sword"/>
+	<Proposition type="subjective" head="Lil" connection="dislikes" tail="banana slug"/>
+	<Proposition type="subjective" head="Lil" connection="dislikes" tail="laughy candy joke"/>
+	<Proposition type="subjective" head="Lil" connection="has" tail="dead bug"/>
+	<Proposition type="subjective" head="Lil" connection="has" tail="vegan burger"/>
+	<Proposition type="subjective" head="Lil" connection="has" tail="leather jacket"/>
+	<Proposition type="subjective" head="Lil" connection="has" tail="candy heart"/>
+	<Proposition type="subjective" head="Lil" connection="has" tail="gooberball"/>
+	<Proposition type="subjective" head="Lil" connection="dislikes" tail="gooberball"/>
+	<Proposition type="subjective" head="Lil" connection="likes" tail="webcomic"/>
+	<Proposition type="subjective" head="Lil" connection="likes" tail="zombie movie"/>
+	<Proposition type="subjective" head="Lil" connection="has" tail="zombie movie"/>
+	<Proposition type="subjective" head="Lil" connection="dislikes" tail="dodgeball"/>
+	<Proposition type="subjective" head="Lil" connection="likes" tail="chainsaw"/>
+	<Proposition type="subjective" head="Lil" connection="wants" tail="chainsaw"/>
+	<Proposition type="subjective" head="Lil" connection="wants" tail="codpiece"/>
+	
+	<Proposition type="subjective" head="Nicholas" connection="has" tail="diamond"/>
+	<Proposition type="subjective" head="Nicholas" connection="has" tail="skateboard"/>	
+	<Proposition type="subjective" head="Nicholas" connection="has" tail="class ring"/>	
+	<Proposition type="subjective" head="Nicholas" connection="dislikes" tail="class ring"/>	
+	<Proposition type="subjective" head="Nicholas" connection="has" tail="bobblehead"/>
+	<Proposition type="subjective" head="Nicholas" connection="has" tail="fart machine"/>
+	<Proposition type="subjective" head="Nicholas" connection="has" tail="Japanese sword"/>
+	<Proposition type="subjective" head="Nicholas" connection="has" tail="glass rose"/>
+	<Proposition type="subjective" head="Nicholas" connection="dislikes" tail="glass rose"/>
+	<Proposition type="subjective" head="Nicholas" connection="dislikes" tail="diamond"/>	
+	<Proposition type="subjective" head="Nicholas" connection="dislikes" tail="skateboard"/>
+	<Proposition type="subjective" head="Nicholas" connection="dislikes" tail="bobblehead"/>	
+	<Proposition type="subjective" head="Nicholas" connection="dislikes" tail="fart machine"/>
+	<Proposition type="subjective" head="Nicholas" connection="dislikes" tail="Japanese sword"/>
+	<Proposition type="subjective" head="Nicholas" connection="has" tail="vegan burger"/>
+	<Proposition type="subjective" head="Nicholas" connection="dislikes" tail="laughy candy joke"/>
+	<Proposition type="subjective" head="Nicholas" connection="dislikes" tail="smoking jacket"/>
+	<Proposition type="subjective" head="Nicholas" connection="wants" tail="leather jacket"/>
+	<Proposition type="subjective" head="Nicholas" connection="dislikes" tail="gooberball"/>
+	<Proposition type="subjective" head="Nicholas" connection="has" tail="dodgeball"/>
+	<Proposition type="subjective" head="Nicholas" connection="likes" tail="dodgeball"/>
+
+	<Proposition type="subjective" head="Zack" connection="likes" tail="retro phone"/>
+	<Proposition type="subjective" head="Zack" connection="has" tail="retro phone"/>
+	<Proposition type="subjective" head="Zack" connection="has" tail="lightsaber"/>
+	<Proposition type="subjective" head="Zack" connection="has" tail="class ring"/>
+	<Proposition type="subjective" head="Zack" connection="likes" tail="class ring"/>
+	<Proposition type="subjective" head="Zack" connection="likes" tail="banana slug"/>
+	<Proposition type="subjective" head="Zack" connection="wants" tail="banana slug"/>
+	<Proposition type="subjective" head="Zack" connection="has" tail="calculus book"/>
+	<Proposition type="subjective" head="Zack" connection="has" tail="bobblehead"/>
+	<Proposition type="subjective" head="Zack" connection="dislikes" tail="skateboard"/>
+	<Proposition type="subjective" head="Zack" connection="dislikes" tail="glass rose"/>
+	<Proposition type="subjective" head="Zack" connection="dislikes" tail="vegan burger"/>
+	<Proposition type="subjective" head="Zack" connection="likes" tail="laughy candy joke"/>
+	<Proposition type="subjective" head="Zack" connection="likes" tail="smoking jacket"/>
+	<Proposition type="subjective" head="Zack" connection="wants" tail="smoking jacket"/>
+	<Proposition type="subjective" head="Zack" connection="wants" tail="hand zapper"/>
+	<Proposition type="subjective" head="Zack" connection="wants" tail="leather jacket"/>
+	<Proposition type="subjective" head="Zack" connection="dislikes" tail="gooberball"/>
+	<Proposition type="subjective" head="Zack" connection="likes" tail="webcomic"/>
+	<Proposition type="subjective" head="Zack" connection="likes" tail="zombie movie"/>
+	<Proposition type="subjective" head="Zack" connection="has" tail="zombie movie"/>
+	<Proposition type="subjective" head="Zack" connection="dislikes" tail="dodgeball"/>
+	<Proposition type="subjective" head="Zack" connection="wants" tail="chainsaw"/>
+	<Proposition type="subjective" head="Zack" connection="has" tail="cheezeytoos snack pack"/>
+	<Proposition type="subjective" head="Zack" connection="likes" tail="cheezeytoos snack pack"/>
+	
+	<Proposition type="subjective" head="Chloe" connection="likes" tail="skateboard"/>
+	<Proposition type="subjective" head="Chloe" connection="has" tail="retro phone"/>
+	<Proposition type="subjective" head="Chloe" connection="has" tail="class ring"/>
+	<Proposition type="subjective" head="Chloe" connection="likes" tail="class ring"/>
+	<Proposition type="subjective" head="Chloe" connection="has" tail="glass rose"/>
+	<Proposition type="subjective" head="Chloe" connection="has" tail="lightsaber"/>
+	<Proposition type="subjective" head="Chloe" connection="likes" tail="banana slug"/>
+	<Proposition type="subjective" head="Chloe" connection="dislikes" tail="diamond"/>
+	<Proposition type="subjective" head="Chloe" connection="wants" tail="calculus book"/>
+	<Proposition type="subjective" head="Chloe" connection="wants" tail="vegan burger"/>
+	<Proposition type="subjective" head="Chloe" connection="likes" tail="laughy candy joke"/>
+	<Proposition type="subjective" head="Chloe" connection="has" tail="laughy candy joke"/>
+	<Proposition type="subjective" head="Chloe" connection="wants" tail="smoking jacket"/>
+	<Proposition type="subjective" head="Chloe" connection="wants" tail="leather jacket"/>
+	<Proposition type="subjective" head="Chloe" connection="likes" tail="leather jacket"/>
+	<Proposition type="subjective" head="Chloe" connection="has" tail="gooberball"/>
+	<Proposition type="subjective" head="Chloe" connection="likes" tail="webcomic"/>
+	<Proposition type="subjective" head="Chloe" connection="likes" tail="zombie movie"/>
+	<Proposition type="subjective" head="Chloe" connection="wants" tail="cheezeytoos snack pack"/>
+	<Proposition type="subjective" head="Chloe" connection="likes" tail="cheezeytoos snack pack"/>
+	
+	<Proposition type="subjective" head="Simon" connection="likes" tail="calculus book"/>
+	<Proposition type="subjective" head="Simon" connection="has" tail="calculus book"/>
+	<Proposition type="subjective" head="Simon" connection="has" tail="retro phone"/>
+	<Proposition type="subjective" head="Simon" connection="likes" tail="class ring"/>
+	<Proposition type="subjective" head="Simon" connection="wants" tail="class ring"/>
+	<Proposition type="subjective" head="Simon" connection="has" tail="lightsaber"/>
+	<Proposition type="subjective" head="Simon" connection="likes" tail="retro phone"/>
+	<Proposition type="subjective" head="Simon" connection="dislikes" tail="skateboard"/>
+	<Proposition type="subjective" head="Simon" connection="dislikes" tail="Japanese sword"/>
+	<Proposition type="subjective" head="Simon" connection="dislikes" tail="dead bug"/>
+	<Proposition type="subjective" head="Simon" connection="dislikes" tail="glass rose"/>
+	<Proposition type="subjective" head="Simon" connection="has" tail="vegan burger"/>
+	<Proposition type="subjective" head="Simon" connection="dislikes" tail="laughy candy joke"/>
+	<Proposition type="subjective" head="Simon" connection="wants" tail="smoking jacket"/>
+	<Proposition type="subjective" head="Simon" connection="wants" tail="hand zapper"/>
+	<Proposition type="subjective" head="Simon" connection="has" tail="candy heart"/>
+	<Proposition type="subjective" head="Simon" connection="wants" tail="gooberball"/>
+	<Proposition type="subjective" head="Simon" connection="likes" tail="gooberball"/>
+	<Proposition type="subjective" head="Simon" connection="dislikes" tail="webcomic"/>
+	<Proposition type="subjective" head="Simon" connection="likes" tail="zombie movie"/>
+	<Proposition type="subjective" head="Simon" connection="wants" tail="zombie movie"/>
+	<Proposition type="subjective" head="Simon" connection="dislikes" tail="dodgeball"/>
+	<Proposition type="subjective" head="Simon" connection="dislikes" tail="chainsaw"/>
+	<Proposition type="subjective" head="Simon" connection="likes" tail="cheezeytoos snack pack"/>
+	
+  </CulturalKB>
+</CiFState>

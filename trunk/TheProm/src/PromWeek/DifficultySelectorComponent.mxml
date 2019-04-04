@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 initialize="onInitialize()"
+		 width="100%"
+		 height="100%"
+		 styleName="classicPromWeek">
+	
+	<fx:Metadata>
+	</fx:Metadata>
+		
+	<fx:Declarations>
+	</fx:Declarations>
+	
+	<s:Rect id="Background" left="0" width="100%" height="100%" radiusX="6" radiusY="6">
+		<s:stroke>
+			<s:SolidColorStroke weight="{getStyle('backgroundStrokeWeight')}" color="{getStyle('backgroundStroke')}" caps="none" />
+		</s:stroke>
+		<s:fill>
+			<s:SolidColor color="{getStyle('backgroundColor')}" alpha="1.0" />
+		</s:fill>
+	</s:Rect>
+
+	<s:VGroup width="100%" height="100%" paddingBottom="15" paddingTop="15" paddingLeft="15" paddingRight="15">
+		<s:HGroup width="100%" height="15%" paddingLeft="90" paddingRight="15">
+			<s:RichText id="adjustDifficultyText" text="Adjust Difficulty" fontWeight="bold" fontSize="20" color="{getStyle('textColor')}" verticalAlign="top" width="100%" height="100%" styleName="basicFontStyle" />
+			<!-- the 'close this window' x -->
+			<s:Button id="closeButton" width="20" height="20" right="70" click="closeWindow(event)" toolTip="Close Window" skinClass="PromWeek.skins.NEW_closeButtonSkin"/>
+
+		</s:HGroup>
+		
+		<!-- the difficulty selector -->
+		<s:HGroup width="100%" height="20%" paddingLeft="20" paddingRight="20"  paddingTop="15">
+			<prom:NextPrevButton id="prevArrow" visible="true" x="{this.width}" width="10%" height="100%" click="previousDifficulty();" isNext="false" isPrev="true"/>
+			<s:RichText id="difficultySelector" text="Easy" fontWeight="bold" fontSize="18" color="{getStyle('textColor')}" width="80%" height="100%" textAlign="center" styleName="basicFontStyle" />
+			<prom:NextPrevButton id="nextArrow" visible="true" x="{this.width}"  width="10%" height="100%" click="nextDifficulty();" isNext="true" isPrev="false"/>
+		</s:HGroup>
+		
+		<!-- the description of the difficulty -->
+		<s:HGroup width="100%" height="45%" paddingLeft="20" paddingRight="20" paddingTop="15">
+			<s:RichText id="difficultyDescription" text="Difficulty Description" fontWeight="bold" fontSize="13" color="{getStyle('textColor')}" width="100%" height="100%" textAlign="center" styleName="basicFontStyle"/>
+		</s:HGroup>
+		
+		<!-- Closing Note and Button -->
+		<s:HGroup width="100%" height="20%" paddingLeft="10" paddingRight="10" paddingTop="5">
+			<s:RichText id="penaltyFreeText" text="*You can change difficulty at any time, free of penalty!" fontSize="10" color="{getStyle('textColor')}" width="100%" height="100%" styleName="basicFontStyle"/>
+			<prom:PromWeekButton id="acceptChangesButton" label="Accept Changes" width="100%" height="100%" click="acceptChangesClicked()" />
+		</s:HGroup>
+		
+
+	</s:VGroup>
+	
+	<fx:Script>
+		<![CDATA[
+		import CiF.CiFSingleton;
+		import CiF.Debug;
+		import flash.events.KeyboardEvent;
+		import flash.events.Event;
+		import flash.events.MouseEvent;
+		import PromWeek.assets.ResourceLibrary;
+		import flash.utils.Dictionary;
+		
+		public var statisticsManager:StatisticsManager;
+		private var gameEngine:PromWeek.GameEngine;
+		private var cif:CiFSingleton;
+		private var dm:DifficultyManager;
+		private var jpm:JuicePointManager;
+		
+		public var unofficialDifficulty:int = 3; // default to hard mode?
+		
+		public function onInitialize():void {
+			statisticsManager = StatisticsManager.getInstance();
+			this.gameEngine = GameEngine.getInstance();
+			
+			this.cif = CiFSingleton.getInstance();
+			this.dm = DifficultyManager.getInstance();
+			this.jpm = JuicePointManager.getInstance();
+		
+			//this.title.text = "Options";
+			//button.label = "Return to Main Menu";
+			
+		}
+		
+
+		
+		public function noClicked(e:Event):void {
+			//gameEngine.hudGroup.megaUI.optionsMenuButton.selected = true;
+			this.visible = false;
+			unofficialDifficulty = dm.getDifficulty(); // go back to whatever difficulty they are actually at.
+			updateAdjustDifficultyText();
+		}
+		
+		/**
+		 * The x was clicked -- close this window
+		 * @param	event the click event
+		 */
+		public function closeWindow(event:Event):void {
+			this.visible = false;
+			unofficialDifficulty = dm.getDifficulty(); // go back to whatever difficulty they are actually at.
+			updateAdjustDifficultyText();
+		}
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			this.acceptChangesButton.setStyleName();
+			this.invalidateProperties();
+		}
+		
+		/**
+		 * Advance the difficulty by one, i.e. go from easy to medium.
+		 * Note how this doesn't actually CHANGE the difficulty yet. It isn't
+		 * until the user pushes the 'accept changes' button that the difficulty
+		 * gets changed.
+		 */
+		public function nextDifficulty():void {
+			Debug.debug(this, "next difficulty clicked");
+			if (unofficialDifficulty + 1 > dm.EXPERT_ID) {
+				//We shouldn't have ever gotten here, but just in case, don't actually change anything.
+			}
+			else {
+				unofficialDifficulty++;
+				updateAdjustDifficultyText();
+			}
+		}
+		
+		/**
+		 *  Retreat (?) the difficulty by one, i.e. go from hard to medium.
+		 * Note how this doesn't actually CHANGE the difficulty yet. It isn't
+		 * until the user pushes the 'accept changes' button that the difficulty
+		 * gets changed.
+		 */
+		public function previousDifficulty():void {
+			Debug.debug(this, "previous difficulty clicked");
+			if (unofficialDifficulty - 1 < dm.EASY_ID) {
+				//We shouldn't have ever gotten here (arrows shouldn't be drawn if we are at
+				//an extreme case), but just in case, don't actually change anything
+			}
+			else {
+				unofficialDifficulty--;
+				updateAdjustDifficultyText();
+			}
+		}
+		
+		
+		/**
+		 * click handler for the 'accept changes' clicked. This will actually change the difficulty
+		 * level of the DifficultyManager, which is then used to adjust various gameplay things
+		 * (like the amount of juice points received, or the liklihood of someone accepting or
+		 * rejecting a social game) Will have to re-formulate intent, as characters will want to
+		 * do different things as a result of changing the gameplay mode.
+		 */
+		public function acceptChangesClicked():void {
+			//OK, fine, *technically* we lied -- changing difficulty will re-lock any hints that you may have purchased.
+			jpm.clearHints();
+			gameEngine.hudGroup.megaUI.clear();
+			gameEngine.worldGroup.characterDeselection();
+			
+			
+			dm.setDifficulty(unofficialDifficulty);
+			
+			//reform intent!
+			gameEngine.hudGroup.initIntentProgressBar( gameEngine.currentLevel.cast.length * gameEngine.currentLevel.cast.length);
+			gameEngine.hudGroup.intentProgressBar.visible = true;
+			cif.clearProspectiveMemory();
+			
+			gameEngine.startIntentTime = new Date().time;
+			
+			//Debug.debug(this,"clearProspectiveMemory happened!");
+			
+			gameEngine.intentInitiatorIterator = 0;
+			gameEngine.intentResponderIterator = 0;
+			gameEngine.intentSGIterator = 0;
+			gameEngine.isFormingIntent = true;
+			gameEngine.isFormingIntent = true;
+			gameEngine.consoleFormIntent = true
+			
+			this.visible = false;
+		}
+		
+		/**
+		 * This updates the various bits of text that need updating in the difficultySelectorComponent when
+		 * either the 'next' or 'previous' button is pushed.  This includes the difficulty that is displayed
+		 (e.g. Easy, Medium, Hard, etc.), as well as the description that goes with that difficulty.
+		 */
+		public function updateAdjustDifficultyText():void {
+			//Update the description.
+			if(!gameEngine.currentStory.isQuickPlay){
+				switch(unofficialDifficulty) {
+					case dm.EASY_ID:
+						difficultyDescription.text = dm.easyDescription;
+						difficultySelector.text = "Easy";
+						break;
+					case dm.MEDIUM_ID:
+						difficultyDescription.text = dm.mediumDescription;
+						difficultySelector.text = "Medium";
+						break;
+					case dm.HARD_ID:
+						difficultyDescription.text = dm.hardDescription;
+						difficultySelector.text = "Hard";
+						break;
+					case dm.EXPERT_ID:
+						difficultyDescription.text = dm.expertDescription;
+						difficultySelector.text = "Expert";
+						break;
+					default:
+						difficultyDescription.text = "Unrecognized difficulty selected";
+						difficultySelector.text = "Unrecognized";
+						break;
+				}
+				
+				//Update the previous and next arrows.
+				prevArrow.visible = true;
+				nextArrow.visible = true;
+				penaltyFreeText.visible = true;
+				acceptChangesButton.visible = true;
+				if (unofficialDifficulty == dm.EASY_ID)
+					prevArrow.visible = false;
+				if (unofficialDifficulty == dm.EXPERT_ID)
+					nextArrow.visible = false;
+			}
+			else {
+				//in quickplay mode, we don't want them to be able to change the difficulty setting!
+				
+				prevArrow.visible = false;
+				nextArrow.visible = false;
+				penaltyFreeText.visible = false;
+				acceptChangesButton.visible = false;
+				difficultySelector.text = "\"Get Started\" Mode";
+				difficultyDescription.text = "Sorry!  Changing the difficulty in \"Get Started\" mode is not available.";
+				
+			}
+		}
+		
+		]]>
+	</fx:Script>
+
+	
+</s:Group>

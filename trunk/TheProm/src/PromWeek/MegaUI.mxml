@@ -1,0 +1,2388 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()" 
+		 width="510"
+		 height="150"
+		 styleName="classicPromWeek">
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<!--<fx:String id="pathData">M 0 0 l 0 165 l 560 0 l 0 -140 l -435 0 s -25 -50 -100 -50 l -25 0 Z</fx:String>-->
+		<fx:String id="pathData">M 0 0 l 0 140 l 75 0 l 0 -140 l -75 0 Z</fx:String>
+		<fx:Number id="networkBuddy">0x00FF00</fx:Number>
+		<fx:Number id="networkRomance">0xFF99CE</fx:Number>
+		<fx:Number id="networkCool">0x0000FF</fx:Number>
+		<fx:Number id="maxLineLength">123</fx:Number>
+		<fx:Number id="responderNetworkLineOffset">12</fx:Number>
+		
+		<fx:Number id="initiatorMotivesID">0</fx:Number>
+		<fx:Number id="initiatorIntentID">1</fx:Number>
+		<fx:Number id="responderMotivesID">2</fx:Number>
+		<fx:Number id="resultsID">3</fx:Number>
+		<fx:Number id="forecastID">4</fx:Number>
+		
+		
+		<fx:Boolean id="megaUIExpanded">false</fx:Boolean>
+		
+		
+		<fx:Number id="relationshipIconDimension">30</fx:Number>
+		<fx:Number id="statusIconDimension">27</fx:Number>
+		<fx:Number id="smallerStatusIconDimension">25</fx:Number>
+		<fx:Number id="bottomButtonRoundness">12</fx:Number>
+		<fx:Number id="minimizeAlpha">0.2</fx:Number>
+		<fx:Number id="relationshipToggleButtonDisabledAlpha">0.1</fx:Number>
+		
+		
+		<fx:String id="pathDataFilterButton">M 0 0 c 53 1 60 4 72 18 c 83 37 83 63 85 150 l -85 0 Z</fx:String>
+		
+		<mx:Fade id="fadeOut" duration="300" alphaFrom="1.0" alphaTo="0.0" effectEnd="fadeOutDone(event)" />
+		<mx:Fade id="fadeIn" duration="300" alphaFrom="0.0" alphaTo="1.0" effectStart="fadeInStarted(event)" />
+		
+		<mx:Glow id="glowGoalButton" duration="100"
+				alphaFrom="0" alphaTo="1"
+				blurXFrom="0.0" blurXTo="40.0" 
+				blurYFrom="0.0" blurYTo="40.0"  strength="2"
+				color="0xFFFFFF" target="{goalButton}"/>
+					
+		
+		<mx:Glow id="unglowGoalButton" duration="300"  
+				alphaFrom="1" alphaTo="0"
+				blurXFrom="40.0" blurXTo="0.0"
+				blurYFrom="40.0" blurYTo="0.0"  strength="2"
+				color="0xFFFFFF" target="{goalButton}"/>
+	</fx:Declarations>
+	
+	
+	<!--<s:Group id="bgGroup" width="100%" height="100%">
+		<s:Rect width="100%" height="100%" y="0">
+				<s:stroke>
+					<s:SolidColorStroke weight="{getStyle('backgroundStrokeWeight')}" color="{getStyle('backgroundStroke')}" />
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor color="{getStyle('backgroundColor')}"/>
+				</s:fill>
+		</s:Rect>
+	</s:Group>-->	
+		
+	<s:Group id="cloakOfInvisibility" width="100%" height="100%">
+	<s:HGroup id="bottomButtonsGroup" width="100%" height="35" x="100" y="{this.height - 35}" gap="18">
+		<prom:ToggleableContainerButton id="initiatorCharButton" label="Init" width="110" height="100%" click="filterButtonClicked(event)" selected="false" boxPadding="5" toolTip="Initiator's Info" roundness="{this.bottomButtonRoundness}" visible="false" toggleable="true" />
+		<s:Group id="socialGameButtonGroup" width="110" height="100%" x="0" y="0" visible="false">
+			<prom:goButton id="playSGButton" click="goButtonClicked()" visible="true" x="5" y="-45" />
+			<prom:ToggleableContainerButton id="socialExchangeButton" width="100%" height="100%" label="Social Exchange" click="filterButtonClicked(event)" selected="true" boxPadding="0" toolTip="Social Exchange Info" roundness="{this.bottomButtonRoundness}"/>
+		</s:Group>
+		<prom:ToggleableContainerButton id="responderCharButton" label="Resp" width="110" height="100%" click="filterButtonClicked(event)" selected="false" boxPadding="5" toolTip="Responder's Info" roundness="{this.bottomButtonRoundness}" visible="false" toggleable="true" />	
+		<prom:ToggleableContainerButton id="relationshipButton" width="100%" height="100%" label="Social State" click="filterButtonClicked(event)" selected="true" boxPadding="0" roundness="{this.bottomButtonRoundness}" visible="false" />
+	</s:HGroup>
+	<s:HGroup x="475" y="0" rollOver="minimizeRolledOver(event)" rollOut="minimizeRolledOut(event)">
+		<prom:ToggleableContainerButton id="minimizeButton" width="35" height="35" visible="false" toggleable="false" boxPadding="5" toolTip="Minimize" click="onMinimizeButtonClicked(event)" alpha="{this.minimizeAlpha}" paddingTop="4" roundness="5" />
+	</s:HGroup>
+	
+	
+	
+	
+		<!--<s:Group id="farLeftBGGroup" x="-33" y="-15">-->
+		<s:Group id="farLeftBGGroup" x="-30" y="160">
+			<!--<s:Path data="M 0 0 L 0 -170 C 20 -183 74 -192 105 -170 C 130 -153 134 -69 123 0">-->
+			<!--<s:Path data="M 0 0 L 0 -170 C 25 -179 74 -192 105 -170 C 138 -146 130 -69 118 0">-->
+			<!--<s:Path data="M 0 0 L 0 -177 C 25 -179 74 -192 105 -170 C 138 -146 130 -69 118 0">-->
+			<s:Path data="M 0 0 L 0 -177 C 25 -179 74 -189 105 -170 C 138 -146 130 -69 118 0">
+				<s:stroke>
+					<s:SolidColorStroke weight="{getStyle('megaUIStrokeWeight')}" color="{getStyle('megaUIStroke')}" />
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor color="{getStyle('backgroundColor')}"/>
+				</s:fill>
+				
+			</s:Path>
+			<util:SmoothImage id="farLeftBackground" visible="false" includeInLayout="false"></util:SmoothImage>
+			
+		</s:Group>
+	
+	
+		<s:Group id="filterButtonsGroup" width="75" height="150" x="0" y="0">
+			<!--<s:Rect width="100%" height="100%">
+				<s:fill>
+					<s:SolidColor color="{getStyle('backgroundColor')}" alpha="{getStyle('backgroundAlpha')}"/>
+				</s:fill>
+			</s:Rect>-->
+			<s:Path x="-25" y="435" data="{this.pathDataFilterButton}">
+				<s:stroke>
+					<s:SolidColorStroke weight="{getStyle('megaUIStrokeWeight')}" color="{getStyle('megaUIStroke')}" />
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor color="{getStyle('backgroundColor')}"/>
+				</s:fill>
+			</s:Path>
+			<s:VGroup width="100%" height="100%" paddingBottom="5" paddingTop="5" paddingLeft="5" paddingRight="5" gap="8">
+				<prom:PromWeekButton id="goalButton" width="100%" height="35%" label="Goals" click="goalButtonClicked()" fontSize="18" />
+				<!--<prom:ToggleableContainerButton id="levelClockButton" width="100%" height="40%" click="onClickLevelClock(event)" toggleable="false" boxPadding="0" toolTip="Time Remaining" roundness="30" />-->
+				<s:HGroup paddingLeft="10"><prom:ToggleableContainerButton id="levelClockButton" width="54" height="54" click="onClickLevelClock(event)" toggleable="false" boxPadding="0" toolTip="Time Remaining (click to end level)" roundness="26" /></s:HGroup>
+				<s:HGroup width="100%" height="25%">
+					<prom:ToggleableContainerButton id="notificationButton" width="50%" height="100%" toggleable="false" boxPadding="3" toolTip="Notifications" click="filterButtonClicked(event)" roundness="5" />
+					<prom:ToggleableContainerButton id="exploreStateButton" width="50%" height="100%" toggleable="false" boxPadding="3" toolTip="Social Summary" click="filterButtonClicked(event)" roundness="5" />
+				</s:HGroup>
+			</s:VGroup>
+		</s:Group>
+		
+		
+		<s:Group id="rightSideContentGroup" width="430" height="112" x="90" y="38" visible="false">
+			<s:Rect x="6" width="98.6%" height="130" topRightRadiusX="25" topRightRadiusY="25">
+				<s:fill>
+					<s:SolidColor color="{getStyle('backgroundColor')}" /><!--alpha="{getStyle('backgroundColorAlpha')}"/>-->
+				</s:fill>
+				<s:stroke>
+					<!--<s:SolidColorStroke weight="{getStyle('backgroundStrokeWeight')}" color="{getStyle('backgroundStroke')}" />-->
+					<s:SolidColorStroke weight="{getStyle('megaUIStrokeWeight')}" color="{getStyle('megaUIStroke')}" />
+				</s:stroke>
+			</s:Rect>
+			<s:Rect id="meantToCoverTheFarLeftStrokeLine" x="-7" y="2" width="15" height="120">
+				<s:fill>
+					<s:SolidColor color="{getStyle('backgroundColor')}" />
+				</s:fill>
+			</s:Rect>
+			
+			
+			<s:HGroup paddingLeft="46" id="relationshipInfoGroup" visible="false">
+				<s:Group scaleX="0.864" scaleY="0.864">
+					<prom:PlayerPortrait id="primaryPortrait" top="35" left="58" width="90" height="90" />
+					<prom:PlayerPortrait id="secondaryPortrait" top="35" left="283" width="90" height="90" />
+					
+					<s:Group id="relationshipIconsGroup" x="148" y="10" width="140" height="40">
+						<util:SmoothImage id="friendsIcon" top="0" left="0" width="{relationshipIconDimension}" height="{relationshipIconDimension}" toolTip="Friends" />
+						<util:SmoothImage id="datingIcon" top="0" left="{relationshipIconsGroup.width/3}" width="{relationshipIconDimension}" height="{relationshipIconDimension}" toolTip="Dating" />
+						<util:SmoothImage id="enemiesIcon" top="0" left="{relationshipIconsGroup.width/3 * 2}" width="{relationshipIconDimension}" height="{relationshipIconDimension}" toolTip="Enemies" />
+					</s:Group>
+					
+					<s:Group id="initiatorStatusGroup" width="52" height="90" x="0" y="40" />
+					<s:Group id="responderStatusGroup" width="52" height="90" x="375" y="40" />
+					
+					<s:Group id="networkLines" top="45" left="148">
+						<s:Path id="primaryToSecondaryBuddyPath" >
+							<s:stroke>
+								<s:SolidColorStroke weight="{getStyle('networkStrokeWeight')}" color="{getStyle('buddyColor')}" caps="none" />
+							</s:stroke>
+						</s:Path>
+						<s:Path id="secondaryToPrimaryBuddyPath" >
+							<s:stroke>
+								<s:SolidColorStroke weight="{getStyle('networkStrokeWeight')}" color="{getStyle('buddyColor')}" caps="none"/>
+							</s:stroke>		
+						</s:Path>
+						
+						<s:Path id="primaryToSecondaryRomancePath" >
+							<s:stroke>
+								<s:SolidColorStroke weight="{getStyle('networkStrokeWeight')}" color="{getStyle('romanceColor')}" caps="none"/>
+							</s:stroke>		
+						</s:Path>
+						<s:Path id="secondaryToPrimaryRomancePath" >
+							<s:stroke>
+								<s:SolidColorStroke weight="{getStyle('networkStrokeWeight')}" color="{getStyle('romanceColor')}" caps="none"/>
+							</s:stroke>		
+						</s:Path>
+						
+						<s:Path id="primaryToSecondaryCoolPath" >
+							<s:stroke>
+								<s:SolidColorStroke weight="{getStyle('networkStrokeWeight')}" color="{getStyle('coolColor')}" caps="none"/>
+							</s:stroke>		
+						</s:Path>
+						<s:Path id="secondaryToPrimaryCoolPath" >
+							<s:stroke>
+								<s:SolidColorStroke weight="{getStyle('networkStrokeWeight')}" color="{getStyle('coolColor')}" caps="none"/>
+							</s:stroke>		
+						</s:Path>
+						
+						<s:Group id="buddyMouseOverGroup" x="0" y="-5" width="{maxLineLength}" height="25" toolTip="'Buddy' subjective feelings" />
+						<s:Group id="romanceMouseOverGroup" x="0" y="25" width="{maxLineLength}" height="25" toolTip="'Romantic' subjective feelings" />
+						<s:Group id="coolMouseOverGroup" x="0" y="55" width="{maxLineLength}" height="25" toolTip="'Cool' subjective feelings" />
+						
+						
+						<!--<s:Group id="coolSecondaryToPrimaryMouseOverGroup" x="0" y="67" width="{maxLineLength}" height="10" rollOver="rollOverCoolSecondaryToPrimary(event)" rollOut="rollOutCoolSecondaryToPrimary(event)"/>-->
+					</s:Group>
+				</s:Group>
+			</s:HGroup>
+			<s:Group id="singleCharacterInfoGroup" width="100%" height="100%" visible="false">
+				<s:HGroup gap="0" width="100%" height="100%" paddingBottom="5" paddingLeft="55" paddingRight="5" paddingTop="5">
+					<s:VGroup width="37%" height="100%">
+						<!--<s:Group width="100%" height="20%">
+							<s:Rect width="100%" height="100%">
+								<s:fill>
+									<s:SolidColor color="{getStyle('backgroundColor')}" alpha=".7"/>
+								</s:fill>
+							</s:Rect>
+							<s:HGroup id="sgTitleBarGroup" width="100%" height="100%">
+								<util:SmoothImage id="smallCharacterImage" width="25" height="25"/>
+								<s:RichText id="characterNameText" width="50%" height="100%" color="white" fontSize="14" fontWeight="bold" textAlign="center" verticalAlign="middle"/>
+							</s:HGroup>
+						</s:Group>-->
+						<s:HGroup width="100%" height="80%" paddingTop="5">
+							<s:VGroup width="50%" height="100%" paddingTop="3" paddingLeft="3" paddingRight="3" paddingBottom="3">
+								<s:RichText id="traitTitle" text="Traits:" fontSize="11" fontWeight="bold" color="{getStyle('contentAreaTextColor')}" />
+								<s:HGroup paddingLeft="5"><s:RichText id="TraitList" color="{getStyle('contentAreaTextColor')}" fontSize="12" lineHeight="20" /></s:HGroup>
+							</s:VGroup>
+							<s:VGroup width="50%" height="100%" paddingTop="3" paddingLeft="3" paddingRight="3" paddingBottom="3">
+								<s:RichText id="statusTitle" text="Statuses:" color="{getStyle('contentAreaTextColor')}" fontSize="11" fontWeight="bold" />
+								<s:HGroup paddingLeft="5"><s:HGroup id="statusGroup"/></s:HGroup>
+							</s:VGroup>
+						</s:HGroup>
+					</s:VGroup>
+					<s:VGroup width="63%" height="100%" horizontalAlign="center" gap="0">
+						<mx:ToggleButtonBar id="bioStarsButtonBar"
+								direction="horizontal"
+								dataProvider="{bioStarsViewStack}"
+								width="100"
+								height="10%"
+								toggleOnClick="true" fontSize="10" />
+						<mx:ViewStack id="bioStarsViewStack"
+								backgroundColor="{getStyle('backgroundColor')}"
+								width="100%"
+								height="85%" 
+								creationPolicy="all"
+								verticalScrollPolicy="off" horizontalScrollPolicy="off">
+							<mx:Canvas id="starCanvas" label="Stars" width="100%" height="100%" verticalScrollPolicy="off" horizontalScrollPolicy="off">
+									<!--icon="@Embed('assets/bulletCheck.png')">-->
+								<s:BorderContainer width="100%" height="100%" borderWeight="2" 
+										cornerRadius="3" dropShadowVisible="true" creationPolicy="all">
+									<s:backgroundFill>
+										<s:LinearGradient rotation="90">
+											<s:GradientEntry color="{getStyle('contentAreaColor')}" />
+											<s:GradientEntry color="{getStyle('contentAreaColor')}" />
+										</s:LinearGradient>
+									</s:backgroundFill>
+									<s:VGroup id="starGroup" width="90%" height="90%" paddingTop="3">
+									</s:VGroup>
+								</s:BorderContainer>
+							</mx:Canvas>
+							<mx:Canvas id="bioCanvas" label="Bio" width="100%" height="100%" verticalScrollPolicy="off">
+								<!--icon="@Embed('assets/bulletCritical.png')">-->
+								<s:BorderContainer width="100%" height="100%" borderWeight="2" cornerRadius="3" dropShadowVisible="{getStyle('contentAreaDropShadows')}" creationPolicy="all">
+									<s:backgroundFill>
+										<s:LinearGradient rotation="90">
+											<s:GradientEntry color="{getStyle('contentAreaColor')}" />
+											<s:GradientEntry color="{getStyle('contentAreaColor')}" />
+										</s:LinearGradient>
+									</s:backgroundFill>
+									<s:HGroup width="100%" height="100%" >
+										<s:TextArea id="characterBio" height="80" width="100%" contentBackgroundColor="{getStyle('contentAreaColor')}" color="{getStyle('textColor')}" fontSize="12" editable="false" selectable="false" horizontalScrollPolicy="off" />
+									</s:HGroup>
+								</s:BorderContainer>
+							</mx:Canvas>
+						</mx:ViewStack>
+					</s:VGroup>
+					<!--<prom:PromWeekButton label="Rel->" width="15%" click="setToRelationshipState(event)"/>-->
+				</s:HGroup>
+			</s:Group>
+			
+			
+			<s:HGroup id="miniMapGroup" visible="false" scaleX="0.85" scaleY="0.85" paddingLeft="70">
+				<prom:StateVisualizer id="stateVisualizer" width="240" height="118" />
+			</s:HGroup>
+			
+			<s:Group id="socialGameInfoGroup" visible="false" width="100%" height="100%">
+				<prom:SocialGameInfoComponent id="sgInfo" width="430" height="112" />
+			</s:Group>
+			<s:VGroup id="characterFilterGroup" width="60" height="100%" x="0" y="0">
+				<s:Rect>
+					<s:fill>
+						<mx:SolidColor color="red"></mx:SolidColor>
+					</s:fill>
+				</s:Rect>
+				<s:VGroup id="singleCharacterToggleButtonsGroup" width="100%" height="100%" paddingRight="5" paddingLeft="5" paddingTop="20" paddingBottom="5">
+					<prom:ToggleableContainerButton id="characterSheetToggleButton" width="80%" height="40%" roundness="8" selected="false" toggleable="true" enabled="true" toolTip="Character Info" boxPadding="0" click="clickOnSingleCharToggle(event)" />
+					<prom:ToggleableContainerButton id="relationshipToggleButton" width="80%" height="40%" roundness="8" click="setToRelationshipState(event)" selected="false" toggleable="true" enabled="false" toolTip="Relationship Info" boxPadding="0"/>
+					<!--<prom:ToggleableContainerButton id="exploreStateToggleButton" width="80%" height="30%" roundness="8" selected="true" enabled="true" toolTip="Social Summary" boxPadding="0" click="exploreStateForCharClicked(event)" />-->
+				</s:VGroup>
+			</s:VGroup>
+		</s:Group>
+		</s:Group>
+	
+	
+	
+	
+	
+	<fx:Script>
+		<![CDATA[
+		import CiF.CiFSingleton;
+		import flash.geom.Rectangle;
+		import flash.geom.Vector3D;
+		import flash.text.TextField;
+		import flash.text.TextFormat;
+		import flash.utils.Dictionary;
+		import flashx.textLayout.utils.CharacterUtil;
+		import mx.controls.Button;
+		import mx.events.ItemClickEvent;
+		import spark.components.Group;
+		import spark.components.Button;
+		import mx.graphics.SolidColor;
+		import mx.graphics.SolidColorStroke;
+		import spark.components.HGroup;
+		import spark.components.RichText;
+		import spark.components.VGroup;
+		import spark.primitives.*;
+		import flash.text.TextField;
+		import spark.components.Label;
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import flash.events.*;
+		import spark.filters.*;
+		import CiF.*;
+		import flashx.textLayout.formats.TextAlign;
+		import PromWeek.assets.ResourceLibrary;
+		import mx.managers.ToolTipManager;
+		import mx.controls.ToolTip;
+		import mx.collections.ArrayCollection;
+		import flash.display.InteractiveObject;
+		import flash.events.IEventDispatcher;
+		
+		
+		public static const DEFAULT_MAX_DESIRE:Number = 12;
+		public static const DEFAULT_MIN_DESIRE:Number = -12;
+		
+		public static const DEFAULT_ZERO_POINT:Number = 0.5;
+		
+		
+		// These are for use in determining how long the network lines are
+		public static const BUDDY_BUDDY_UP_SIGNIFICANCE:Number = 0.4;
+		public static const BUDDY_FRIENDS_SIGNIFICANCE:Number = 0.4;
+		public static const BUDDY_END_ENEMIES_SIGNIFICANCE:Number = 0.2;	
+		
+		public static const BUDDY_END_FRIENDS_SIGNIFICANCE:Number = 0.4;
+		public static const BUDDY_BUDDY_DOWN_SIGNIFICANCE:Number = 0.4;		
+		public static const BUDDY_ENEMIES_SIGNIFICANCE:Number = 0.2;
+		
+		
+		
+		public static const ROMANCE_ROMANCE_UP_SIGNIFICANCE:Number = 0.4;
+		public static const ROMANCE_DATING_SIGNIFICANCE:Number = 0.6;
+		
+		public static const ROMANCE_END_DATING_SIGNIFICANCE:Number = 0.6;
+		public static const ROMANCE_ROMANCE_DOWN_SIGNIFICANCE:Number = 0.4;
+		
+		/**
+		 * This is set to true when a secondary character is selected when there was none selected previously.
+		 * This has the effect of forcing the relationship state to be shown on filter button update.
+		 */
+		public var _setToRelationshipState:Boolean = false;
+		
+		public static const COOL_COOL_UP_SIGNIFICANCE:Number = 1.0;
+		
+		public static const COOL_COOL_DOWN_SIGNIFICANCE:Number = 1.0;
+		//-------------------------------------------------
+
+		// These are used to say what percent of the rules must be true of an intent type in order to contribute 
+		// that intent's full significance to the network line. Seems like something that would require tuning
+		// Lots of magic numbers...
+		public static const BUDDY_UP_POS_THRESHOLD:Number = 0.05
+		public static const BUDDY_UP_NEG_THRESHOLD:Number = 0.05
+		public static const BUDDY_DOWN_POS_THRESHOLD:Number = 0.05
+		public static const BUDDY_DOWN_NEG_THRESHOLD:Number = 0.05
+		public static const ROMANCE_UP_POS_THRESHOLD:Number = 0.05
+		public static const ROMANCE_UP_NEG_THRESHOLD:Number = 0.05
+		public static const ROMANCE_DOWN_POS_THRESHOLD:Number = 0.05
+		public static const ROMANCE_DOWN_NEG_THRESHOLD:Number = 0.05
+		public static const COOL_UP_POS_THRESHOLD:Number = 0.05
+		public static const COOL_UP_NEG_THRESHOLD:Number = 0.05
+		public static const COOL_DOWN_POS_THRESHOLD:Number = 0.05
+		public static const COOL_DOWN_NEG_THRESHOLD:Number = 0.05
+		public static const FRIENDS_POS_THRESHOLD:Number = 0.05
+		public static const FRIENDS_NEG_THRESHOLD:Number = 0.05
+		public static const END_FRIENDS_POS_THRESHOLD:Number = 0.05
+		public static const END_FRIENDS_NEG_THRESHOLD:Number = 0.05
+		public static const DATING_POS_THRESHOLD:Number = 0.05
+		public static const DATING_NEG_THRESHOLD:Number = 0.05
+		public static const END_DATING_POS_THRESHOLD:Number = 0.05
+		public static const END_DATING_NEG_THRESHOLD:Number = 0.05
+		public static const ENEMIES_POS_THRESHOLD:Number = 0.05
+		public static const ENEMIES_NEG_THRESHOLD:Number = 0.05
+		public static const END_ENEMIES_POS_THRESHOLD:Number = 0.05
+		public static const END_ENEMIES_NEG_THRESHOLD:Number = 0.05
+		//---------------------------------------------------------------
+		
+		public var gameEngine:PromWeek.GameEngine;
+		public var rL:ResourceLibrary;
+		public var resourceLibrary:ResourceLibrary;
+		public var cif:CiFSingleton;
+		public var jpm:JuicePointManager;
+		public var dm:DifficultyManager;
+		public var currentCharacter:Character;
+		
+		
+		[Bindable] public var sgArray:ArrayCollection;
+		
+		public var currentPrimaryCharacter:Character;
+		public var currentSecondaryCharacter:Character;
+		
+		public var selectedGameName:String = "";
+		public var socialGameContext:SocialGameContext;
+		
+		public var acceptForecasts:Dictionary;
+		public var rejectForecasts:Dictionary;
+		
+		public var actualResponderMotiveStrengthDictionary:Dictionary;
+		public var currentResponderMotiveStrengthDictionary:Dictionary;
+		
+		public var revealedPredictions:Dictionary;
+		
+		public var lastSingleCharClicked:String;
+		
+		public var availableSocialGames:Dictionary;
+		
+		public var gamesToUnlockDictionary:Dictionary; // the games that live inside of the drop down list.
+		
+		public var numUnreadSSU:RichText;
+		public var unreadGroup:Group;
+		public var numUnread:int = 0;
+		
+		public var socialExchangeButtonGameName:RichText;
+		
+		
+		
+		public var goalButtonHasBeenClicked:Boolean;
+		
+		
+		//override protected function commitProperties():void {
+			//trace("MegaUI Oy!");
+			//super.commitProperties();
+		//}	
+		
+		public var levelClock:LevelClock;
+		
+
+		
+		
+		public function onCreationComplete():void 
+		{
+			
+			gameEngine = GameEngine.getInstance();
+			rL = ResourceLibrary.getInstance();
+			resourceLibrary = rL;
+			cif = CiFSingleton.getInstance();
+			jpm = JuicePointManager.getInstance();
+			dm = DifficultyManager.getInstance();
+			
+			
+			this.levelClock = new LevelClock();
+			levelClock.x -= 2;
+			levelClock.y -= 2;
+			this.levelClockButton.mainContainer.addElement(this.levelClock);
+			
+			
+			acceptForecasts = new Dictionary();
+			rejectForecasts = new Dictionary();
+			
+			actualResponderMotiveStrengthDictionary = new Dictionary();
+			currentResponderMotiveStrengthDictionary = new Dictionary();
+			
+			revealedPredictions = new Dictionary();
+			
+			availableSocialGames = new Dictionary();
+			
+			gamesToUnlockDictionary = new Dictionary();
+			
+			
+			
+			//create the background of the next/prev sg buttons
+			var group:Group;// = new Group();
+			/*
+			var stroke:SolidColorStroke = new SolidColorStroke();
+			stroke.color = getStyle('navSGArrowColor');
+			stroke.weight = 2;
+			var p:Path = new Path();
+			p.stroke = stroke;
+			var pData:String = "M 0 0 l ";
+			pData += this.nextSocialGameButton.width + " " + this.nextSocialGameButton.height / 2;
+			pData += " " + (-1 * this.nextSocialGameButton.width) + " " + this.nextSocialGameButton.height / 2;
+			p.data = pData;
+			group.addElement(p);
+			group.width = this.nextSocialGameButton.width;
+			group.height = this.nextSocialGameButton.height;
+			nextSocialGameButton.mainContainer.addElement(group);
+			
+			group= new Group();
+			p = new Path();
+			//stroke = new SolidColorStroke();
+			//stroke.color = 0x000000;
+			p.stroke = stroke;
+			pData = "M " + this.previousSocialGameButton.width + " 0 l ";
+			pData += (-1 * this.previousSocialGameButton.width) + " " + this.previousSocialGameButton.height / 2;
+			pData += " " + this.previousSocialGameButton.width + " " + this.previousSocialGameButton.height / 2;
+			p.data = pData;
+			group.addElement(p);
+			group.width = this.previousSocialGameButton.width;
+			group.height = this.previousSocialGameButton.height;
+			previousSocialGameButton.mainContainer.addElement(group);
+			*/
+			
+			this.socialExchangeButtonGameName = new RichText();
+			socialExchangeButtonGameName.width = socialExchangeButton.mainContainer.width;
+			socialExchangeButtonGameName.height = socialExchangeButton.mainContainer.height;
+			socialExchangeButtonGameName.text = "Social Exchange"
+			socialExchangeButtonGameName.setStyle("fontSize", "12");
+			socialExchangeButtonGameName.setStyle("verticalAlign", "middle");
+			socialExchangeButtonGameName.setStyle("textAlign", "center");
+			socialExchangeButton.mainContainer.addElement(socialExchangeButtonGameName);
+			
+			this.stateVisualizer.stateFilter.characterFilterGroup.hiderBtn.setDimentions(28, 25);
+			
+			var img:SmoothImage;
+
+			img = new SmoothImage();
+			img.width = 15//this.characterSheetToggleButton.mainContainer.width;
+			img.height = 20//this.characterSheetToggleButton.mainContainer.height;
+			img.source = resourceLibrary.uiIcons["singleCharIcon"];
+			this.characterSheetToggleButton.mainContainer.addElement(img);
+			
+			img = new SmoothImage();
+			img.width = 27//this.relationshipToggleButton.mainContainer.width;
+			img.height = 20//this.relationshipToggleButton.mainContainer.height;
+			img.source = resourceLibrary.uiIcons["twoCharIcon"];
+			this.relationshipToggleButton.mainContainer.addElement(img);
+			
+			//img = new SmoothImage();
+			//img.width = 20//this.exploreStateToggleButton.mainContainer.width;
+			//img.height = 22//this.exploreStateToggleButton.mainContainer.height;
+			//img.source = resourceLibrary.uiIcons["socialState"];
+			//this.exploreStateToggleButton.mainContainer.addElement(img);
+			
+			img = new SmoothImage();
+			img.width = this.notificationButton.mainContainer.width;
+			img.height = this.notificationButton.mainContainer.height;
+			img.source = resourceLibrary.uiIcons["notification"];
+			this.notificationButton.mainContainer.addElement(img);
+			
+			img = new SmoothImage();
+			img.width = this.minimizeButton.mainContainer.width;
+			img.height = this.minimizeButton.mainContainer.height;
+			img.source = resourceLibrary.uiIcons["minimize"];
+			this.minimizeButton.mainContainer.addElement(img);
+			
+			img = new SmoothImage();
+			img.width = this.exploreStateButton.mainContainer.width;
+			img.height = this.exploreStateButton.mainContainer.height;
+			img.source = resourceLibrary.uiIcons["socialState"];
+			this.exploreStateButton.mainContainer.addElement(img);
+			
+			
+			farLeftBackground.source = resourceLibrary.uiIcons["farLeftBackground"];
+			
+			/*
+			group = new Group();
+			img = new Image();
+			img.width = 17//this.socialStatusUpdateButton.width / 4;
+			img.height = 24//this.socialStatusUpdateButton.height;
+			img.source = resourceLibrary.uiIcons["phone"];
+			//group.width = img.width;
+			//group.height = img.height;
+			group.addElement(img);
+			img.x = 5;
+			img.y = 2;
+			
+			this.unreadGroup = new Group();
+			var circle:Ellipse = new Ellipse();
+			circle.width = 18;
+			circle.height = 18;
+			var sColor:SolidColor = new SolidColor();
+			sColor.color = 0xFF0000;
+			circle.fill = sColor;
+			this.unreadGroup.addElement(circle);
+			this.numUnreadSSU = new RichText();
+			this.numUnreadSSU.setStyle("color","white");
+			this.numUnreadSSU.setStyle("fontWeight","bold");
+			this.numUnreadSSU.setStyle("fontSize","12");
+			this.unreadGroup.addElement(this.numUnreadSSU);
+			circle.x = -15
+			this.numUnreadSSU.x = -10;
+			this.numUnreadSSU.y = 5;
+			this.unreadGroup.x = 0;
+			this.unreadGroup.y = 5;
+			group.addElement(this.unreadGroup);
+			this.updateNumUnreadSSU(0);
+			this.socialStatusUpdateButton.mainContainer.addElement(group);
+			
+			
+			group = new Group();
+			var rt:RichText = new RichText();
+			rt.width = 22;
+			rt.height = 20;
+			//group.width = img.width;
+			//group.height = img.height;
+			rt.y = 2;
+			rt.text = "..."
+			group.addElement(rt);
+			this.optionsMenuButton.mainContainer.addElement(group);
+			*/
+			this.setRelationshipButton("miniMapIcon");
+			
+			//this.socialStatusUpdateButton.selected = !gameEngine.hudGroup.ssuVisualizer.visible;
+
+			//this.optionsMenuButton.selected = false;
+		}
+		
+		
+		/**
+		 * Click event handler for the level clock. If the level goals have been
+		 * successfully met, flag the game engine to load the next level.
+		 * @param	event	Incoming mouse event.
+		 */
+		
+		public function onClickLevelClock(event:flash.events.MouseEvent):void 
+		{
+			gameEngine.hudGroup.inGameOptionMenu.visible = false;
+			
+			//Debug.debug(this, "onClickLevelClock() clicked");
+			if (!gameEngine.currentLevel.endable)
+			{
+				gameEngine.hudGroup.skipLevelOptionMenu.visible = true;
+			}
+			else
+			{
+				gameEngine.hudGroup.skipToEndOfPromNight.visible = true;
+			}
+			
+		}
+		
+		public function exploreStateForCharClicked(e:MouseEvent = null):void
+		{
+			if (!cif.cast.getCharByName(this.lastSingleCharClicked)) return;
+			this.setToMiniMap(cif.cast.getCharByName(this.lastSingleCharClicked));
+			
+			/*
+			if (gameEngine.primaryAvatarSelection == null) return;
+			
+			if (gameEngine.primaryAvatarSelection == this.currentPrimaryCharacter.characterName.toLowerCase())
+			{
+				this.setToMiniMap(this.currentPrimaryCharacter);
+				//this.setToMiniMap(this.currentCharacter);
+			}
+			else if (gameEngine.secondaryAvatarSelection != null)
+			{
+				if (gameEngine.secondaryAvatarSelection == this.currentSecondaryCharacter.characterName.toLowerCase())
+				{
+					this.setToMiniMap(this.currentSecondaryCharacter);
+					//this.setToMiniMap(this.currentCharacter);
+				}
+			}
+			*/
+			this.characterSheetToggleButton.selected = true;
+			//this.exploreStateToggleButton.selected = false;
+			this.relationshipToggleButton.selected = true;
+		}
+		
+		public function updateSingleCharacterToggleButtons():void
+		{
+			//trace(vgroup.width + " " + vgroup.height);
+			
+			
+			if (this.currentSecondaryCharacter == null) 
+			{
+				//relationshipToggleButton.selected = true;
+				relationshipToggleButton.enabled = false;
+				relationshipToggleButton.alpha = this.relationshipToggleButtonDisabledAlpha;
+				
+			}
+			else
+			{
+				relationshipToggleButton.enabled = true;
+				relationshipToggleButton.alpha = 1;
+			}
+			//characterSheetToggleButton
+			//exploreStateToggleButton
+		}
+		
+		
+		/*
+		public function updateNumUnreadSSU(numUnread1:int):void
+		{
+
+			this.numUnread = numUnread1;
+			if (this.numUnread == 0)
+			{
+				this.unreadGroup.visible = false;
+			}
+			else
+			{
+				if (!gameEngine.hudGroup.ssuVisualizer.visible)
+				{
+					this.unreadGroup.visible = true;
+					this.numUnreadSSU.text = this.numUnread.toString();
+				}
+			}
+		}
+		*/
+		
+		public function clickOnSingleCharToggle(e:MouseEvent = null):void
+		{
+			var toSetTo:String;
+			
+			if (gameEngine.primaryAvatarSelection == null) return;
+			/*
+			if (gameEngine.primaryAvatarSelection.toLowerCase() == this.currentCharacter.characterName.toLowerCase())
+			{
+				toSetTo = "initiator";
+			}
+			else if (gameEngine.secondaryAvatarSelection != null)
+			{
+				if (gameEngine.secondaryAvatarSelection.toLowerCase() == this.currentCharacter.characterName.toLowerCase())
+				{
+					toSetTo = "responder";
+				}
+			}
+			*/
+			if (this.initiatorCharButton.selected)
+			{
+				toSetTo = "initiator";
+			}
+			else if (this.responderCharButton.selected)
+			{
+				toSetTo = "responder";
+			}
+			else 
+			{
+				return;
+			}
+			
+			//once we've gotten here, it means we've probably gotten the right character..., I think.
+			this.setToSingleCharacterView(toSetTo);
+			this.updateSingleCharacterToggleButtons();
+			
+			this.characterSheetToggleButton.selected = true;
+			//this.exploreStateToggleButton.selected = true;
+			this.relationshipToggleButton.selected = false;
+		}
+		
+		
+		public function setRelationshipButton(mode:String):void
+		{
+			this.relationshipButton.mainContainer.removeAllElements();
+			
+			var group:Group = new Group();
+			var img:SmoothImage = new SmoothImage();
+			if (mode == "relationshipIcon")
+			{
+				img.width = this.relationshipButton.width;
+				img.height = this.relationshipButton.height;
+				img.source = resourceLibrary.uiIcons["relationshipIcon"];
+				group.addElement(img);
+				this.relationshipButton.mainContainer.addElement(group);
+				this.relationshipButton.toolTip = "Information about the initiator and responder's relationship";
+			}
+			else if (mode == "miniMapIcon")
+			{
+				img.width = this.relationshipButton.width;
+				img.height = this.relationshipButton.height;
+				img.source = resourceLibrary.uiIcons["miniMapIcon"];
+				group.addElement(img);
+				this.relationshipButton.mainContainer.addElement(group);
+				this.relationshipButton.toolTip = "A summary of the social state";
+			}
+		}
+		
+		public function populateFilterButtons():void
+		{			
+			this.initiatorCharButton.mainContainer.removeAllElements();			
+			this.responderCharButton.mainContainer.removeAllElements();
+
+			var image:SmoothImage;
+			var rt:RichText;
+			var buttonHGroup:HGroup;
+			if (this.currentPrimaryCharacter != null)
+			{
+				this.initiatorCharButton.mainContainer.removeAllElements();
+				
+				buttonHGroup = new HGroup();
+				buttonHGroup.width = this.initiatorCharButton.mainContainer.width - this.initiatorCharButton.boxPadding;
+				buttonHGroup.height = this.initiatorCharButton.mainContainer.height - this.initiatorCharButton.boxPadding;
+				
+				image = new SmoothImage();
+				image.width = buttonHGroup.height;
+				image.height = buttonHGroup.height;
+				image.source = rL.charHeads[this.currentPrimaryCharacter.characterName.toLowerCase()];
+				buttonHGroup.addElement(image);
+				
+				rt = new RichText();
+				rt.width = initiatorCharButton.mainContainer.width - image.width;
+				rt.height = initiatorCharButton.mainContainer.height;
+				rt.text = this.currentPrimaryCharacter.characterName;
+				rt.setStyle("fontSize", "12");
+				rt.setStyle("verticalAlign", "middle");
+				rt.setStyle("textAlign", "center");
+				buttonHGroup.addElement(rt);
+				
+				this.initiatorCharButton.mainContainer.addElement(buttonHGroup);
+			}
+
+			
+			
+			if (this.currentSecondaryCharacter != null)
+			{
+				this.responderCharButton.mainContainer.removeAllElements();
+				
+				buttonHGroup = new HGroup();
+				buttonHGroup.width = this.responderCharButton.mainContainer.width - this.responderCharButton.boxPadding;
+				buttonHGroup.height = this.responderCharButton.mainContainer.height - this.responderCharButton.boxPadding;
+				
+				image = new SmoothImage();
+				image.width = buttonHGroup.height;
+				image.height = buttonHGroup.height;
+				image.source = rL.charHeads[this.currentSecondaryCharacter.characterName.toLowerCase()];
+				buttonHGroup.addElement(image);
+				
+				rt = new RichText();
+				rt.width = responderCharButton.mainContainer.width - image.width;
+				rt.height = responderCharButton.mainContainer.height;
+				rt.text = this.currentSecondaryCharacter.characterName;
+				rt.setStyle("fontSize", "12");
+				rt.setStyle("verticalAlign", "middle");
+				rt.setStyle("textAlign", "center");
+				buttonHGroup.addElement(rt);
+				
+				this.responderCharButton.mainContainer.addElement(buttonHGroup);
+			}
+
+			
+		}
+		
+		
+		public function filterButtonClicked(e:MouseEvent = null):void
+		{	
+			if (e.currentTarget.id == "initiatorCharButton")
+			{
+				this.currentCharacter = this.currentPrimaryCharacter;
+				
+				lastSingleCharClicked = gameEngine.primaryAvatarSelection;
+				
+				updateSingleCharacterToggleButtons();
+				this.singleCharacterToggleButtonsGroup.visible = true;
+				
+				this.initiatorCharButton.selected = true;
+				this.responderCharButton.selected = false;
+				if (!this.currentSecondaryCharacter)
+				{
+
+					this.setToSingleCharacterView("initiator");
+				}
+				else
+				{
+					if(this.relationshipToggleButton.selected)
+						this.setToRelationshipState();
+					else
+						this.setToSingleCharacterView("initiator");
+				}
+			}
+			else if (e.currentTarget.id == "responderCharButton")
+			{
+				this.currentCharacter = this.currentSecondaryCharacter;
+				
+				lastSingleCharClicked = gameEngine.secondaryAvatarSelection;
+				
+				if (_setToRelationshipState) {
+					this.setToRelationshipState();
+					this._setToRelationshipState = false;
+				}
+				
+				updateSingleCharacterToggleButtons();
+				this.singleCharacterToggleButtonsGroup.visible = true;
+				if (this.currentSecondaryCharacter != null)
+				{
+					this.responderCharButton.selected = true;
+					this.initiatorCharButton.selected = false;
+					if(this.relationshipToggleButton.selected)
+						this.setToRelationshipState();
+					else
+						this.setToSingleCharacterView("responder");
+				}
+				else
+				{
+					setToSingleCharacterView("responder");
+				}
+			}
+			else
+			{
+				if (!((e.currentTarget as PromWeek.ToggleableContainerButton).id == "exploreStateButton") && !((e.currentTarget as PromWeek.ToggleableContainerButton).id == "notificationButton"))
+				{
+					this.singleCharacterInfoGroup.visible = false;
+				}
+			}
+			
+			
+			var relationshipButtonReset:Boolean = false;
+			var stateButtonClicked:Boolean = false;
+			var shouldntExpand:Boolean = false;
+			var notificationButtonClicked:Boolean  = false;
+			if ((e.currentTarget as PromWeek.ToggleableContainerButton).id == "notificationButton")
+			{	
+				gameEngine.hudGroup.ssuVisualizer.visible = !gameEngine.hudGroup.ssuVisualizer.visible;
+				shouldntExpand = true;
+				notificationButtonClicked = true;
+			}
+			else if ((e.currentTarget as PromWeek.ToggleableContainerButton).id == "exploreStateButton")
+			{
+				if (this.megaUIExpanded && this.miniMapGroup.visible)
+				{
+					shouldntExpand = true;
+					this.onMinimizeButtonClicked();
+				}
+				else
+				{
+					this.singleCharacterToggleButtonsGroup.visible = false;
+					var charToSet:Character = (this.currentPrimaryCharacter != null)?this.currentPrimaryCharacter:null;
+					this.setToMiniMap(charToSet);
+					
+					this.initiatorCharButton.selected = false;
+					this.responderCharButton.selected = false;
+					this.socialExchangeButton.selected = false;
+					
+					stateButtonClicked = true;
+					miniMapGroup.visible = true;
+				}
+			}
+			else
+			{
+				miniMapGroup.visible = false;
+			}
+			
+			//if ((e.currentTarget as PromWeek.ToggleableContainerButton).label == "Relationship" && !relationshipButtonReset)
+			//{
+				//setToRelationshipState();
+			//}
+			//else
+			//{
+				//relationshipInfoGroup.visible = false;
+			//}
+			
+			
+			//socialExchangeButton
+			if (e.currentTarget.id == "socialExchangeButton")
+			{
+				this.singleCharacterToggleButtonsGroup.visible = false;
+				this.setToSocialGameInfo();
+				socialGameInfoGroup.visible = true;
+			}
+			else
+			{
+				if (!notificationButtonClicked)
+				{
+					socialGameInfoGroup.visible = false;
+				}
+			}
+			
+			
+			
+			
+			//make it expanded!!!!!!
+			if (!this.megaUIExpanded && !shouldntExpand)
+			{
+				this.expandMegaUI();
+			}
+		}
+		
+		
+		
+		public function expandMegaUI():void
+		{
+			this.bottomButtonsGroup.y = 0;
+			this.rightSideContentGroup.visible = true;
+			this.megaUIExpanded = true;
+			minimizeButton.visible = true;
+		}
+		
+		public function onMinimizeButtonClicked(e:MouseEvent = null):void
+		{
+			this.initiatorCharButton.selected = false;	
+			this.responderCharButton.selected = false;	
+			this.socialExchangeButton.selected = false;
+			
+			this.bottomButtonsGroup.y = this.height - this.bottomButtonsGroup.height;
+			this.rightSideContentGroup.visible = false;
+			this.megaUIExpanded = false;
+			minimizeButton.visible = false;
+			this.minimizeButton.alpha = this.minimizeAlpha;
+		}
+
+		public function resetMegaUISelections():void
+		{
+			this.currentPrimaryCharacter = null;
+			this.currentSecondaryCharacter = null;
+			this.currentCharacter = null;
+			this.selectedGameName = "";
+			
+			this.setButtonsToAppropriateEnabledState();
+		}
+		
+		public function setButtonsToAppropriateEnabledState():void
+		{
+			this.relationshipButton.enabled = true;
+			/*if (this.currentPrimaryCharacter == null)
+			{
+				this.initiatorCharButton.enabled = false;
+			}
+			else
+			{
+				this.initiatorCharButton.enabled = true;
+			}
+			
+			if (this.currentSecondaryCharacter == null)
+			{
+				this.responderCharButton.enabled = false;
+			}
+			else
+			{
+				this.responderCharButton.enabled = true;
+			}*/
+			
+			
+			if (!this.currentPrimaryCharacter) {
+				//no characters selected
+				this.initiatorCharButton.enabled = false;
+				this.responderCharButton.enabled = false;
+			} else if (!this.currentSecondaryCharacter) {
+				//only one character selected
+				this.initiatorCharButton.enabled = true;
+				this.responderCharButton.enabled = false;
+			} else {
+				//2 characters selected
+				this.initiatorCharButton.enabled = true;
+				this.responderCharButton.enabled = true;
+			}
+			
+			if (this.selectedGameName == "")
+			{
+				this.socialExchangeButton.enabled = false;
+			}
+			else
+			{
+				this.socialExchangeButton.enabled = true;
+			}
+			
+			//Only let you click the go button if all the coponent parts are in place.
+			if (this.currentPrimaryCharacter == null || this.currentSecondaryCharacter == null || this.selectedGameName == "" || this.selectedGameName == null) {
+				this.playSGButton._isUnlocked = false;
+				this.playSGButton.invalidating();
+			}
+			else {
+				this.playSGButton._isUnlocked = true;
+				this.playSGButton.invalidating();
+			}
+		}
+		
+		
+		public function minimizeRolledOver(e:MouseEvent=null):void
+		{
+			this.minimizeButton.alpha = 1;
+		}
+
+		public function minimizeRolledOut(e:MouseEvent=null):void
+		{
+			this.minimizeButton.alpha = this.minimizeAlpha;
+		}
+		
+		
+		public function goalButtonClicked(e:MouseEvent=null,shouldTurnOn:Boolean=false):void 
+		{
+			if (!this.goalButtonHasBeenClicked)
+			{
+				this.goalButtonHasBeenClicked = true;
+				this.unglowGoalButton.play();
+			}
+			
+			if (shouldTurnOn)
+			{
+				if (!this.gameEngine.hudGroup.storyGoalWindow.visible)
+				{
+					gameEngine.hudGroup.inGameOptionMenu.visible = false; // just because otherwise they would overlap with each other.
+					fadeIn.play([this.gameEngine.hudGroup.storyGoalWindow]);
+				}
+			}
+			else
+			{
+				if (this.gameEngine.hudGroup.storyGoalWindow.visible)
+				{
+					fadeOut.play([this.gameEngine.hudGroup.storyGoalWindow]);
+				}
+				else
+				{
+					gameEngine.hudGroup.inGameOptionMenu.visible = false; // just because otherwise they would overlap with each other.
+					fadeIn.play([this.gameEngine.hudGroup.storyGoalWindow]);
+				}
+			}
+		}
+		
+		public function fadeInStarted(e:Event):void
+		{
+			gameEngine.hudGroup.storyGoalWindow.visible = true;
+		}
+		public function fadeOutDone(e:Event):void
+		{
+			gameEngine.hudGroup.storyGoalWindow.visible = false;
+			if (gameEngine.hudGroup.storyGoalWindow.hintComponent.filterTopLevel.visible)
+			{
+				gameEngine.hudGroup.storyGoalWindow.hintComponent.fadeOut.play([gameEngine.hudGroup.storyGoalWindow.hintComponent.hintSearchGroup]);
+			}
+		}
+		
+		
+		
+		
+		public function setToSingleCharacterView(who:String):void
+		{
+			if (this.currentCharacter == null) return;
+			
+			this.characterSheetToggleButton.selected = true;
+			//this.exploreStateToggleButton.selected = true;
+			this.relationshipToggleButton.selected = false;
+			
+			this.singleCharacterToggleButtonsGroup.visible = true;
+			
+			
+			//var charInfoClicked:Boolean = false;
+			if (who == "initiator")
+			{
+				if (gameEngine.primaryAvatarSelection == null|| gameEngine.primaryAvatarSelection == "") return;
+				lastSingleCharClicked = gameEngine.primaryAvatarSelection;
+				
+				initiatorCharButton.selected = true;
+				responderCharButton.selected = false;
+			}
+			else
+			{
+				initiatorCharButton.selected = false;
+			}
+			
+			
+			if (who == "responder")
+			{
+				if (gameEngine.secondaryAvatarSelection == null || gameEngine.secondaryAvatarSelection == "") return;
+				lastSingleCharClicked = gameEngine.secondaryAvatarSelection;
+				
+				initiatorCharButton.selected = false;
+				responderCharButton.selected = true;
+			}
+			else
+			{
+				responderCharButton.selected = false;
+			}
+			
+			if (this.currentCharacter == null)
+			{
+				this.currentCharacter = this.currentPrimaryCharacter;
+			}else {
+				this.currentCharacter = cif.cast.getCharByName(this.lastSingleCharClicked);
+			}
+			
+			this.populateSingleCharacterInfo(this.currentCharacter.characterName.toLowerCase());
+			
+			this.singleCharacterInfoGroup.visible = true;
+			this.miniMapGroup.visible = false;
+			this.relationshipInfoGroup.visible = false;
+			this.socialGameInfoGroup.visible = false;
+			
+			this.relationshipButton.selected = true;
+			this.socialExchangeButton.selected = false;
+		}
+		
+		public function setToSocialGameInfo():void
+		{
+			this.characterSheetToggleButton.selected = false;
+			//this.exploreStateToggleButton.selected = true;
+			this.relationshipToggleButton.selected = false;
+			
+			this.initiatorCharButton.selected = false;
+			this.responderCharButton.selected = false;
+			this.socialExchangeButton.selected = true;
+			
+			relationshipInfoGroup.visible = false;
+			miniMapGroup.visible = false;
+			singleCharacterInfoGroup.visible = false;
+			socialGameInfoGroup.visible = true;
+			
+			this.relationshipButton.selected = true;
+		}
+		
+		public function setToRelationshipState(e:MouseEvent = null):void
+		{
+			//this is just  a hack for now
+			if (this.currentSecondaryCharacter == null) return;
+		
+			this.characterSheetToggleButton.selected = false;
+			//this.exploreStateToggleButton.selected = true;
+			this.relationshipToggleButton.selected = true;
+			
+			//this.initiatorCharButton.selected = true;
+			//this.responderCharButton.selected = true;
+			this.socialExchangeButton.selected = false;
+			//this.relationshipButton.selected = false;
+			
+			drawPortraits();
+			drawNetworkLines();
+			updateStatusIconsForRelationshipView();
+			drawRelationshipIcons();
+			relationshipInfoGroup.visible = true;
+			miniMapGroup.visible = false;
+			singleCharacterInfoGroup.visible = false;
+			socialGameInfoGroup.visible = false;
+			relationshipButton.label = "Social State"
+			
+			this.setRelationshipButton("miniMapIcon");
+		}
+		
+		public function setToMiniMap(charToSet:Character=null):void
+		{
+			var charToDisplay:Character = (charToSet == null)?cif.cast.getCharByName(gameEngine.currentStory.storyLeadCharacter):charToSet;
+			this.currentCharacter = charToDisplay;
+			this.stateVisualizer.updateCharacterInfoGroup(this.currentCharacter, gameEngine.currentLevel.cast);
+			
+			miniMapGroup.visible = true;
+			relationshipInfoGroup.visible = false;
+			singleCharacterInfoGroup.visible = false;
+			socialGameInfoGroup.visible = false;
+			
+			if (this.currentSecondaryCharacter != null)
+			{
+				relationshipButton.label = "Relationship";
+				
+				this.setRelationshipButton("relationshipIcon");
+			}
+
+			this.relationshipButton.selected = false;
+			
+			//this.initiatorCharButton.selected = true;
+			//this.responderCharButton.selected = true;
+			this.socialExchangeButton.selected = true;
+		}
+		
+		
+		public function buttonBarClicked(e:ItemClickEvent = null):void
+		{
+			if (e.index == initiatorMotivesID)
+			{
+				
+			}
+			else if (e.index == responderMotivesID)
+			{
+				
+			}
+			else if (e.index == initiatorIntentID)
+			{
+				
+			}
+			else if (e.index == resultsID)
+			{
+				
+			}
+			else if (e.index == forecastID)
+			{
+				
+				var castToUse:Vector.<Character>;
+				/*
+				if (gameEngine.currentStory.storyLeadCharacter == "Zack" || gameEngine.currentStory.storyLeadCharacter == "Chloe")
+				{
+					castToUse = gameEngine.currentLevel.cast;
+				}
+				else
+				{
+					castToUse = cif.cast.characters;
+				}
+				*/
+				castToUse = cif.cast.characters;
+				var sgc:SocialGameContext = cif.playGame(cif.socialGamesLib.getByName(this.selectedGameName), this.currentPrimaryCharacter, this.currentSecondaryCharacter, null, castToUse, gameEngine.currentLevel.cast, false, dm.getVolitionThreshold("responder"), dm.getResponderBoostFromDictionary(gameEngine.primaryAvatarSelection.toLowerCase() , gameEngine.secondaryAvatarSelection.toLowerCase(), this.selectedGameName)  );
+				this.sgInfo.populateForcast(sgc);
+			}
+		}
+
+		
+		public function populateInitiatorIntentForResponse(sgc:SocialGameContext):void
+		{
+			//set the intent picture and intensity
+			this.sgInfo.intentImageGroupForResponse.removeAllElements();
+			var intentPred:Predicate = cif.socialGamesLib.getByName(this.selectedGameName).intents[0].predicates[0];
+			this.sgInfo.intentImageGroupForResponse.addElement(MegaUI.getIntentImage(intentPred, this.currentPrimaryCharacter, this.currentSecondaryCharacter));
+			//initIntentLabel.text = this.currentPrimaryCharacter.characterName + " intends:";
+			//this.intensityLabel.text = gameEngine.getIntensityOfDesireToDoWhatTheCharacterDid("initiator", sgc);
+		}
+		
+		public static function getIntentImage(intentPred:Predicate, init:Character, resp:Character):Group 
+		{
+			var intentID:int = intentPred.getIntentType();
+			var returnGroup:Group = new Group();
+			if (intentPred.type == Predicate.RELATIONSHIP)
+			{
+				var relType:String;
+				if (intentPred.relationship == RelationshipNetwork.FRIENDS)
+				{
+					relType = "friends";
+				}
+				else if (intentPred.relationship == RelationshipNetwork.DATING)
+				{
+					relType = "dating";
+				}
+				else if (intentPred.relationship == RelationshipNetwork.ENEMIES)
+				{
+					relType = "enemies";
+				}
+				var relTwoChar:RelationshipIconTwoChar = new RelationshipIconTwoChar();
+				relTwoChar.loadImagesToIcon(intentPred.relationship, init.characterName.toLowerCase(), resp.characterName.toLowerCase(), intentPred.negated,"",true);
+				returnGroup.addElement(relTwoChar);
+			}
+			else if (intentPred.type == Predicate.NETWORK)
+			{
+				var netName:String;
+				if (intentPred.networkType == SocialNetwork.BUDDY)
+				{
+					netName = "buddy";
+				}
+				else if (intentPred.networkType == SocialNetwork.ROMANCE)
+				{
+					netName = "romance";
+				}
+				else if (intentPred.networkType == SocialNetwork.COOL)
+				{
+					netName = "cool";
+				}
+				var netTwoChar:NetworkIconTwoChar = new NetworkIconTwoChar();// init.characterName.toLowerCase(), resp.characterName.toLowerCase(), netName, intentPred.networkValue, intentPred.operator, true);
+				netTwoChar.loadImagesToIcon(intentPred.networkType, resp.characterName.toLowerCase(), init.characterName.toLowerCase(), intentPred.negated,"",intentPred.operator,true);
+				returnGroup.addElement(netTwoChar);
+			}
+			return returnGroup;
+		}
+		
+		
+
+		
+		
+		
+		
+		
+		public function populateSingleCharacterInfo(name:String):void
+		{
+			this.currentCharacter = cif.cast.getCharByName(name);
+			//this.characterNameText.text = this.currentCharacter.characterName;
+			//this.smallCharacterImage.source = rL.charHeads[name.toLowerCase()];
+			this.updateTraitList();
+			this.updateStatusIcons();
+			this.updateBio();
+			this.populateStarsList();
+			
+		}
+		
+		public function updateTraitList():void
+		{
+			this.TraitList.text = "";
+			var traitName:String;
+			var traits:Vector.<Number> = this.currentCharacter.traits;
+			for (var i:int; i < traits.length; i++) {
+				traitName = Trait.getNameByNumber(traits[i]);
+				if (traits[i] < Trait.FIRST_TO_IGNORE)
+				{
+					if (traits[i] == Trait.AFRAID_OF_COMMITMENT)
+					{
+						this.TraitList.text += "*Timid\n";//"*Afraid of\n  commitment\n";
+					}
+					else if (traits[i] == Trait.TAKES_THINGS_SLOWLY)
+					{
+						this.TraitList.text += "*Reserved\n";//"*Afraid of\n  commitment\n";
+					}
+					else
+					{
+						this.TraitList.text += "*" + LineOfDialogue.toInitialCap(traitName) + "\n";
+					}
+				}
+			}
+		}
+		public function updateBio():void 
+		{
+			switch(this.currentCharacter.characterName) 
+			{
+				case 'Mave': 
+					this.characterBio.text = "Mave is a big fish in the small, black-and-lace-filled pool of the high school Goths. She doesn't suffer fools (which includes most of her classmates) and will stop at nothing to get what she wants. But beneath her cynical exterior and acerbic wit lies a desire for a partner who matches her in more than just style."; 
+					break;
+				case 'Edward': 
+					this.characterBio.text = "Edward may be the best dressed Goth in school, but there's not much going on underneath his dapper black hat: he lacks the wit he thinks he has. Once one of the popular crowd before his fall to 'the dark side,' he secretly wants nothing more than to be cool again, although he's too self-defeating and naive to ever get back with the in crowd... isn't he?"; 
+					break;
+				case 'Phoebe': 
+					this.characterBio.text = "Phoebe was a spoiled rich kid who turned emo senior year, much to the annoyance of everyone except the other emos, who she drives around in her dad's swank car. She can't understand why more people don't love her winning personality. Her best quality is that she won't take no for an answer: maybe she can channel that stubbornness into a less lonely existence?"; 
+					break;
+				case 'Nicholas':
+					this.characterBio.text = "Nicholas has been described as a 'smug little punk' by some and a 'vicious heartbreaking monster' by others, and that's just what his parents think of him. Rich, good-looking, three-time student body president, Nicholas is the paradigm of perfection. He's also 'friends' with the rest of the popular crowd, and with ladies from any clique who catch his fancy."; 
+					break;
+				case 'Monica':
+					this.characterBio.text = "Monica is a manipulative machiavellian mastermind.  Boys want her, girls want the thing she has that the boys want. She rules this school with an iron fist (fashionably manicured, of course). But despite smiling out from nearly every page of the yearbook, in her darkest nights Monica can't help but wonder if she's missing something from life..."; 
+					break;
+				case 'Zack':
+					this.characterBio.text = "Zack is a geek and proud of it, flaunting his l33t skillz and pop culture references at every opportunity. If he does okay in his classes it's mostly because he copies off Simon: he'd much rather watch pirated anime than actually study. His single-minded selfishness has made him a lot of enemies, but if he wants something, he'll do whatever it takes."; 
+					break;
+				case 'Lil':
+					this.characterBio.text = "Lil has few friends, meandering through life to the beat of a drummer no one else can quite hear: sometimes awkward, sometimes a compulsive liar, other times she's graceful and can't stand posers. Although she keeps mostly to herself, who know's what she's plotting underneath all that hair?"; 
+					break;
+				case 'Doug':
+					this.characterBio.text = "Doug does his best to avoid the petty politics that consume his peers, who as a result mostly ignore him. But to his friends, he's a sweet, if awkward kid who isn't afraid to be himself. As long as he's got his board, it's all good.";
+					break;
+				case 'Simon':
+					this.characterBio.text = "Simon seems like your classic nerd on the surface, but deep down he's much nerdier than that. (As president of the lightsaber construction club, he'd viciously ban members who didn't properly complete their training.) The popular kids tolerate him because of his sometimes useful hacking skills, despite his embarrassing attempts to use their lingo.";
+					break;
+				case 'Naomi':
+					this.characterBio.text = "Naomi, head of the prom committee and determined to make it the best prom ever, would seem to have the perfect life: top-notch SAT scores, talented, and a kindness that's earned her friends across the social spectrum. But she can't stop worrying about the future, and is terrified that with one false move she might lose everything.";
+					break;
+				case 'Buzz':
+					this.characterBio.text = "Buzz is the star quarterback of the football team. He knows what he likes (mostly taking cheerleaders out for rides on his motorcycle) and likes what he knows (which isn't much). Though his angry demeanor puts the nerds of the school in a perpetual state of panic, underneath lies a heart yearning to express emotions that he just isn't articulate enough to express.";
+					break;
+				case 'Jordan':
+					this.characterBio.text = "Jordan's competitiveness often lands her in situation she regrets. She managed to work her way to Differential Calculus AP, not due to any great love of math, but due to a disgust of Naomi thinking she is better than her. She would much prefer riding on skateboards (but only if she can be the best at it).";
+					break;
+				case 'Chloe':
+					this.characterBio.text = "Something of a social butterfly, Chloe views herself as the great bridge, connecting the popular and the unpopular kids together, once and forever! Her friends list might be several miles long, but does it come from a genuine desire to befriend, or is it just a means to mask her insecurities?";
+					break;
+				case 'Gunter':
+					this.characterBio.text = "Recently transfered from Germany, Gunter is of undeterminate age and questionable intelligence. Most of his classmates are secretly terrified of his ripped body, punk outfits, and sometimes shocking European sensibilities, although Gunter himself has not seemed to notice their reactions. Can Gunter find a place at school in time to be one of the gang by the Prom?";
+					break;
+				case 'Lucas':
+					this.characterBio.text = "Lucas wears his heart on his sleeve (and on most of the rest of his shirt) and has been known to be both a fiercely loyal friend and to burst into tears when mean people talk to him. Slow to change his mind or forget a grudge, Lucas just hopes he can make it through the last week of high school without any humiliation.";
+					break;
+				case 'Oswald':
+					this.characterBio.text = "Captain of the debate team, three-time Tennis Fashion Magazine award winner, Oswald glides through high school like an infomercial spokesman: charming, obsequious, and a little sleazy. He has a love/hate relationship with the popular kids(those smarmy pretenders!) and doesn't really think much about anyone else as long as they stay out of his way";
+					break;
+				case 'Kate':
+					this.characterBio.text = "Kate's felt increasingly awkward all through high school. While her classmates have gone all goth or emo or fashion-crazy, she still likes the simple things: playing in band and riding bikes. She wouldn't ever think she'd get asked her out for the Prom. Hopefully someone will see through her frazzled hair and blushing freckles to the sweet soul underneath.";
+					break;	
+				case 'Cassandra':
+					this.characterBio.text = "Cassandra has worked hard every step of the way to be one of the popular kids, and at last she's succeeded. Though she knows sometimes you have to be vindictive, petty, or cruel to succeed, she doesn't enjoy it: she just wants to shop and gossip and date the cute boys. If she has to break a few hearts or tell a few lies to be part of that, isn't it worth it?";
+					break;
+				default: 
+					this.characterBio.text = "Err, which character are you talking about again?";
+			}
+		}
+		public function updateStatusIcons():void
+		{
+			this.statusGroup.removeAllElements();
+			
+			var vGroup:VGroup = new VGroup();
+			
+			vGroup.gap = 4;
+			
+			var hGroup:HGroup;
+			var status:Status;
+			var numDisplayed:int = 0;
+			var statusIcon:StatusIcon;
+			
+			var howManyPerRow:int = 2;
+			var shouldDisplayStatus:Boolean;
+			for each (status in this.currentCharacter.statuses)
+			{
+				shouldDisplayStatus = true;
+				if (status.type >= Status.FIRST_TO_IGNORE_NON_DIRECTED && status.type < Status.FIRST_DIRECTED_STATUS)
+				{
+					shouldDisplayStatus = false;
+				}
+				if (shouldDisplayStatus)
+				{
+					if (numDisplayed >= 6)
+					{
+						break;
+					}
+					
+					if (numDisplayed % howManyPerRow == 0)
+					{
+						hGroup = new HGroup();
+						vGroup.addElement(hGroup);
+					}
+					statusIcon = new PromWeek.StatusIcon();//this.statusIcons[numDisplayed];
+					statusIcon.width = 24;// (howManyPerRow == 2)?twoPerRomDimension:threePerRomDimension;
+					statusIcon.height = 24;// (howManyPerRow == 2)?twoPerRomDimension:threePerRomDimension;
+					statusIcon.loadStatusImagesToIcon(status.type, status.directedToward, status.remainingDuration);
+					hGroup.addElement(statusIcon);
+					numDisplayed++;
+				}
+			}
+			
+			
+			this.statusGroup.addElement(vGroup);
+		}
+		
+		
+		public function updateStatusIconsForRelationshipView():void
+		{
+			this.initiatorStatusGroup.removeAllElements();
+			
+			var vGroup:VGroup = new VGroup();
+			
+			var hGroup:HGroup;
+			var status:Status;
+			var numDisplayed:int = 0;
+			var statusIcon:StatusIcon;
+			
+			var howManyPerRow:int = 2;
+			
+			
+			var shouldDisplayStatus:Boolean;
+			for each (status in this.currentPrimaryCharacter.statuses)
+			{
+				shouldDisplayStatus = true;
+				
+				if (status.type >= Status.FIRST_TO_IGNORE_NON_DIRECTED && status.type < Status.FIRST_DIRECTED_STATUS)
+				{	
+					shouldDisplayStatus = false;
+				}
+				if (shouldDisplayStatus)
+				{
+					if (numDisplayed >= 6)
+					{
+						break;
+					}				
+					
+					if (numDisplayed % howManyPerRow == 0)
+					{
+						hGroup = new HGroup();
+						vGroup.addElement(hGroup);
+					}
+					statusIcon = new PromWeek.StatusIcon();//this.statusIcons[numDisplayed];
+					statusIcon.width = smallerStatusIconDimension;// (howManyPerRow == 2)?twoPerRomDimension:threePerRomDimension;
+					statusIcon.height = smallerStatusIconDimension;// (howManyPerRow == 2)?twoPerRomDimension:threePerRomDimension;
+					statusIcon.loadStatusImagesToIcon(status.type, status.directedToward, status.remainingDuration);
+					hGroup.addElement(statusIcon);
+					numDisplayed++;
+				}
+			}
+			
+			this.initiatorStatusGroup.addElement(vGroup);
+			
+			//add em in for the responder now
+			this.responderStatusGroup.removeAllElements();			
+			vGroup = new VGroup();
+			numDisplayed = 0;
+			for each (status in this.currentSecondaryCharacter.statuses)
+			{
+				shouldDisplayStatus = true;
+				if (status.type >= Status.FIRST_TO_IGNORE_NON_DIRECTED && status.type < Status.FIRST_DIRECTED_STATUS)
+				{
+					shouldDisplayStatus = false;
+				}
+				if (shouldDisplayStatus)
+				{
+					if (numDisplayed >= 6)
+					{
+						break;
+					}
+					
+					if (numDisplayed % howManyPerRow == 0)
+					{
+						hGroup = new HGroup();
+						vGroup.addElement(hGroup);
+					}
+					statusIcon = new PromWeek.StatusIcon();//this.statusIcons[numDisplayed];
+					statusIcon.width = smallerStatusIconDimension;// (howManyPerRow == 2)?twoPerRomDimension:threePerRomDimension;
+					statusIcon.height = smallerStatusIconDimension;// (howManyPerRow == 2)?twoPerRomDimension:threePerRomDimension;
+					statusIcon.loadStatusImagesToIcon(status.type, status.directedToward, status.remainingDuration);
+					hGroup.addElement(statusIcon);
+					numDisplayed++;
+				}
+			}
+			this.responderStatusGroup.addElement(vGroup);
+		}
+
+		
+		
+		
+		
+		public function populateStarsList():void
+		{
+			if (rL == null)
+			{
+				rL = PromWeek.assets.ResourceLibrary.getInstance();
+			}
+			
+			this.currentCharacter.updateCharacterLabels();
+			
+			starGroup.removeAllElements();
+			var vGroup:VGroup = new VGroup();
+			vGroup.width = starGroup.width;
+			vGroup.height = 85;//starGroup.height;
+			sgInfo.vgroup.gap = 0;
+			var group:Group;
+			var label:Label;
+			var image:SmoothImage;
+			var hGroup:HGroup;
+			for (var i:int = 0; i < this.currentCharacter.characterLabels.length; i++ )
+			{
+				if (i % 3 == 0)
+				{
+					hGroup = new HGroup();
+					hGroup.width = starGroup.width;
+					hGroup.height = 85/2 - 10//starGroup.height / 2;
+					hGroup.gap = 0;
+					vGroup.addElement(hGroup);
+				}
+				group = new Group();
+				label = new Label();
+				label.setStyle("color", "yellow");
+				label.setStyle("fontWeight", "bold");
+				label.setStyle("fontSize", "11");
+				label.setStyle("textAlign",TextAlign.CENTER);
+				image = new SmoothImage();
+				if (this.currentCharacter.characterLabels[i] != "")
+				{
+					image.source = rL.portraits[this.currentCharacter.characterLabels[i].toLowerCase()];
+					if (i == Character.LABEL_DATING)
+					{
+						label.text = (cif.cast.getCharByName(this.currentCharacter.characterLabels[i]).hasTrait(Trait.MALE))?"Boyfriend":"Girlfriend";
+					}
+					else
+					{
+						label.text = Character.getLabelNameByID(i);
+					}
+				}
+				else
+				{
+					label.text = Character.getLabelNameByID(i);
+					image.source = rL.portraits["noOne"];
+				}
+				label.width = 70;
+				image.width = hGroup.height - 5;
+				image.height = hGroup.height - 5;
+				image.x = 22;
+				image.y = 8;
+				group.addElement(image);
+				group.addElement(label);
+				group.toolTip = (this.currentCharacter.characterLabels[i] == "")?"no one":this.currentCharacter.characterLabels[i];
+				hGroup.addElement(group);
+			}
+			
+			starGroup.addElement(vGroup);
+		}
+		
+		
+		
+		/**
+		 * These function handle all the tool tip stuff
+		 */
+		public var buddyToolTip:ToolTip;
+		public var romanceToolTip:ToolTip;
+		public var coolToolTip:ToolTip;
+		/*
+		public function rollOverBuddyPrimaryToSecondary(e:MouseEvent):void
+		{
+			buddyToolTip = ToolTipManager.createToolTip((this.currentPrimaryCharacter.characterName + " buddy feelings toward " + this.currentSecondaryCharacter.characterName + ": " + cif.buddyNetwork.getWeight(this.currentPrimaryCharacter.networkID,this.currentSecondaryCharacter.networkID)), networkLines.left + buddyPrimaryToSecondaryMouseOverGroup.x, networkLines.top + buddyPrimaryToSecondaryMouseOverGroup.y + 10) as ToolTip;
+		}
+		public function rollOutBuddyPrimaryToSecondary(e:MouseEvent):void
+		{
+			ToolTipManager.destroyToolTip(buddyToolTip);
+		}
+		public function rollOverBuddySecondaryToPrimary(e:MouseEvent):void
+		{
+			buddyToolTip = ToolTipManager.createToolTip((this.currentSecondaryCharacter.characterName + "'s buddy feelings toward " + this.currentPrimaryCharacter.characterName + ": " + cif.buddyNetwork.getWeight(this.currentSecondaryCharacter.networkID,this.currentPrimaryCharacter.networkID)), networkLines.left + buddySecondaryToPrimaryMouseOverGroup.x,networkLines.top + buddySecondaryToPrimaryMouseOverGroup.y + 10) as ToolTip;
+		}
+		public function rollOutBuddySecondaryToPrimary(e:MouseEvent):void
+		{
+			ToolTipManager.destroyToolTip(buddyToolTip);
+		}
+		public function rollOverRomancePrimaryToSecondary(e:MouseEvent):void
+		{
+			romanceToolTip = ToolTipManager.createToolTip((this.currentPrimaryCharacter.characterName + "'s feelings of romance toward " + this.currentSecondaryCharacter.characterName + ": " + cif.romanceNetwork.getWeight(this.currentPrimaryCharacter.networkID,this.currentSecondaryCharacter.networkID)), networkLines.left + romancePrimaryToSecondaryMouseOverGroup.x, networkLines.top + romancePrimaryToSecondaryMouseOverGroup.y + 10) as ToolTip;
+		}
+		public function rollOutRomancePrimaryToSecondary(e:MouseEvent):void
+		{
+			ToolTipManager.destroyToolTip(romanceToolTip);
+		}
+		
+		public function rollOverRomanceSecondaryToPrimary(e:MouseEvent):void
+		{
+			romanceToolTip = ToolTipManager.createToolTip((this.currentSecondaryCharacter.characterName + "'s feelings of romance toward " + this.currentPrimaryCharacter.characterName + ": " + cif.romanceNetwork.getWeight(this.currentSecondaryCharacter.networkID,this.currentPrimaryCharacter.networkID)), networkLines.left + romanceSecondaryToPrimaryMouseOverGroup.x,networkLines.top + romanceSecondaryToPrimaryMouseOverGroup.y + 10) as ToolTip;
+		}
+		public function rollOutRomanceSecondaryToPrimary(e:MouseEvent):void
+		{
+			ToolTipManager.destroyToolTip(romanceToolTip);
+		}
+		public function rollOverCoolPrimaryToSecondary(e:MouseEvent):void
+		{
+			coolToolTip = ToolTipManager.createToolTip(("How cool " + this.currentPrimaryCharacter.characterName + " thinks " + this.currentSecondaryCharacter.characterName + " is" + ": " + cif.coolNetwork.getWeight(this.currentPrimaryCharacter.networkID,this.currentSecondaryCharacter.networkID)), networkLines.left + coolPrimaryToSecondaryMouseOverGroup.x, networkLines.top + coolPrimaryToSecondaryMouseOverGroup.y + 10) as ToolTip;
+		}
+		public function rollOutCoolPrimaryToSecondary(e:MouseEvent):void
+		{
+			ToolTipManager.destroyToolTip(coolToolTip);
+		}
+		public function rollOverCoolSecondaryToPrimary(e:MouseEvent):void
+		{
+			coolToolTip = ToolTipManager.createToolTip(("How cool " + this.currentSecondaryCharacter.characterName + " thinks " + this.currentPrimaryCharacter.characterName + " is" + ": " + cif.coolNetwork.getWeight(this.currentSecondaryCharacter.networkID,this.currentPrimaryCharacter.networkID)), networkLines.left + coolSecondaryToPrimaryMouseOverGroup.x,networkLines.top + coolSecondaryToPrimaryMouseOverGroup.y + 10) as ToolTip;
+		}
+		public function rollOutCoolSecondaryToPrimary(e:MouseEvent):void
+		{
+			ToolTipManager.destroyToolTip(coolToolTip);
+		}
+		*/
+		public function drawNetworkLines():void
+		{
+			var cif:CiFSingleton = CiFSingleton.getInstance();
+			var primaryProsMem:ProspectiveMemory = this.currentPrimaryCharacter.prospectiveMemory;
+			var secondaryProsMem:ProspectiveMemory = this.currentSecondaryCharacter.prospectiveMemory;
+			
+			var value:Number;
+			var networkLineLength:Number;
+			var pathString:String;
+			
+			var posTotalWeight:Number = 0.0;
+			var negTotalWeight:Number = 0.0;
+			
+			var pos:Number = 0.0;
+			var neg:Number = 0.0;
+			var curIntent:Number;
+			
+			var finalPrimaryGreenValue:Number;
+			var finalSecondaryGreenValue:Number;
+			var finalPrimaryRedValue:Number;
+			var finalSecondaryRedValue:Number;
+			var finalPrimaryBlueValue:Number;
+			var finalSecondaryBlueValue:Number;
+			
+			//Green from initiator
+			finalPrimaryGreenValue = gameEngine.worldGroup.avatars[this.currentPrimaryCharacter.characterName.toLowerCase()].subjectiveGreenOpinions[this.currentSecondaryCharacter.networkID];
+			//Green from Responder
+			finalSecondaryGreenValue = gameEngine.worldGroup.avatars[this.currentSecondaryCharacter.characterName.toLowerCase()].subjectiveGreenOpinions[this.currentPrimaryCharacter.networkID];
+
+			//Red from initiator
+			finalPrimaryRedValue = gameEngine.worldGroup.avatars[this.currentPrimaryCharacter.characterName.toLowerCase()].subjectiveRedOpinions[this.currentSecondaryCharacter.networkID];
+			//Red from Responder
+			finalSecondaryRedValue = gameEngine.worldGroup.avatars[this.currentSecondaryCharacter.characterName.toLowerCase()].subjectiveRedOpinions[this.currentPrimaryCharacter.networkID];
+						
+			//Blue from initiator
+			finalPrimaryBlueValue = gameEngine.worldGroup.avatars[this.currentPrimaryCharacter.characterName.toLowerCase()].subjectiveBlueOpinions[this.currentSecondaryCharacter.networkID];
+			//Blue from Responder
+			finalSecondaryBlueValue = gameEngine.worldGroup.avatars[this.currentSecondaryCharacter.characterName.toLowerCase()].subjectiveBlueOpinions[this.currentPrimaryCharacter.networkID];
+			
+			//buddy	
+			networkLineLength = 10 + finalPrimaryGreenValue * maxLineLength;
+			pathString = "";
+			pathString += "m 0 0 "
+			pathString += "l " + networkLineLength + " 0 ";
+			pathString += "l -5 5 ";
+			pathString += "m 5 -5 ";
+			pathString += "l -5 -5 ";
+			primaryToSecondaryBuddyPath.data = new String(pathString);
+			
+			networkLineLength = 10 + finalSecondaryGreenValue * maxLineLength;
+			pathString = "";
+			pathString += "m "+(maxLineLength+responderNetworkLineOffset)+" 12 "
+			pathString += "l " + -1*networkLineLength + " 0 ";
+			pathString += "l 5 -5 ";
+			pathString += "m -5 5 ";
+			pathString += "l 5 5 ";
+			secondaryToPrimaryBuddyPath.data = new String(pathString);
+			
+			//romance
+			networkLineLength = 10 + finalPrimaryRedValue * maxLineLength;
+			pathString = "";
+			pathString += "m 0 30 "
+			pathString += "l " + networkLineLength + " 0 ";
+			pathString += "l -5 5 ";
+			pathString += "m 5 -5 ";
+			pathString += "l -5 -5 ";
+			primaryToSecondaryRomancePath.data = new String(pathString);
+			
+			networkLineLength = 10 + finalSecondaryRedValue * maxLineLength;
+			pathString = "";
+			pathString += "m "+(maxLineLength+responderNetworkLineOffset)+" 42 "
+			pathString += "l " + -1*networkLineLength + " 0 ";
+			pathString += "l 5 -5 ";
+			pathString += "m -5 5 ";
+			pathString += "l 5 5 ";
+			secondaryToPrimaryRomancePath.data = new String(pathString);
+			
+			//cool
+			networkLineLength = 10 + finalPrimaryBlueValue * maxLineLength;	
+			pathString = "";
+			pathString += "m 0 60 "
+			pathString += "l " + networkLineLength + " 0 ";
+			pathString += "l -5 5 ";
+			pathString += "m 5 -5 ";
+			pathString += "l -5 -5 ";
+			primaryToSecondaryCoolPath.data = new String(pathString);
+			
+			networkLineLength = 10 + finalSecondaryBlueValue * maxLineLength;	
+			pathString = "";
+			pathString += "m "+(maxLineLength+responderNetworkLineOffset)+" 72 "
+			pathString += "l " + -1*networkLineLength + " 0 ";
+			pathString += "l 5 -5 ";
+			pathString += "m -5 5 ";
+			pathString += "l 5 5 ";
+			secondaryToPrimaryCoolPath.data = new String(pathString);
+		}
+		
+		public static function getPortionOfLineToFill(opinionValue:Number):Number
+		{
+			if (opinionValue > 0)
+			{
+				if (opinionValue > DEFAULT_MAX_DESIRE)
+				{
+					opinionValue = DEFAULT_MAX_DESIRE;
+				}
+				return DEFAULT_ZERO_POINT + opinionValue / DEFAULT_MAX_DESIRE * (1 - DEFAULT_ZERO_POINT);
+			}
+			else
+			{
+				if (opinionValue < DEFAULT_MIN_DESIRE)
+				{
+					opinionValue = DEFAULT_MIN_DESIRE;
+				}
+				return DEFAULT_ZERO_POINT - (opinionValue / DEFAULT_MIN_DESIRE * DEFAULT_ZERO_POINT);
+			}
+		}
+		
+		public function drawRelationshipIcons():void
+		{
+			var hasRelationship:Boolean;
+
+			//friends
+			hasRelationship = cif.relationshipNetwork.getRelationship(RelationshipNetwork.FRIENDS, this.currentPrimaryCharacter, this.currentSecondaryCharacter);
+			if (hasRelationship)
+			{
+				this.friendsIcon.source = resourceLibrary.relationshipIcons["friends"];
+			}
+			else
+			{
+				this.friendsIcon.source = resourceLibrary.relationshipIcons["notFriends"];
+			}
+			
+			//dating
+			hasRelationship = cif.relationshipNetwork.getRelationship(RelationshipNetwork.DATING, this.currentPrimaryCharacter, this.currentSecondaryCharacter);
+			if (hasRelationship)
+			{
+				this.datingIcon.source = resourceLibrary.relationshipIcons["dating"];
+			}
+			else
+			{
+				this.datingIcon.source = resourceLibrary.relationshipIcons["notDating"];
+			}
+			
+			//enemies
+			hasRelationship = cif.relationshipNetwork.getRelationship(RelationshipNetwork.ENEMIES, this.currentPrimaryCharacter, this.currentSecondaryCharacter);
+			if (hasRelationship)
+			{
+				this.enemiesIcon.source = resourceLibrary.relationshipIcons["enemies"];
+			}
+			else
+			{
+				this.enemiesIcon.source = resourceLibrary.relationshipIcons["notEnemies"];
+			}
+		}
+		
+		public function drawPortraits():void
+		{	
+			primaryPortrait.visible = true;
+			//triplePanelInitiator.visible = true;
+			primaryPortrait.PortraitImage.source = resourceLibrary.portraits[this.currentPrimaryCharacter.characterName.toLowerCase()];
+			primaryPortrait.PortraitImage.toolTip = currentPrimaryCharacter.characterName;
+			primaryPortrait.topGradient.color = 0x00FF00;
+			primaryPortrait.botGradient.color = 0xFFFFFF;
+			primaryPortrait.NameRichText.text = this.currentPrimaryCharacter.characterName;
+			primaryPortrait.NameRichText.setStyle("textAlign", TextAlign.CENTER);
+			primaryPortrait.figureWidth();
+
+			secondaryPortrait.visible = true;
+			//triplePanelResponder.visible = true;
+			secondaryPortrait.PortraitImage.source = resourceLibrary.portraits[this.currentSecondaryCharacter.characterName.toLowerCase()];
+			secondaryPortrait.PortraitImage.toolTip = this.currentSecondaryCharacter.characterName;
+			secondaryPortrait.topGradient.color = 0xFCFF00;
+			secondaryPortrait.botGradient.color = 0xFFFFFF;
+			secondaryPortrait.NameRichText.text = this.currentSecondaryCharacter.characterName;
+			secondaryPortrait.NameRichText.setStyle("textAlign", TextAlign.CENTER);
+			secondaryPortrait.figureWidth();
+		}
+		
+		
+		
+		
+		public function socialStatusUpdateClicked():void
+		{		
+			gameEngine.hudGroup.ssuButtonClicked();
+			
+			//this.socialStatusUpdateButton.selected = !gameEngine.hudGroup.ssuVisualizer.visible;
+		}	
+		
+		
+		/*
+		public function socialHistoryButtonClicked():void
+		{
+			if (!gameEngine.hudGroup.sfdbVisualizer.visible)
+			{
+				//create a list of chars that includes the selected char
+				var chars:Vector.<Character> = new Vector.<Character>();
+				for each (var char:Character in this.stateVisualizer.charactersToDisplay)
+				{
+					chars.push(char.clone())
+				}
+				chars.push(this.stateVisualizer.selectedCharacter.clone());
+				
+				//gameEngine.hudGroup.sfdbVisualizer.stateFilter.characterFilterGroup.updateIndividualCharacterFilterGroup(chars);
+				gameEngine.hudGroup.sfdbVisualizer.updateSFDBVisualizer(chars,chars);
+				gameEngine.hudGroup.sfdbVisualizer.visible = true;
+			}
+			else
+			{
+				gameEngine.hudGroup.sfdbVisualizer.visible = false;	
+			}
+			this.socialHistoryButton.selected = !gameEngine.hudGroup.sfdbVisualizer.visible;
+		}
+		*/
+		/*
+		public function forecastClicked():void {
+			//Debug.debug(this, "forecast clicked!");
+			
+			if (!forecastButton._isUnlocked) {
+				//the forecast of the game is not unlocked, we need to unlock it!
+				if (jpm.handleForecastUnlock(currentPrimaryCharacter.characterName.toLowerCase(), currentSecondaryCharacter.characterName.toLowerCase(), selectedGameName, socialGameContext)) {
+					//Debug.debug(this, "forecastClicked() had enough juice!");
+					forecastButton._isUnlocked = true;
+					juicePointButtonClicked("forecast");
+					forecastGroup.visible = true;
+					forecastFailureLabel.visible = true;
+					forecastSuccessLabel.visible = true;
+					forecastReject.visible = true;
+					forecastAccept.visible = true;
+					
+					//Store the data that we get, so we don't have to compute it again!
+					var indexString:String = currentPrimaryCharacter.characterName.toLowerCase() + "-" + currentSecondaryCharacter.characterName.toLowerCase() + "-" + selectedGameName.toLowerCase();
+					acceptForecasts[indexString] = forecastAccept.text;
+					rejectForecasts[indexString] = forecastReject.text;
+				}
+				else {
+					//Debug.debug(this, "forecastClicked() not enough juice!");
+					return;
+				}
+			}
+			else {
+					juicePointButtonClicked("forecast");
+					forecastGroup.visible = true;
+					forecastFailureLabel.visible = true;
+					forecastSuccessLabel.visible = true;
+					forecastReject.visible = true;
+					forecastAccept.visible = true;
+			}
+			
+		
+		}
+		*/
+		
+		public function goButtonClicked():void {
+			if(this.playSGButton._isUnlocked) {
+				this.playSGButton._isUnlocked = false;
+				
+				//Find out if this is a game that they had to purchase
+				var init:String = currentPrimaryCharacter.characterName.toLowerCase();
+				var respond:String = currentSecondaryCharacter.characterName.toLowerCase();
+				var index:String = init + "-" + respond;
+				
+				//Make it so that if they played a 'non-top social game', they don't get juice point credit for it.
+				for (var i:int = 0; i < availableSocialGames[index].length; i++) {
+					if (availableSocialGames[index][i]) {
+						if (availableSocialGames[index][i].toLowerCase() == this.selectedGameName.toLowerCase()) {
+							//check to see what the value of i is.
+							if (i >= gameEngine.hudGroup.socialGameButtonRing.maxNumButtons) {
+								//This means that they played a non-top-five game.  Prevent them from getting new juice points.
+								jpm.playedNonTopSG = true; // you don't get more juice points if you play a non-top scoring game.
+							}
+							else {
+								jpm.playedNonTopSG = false;
+							}
+						}
+					}
+				}
+				
+				//Turn off the SG button ring (it was lingering around after pushing the go button!)
+				gameEngine.hudGroup.socialGameButtonRing.visible = false;
+				gameEngine.hudGroup.megaUI.visible = false;
+				//gameEngine.hudGroup.levelClock.visible = false;
+				
+				gameEngine.socialGameToPerform = selectedGameName;
+				
+				
+				gameEngine.initiatorName = currentPrimaryCharacter.characterName.toLowerCase();
+				gameEngine.responderName = currentSecondaryCharacter.characterName.toLowerCase();
+				
+				gameEngine.worldGroup.avatars[gameEngine.initiatorName].lookingAtTarget = gameEngine.responderName.toLowerCase();
+				gameEngine.worldGroup.avatars[gameEngine.responderName].lookingAtTarget = gameEngine.initiatorName.toLowerCase();
+				
+				gameEngine.currentState = "Performance";
+			}
+		}
+		
+		public function clear():void {
+			this.singleCharacterToggleButtonsGroup.visible = false;
+			
+			this.currentPrimaryCharacter = null;
+			this.currentSecondaryCharacter = null;
+			
+			this.currentCharacter = null;
+			
+			acceptForecasts = new Dictionary();
+			rejectForecasts = new Dictionary();
+			actualResponderMotiveStrengthDictionary = new Dictionary();
+			currentResponderMotiveStrengthDictionary = new Dictionary();
+			revealedPredictions = new Dictionary();
+			availableSocialGames = new Dictionary();
+			gamesToUnlockDictionary = new Dictionary();;
+			
+			this.socialExchangeButtonGameName.text = "Social Exchange";
+			this.initiatorCharButton.mainContainer.removeAllElements();			
+			this.responderCharButton.mainContainer.removeAllElements();
+			
+			this.initiatorCharButton.visible = false;
+			this.responderCharButton.visible = false;
+			this.socialGameButtonGroup.visible = false;
+			
+			if (this.megaUIExpanded)
+			{
+				this.rightSideContentGroup.visible = true;
+				this.minimizeButton.visible = true;
+			}
+			
+			sgInfo.initiatorIntentButton.selected = true;
+			sgInfo.initiatorIntentButton.enabled = false;
+			sgInfo.initiatorIntentGroup.visible = true;
+			
+			sgInfo.initiatorMotivesButton.selected = false;
+			sgInfo.responderMotivesButton.selected = false;
+			//forecastButton.selected = false;
+			sgInfo.resultsButton.selected = false;
+			
+			sgInfo.initiatorMotivesButton.enabled = true;
+			sgInfo.responderMotivesButton.enabled = true;
+			//forecastButton.enabled = true;
+			sgInfo.resultsButton.enabled = true;
+			
+			sgInfo.initiatorMotivesGroup.visible = false;
+			sgInfo.responderMotivesGroup.visible = false;
+			//forecastGroup.visible = false;
+			sgInfo.resultsGroup.visible = false;
+
+			relationshipInfoGroup.visible = false;
+			socialGameInfoGroup.visible = false;
+			miniMapGroup.visible = false;
+			
+			jpm.clearHints();
+			
+			
+		}
+		
+		public function previousSocialGameButtonClicked():void {
+			//Debug.debug(this, "previous social game button clicked!");
+			//Debug.debug(this, "previousSGButtonClicked()!");
+			var newIndex:int;
+			var newSelectedGameName:String = "";
+			var sgDictionaryIndex:String = gameEngine.primaryAvatarSelection.toLowerCase() + "-" + gameEngine.secondaryAvatarSelection.toLowerCase();
+
+			//Get the index we care about.
+			for (var i:int = 0; i < this.availableSocialGames[sgDictionaryIndex].length; i++ ) {
+				var localGameName:String = this.availableSocialGames[sgDictionaryIndex][i];
+				//Debug.debug(this, "game name is: " + localGameName);
+				if (localGameName.toLowerCase() == selectedGameName.toLowerCase()) {
+					//Debug.debug(this, "index " + i + " is what we care about!");
+					newIndex = i - 1;
+					break
+				}
+
+			}
+			if (newIndex < 0) {
+				newIndex = this.availableSocialGames[sgDictionaryIndex].length - 1; // good for the top five social games. Not good if they unlock new ones.
+			}
+			
+			newSelectedGameName = this.availableSocialGames[sgDictionaryIndex][newIndex]
+			
+			//Make this button selected, and every other button not selected!
+			for each(var b:SocialGameButton in gameEngine.hudGroup.socialGameButtonRing.socialGameButtons) {
+				b.isSelected = false;
+			}
+			
+			var gameWasUnlocked:Boolean = true;
+			for each(b in gameEngine.hudGroup.socialGameButtonRing.socialGameButtons) {
+				if (b.gameName.toLowerCase() == newSelectedGameName.toLowerCase()){
+					b.isSelected = true;
+					gameWasUnlocked = false;
+				}
+				b.skin.invalidateProperties();
+			}
+			
+			//They spent juice points to unlock it from the little drop down menu.
+			//let's automatically select it from the drop down menu.
+			var tempIndex:int = 0;
+			if (gameWasUnlocked) {
+				for each (var dropDownItem:DropDownItem in gameEngine.hudGroup.socialGameButtonRing.sgDropDown.ddlDP) {
+					if (dropDownItem._game.toLowerCase() == newSelectedGameName.toLowerCase()) {
+						gameEngine.hudGroup.socialGameButtonRing.sgDropDown.ddl.selectedIndex = tempIndex;
+						break;
+					}
+					tempIndex++;
+				}
+			}
+			
+			gameEngine.currentlySelectedSG = newSelectedGameName;
+			gameEngine.currentlySelectedInitiator = gameEngine.primaryAvatarSelection;
+			gameEngine.currentlySelectedResponder = gameEngine.secondaryAvatarSelection;
+			
+			sgInfo.loadSGInfo(this.availableSocialGames[sgDictionaryIndex][newIndex]);
+			this.gameEngine.hudGroup.megaUI.setToSocialGameInfo();
+			gameEngine.hudGroup.megaUI.setButtonsToAppropriateEnabledState();
+		}
+		
+		public function nextSocialGameButtonClicked():void {
+			//Debug.debug(this, "next social game button clicked!");
+//Debug.debug(this, "nextSGButtonClicked()!");
+			
+
+
+			var newIndex:int;
+			var newSelectedGameName:String = "";
+			var sgDictionaryIndex:String = gameEngine.primaryAvatarSelection.toLowerCase() + "-" + gameEngine.secondaryAvatarSelection.toLowerCase();
+			
+			//Get the index we care about.
+			for(var i:int = 0; i < this.availableSocialGames[sgDictionaryIndex].length; i++ ) {
+				var localGameName:String = this.availableSocialGames[sgDictionaryIndex][i];;
+			//	Debug.debug(this, "localGameName: " + localGameName + " gameName: " + gameName.toLowerCase());
+				if (localGameName.toLowerCase() == selectedGameName.toLowerCase()) {
+					//Debug.debug(this, "index " + i + " is what we care about!");
+					newIndex = i + 1;
+					break
+				}
+			}
+			
+			if (newIndex >= this.availableSocialGames[sgDictionaryIndex].length) {
+				newIndex = 0; // good for the top five social games. Not good if they unlock new ones.
+			}
+			
+			newSelectedGameName = this.availableSocialGames[sgDictionaryIndex][newIndex]
+			
+			//Make this button selected, and every other button not selected!
+			for each(var b:SocialGameButton in gameEngine.hudGroup.socialGameButtonRing.socialGameButtons) {
+				b.isSelected = false;
+			}
+			
+			var gameWasUnlocked:Boolean = true;
+			for each(b in gameEngine.hudGroup.socialGameButtonRing.socialGameButtons) {
+				if (b.gameName.toLowerCase() == newSelectedGameName.toLowerCase()){
+					b.isSelected = true;
+					gameWasUnlocked = false;
+				}
+				b.skin.invalidateProperties();
+			}
+			
+			
+			//They spent juice points to unlock it from the little drop down menu.
+			//let's automatically select it from the drop down menu.
+			var tempIndex:int = 0;
+			if (gameWasUnlocked) {
+				for each (var dropDownItem:DropDownItem in gameEngine.hudGroup.socialGameButtonRing.sgDropDown.ddlDP) {
+					if (dropDownItem._game.toLowerCase() == newSelectedGameName.toLowerCase()) {
+						gameEngine.hudGroup.socialGameButtonRing.sgDropDown.ddl.selectedIndex = tempIndex;
+						break;
+					}
+					tempIndex++;
+				}
+			}
+			
+			gameEngine.currentlySelectedSG = newSelectedGameName;
+			gameEngine.currentlySelectedInitiator = gameEngine.primaryAvatarSelection;
+			gameEngine.currentlySelectedResponder = gameEngine.secondaryAvatarSelection;
+			
+			sgInfo.loadSGInfo(this.availableSocialGames[sgDictionaryIndex][newIndex]);
+			this.gameEngine.hudGroup.megaUI.setToSocialGameInfo();
+			gameEngine.hudGroup.megaUI.setButtonsToAppropriateEnabledState();
+		}
+		
+		/**
+		 * This initally populates teh availableSocialGame vector at the appropriate dictionary index
+		 * given an initiator-responder pair.  It is just the same top five social games that appear in
+		 * the social game button ring.
+		 * @param	availableSocialGameIndex The pertinent initiator responder pair.  format is: 'initiatorname-respondername'
+		 */
+		public function handleInitialAvailableGames(availableSocialGameIndex:String):void {
+			//Fill in the vector of available social games if we haven't yet.
+			if (availableSocialGames[availableSocialGameIndex]) {
+				//It's already full!  Don't need to do anything.
+			}
+			else { // It isn't full yet -- fill it up with the top five social games.
+				//Debug.debug(this, "I successfully realized that there was nothing of value in here.");
+				availableSocialGames[availableSocialGameIndex] = new Vector.<String>();
+				
+				//The way I am going to fill this in is by looking at the social game button ring.
+				for(var i:int = 0; i < this.gameEngine.hudGroup.socialGameButtonRing.socialGameButtons.length; i++ ) {
+					var localGameName:String = this.gameEngine.hudGroup.socialGameButtonRing.socialGameButtons[i].gameName;
+					availableSocialGames[availableSocialGameIndex].push(localGameName);
+				}
+			}
+		}
+		
+/**
+		 * This fills the drop down list (or whatever component we use to represent the games that can be purchased) with 
+		 * the available games FOR purchase.  As the user buys more and more games between pairs of people, the length of this
+		 * list will diminish.  You can't buy games that have already been purchaed, that the characters want to play with each
+		 * other naturally, or that you don't satisfy the precondtions for.
+		 * @param	availableSocialGameIndex the initiator-responder pair.  Specified by 'initiatorname-respondername'
+		 */
+		public function updateDropDownList(availableSocialGameIndex:String):ArrayCollection {
+			if (!gamesToUnlockDictionary[availableSocialGameIndex]) { //Filling it up for the first time.
+				//Debug.debug(this, "updateDropDownList() FILLING IT UP FOR THE FIRST TIME!");
+				var allGameScores:Vector.<GameScore> =  cif.cast.getCharByName(currentPrimaryCharacter.characterName).prospectiveMemory.getHighestGameScoresTo(currentSecondaryCharacter.characterName, gameEngine.currentSetOfSocialGames.length, -1000); // someone will have to REALLY not want to play a game in order for it to not show up in the drop down list.
+				sgArray = new ArrayCollection() // zero it out -- data binding array.
+				var nameString:String = ""; // will be the game name, followed by its volition.
+				var highestVolitionGame:int = allGameScores[0].score;
+				for each(var gsFromAllGameScores:GameScore in allGameScores) {
+					if (gsFromAllGameScores.score == -100) {
+						//Don't even bother adding it if we don't satisfy the precondition!
+					}
+					else {
+						//We satisfy the preconditions!  Great!  Let's add it (have to strip away the juice point cost)
+						nameString = gsFromAllGameScores.name + "(" + gsFromAllGameScores.score + ")";
+						//Debug.debug(this, "stripped away I hope: " + stripPriceFromGame(nameString));
+						var jpCost:int = jpm.computeJuicePointCostOfNonTopSG(highestVolitionGame, gsFromAllGameScores.score);
+						//var renderItem:Object = new Object();
+						//var renderItem:IEventDispatcher = new IEventDispatcher();
+						var renderItem:DropDownItem = new DropDownItem();
+						
+						
+						renderItem.cost = jpCost
+						renderItem.game = gsFromAllGameScores.name;
+						renderItem.isLocked = true;
+						
+						sgArray.addItem(renderItem);
+						
+						//sgArray.addItem({Label: gsFromAllGameScores.name });
+						//sgArray.addItem( gsFromAllGameScores.name + " (" + jpCost + " JP)");
+					}
+
+				}
+				
+				//OK, now let's go through every game that they wanted to play anyway, and 
+				// remove it so that the user can't purchase something taht they wanted to play anyway.
+				
+		
+				var arrayIndex:int = 0;
+				for each (var gameAlreadyWantedToPlay:String in this.availableSocialGames[availableSocialGameIndex]) {
+					for (var i:int = 0; i < sgArray.length; i++) {
+						if (gameAlreadyWantedToPlay)
+						{
+							//if (gameAlreadyWantedToPlay.toLowerCase() == this.stripPriceFromGame(sgArray[i].toLowerCase())) {
+							if (gameAlreadyWantedToPlay.toLowerCase() == sgArray[i]._game.toLowerCase()) {
+								//We have a duplicate!  I want to remove it from the list!
+								sgArray.removeItemAt(i);
+								//Debug.debug(this, "I believe I am removing this game: " + gameAlreadyWantedToPlay.toLowerCase()); 
+								break; // save ourselves some time, or cause ourselve some headaches?
+							}
+						}
+					}
+				
+				}
+				
+				//Great!  We've computed this awesome arrayCollection. Let's save it for later
+				gamesToUnlockDictionary[availableSocialGameIndex] = sgArray;
+				
+			}
+			else { 
+				// We already had computed it at least once, but it may be different now.
+				// Don't have to worry about all sorts of junky stuff -- our gamesToUnlockDictionary has already
+				//been updated, and we just need to make the data binding reflect it now.
+				//Debug.debug(this, "FILLING IT IN A SECOND TIME!");
+				sgArray = new ArrayCollection();
+				
+				for each(var dropDownItem:DropDownItem in gamesToUnlockDictionary[availableSocialGameIndex]) {
+					var tempDropDown:DropDownItem = new DropDownItem();
+					tempDropDown.game = dropDownItem._game;
+					var tempCost:int = jpm.adjustAddOrSubtractJuicePointsBasedOnDifficulty(dropDownItem.cost, false);
+					if (tempCost > 100) tempCost = 100
+					else if (tempCost < 0) tempCost = 0;
+					tempDropDown.cost = tempCost;
+					tempDropDown.isLocked = dropDownItem.isLocked;
+					sgArray.addItem(tempDropDown);
+				}
+				/*
+				for each(var sgname:String in gamesToUnlockDictionary[availableSocialGameIndex]) {
+					sgArray.addItem(sgname);
+				}
+				*/
+			}
+			return sgArray;
+		}
+		
+		/**
+		 * Just a nice little function that takes a string of the form "Game Name ( 5 JP)"
+		 * and only returns "Game Name".  Used for unlocking new social games using juice points.
+		 * @param	gameAndPrice A string of the form Game Name ( 5 JP)
+		 * @return Just the name of the social game, withot it's cost to unlock in juice points.
+		 */
+		/*
+		public function stripPriceFromGame(gameAndPrice:String):String {
+			var index:int = gameAndPrice.indexOf(" (");
+			var noJP:String = gameAndPrice.substr(0, index);
+			return noJP;
+		}
+		*/
+		
+		/**
+		 * Once a user has purhased a new SG using juice points, we want to remove that
+		 * game from the list of 'available games to purchase', so that they can not purchase
+		 * the same game twice.
+		 * @param	index the initiator-responder pair.  format is "initiatorname-respondername'
+		 * @param	gameToRemove the name of the social game to remove from the available games to purchase list.
+		 */
+		public function removeGameFromGamesToUnlockDictionary(index:String, gameToRemove:String):void {
+			for (var i:int = 0; i < gamesToUnlockDictionary[index].length; i++) {
+				var longName:String = gamesToUnlockDictionary[index][i]._game;
+				
+				
+				//var shortName:String = stripPriceFromGame(longName);
+				if (longName.toLowerCase() == gameToRemove.toLowerCase()) {
+					gamesToUnlockDictionary[index].removeItemAt(i);
+					return; // same us some time, or cause us some heart break?
+				}
+			}
+		}
+		
+		/**
+		 * Once a user has purhased a new SG using juice points, we want to mark it as
+		 * unlocked, so that the picture of the lock doesn't keep on showing up indicating that it 
+		 * doesn't have to be purchased again.
+		 * @param	index the initiator-responder pair.  format is "initiatorname-respondername'
+		 * @param	gameToRemove the name of the social game to remove from the available games to purchase list.
+		 */
+		public function markGameAsUnlocked(index:String, gameToRemove:String):void {
+			for (var i:int = 0; i < gamesToUnlockDictionary[index].length; i++) {
+				var longName:String = gamesToUnlockDictionary[index][i]._game;
+				
+				
+				//var shortName:String = stripPriceFromGame(longName);
+				if (longName.toLowerCase() == gameToRemove.toLowerCase()) {
+					gamesToUnlockDictionary[index][i].isLocked = false;
+					return; // same us some time, or cause us some heart break?
+				}
+			}
+		}
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+		
+			this.goalButton.setStyleName();
+			this.levelClockButton.setStyleName();
+			this.notificationButton.setStyleName();
+			this.exploreStateButton.setStyleName();
+			this.stateVisualizer.setStyleName();
+			this.initiatorCharButton.setStyleName();
+			this.responderCharButton.setStyleName();
+			this.playSGButton.setStyleName();
+			this.minimizeButton.setStyleName();
+			this.socialExchangeButton.setStyleName();
+			this.stateVisualizer.stateFilter.setStyleName();
+			this.relationshipButton.setStyleName();
+			this.characterSheetToggleButton.setStyleName();
+			this.relationshipToggleButton.setStyleName();
+			//this.sgInfo.styleName = PromWeek.GameEngine.getInstance().activeStyleName;
+			this.sgInfo.setStyleName();
+			this.invalidateProperties();
+		}
+		
+		]]>
+			
+	</fx:Script>
+		
+		
+	
+</s:Group>

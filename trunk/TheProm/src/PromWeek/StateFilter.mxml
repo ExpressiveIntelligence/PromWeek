@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 preinitialize="onPreinitialize()"
+		 initialize="initializeStateFilter()"
+		 creationComplete="onCreationComplete()"
+		 width="100%"
+		 height="100%">
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+			 <fx:Number id="buttonDimensions">30</fx:Number>
+		 </fx:Declarations>
+		 
+		 
+		<s:VGroup id="stateVisualizerFilterGroup" y="23" width="100%" height="100%" paddingTop="5" paddingBottom="5" paddingLeft="5" paddingRight="5" gap="0">
+			<!--<prom:PromWeekButton id="addLevelCastButton" label="Present" click="addLevelCastClicked()"/>-->
+			<!--<prom:PromWeekButton id="addAllCastButton" label="All" click="addAllCastClicked()"/>-->
+			<!--<prom:CharPortraitDrawer id="characterFilterGroup" visible="true" downward="false" maintainList="true" buttonLabel="Add/Remove Characters" />-->
+			<prom:ToggleableContainerButton id="filterFriendsCastButton" width="{buttonDimensions}" height="{buttonDimensions}" click="filterFriendsClicked()" toggleable="false" boxPadding="0" toolTip="View Friends" roundness="5" />
+			<prom:ToggleableContainerButton id="filterDatingCastButton" width="{buttonDimensions}" height="{buttonDimensions}" click="filterDatingClicked()" toggleable="false" boxPadding="0" toolTip="View Dating" roundness="5"/>
+			<prom:ToggleableContainerButton id="filterEnemiesCastButton" width="{buttonDimensions}" height="{buttonDimensions}"  click="filterEnemiesClicked()" toggleable="false" boxPadding="0" toolTip="View Enemies" roundness="5"/>
+		</s:VGroup>
+
+		<prom:CharPortraitDrawer id="characterFilterGroup" width="20" height="25" visible="true" downward="false" maintainList="true" buttonLabel="+/-" x="5" y="-300" /><!--x="{stateVisualizerFilterGroup.x + 5}" y="{stateVisualizerFilterGroup.y + 85 - characterFilterGroup.height}" -->
+	<fx:Script>
+		<![CDATA[
+		
+		import CiF.CiFSingleton;
+		import flash.geom.Vector3D;
+		import flash.text.TextFormat;
+		import flash.utils.Dictionary;
+		import flashx.textLayout.utils.CharacterUtil;
+		import spark.components.Group;
+		import spark.components.Button;
+		import mx.graphics.SolidColor;
+		import mx.graphics.SolidColorStroke;
+		import spark.components.HGroup;
+		import spark.components.RichText;
+		import spark.primitives.*;
+		import spark.components.Label;
+		import spark.components.ToggleButton;
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import flash.events.*;
+		import CiF.*;
+		import flashx.textLayout.formats.TextAlign;
+		import PromWeek.assets.ResourceLibrary;
+		
+		public static const MINI_PORTRAIT_HEIGHT:Number = 20;
+		public static const MINI_PORTRAIT_WIDTH:Number = 20;
+		
+		private var gameEngine:GameEngine;
+		private var resourceLibrary:PromWeek.assets.ResourceLibrary;
+		private var cif:CiFSingleton;
+		//private var resourceLibrary:ResourceLibrary;
+		
+		public var mainBodyFill:SolidColor;
+		public var mainBodyStroke:SolidColorStroke;
+		private var mainBody:Rect;
+		
+		public var characterRepresentations:Dictionary;
+		public var sfdbLabelFilterButtons:Dictionary;
+		
+		public var lastCharClicked:String;
+		
+		public function onCreationComplete():void 
+		{
+			resourceLibrary = ResourceLibrary.getInstance();
+			
+			var image:SmoothImage = new SmoothImage();
+			image.width = this.filterFriendsCastButton.mainContainer.width - 4;
+			image.height = this.filterFriendsCastButton.mainContainer.height - 4;
+			image.source = resourceLibrary.relationshipIcons["friends"];
+			this.filterFriendsCastButton.mainContainer.addElement(image);
+			
+			image = new SmoothImage();
+			image.width = this.filterDatingCastButton.mainContainer.width - 4;
+			image.height = this.filterDatingCastButton.mainContainer.height - 4;
+			image.source = resourceLibrary.relationshipIcons["dating"];
+			this.filterDatingCastButton.mainContainer.addElement(image);
+			
+			image = new SmoothImage();
+			image.width = this.filterEnemiesCastButton.mainContainer.width - 4;
+			image.height = this.filterEnemiesCastButton.mainContainer.height - 4;
+			image.source = resourceLibrary.relationshipIcons["enemies"];
+			this.filterEnemiesCastButton.mainContainer.addElement(image);
+		}
+		
+		public function networkFilterClicked(e:Event=null):void
+		{
+			dispatchEvent(new Event("UPDATE_NETWORK_LINES", true, true));
+			this.invalidateProperties();
+			this.invalidateSize();
+			this.invalidateDisplayList();
+		}
+
+		override protected function createChildren():void {
+			super.createChildren();
+			//characterFilterGroup.hiderBtn.label = "Add/Remove Character";
+			var image:PortraitIcon;
+			//update character filter group
+			for each (var char:Character in cif.cast.characters)
+			{
+				//this means that the char is not in the state network visualizer thing
+				image = new PortraitIcon();
+				image.loadPortraitImageToIcon(char.characterName.toLowerCase(), true, false, StateFilter.MINI_PORTRAIT_WIDTH,StateFilter.MINI_PORTRAIT_HEIGHT);
+				this.characterRepresentations[char.characterName.toLowerCase()] = image;
+				//image.source = resourceLibrary.charHeads[char.characterName.toLowerCase()];
+				/*if (numFilterCharsAdded == 9)
+				{
+					newHGroup = new HGroup();
+					this.individualCharacterFilterGroup.addElement(newHGroup);
+				}
+				//image.addEventListener(MouseEvent.CLICK, portraitClickedHandler);
+				image.addEventListener(MouseEvent.CLICK, characterClicked);
+				newHGroup.addElement(image);
+
+				
+				
+				numFilterCharsAdded++;*/
+			}
+		}
+
+
+		public function onPreinitialize():void {
+			Debug.debug(this, "onPreinitialize()");
+			gameEngine = GameEngine.getInstance();
+			cif = CiFSingleton.getInstance();
+			resourceLibrary = PromWeek.assets.ResourceLibrary.getInstance();
+
+			this.characterRepresentations = new Dictionary();
+			this.sfdbLabelFilterButtons = new Dictionary();
+		}
+		
+		public function initializeStateFilter():void 
+		{	
+			//trace("character sheet initialize");
+		}
+		
+		
+		override protected function commitProperties():void {
+			super.commitProperties();
+			//Debug.debug(this, "commitProperites()");			
+		}
+
+		/*public function characterClicked(e:MouseEvent):void
+		{
+			this.lastCharClicked = e.currentTarget.characterName;
+			if (e.currentTarget.characterName) {
+				//This seemed to make it crash
+				this.characterRepresentations[e.currentTarget.characterName.toLowerCase()].toggleSelected()// = !this.characterRepresentations[e.currentTarget.characterName].selected;
+			}
+			else {
+				//And this seemed to make it crash too, but for a different reason -- claims charName is not a property, but it SEEMS like it actually is.
+				this.characterRepresentations[e.currentTarget._charName.toLowerCase()].toggleSelected()// = !this.characterRepresentations[e.currentTarget.characterName].selected;
+			}
+			
+			//Debug.debug(this,this.lastCharClicked + " selected: " + this.characterRepresentations[e.currentTarget.characterName.toLowerCase()].selected);
+			//Debug.debug(this, this.characterRepresentations[e.currentTarget.characterName].characterName + " selected: " + this.characterRepresentations[e.currentTarget.characterName].selected);
+			
+			
+			//if (this.characterRepresentations[e.currentTarget.characterName].selected)
+			//{
+				//dispatchEvent(new Event("ADD_CHARACTER_TO_VISUALIZER", true, true));
+			//}
+			//else
+			//{
+				//dispatchEvent(new Event("REMOVE_CHARACTER_FROM_VISUALIZER", true, true));
+			//}
+			dispatchEvent(new Event("CHARACTER_CLICKED", true, true));
+			this.invalidateProperties();
+			this.invalidateSize();
+			this.invalidateDisplayList();
+		}*/
+		
+		public function addAllCastClicked():void
+		{
+			dispatchEvent(new Event("ALL_CAST_CLICKED", true, true));
+			this.invalidateProperties();
+			this.invalidateSize();
+			this.invalidateDisplayList();
+		}
+		
+		public function addLevelCastClicked():void
+		{
+			dispatchEvent(new Event("LEVEL_CAST_CLICKED", true, true));
+			this.invalidateProperties();
+			this.invalidateSize();
+			this.invalidateDisplayList();
+		}
+		
+		public function filterFriendsClicked():void
+		{
+			dispatchEvent(new Event("FRIENDS_FILTER_CLICKED", true, true));
+			this.invalidateProperties();
+			this.invalidateSize();
+			this.invalidateDisplayList();
+		}
+		
+		
+		public function filterDatingClicked():void
+		{
+			dispatchEvent(new Event("DATING_FILTER_CLICKED", true, true));
+			this.invalidateProperties();
+			this.invalidateSize();
+			this.invalidateDisplayList();
+		}
+		public function filterEnemiesClicked():void
+		{
+			dispatchEvent(new Event("ENEMIES_FILTER_CLICKED", true, true));
+			this.invalidateProperties();
+			this.invalidateSize();
+			this.invalidateDisplayList();
+		}
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			this.filterFriendsCastButton.setStyleName();
+			this.filterDatingCastButton.setStyleName();
+			this.filterEnemiesCastButton.setStyleName();
+			this.characterFilterGroup.setStyleName();
+			this.invalidateProperties();
+		}
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

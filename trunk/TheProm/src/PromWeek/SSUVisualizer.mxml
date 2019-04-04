@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 mouseWheel="onMouseWheel(event)"
+		 initialize="SSUVisualizerInitialize()"
+		 width="220"
+		 height="560"
+		 styleName="classicPromWeek">
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+		 </fx:Declarations>
+		 
+		<s:Rect id="componentBackground" left="0" width="100%" height="100%" radiusX="10" radiusY="10">
+			<s:stroke>
+				<s:SolidColorStroke weight="3" color="{getStyle('backgroundStroke')}" caps="none" />
+			</s:stroke>
+			<s:fill>
+				<s:SolidColor color="{getStyle('backgroundColor')}" alpha="0.9" />
+			</s:fill>
+		</s:Rect>
+		<s:VGroup horizontalAlign="right" width="100%" paddingTop="5" paddingRight="5">
+			<s:Button skinClass="PromWeek.skins.NEW_closeButtonSkin" width="25" height="25" click="xClickedOn(event)" />
+		</s:VGroup>
+		<s:VGroup id="theGroup" width="100%" height="100%" top="30" paddingLeft="2" paddingBottom="10">
+			<s:Group id="elementsGroup" width="100%" height="100%">
+				<s:Scroller id="SSUEntryScroller" width="100%" height="100%" horizontalScrollPolicy="off">
+					<s:VGroup id="scrollerGroup" height="100%" width="100%" paddingLeft="0" paddingRight="0" paddingTop="5" paddingBottom="5" gap="0"/>	
+				</s:Scroller>
+			</s:Group>
+		</s:VGroup>
+		
+	<fx:Script>
+		<![CDATA[
+		import flash.events.MouseEvent;
+		import PromWeek.skins.NEW_listScrollSkin;
+		import PromWeek.SSUEntry
+		import PromWeek.assets.ResourceLibrary
+		import flashx.textLayout.formats.TextAlign;
+		private var resourceLib:PromWeek.assets.ResourceLibrary = PromWeek.assets.ResourceLibrary.getInstance()
+		
+		public function onCreationComplete():void 
+		{
+			SSUEntryScroller.verticalScrollBar.setStyle("skinClass", NEW_listScrollSkin);
+		}
+		
+		public function SSUVisualizerInitialize():void{	
+			
+		}
+		
+		//Adding just the SSUupdate types.
+		public function addSSUNotification(SSUNotification:PromWeek.SSUUpdate):void {
+			scrollerGroup.addElementAt(SSUNotification, 0);
+			/*var tmp:SSUEntry = new SSUEntry()
+			tmp.SSUportrait.NameRichText.text = char
+			tmp.SSUportrait.PortraitImage.source = resourceLib.portraits[char.toLowerCase()]
+			tmp.SSUportrait.NameRichText.setStyle("textAlign", TextAlign.CENTER)
+			tmp.SSUportrait.figureWidth()
+			tmp.SSULine.text = entry
+			tmp.alpha = 0
+			tmp.fadeIn()
+			//scrollerGroup.addElement(tmp)
+			scrollerGroup.addElementAt(tmp,0)*/
+		}
+		
+		//Guess I need a different one for each type, I don't know why.
+		public function addAutoNotification(autoNotification:PromWeek.AutonomousActionPopUp):void {
+			scrollerGroup.addElementAt(autoNotification, 0);
+		}
+		
+		//Same as above, but with a different type.
+		public function addGoalNotification(goalNotification:PromWeek.GoalUpdatedPopUp):void {
+			scrollerGroup.addElementAt(goalNotification, 0);
+		}
+		
+		public function onMouseWheel(e:MouseEvent):void {
+			e.stopPropagation();
+		}
+		
+		public function xClickedOn(e:MouseEvent = null):void{
+			this.visible = false
+			//GameEngine.getInstance().hudGroup.megaUI.socialStatusUpdateButton.selected = !this.visible;
+		}
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

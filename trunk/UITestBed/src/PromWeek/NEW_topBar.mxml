@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 preinitialize="onPreinitialize()"
+		 width="100%"> 
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>	
+			 <fx:String id="pathData"></fx:String>
+			<mx:Fade id="fadeIn" alphaFrom="0.0" alphaTo="1.0" />
+			<mx:Fade id="fadeOut" alphaFrom="1.0" alphaTo="0.0" />
+		 </fx:Declarations>
+		 
+		 
+    <s:Path data="{this.pathData}" >
+        <!--<s:stroke>
+            <s:SolidColorStroke color="#000000" alpha="1" 
+                    weight="3" pixelHinting="true"/>
+        </s:stroke>-->
+        <s:fill>
+            <s:SolidColor color="#45A9FF" alpha="1"/>
+        </s:fill>
+    </s:Path>
+	
+	
+		
+	<s:Group width="100%" height="100%">
+		<prom:NEW_goalButton id="goalButton" click="goalButtonClicked(event)" width="150" height="100%" skinClass="PromWeek.skins.NEW_goalButtonSkin" />
+		<s:HGroup id="rightOfGoalsButtonGroup" x="150" width="{this.width - 150}" height="35">
+			<s:HGroup width="15%" height="100%">
+				<s:Label id="numTurnsLeftText" color="#ffffff" width="50%" height="100%"
+						 text="10"
+						 fontSize="24" fontWeight="bold"
+						 verticalAlign="middle" textAlign="right" />
+						 <!--filters="{[new GlowFilter(0x000000,1.0,2.0,2.0,10)]}"/>-->
+				<s:VGroup width="50%" height="100%" horizontalAlign="left" >
+					<s:Label color="#ffffff" height="50%"
+							 text="turns"
+							 fontSize="11" fontWeight="bold"
+							 verticalAlign="bottom" textAlign="left" />
+							 <!--filters="{[new GlowFilter(0x000000,1.0,2.0,2.0,10)]}"/>-->
+					<s:Label color="#ffffff" height="50%"
+							 text="left"
+							 fontSize="11" fontWeight="bold"
+							 verticalAlign="top" textAlign="left" />
+							 <!--filters="{[new GlowFilter(0x000000,1.0,2.0,2.0,10)]}"/>-->
+				</s:VGroup>
+			</s:HGroup>
+			<s:Label id="dayOfWeekText" color="#ffffff" width="20%" height="100%"
+					 text="Friday"
+					 fontSize="24" fontWeight="bold"
+					 verticalAlign="middle" textAlign="center" />
+					 <!--filters="{[new GlowFilter(0x000000,1.0,2.0,2.0,10)]}"/>-->
+			<s:HGroup width="50%" height="100%">
+				<s:HGroup width="10%" height="100%" verticalAlign="middle" horizontalAlign="right">
+					<util:SmoothImage id="juiceImage" width="100%" />
+				</s:HGroup>
+				<s:HGroup width="90%" height="100%" verticalAlign="middle" horizontalAlign="left">
+					<s:HGroup id="juiceBarGroup" width="100%" height="100%" verticalAlign="middle">
+						<prom:JuiceBar id="juiceBar" width="100%" height="75%"/><!--visible="false" hideEffect="{fadeOut}" showEffect="{fadeIn}"/>-->
+						<!--<s:Group width="100%" height="75%">
+							<s:Rect width="100%" height="100%">
+								<s:fill>
+									<mx:SolidColor color="0x0F0045"/>
+								</s:fill>
+							</s:Rect>
+						</s:Group>-->
+					</s:HGroup>
+				</s:HGroup>
+			</s:HGroup>
+			
+			<s:HGroup id="utilityButtonsGroup" width="15%" height="100%" horizontalAlign="right" paddingRight="15" paddingTop="2" paddingBottom="2">
+				<prom:ToggleableContainerButton id="soundButton" height="100%" width="{soundButton.height}" boxPadding="0" roundness="3" />
+				<prom:ToggleableContainerButton id="optionsButton" height="100%" width="{soundButton.height}" toggleable="false" boxPadding="0" roundness="3" />
+			</s:HGroup>
+			
+		</s:HGroup>
+	</s:Group>
+	
+	<s:Path data="{this.pathData}" >
+        <s:stroke>
+            <s:SolidColorStroke color="#000000" alpha="1" 
+                    weight="3" pixelHinting="true"/>
+        </s:stroke>
+    </s:Path>
+	
+		 
+	<fx:Script>
+		<![CDATA[
+		import CiF.CiFSingleton;
+		import CiF.Debug;
+		import CiF.LineOfDialogue;
+		import CiF.Predicate;
+		import com.util.SmoothImage;
+		import flash.events.MouseEvent;
+		import flash.filters.GlowFilter;
+		import mx.events.ResizeEvent;
+		import PromWeek.assets.ResourceLibrary;
+
+		private var rL:ResourceLibrary;
+		private var cif:CiFSingleton;
+
+		
+		private function onPreinitialize():void 
+		{
+			rL = ResourceLibrary.getInstance();
+		}
+		
+		public function onCreationComplete():void 
+		{
+			cif = CiFSingleton.getInstance();
+			this.pathData = "M -5 -5 l " + (this.width + 10) + " 0 l 0 40 l " + ( -1 * ((this.width + 10) - 150)) + " 0 C 107 77 36 72 -4 52 l 0 -55"
+			
+			this.juiceImage.source = rL.uiIcons["lock"];
+			
+			this.juiceBar.add(10);
+
+			var img:SmoothImage = new SmoothImage();
+			img.width = this.optionsButton.height;
+			img.height = this.optionsButton.height;
+			img.source = rL.uiIcons["wrench"];
+			this.optionsButton.mainContainer.addElement(img);
+			
+			img = new SmoothImage();
+			img.width = this.soundButton.height;
+			img.height = this.soundButton.height;
+			img.source = rL.uiIcons["sound"];
+			this.soundButton.mainContainer.addElement(img);
+		}
+		
+
+
+		
+		public function update(sgName:String):void
+		{
+			
+		}
+		
+		public function goalButtonClicked(e:MouseEvent=null):void 
+		{
+			Debug.debug(this, "GOAL BUTTON CLICKED -- TODO: hook this up to the goals window");
+		}
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>
+

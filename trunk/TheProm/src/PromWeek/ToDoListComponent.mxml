@@ -1,0 +1,443 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 width="400"
+		 height="180"
+		 styleName="classicPromWeek">
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+		 </fx:Declarations>
+		 
+		 
+		 
+		
+		<s:Rect id="backgroundRect" width="100%" height="100%">
+			<s:stroke>
+				<s:SolidColorStroke id="backgroundRectStroke" weight="10" color="{getStyle('toDoListHeaderStroke')}" caps="none" />
+			</s:stroke>
+			<s:fill>
+				<s:SolidColor id="backgroundRectColor" color="{getStyle('toDoListHeaderColor')}" alpha="0.7" />
+			</s:fill>
+		
+		</s:Rect>
+		
+		<s:VGroup width="100%" height="100%">
+			<s:HGroup id="hGroup1" width="100%" height="7%" paddingTop="10">
+				<s:HGroup width="90%" top="5" paddingLeft="10">
+					<s:RichText id="todoListNameLabel" text="Story Goals:" fontSize="16" fontWeight="bold" color="yellow" />
+				</s:HGroup>
+				<s:Group id="removeIconGroup" width="15" height="15" click="exitToDoList(event)" toolTip="Close Window">
+					<s:Rect width="{removeIconGroup.width}" height="{removeIconGroup.height}">
+						<s:stroke>
+							<s:SolidColorStroke color="black" alpha="1.0" />
+						</s:stroke>
+						<s:fill>
+							<s:SolidColor color="white" alpha="0.8" />
+						</s:fill>
+					</s:Rect>
+					<s:Line id="line1" xFrom="0" yFrom="0" xTo="{removeIconGroup.width}" yTo="{removeIconGroup.height}" >
+						<s:stroke>
+							<s:SolidColorStroke color="black" alpha="1.0" weight="2" />
+						</s:stroke>
+					</s:Line>
+					<s:Line id="line2" xFrom="0" yFrom="{removeIconGroup.height}" xTo="{removeIconGroup.width}" yTo="0" >
+						<s:stroke>
+							<s:SolidColorStroke color="black" weight="2"/>
+						</s:stroke>
+					</s:Line>
+				</s:Group>
+			</s:HGroup>
+			<s:VGroup id="todoListGroup" width="100%" height="93%" paddingTop="10" paddingBottom="10">
+			</s:VGroup>
+		</s:VGroup>
+		 
+	<fx:Script>
+		<![CDATA[
+		
+		import CiF.Cast;
+		import CiF.Character;
+		import CiF.CiFSingleton;
+		import CiF.Predicate;
+		import CiF.Debug;
+		import CiF.Trait;
+		import spark.components.List;
+		import flash.utils.Dictionary;
+		import mx.charts.series.items.LineSeriesItem;
+		import spark.components.RichText;
+		import spark.components.VGroup;
+		
+		/**
+		 * toDoItemComponents
+		 */
+		public var toDoItemComponents:Vector.<PromWeek.ToDoItemComponent>;
+		public var gameEngine:PromWeek.GameEngine;
+		public var percentComplete:Number;
+		public var story:Story;
+		public var conditionText:String;
+		public var cif:CiFSingleton;
+		
+		public function onCreationComplete():void 
+		{
+			this.toDoItemComponents = new Vector.<PromWeek.ToDoItemComponent>();
+		}
+		
+		
+		public function exitToDoList(e:Event):void
+		{
+			this.visible = false;
+		}
+	
+	
+		
+		
+		public function populateToDoList(story:Story):void
+		{
+			this.story = story;
+			var toDoItemComponent:PromWeek.ToDoItemComponent;
+			
+			var predTrue:Boolean = false;
+			
+			for each (var toDoItem:ToDoItem in story.todoList)
+			{
+				//Debug.debug(this, "populateToDoList() OK, NOW I'm frickin' populating this list!");
+				toDoItemComponent = new PromWeek.ToDoItemComponent();
+				toDoItemComponent.toDoItem = toDoItem;
+				toDoItemComponent.todoItemNameLabel.text = toDoItem.name;
+				
+				
+				
+				var predicateList:String = "Conditions:\n";
+				
+				//These are some variables used to aid in the way that 'someone' or 'someone else' is presented.
+				//Just to make it a little more clear to the player that it needs to be the SAME person throughout
+				//the entire rule that satisfies everything.
+				var someoneString:String = "someone";
+				var someoneBool:Boolean = false;
+				//var someoneElseString:String = "another person";
+				var someoneElseString:String = "someone";
+				var someoneElseBool:Boolean = false;
+				var heroCohort:String = ""; // this is the actual thing that always gets passed into the natural language rule name.
+				
+				var pred:Predicate;
+				var responderName:String = "";
+				var otherName:String = "";
+				for each (pred in toDoItem.condition.predicates)
+				{
+					if (pred.type == Predicate.TRAIT)
+					{
+						if (pred.trait >= Trait.FIRST_NAME_NUMBER && pred.trait <= Trait.LAST_NAME_NUMBER)
+						{
+							//if we have a trait that refers to a name, we can store that name as the one we wanna use...
+							if (pred.first == "responder")
+							{
+								responderName = Trait.getNameByNumber(pred.trait);
+							}
+							
+							if (pred.first == "other")
+							{
+								otherName = Trait.getNameByNumber(pred.trait);
+							}
+						}
+					}
+				}
+				
+				
+				for each (pred in toDoItem.condition.predicates)
+				{
+					//only add to the predicateList if the trait isn't about a name
+					if (!(pred.trait >= Trait.FIRST_NAME_NUMBER && pred.trait <= Trait.LAST_NAME_NUMBER))
+					{
+						if (pred.secondary.toLowerCase() == "responder"){
+							heroCohort = (responderName != "")?responderName:someoneString;
+							//Debug.debug(this, "saw a responder heroCohort is: " + heroCohort);
+						}
+						else if (pred.secondary.toLowerCase() == "other"){
+							heroCohort = (otherName != "")?otherName:someoneElseString;
+							//Debug.debug(this, "saw an other, hero cohort is: " + heroCohort);
+						}
+							
+						if (pred.numTimesUniquelyTrueFlag && pred.numTimesRoleSlot.toLowerCase() == "second"){
+							predicateList += "  - " + pred.toNaturalLanguageString(heroCohort, story.storyLeadCharacter, someoneElseString) + "\n";
+						}
+						else{
+							predicateList += "  - " + pred.toNaturalLanguageString(story.storyLeadCharacter, heroCohort, someoneElseString) + "\n";
+						}
+						
+						if (!someoneBool && (predicateList.search("someone") != -1) ) { // first time the name 'SOMEONE appeared! 
+							//Debug.debug(this, "value of search was: " + predicateList.search("SOMEONE") + " I think the string someone appears at least once?: " + predicateList);
+							someoneString = "that same someone";
+							someoneBool = true;
+						}
+						if (!someoneElseBool && (predicateList.search("another person") != -1) ) { // first time the name 'SOMEONE appeared! 
+							//Debug.debug(this, "value of search was: " + predicateList.search("SOMEONE") + " I think the string someone appears at least once?: " + predicateList);
+							someoneElseString = "that same other person";
+							someoneElseBool = true;
+						}
+					}
+				}
+				//trace("The value of predicate list here is: " + predicateList);
+				//toDoItemComponent.taskListGroup.toolTip = predicateList;
+				toDoItemComponent.toolTip = predicateList;
+				this.conditionText = predicateList;
+				toDoItemComponent.conditionText = predicateList;
+				this.toDoItemComponents.push(toDoItemComponent);
+				
+				todoListGroup.addElement(toDoItemComponent);
+				
+			}
+		}
+		
+		protected override function commitProperties():void {
+			super.commitProperties();
+			this.backgroundRectColor.color = getStyle('toDoListHeaderColor');
+			this.backgroundRectStroke.color = getStyle('toDoListHeaderStroke');
+		}
+		
+		/**
+		 * This function goes through all to do items and checks to see if their conditions are met, if so, we change the color of the text
+		 */
+		public function updateToDoList():void
+		{
+			for each (var toDoItemCompnent:PromWeek.ToDoItemComponent in this.toDoItemComponents)
+			{
+				var weGottaMakeAGoalProgressNotification:Boolean = false;
+				
+				var pred:Predicate;
+				var responderName:String = "";
+				var otherName:String = "";
+				for each (pred in toDoItemCompnent.toDoItem.condition.predicates)
+				{
+					if (pred.type == Predicate.TRAIT)
+					{
+						if (pred.trait >= Trait.FIRST_NAME_NUMBER && pred.trait <= Trait.LAST_NAME_NUMBER)
+						{
+							//if we have a trait that refers to a name, we can store that name as the one we wanna use...
+							if (pred.first == "responder")
+							{
+								responderName = Trait.getNameByNumber(pred.trait);
+							}
+							
+							if (pred.first == "other")
+							{
+								otherName = Trait.getNameByNumber(pred.trait);
+							}
+						}
+					}
+				}
+				var responder:Character = (responderName != "")?cif.cast.getCharByName(responderName):null;
+				var other:Character = (otherName)?cif.cast.getCharByName(otherName):null;
+				// This is going to be a special thing that has not only the PERCENT towards completion, but also WHO made it so close to completion!
+				var percentAndResponderAndOther:Dictionary = toDoItemCompnent.toDoItem.condition.getPercentageTrueForInitiator(CiFSingleton.getInstance().cast.getCharByName(story.storyLeadCharacter),null,responder,other);
+				
+				//Debug.debug(this, "updateToDoList() percent: " + percentAndResponderAndOther["percent"] + " responder: " + percentAndResponderAndOther["responder"] + " other: " + percentAndResponderAndOther["other"]);
+				
+				var predicateList:String = "Conditions:\n"
+				//These are some variables used to aid in the way that 'someone' or 'someone else' is presented.
+				//Just to make it a little more clear to the player that it needs to be the SAME person throughout
+				//the entire rule that satisfies everything.
+				var someoneString:String = "someone";
+				if (percentAndResponderAndOther["responder"]) {
+					someoneString += " (current best: " + percentAndResponderAndOther["responder"] + ") ";
+				}
+				var someoneBool:Boolean = false;
+				//var someoneElseString:String = "another person";
+				var someoneElseString:String = "someone";
+				if (percentAndResponderAndOther["other"]){
+					someoneElseString += "( current best: " + percentAndResponderAndOther["other"] + ") ";
+				}
+				var someoneElseBool:Boolean = false;
+				
+				var primaryPerson:String = ""; // This is what is always going to be passsed in to the pred.toNaturalRuleName.
+				var secondaryPerson:String = ""; // This is what is always going to be passsed in to the pred.toNaturalRuleName.
+				
+				var i:int;
+				
+				//create a vector of booleans that are going to store the truth values of each of the todoItem's condition
+				var predTruthValues:Vector.<Boolean> = new Vector.<Boolean>();
+				var predNumTimesValues:Vector.<Number> = new Vector.<Number>(); // this is so we can make an update when we increment (or decrement) a num time uniquely true predicate.
+				//you have to loop through each so we can index them by int, this has to do with the fact that we
+				//are skipping over things that are name type predicates.
+				for (i = 0; i < toDoItemCompnent.toDoItem.condition.predicates.length; i++ )
+				{
+					predTruthValues.push(false);
+					predNumTimesValues.push(0);
+				}
+				
+				if (toDoItemCompnent.toDoItem.predTruthValues == null)
+				{
+					toDoItemCompnent.toDoItem.predTruthValues = predTruthValues;
+					toDoItemCompnent.toDoItem.predNumTimesTrue = predNumTimesValues;
+				}
+				
+				
+				for (i = 0;  i < toDoItemCompnent.toDoItem.condition.predicates.length; i++ )
+				{
+					pred = toDoItemCompnent.toDoItem.condition.predicates[i];
+					var primaryCharacter:Character = new Character();
+					var secondaryCharacter:Character = new Character();
+					//only add to the predicateList if the trait isn't about a name
+					responderName = "";
+					otherName = "";
+					if (!pred.isCharNameTrait())
+					{
+						//Look at who the primary and secondary person is in the predicate:
+						if (pred.primary.toLowerCase() == "initiator") {
+							primaryPerson = story.storyLeadCharacter;
+							primaryCharacter = CiFSingleton.getInstance().cast.getCharByName(story.storyLeadCharacter);
+						}
+						else if (pred.primary.toLowerCase() == "responder") {
+							primaryPerson = (responderName != "")?responderName:someoneString;//someoneString;
+							primaryCharacter = CiFSingleton.getInstance().cast.getCharByName(percentAndResponderAndOther["responder"])
+						}
+						else if (pred.primary.toLowerCase() == "other") {
+							primaryPerson = (otherName != "")?otherName:someoneElseString;//someoneElseString;
+							primaryCharacter = CiFSingleton.getInstance().cast.getCharByName(percentAndResponderAndOther["other"])
+						}
+						
+						if (pred.secondary.toLowerCase() == "initiator") {
+							secondaryPerson = story.storyLeadCharacter;
+							secondaryCharacter = CiFSingleton.getInstance().cast.getCharByName(story.storyLeadCharacter);
+						}
+						else if (pred.secondary.toLowerCase() == "responder") {
+							secondaryPerson = (responderName != "")?responderName:someoneString;//someoneString;
+							secondaryCharacter = CiFSingleton.getInstance().cast.getCharByName(percentAndResponderAndOther["responder"])
+						}
+						else if (pred.second.toLowerCase() == "other") {
+							secondaryPerson = (otherName != "")?otherName:someoneElseString;//someoneElseString;
+							secondaryCharacter = CiFSingleton.getInstance().cast.getCharByName(percentAndResponderAndOther["other"])
+						}
+						
+						predicateList += "  - " + pred.toNaturalLanguageString(primaryPerson, secondaryPerson, someoneElseString);
+						
+						
+						//I CLAIM THAT HERE IS WHERE WE WANT TO DO SOME COMPUTATION TO FIGURE OUT WHETHER OR NOT WE ARE ACTUALLY DEALING WITH
+						//A NUM TIMES UNIQUELY TRUE PREDICATE.
+						//HERE, We've ALREADY DONE all of the actual calculation that we care about (i.e. whether it is true or not), or at the very
+						//last we are about to down below.
+						//Here, all we need to do is verify
+						//1.) YES-- this IS a num time uniquely true predicate
+						//2.) Find out how much progress we've made on it.
+						// I've already written that *awesome* new function, so I think, *maybe*, it is just as easy as (doing some thinking about which role we care about)
+						// And then just calling my special function!!
+						//OK, yes... maybe it is as easy as that, but figuring out the 'which role we care about' is not entirely trivial, because we may be dealing with
+						//things like SOMEONE and SOMEONE ELSE, and in those cases we need to do something special..
+						//Oh, wait, well, maybe it is actually just as easy as moving this down a little bit.. OK, maybe it wont be SO bad?
+						//let's TRY IT!
+						//OK.. no, just do it here, man up.  we need to know the primary, secondary of the predicate, and grab characters from them.  Easy.
+						//OK, and you know what, MAYBE You only want to display NAMES for relationships and networks... and directed statuses. huh, maybe SFDB too. that is almost everything.
+						//Maybe non-directed statuses are the only things we don't need.
+						if(pred.numTimesUniquelyTrueFlag){
+							//
+							var dictionary:Dictionary = pred.evalForNumberUniquelyTrueKeepChars(primaryCharacter, secondaryCharacter, other, null);
+							predicateList += " " + dictionary["numTimesTrue"] + "/" + pred.numTimesUniquelyTrue + " (";
+							for (var k:String in dictionary) {
+								  var value:String=dictionary[k];
+								  var key:String = k;
+								 // Debug.debug(this, "key is: " + key + " and value is: " + value);
+								  if (value == "true") {
+									  predicateList += key + ",";
+								  }
+							}
+							predNumTimesValues[i] = dictionary["numTimesTrue"];
+							if (toDoItemCompnent.toDoItem.predNumTimesTrue[i] != dictionary["numTimesTrue"]) {
+								//This means that the value changed in some way?
+								toDoItemCompnent.toDoItem.predNumTimesTrue[i] = dictionary["numTimesTrue"];
+								Debug.debug(this, "updateToDoList() num times uniquely true progress changed!");
+								//Debug.debug(this, "it was for this predicate: " + pred.evalForNumberUniquelyTrueKeepChars(primaryCharacter, secondaryCharacter, other, null));
+								Debug.debug(this, "It was for this predicate: " + pred.toNaturalLanguageString(primaryPerson, secondaryPerson, someoneElseString));
+								weGottaMakeAGoalProgressNotification = true;
+							}
+							predicateList += ")";
+							
+						}
+						//if (pred.toNaturalLanguageString(primaryPerson, secondaryPerson, someoneElseString) == "Monica was a well known cheater during the week."
+						 //|| pred.toNaturalLanguageString(primaryPerson, secondaryPerson, someoneElseString) == "Monica is not friends with at least 17 people."){
+							//Debug.debug(this, pred.toNaturalLanguageString(primaryPerson, secondaryPerson, someoneElseString));
+						 //}
+						if (pred.evaluate(CiFSingleton.getInstance().cast.getCharByName(story.storyLeadCharacter), CiFSingleton.getInstance().cast.getCharByName(percentAndResponderAndOther["responder"]), CiFSingleton.getInstance().cast.getCharByName(percentAndResponderAndOther["other"])))
+						{
+							predicateList += "(DONE)"; // - secondary: " + percentAndResponderAndOther["responder"] + " thirdary: " + percentAndResponderAndOther["other"];
+							predTruthValues[i] = true;
+							if (!toDoItemCompnent.toDoItem.predTruthValues[i])
+							{
+								//this means it became true!
+								predicateList += " (BECAME TRUE)"
+								weGottaMakeAGoalProgressNotification = true;
+							}
+						}
+						else
+						{
+							predTruthValues[i] = false;
+							if (toDoItemCompnent.toDoItem.predTruthValues[i])
+							{
+								//this means it became false!
+								predicateList += " (BECAME FALSE)"
+								weGottaMakeAGoalProgressNotification = true;
+							}
+						}
+						
+						if (!someoneBool && (predicateList.search("someone") != -1) ) { // first time the name 'SOMEONE appeared! 
+							someoneString = "that same someone";
+						if (percentAndResponderAndOther["responder"]) {
+							someoneString += " (current best: " + percentAndResponderAndOther["responder"] + ") ";
+						}
+							someoneBool = true;
+						}
+						if (!someoneElseBool && (predicateList.search("another person") != -1) ) { // first time the name 'ANOTHER PERSON appeared! 
+							someoneElseString = "that same other person";
+							if (percentAndResponderAndOther["other"]){
+								someoneElseString += "( current best: " + percentAndResponderAndOther["other"] + ") ";
+							}
+							someoneElseBool = true;
+						}
+						predicateList += "\n";
+					}
+				}
+				
+				//now update the truth values of the todoItem.
+				toDoItemCompnent.toDoItem.predTruthValues = predTruthValues;
+
+				
+				this.percentComplete = Math.round(100 * percentAndResponderAndOther["percent"]);//toDoItemCompnent.toDoItem.condition.getPercentageTrueForInitiator(CiFSingleton.getInstance().cast.getCharByName(story.storyLeadCharacter), null, responder, other)["percent"]);
+				
+				//toDoItemCompnent.taskListGroup.toolTip = predicateList// + "-- " + this.percentComplete + "% Complete --\n");
+				toDoItemCompnent.progressGroup.toolTip = this.percentComplete + "% Complete";
+				if (toDoItemCompnent.toDoItem.evaluateCondition())
+				{
+					toDoItemCompnent.todoItemNameLabel.setStyle("color", "green");
+				}
+				else
+				{
+					toDoItemCompnent.todoItemNameLabel.setStyle("color", "yellow");
+				}
+				
+				//toDoItemCompnent.progressFGRect.width = toDoItemCompnent.progressBGRect.width * this.percentComplete / 100;
+				
+				
+				//if have made or lost progress on a task, display info!
+				//if (weGottaMakeAGoalProgressNotification)
+				//{
+					//gameEngine.hudGroup.updatesGroup.createGoalProgressPopUp(toDoItemCompnent.toDoItem,predicateList);
+				//}
+			}
+		}
+		
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			for each (var ti:PromWeek.ToDoItemComponent in this.toDoItemComponents)
+				ti.setStyleName();
+			this.invalidateProperties();
+		}
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

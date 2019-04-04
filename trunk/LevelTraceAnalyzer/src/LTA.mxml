@@ -1,0 +1,2221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+				xmlns:s="library://ns.adobe.com/flex/spark"
+				xmlns:mx="library://ns.adobe.com/flex/mx"
+				xmlns:prom="PromWeek.*"
+				creationComplete="onCreationComplete()"
+				preinitialize="onPreinitialize()"
+				initialize="onInitialize()"
+				width="100%"
+				height="100%">
+				
+	<fx:Declarations>
+		<!--fx:XML id="cifStateXMLFoGState" source="../../CiFStates/FoGState.xml" />
+		<fx:XML id="cifLibrariesXML" source="../../CiFStates/libraries (master).xml" /-->
+        <!--fx:XML id="cifStateXMLFoGState" source="../bin/FoGState.xml" />
+        <fx:XML id="cifLibrariesXML" source="../bin/libraries (master).xml" />
+		<fx:XML id="gameXML" source="gameConfig.xml" /-->
+		<fx:String id="levelTraceLocationFolder">LevelTraceStorage18May2012</fx:String> <!-- doesn't actually work! search for 'leveltracelocationfolder' to find the right place to change it -->
+		<fx:XML id="cifStateXML" source="../../CiFStates/PromWeekCharacters.xml" />
+		
+	<prom:AuthoringLibrary id="authLib"/>
+		
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+		import CiF.*;
+		import flash.filesystem.File;
+		import flash.filesystem.FileStream;
+		import flash.filesystem.FileMode;
+		import flash.sampler.NewObjectSample;
+		import flash.utils.Dictionary;
+		
+		private var cif:CiFSingleton;
+		private var numberTossed:int = 0; // the number of files that happened before Feb 15th 2012
+		private var totalNumberOfFilesEver:int = 0; // includes ALL files looked at, including ones thrown away.
+		private var numberKept:int = 0;
+		private var numberTossedDueToDate:int = 0;
+		private var numberOfTriggerContextsThatSeemedToLackInformation:int = 0;
+		private var numberOfMalformedXML:int = 0;
+		private var numberOfTutorials:int = 0;
+		private var numberOfFreeplayMode:int = 0;
+		private var numberOfNonEndOfStoryTypes:int = 0;
+		private const MONTH_CUTOFF:int = 1;
+		private const DAY_CUTOFF:int = 15;
+		private const YEAR_CUTOFF:int = 2012;
+		public var juiceUsedThisTurn:Dictionary;
+		public var tossTutorials:Boolean = true; // if true, don't use anything from Chloe or Zack's campaign.
+		public var thisFileHadGoalProgress:Boolean = false;
+		public var currentAbsolutePath:String = "";
+		public var currentLevel:Level;
+		
+		public var simonGoalCOMPLETEnumber:int = 0;
+		public var simonGoalPROGRESSnumber:int = 0;
+		public var simonGoalANTInumber:int = 0;
+		
+		private var onlyLookAtEndOfStoryFiles:Boolean = true;
+		
+		//Data dictionaries.
+		public var campaignsStarted:Dictionary;
+		public var levelsStarted:Dictionary;
+		public var relationships:Dictionary;
+		public var statuses:Dictionary;
+		public var characterActions:Dictionary;
+		public var socialGamesByCampaignAndLevel:Dictionary;
+		public var totalGamesPlayedPerCampaign:Dictionary;
+		public var socialGameInstantiationsByCampaignAndlevel:Dictionary;
+		public var fileNamesThatAreUsed:Vector.<String>;
+		public var fileNamesWithNoGoalProgress:Dictionary;
+		public var numberOfGoalsAchievedPerFile:Dictionary;
+		public var instantiationTotals:Dictionary;
+		public var juiceTotals:Dictionary;
+		public var goalProgressDictionary:Dictionary;
+		public var typeOfLevelTrace:Dictionary; // 'endOfLevel' or 'endOfStory' probably.
+		public var socialGamesFromPreviousFile:Vector.<String>;
+		public var simonGoalStats:Dictionary;
+		public var leadCharacterInvolvedInSocialGames:Dictionary;
+		
+		public var currentStoryLeadCharacter:String; // will get a new one of these for each new file that we look at!
+		
+		//GOAL PROGRESS VARIABLES
+		public var goalCurrentSocialGameName:String;
+		public var goalCurrentInitiatorName:String;
+		public var goalCurrentResponderName:String;
+		public var goalCurrentTime:int = 0;
+		public var goalCurrentEffectID:int;
+		public var goalCurrentLevel:String;
+		public var goalCurrentUserID:String;
+		public var shouldLogGoalProgress:Boolean = false;
+		//END GOAL PROGRESS VARIABLES
+		
+		public var juiceByCampaignAndLevel:Dictionary;
+		public var juiceThatWasNotFollowedUp:Dictionary; // represents times when someone spent money on juice, and then the NEXT social game that follows is NOT related to that game at all.
+		
+		public var microtheoryStringsDefinitionSeparate:Vector.<String> = new Vector.<String>();
+		public var microtheoryStringsDefinitionAnotherPredicate:Vector.<String> =  new Vector.<String>();
+		
+		public var stories:Vector.<Story> = new Vector.<Story>();
+		
+		private function onPreinitialize():void {
+			Debug.debug(this, "on preInitialize()");
+			cif = CiFSingleton.getInstance();
+			initializeDictionaries();
+			this.cif.parseCiFState(this.cifStateXML);
+			currentLevel = new Level();
+			//I think this is all the mojo we need to populate the authoring library these days.
+			authLib.loadXMLGames()
+			authLib.loadXMLStories(); // to keep track of goal progress, I guess?
+			
+			Debug.debug(this, "finished loading games?")
+			
+			for each(var value:XML in authLib.games) {
+				//Debug.debug(this, "value: " + value);
+				this.cif.parseCiFState(value);
+			}
+			
+			
+			for each(value in authLib.stories) {
+				Debug.debug(this, "parsing the stories I guess...");
+				var story:Story;
+				for each (var storyXML:XML in value..Story) {
+					story = new Story();
+					story.loadFromXML(storyXML);
+					this.stories.push(story);
+				}
+				
+
+			}
+
+			//Let's reset the gamestate to the starting game state!
+			shouldLogGoalProgress = false;
+			resetGameState();
+			shouldLogGoalProgress = true;
+			
+			//And then I guess 'initialize' all of the to do lists, maybe, possibly?
+			for each(var campaign:Story in this.stories) {
+				if (campaign.storyLeadCharacter.toLowerCase() == "nicholas") continue; // the secret campaign causes problems.
+				for each(var tdi:ToDoItem in campaign.todoList) {
+					tdi.predTruthValuesPerResponderOtherPair = new Vector.<Dictionary>();
+					for each (var pred:Predicate in tdi.condition.predicates)
+					{
+						tdi.predTruthValuesPerResponderOtherPair.push(new Dictionary());
+					}
+				}
+				currentStoryLeadCharacter = campaign.storyLeadCharacter;
+				
+				/** COMMENT THIS OUT IF YOU WANT TO SKIP GOAL PROGRESS (there are three of them!) **/
+				//updateToDoList(campaign);
+				
+				//we'll have to temporary set who the story lead character is for each file read!
+				
+				Debug.debug(this, "I think I just updated the to do list maybe based on the starting state...");
+			}
+			
+			Debug.debug(this, "I bet all of the null things have been created by this point...");
+			
+			//Debug.debug(this, "how good of a job did this do of parsing everything I wonder?");
+			//Debug.debug(this, "err, not hitting the breakpoints again I fear?");
+			
+			//OKAY! YES! I believe I have successfully loaded in the initial starting state!
+			//I'm so happy!
+			
+			//populate the microtheory string vector
+			//with string versions of all of our microtheories.
+			for each(var mt:Microtheory in cif.microtheories) {
+				microtheoryToString(mt);
+			}
+			
+
+		}
+		
+		private function onCreationComplete():void {
+			trace("on creation complete");
+			Debug.debug(this, "in creation complete");
+			
+			
+			start();
+		}
+		
+		private function onInitialize():void {
+			trace("on Initialize");
+			
+		}
+		
+		private function start():void {
+			Debug.debug(this, "inside of start!");
+			for each(var sg:SocialGame in cif.socialGamesLib.games) {
+				Debug.debug(this, "sg name is: " + sg.name);
+			}
+			
+			
+			
+			
+			// IF YOU JUST WANT TO TEST MTs, COMMENT THIS OUT.
+			readFiles();
+			
+			outputResults();
+			//var levelTraceXML:XML = readALevelTraceFile("00\\00c36380d023514f2d93aedd01130d88\\1329727691_1308300340.xml");
+			
+			//Debug.debug(this, "here is a level trace XML: " + levelTraceXML);
+			
+		}
+		
+		/**
+		 * Because there are going to be many layers worth of directories to sift through
+		 * this function will go through all of that for us and figure out what an appropriate file name would be.
+		 * @return
+		 */
+		public function readFiles():void {
+			Debug.debug(this, "getAFileName() start");
+			var levelTraceRoot:File = File.applicationDirectory;
+			Debug.debug(this, "level trace root: " + levelTraceRoot.nativePath);
+			
+			
+			/*
+			var file1:File = File.documentsDirectory; 
+			file1 = file1.resolvePath("AIR Test"); 
+			trace(file1.nativePath); // C:\Documents and Settings\userName\My Documents\AIR Test 
+			var file2:File = File.applicationDirectory; 
+			file2 = file2.resolvePath(".."); 
+			file2 = file2.resolvePath(".."); 
+			file2 = file2.resolvePath("."); 
+			trace(file2.nativePath); // C:\Documents and Settings\userName 
+			*/
+			
+			var pathOfFinalPlaceToLook:String =  levelTraceRoot.nativePath + "\\LocalLevelTraces\\" + levelTraceLocationFolder + "\\";
+			Debug.debug(this, "THIS is the folder that we'll be using for level trace files: " + pathOfFinalPlaceToLook);
+			
+			/** Change this for actually changing which data you want to look at  levelTraceLocationFolder **/
+			levelTraceRoot.nativePath += "/LocalLevelTraces/LevelTraceStorage18May2012/LevelTraceStorage/";
+			//levelTraceRoot.nativePath += "/LocalLevelTraces/" + levelTraceLocationFolder + "/";
+			//levelTraceRoot.nativePath += "\\LocalLevelTraces\\" + levelTraceLocationFolder + "\\";
+			
+			
+			for each(var hashDirectory:File in levelTraceRoot.getDirectoryListing()) {
+				//Debug.debug(this, "hashDirectoryName: " + hashDirectory.name);
+				if(hashDirectory.name != ".DS_Store"){ //Dunno what this file is, but we don't want to look at it and I don't want to delete it.
+					for each(var hashedUserDirectory:File in hashDirectory.getDirectoryListing()) {
+						if (hashedUserDirectory.name != ".DS_Store"){
+							//Debug.debug(this, "-->" + hashedUserDirectory.name);
+							
+							//TODO If I wanted to sort level trace files based on time
+							//this is where I would do it.
+							
+							for each (var levelTraceFile:File in hashedUserDirectory.getDirectoryListing()) {
+								if(levelTraceFile.name != ".DS_Store"){
+									//Debug.debug(this, "---->" + levelTraceFile.name);
+									currentAbsolutePath = "LevelTraceStorage/" + hashDirectory.name + "/" + hashedUserDirectory.name + "/" + levelTraceFile.name;
+									levelTraceAnalysis(levelTraceFile);
+								}
+							}
+						}
+					}
+				}
+				
+			}
+			
+		}
+		
+		/**
+		 * This is a function that, given the name of a file that contains level trace information
+		 * turns that file into an XML object, and then starts splitting it up into various
+		 * interesting bits.  First, we have to figure out that we are dealing with a level that we
+		 * actually care about!
+		 * @return
+		 */
+		public function levelTraceAnalysis(levelTraceFile:File):XML {
+			//Debug.debug(this, "LEVEL TRACE ANALYSIS ENTERED!!!!!!!!!!!!!");
+			
+			totalNumberOfFilesEver++;
+			if ( totalNumberOfFilesEver % 10 == 0){ // keep track of our progress!
+				Debug.debug(this, "We've seen " + totalNumberOfFilesEver + " files. Tossed: " + numberTossed + " Kept: " 
+				+ numberKept + " [MalformedXML: " + numberOfMalformedXML + 
+				" Tutorials: " + numberOfTutorials + " Freeplay: " + numberOfFreeplayMode + " BadDates: " + numberTossedDueToDate +
+				"] (separate thing--trigger contexts that are messed up: " + numberOfTriggerContextsThatSeemedToLackInformation + ")");
+			}
+			
+			juiceUsedThisTurn = new Dictionary(); // if we are on a new file now, clear out the juice used this turn.
+			
+			//PROBLEM FILE MAYBE:
+			//a28cbd7bf41a6eb2dd518d23e2cf856e
+			
+			if (levelTraceFile.name == "1326499619_65963461.xml") {
+				//Debug.debug(this, "I think maybe it is about to crash?");
+			}
+			
+			var fs:FileStream = new FileStream();
+			fs.open(levelTraceFile, FileMode.READ);
+			try{
+			var levelTraceXML:XML = XML(fs.readUTFBytes(fs.bytesAvailable));
+			} catch (e:Error) {
+				Debug.debug(this, "WOAH -- file had malformed XML or something, somehow. geeze.");
+				numberOfMalformedXML++;
+				numberTossed++;
+				return null;
+			}
+			fs.close();
+			
+			if (!validDate(levelTraceFile)) {
+				numberTossedDueToDate++;
+				numberTossed++;
+				return null;
+			}
+			
+			if (tossTutorials) {
+				var storyName:String = levelTraceXML.@storyName;
+				if (storyName.toLowerCase() == "chloe" || storyName.toLowerCase() == "zack") {
+					numberTossed++;
+					numberOfTutorials++;
+					return null;
+				}
+					
+			}
+			
+			
+			
+			//We want to not listen to any stories that have to do with freeplay mode.
+			if (levelTraceXML.@storyName.toLowerCase() == "freeplay") {
+				numberTossed++;
+				numberOfFreeplayMode++;
+				return null;
+			}
+			
+
+			
+			//Ok, so at this point, we know we are dealing with a file that we actually care about.
+			//Debug.debug(this, "analyzing file: " + levelTraceFile.name);
+			numberKept++;
+			goalCurrentUserID = levelTraceFile.name;
+			goalCurrentUserID = goalCurrentUserID.substring(0, goalCurrentUserID.indexOf(".xml"));
+			readALevelTrace(levelTraceXML);
+			
+
+			
+			
+			return levelTraceXML;
+		}
+		
+		/**
+		 * This is the MAIN FUNCTION of this whole thing.
+		 * Given the XML of a level trace, it parses out all of the information that we care about!
+		 * @param	levelTraceFile
+		 */
+		public function readALevelTrace(levelTraceXML:XML):void {
+			var startTime:int = levelTraceXML.@startTime;
+			var endTime:int = levelTraceXML.@endTime;
+			var name:String = levelTraceXML.@name;
+			var storyName:String = levelTraceXML.@storyName;
+			var type:String = levelTraceXML.@type;
+			var story:Story = new Story();
+			currentStoryLeadCharacter = storyName; // this is just to help us out a little with story parsing.
+			shouldLogGoalProgress = true;
+			thisFileHadGoalProgress = false;
+		
+			var storyHasBeenFound:Boolean = false;
+			var levelHasBeenFound:Boolean = false;
+			
+			//There are going to be a variety of contexts that we are going to care about. Status, trigger, and social game
+			//trigger contexts
+			var allContexts:XMLList = levelTraceXML.SFDB.children();
+		
+			//Grab the ACTUAL story data structure that we want, and the ACTUAL level within this story that we want.
+			for each(story in this.stories) {
+				if (story.storyLeadCharacter.toLowerCase() == currentStoryLeadCharacter.toLowerCase()) {
+					storyHasBeenFound = true;
+					for each(currentLevel in story.levels) {
+						if (currentLevel.title.toLowerCase() == name.toLowerCase()) {
+							levelHasBeenFound = true;
+							break;
+						}
+					}
+				}
+				if (storyHasBeenFound) break;
+			}
+			
+			if (onlyLookAtEndOfStoryFiles) {
+				startTime = 0; // Force it to RESTART ALL THE TIME!!!!
+				if (type.toLowerCase() != "endofstory") {
+					numberOfNonEndOfStoryTypes++;
+					numberTossed++;
+					return;
+				}
+			}
+			
+			/*
+			 * 
+			 * Something to do AROUND here (though maybe not here exactly)
+			 * --STORE information about the social games that we saw in the previous file (game name, init, and respond should be enough).
+			 * --Go through the social games of THIS FILE (only need to do this if this is not a 'starting' file and see if they match up to the point of where new games should start
+			 * --If the social games DON'T match up, then we need to go through all of the social game contexts even BEFORE this new file's start time, and enact all of those changes.
+			 * --If the social games DO match up, then assume that we have the correct 'starting' state already for this point in the file, and just proceed as normal.
+			 * --If the file has a starting time of '0' then just continue to behave as we normally have (because we have to start over from the starting state anyway).
+			 * */
+			var tempString:String;
+			 
+			//*****BOKkENmeebbee?
+			 var socialGamesMatchUp:Boolean = true;
+			 var socialGameContextsBeforeThisStartTime:Vector.<String> = new Vector.<String>();
+			 if (startTime != 0) {
+				 for (var iterator:int = allContexts.length() - 1; iterator >= 0; iterator--) {
+					 var helpContextXML:XML = allContexts[iterator];
+					 if (helpContextXML.@time >= startTime) break;
+					 if (helpContextXML.name() == "SocialGameContext") {
+						 tempString = helpContextXML.@gameName +"-" + helpContextXML.@initiator + "-" + helpContextXML.@responder;
+						tempString = tempString.toLowerCase();
+						socialGameContextsBeforeThisStartTime.push(tempString);
+					 }
+				 }
+			 }
+			 
+			 //Ok, now I have a vector of all of the previous social games that were played from previous level traces that were examined.
+			 for (iterator = socialGameContextsBeforeThisStartTime.length - 1; iterator >= 0; iterator--) {
+				 if (socialGameContextsBeforeThisStartTime[iterator] != socialGamesFromPreviousFile[iterator]){
+					socialGamesMatchUp = false;
+					break;
+				 }
+			 }
+			 
+			 if (!socialGamesMatchUp && startTime != 0) {
+				 //enact all of the changes.
+				 shouldLogGoalProgress = false;
+				 resetGameState();
+				 shouldLogGoalProgress = true;
+				 
+				var init:Character;
+				var respond:Character;
+				var other:Character;
+				 
+				 for (iterator = allContexts.length() - 1; iterator >= startTime; iterator--) {
+					var context:SFDBContext = ParseXML.SFDBContextParse(allContexts[iterator]);
+					
+					if (context.isTrigger()) {
+						var triggerContext:TriggerContext = context as TriggerContext;
+						
+						init = cif.cast.getCharByName(triggerContext.initiator);
+						respond = cif.cast.getCharByName(triggerContext.responder);
+						other = cif.cast.getCharByName(triggerContext.other);
+						
+						triggerContext.getChange().valuation(init, respond, other);
+						
+					}
+					else if (context.isStatus()) {
+						var contextXML:XML = allContexts[iterator];
+						
+						var firstString:String = "";
+						firstString = contextXML.@from;
+						
+						var secondString:String = "";
+						secondString = contextXML.@to;
+						
+						if (secondString != "") {
+							//secondString += "*";
+						}
+						else {
+							secondString = "NA";
+						}
+
+						var statusString:String = ""
+						statusString = contextXML.@status;
+						
+						var negatedString:String = "";
+						var negated:String = contextXML.@negated; // needs to be converted to a bool
+						if (negated == "true"){
+							negatedString = "ended";
+						}
+						else {
+							negatedString = "started";
+						}
+						
+						
+						//Maybe... don't need this any more! Social game context can handle all of this garbage!
+						if(negatedString == "started") // add the status
+							cif.cast.getCharByName(firstString).addStatus(Status.getStatusNumberByName(statusString), cif.cast.getCharByName(secondString));
+						else if (negatedString == "ended") // remove the status
+							cif.cast.getCharByName(firstString).removeStatus(Status.getStatusNumberByName(statusString), cif.cast.getCharByName(secondString));
+						
+					}
+					else if (context.isSocialGame()) {
+						var socialGameContext:SocialGameContext = context as SocialGameContext;
+						var socialGame:SocialGame = cif.socialGamesLib.getByName(socialGameContext.gameName);
+						
+						init = cif.cast.getCharByName(socialGameContext.initiator);
+						respond = cif.cast.getCharByName(socialGameContext.responder);
+						other = cif.cast.getCharByName(socialGameContext.other);
+						
+						socialGameContext.getChange().valuation(init, respond, other, socialGame);
+					}
+					cif.time++;
+					cif.sfdb.addContext(context);
+					
+					
+					//var sgcontext:SocialGameContext = ParseXML.SFDBContextParse(helpContextXML) as SocialGameContext;
+					//cif.changeSocialState(sgcontext, currentLevel.cast);
+					
+				 }
+			 }
+			 //*****END BOKkENmeebbee?
+
+			
+			
+			if (typeOfLevelTrace[storyName + "*" + name + "*" + type])
+				typeOfLevelTrace[storyName + "*" + name + "*" + type] += 1;
+			else
+				typeOfLevelTrace[storyName + "*" + name + "*" + type] = 1;
+			
+				
+			//Debug.debug(this, "adding this to file names that are used: " + currentAbsolutePath);
+			fileNamesThatAreUsed.push(currentAbsolutePath);
+			
+			
+			//Debug.debug(this, "start time: " + startTime + " endTime: " + endTime + " name: " + name + " storyName: " + storyName + " type: " + type);
+			
+			levelsStarted[storyName.toLowerCase()] += 1;// we started a new level with this character!
+			if (startTime == 0) { // they started a NEW campaign!
+				campaignsStarted[storyName.toLowerCase()] += 1;
+				
+				socialGamesFromPreviousFile = new Vector.<String>(); // zero this out.
+				
+				//We also have to reset the social state, I believe...
+				shouldLogGoalProgress = false;
+				resetGameState();
+				shouldLogGoalProgress = true;
+			}
+			
+
+			
+			
+			//for each (var contextXML:XML in allContexts) {
+			//we want to go in 'backwards' order, because it is important that we follow things
+			//based on the time that they happened for goal progression, and they are stored in backwards order
+			//in the XMLList that is generated.
+			for (var i:int = allContexts.length() -1; i >= 0; i--) {
+				contextXML = allContexts[i];
+				//Debug.debug(this, "StOP the presses!");
+				if (contextXML.@time < startTime || contextXML.@time > endTime) { // we don't want to double dip!
+					//but we do want to track the social games that we encounter, I think.
+					if(contextXML.name() == "SocialGameContext"){
+						tempString = contextXML.@gameName +"-" + contextXML.@initiator + "-" + contextXML.@responder;
+						tempString = tempString.toLowerCase();
+						socialGamesFromPreviousFile.push(tempString);
+					}
+					continue;
+				}
+					
+				if (goalCurrentTime < contextXML.@time) {
+					//we have hit the next time step! we will increment current time (and, I guess before that)
+					//update all of the goal progress!
+					
+					/** COMMENT THIS OUT IF YOU WANT TO SKIP GOAL PROGRESS (thre are three of them) **/
+					//updateToDoList(story);
+					goalCurrentTime = contextXML.@time;
+					cif.time = goalCurrentTime;
+				}
+				else if(goalCurrentTime > contextXML.@time){
+					//If the goal current time is way bigger than the contextXML.@time, then what probably 
+					//happened is that we are now looking at a new file.  
+					//I think we should set goalCurrentTime to the start time of this file.
+					goalCurrentTime = startTime;
+					cif.time = goalCurrentTime;
+				}
+				else { // this is the case where goalCurrentTime == contextXML.@time
+					//I believe we don't actually have to do anything here!
+				}
+				
+				//These are useful regarless of what context I'm dealing with.
+				var initCharacter:Character = cif.cast.getCharByName(contextXML.@initiator);
+				var respondCharacter:Character = cif.cast.getCharByName(contextXML.@responder);
+				var otherCharacter:Character = cif.cast.getCharByName(contextXML.@other);
+				
+				
+
+				
+				if (contextXML.name() == "TriggerContext") {
+					
+					//Debug.debug(this, "TC!  time: " + contextXML.@time + " id " + contextXML.@id + " initiator: " + contextXML.@initiator + " responder: " + contextXML.@responder);
+					var trigger:Trigger = cif.sfdb.getTriggerByID(contextXML.@id);
+					
+					triggerContext= ParseXML.SFDBContextParse(contextXML) as TriggerContext;
+					
+
+					var triggerChangeRule:Rule = trigger.change;
+					
+					
+					//MAYBE We don't need this any more! Social game context can handle all of the valuation stuff!
+					//I think we want to valuate this trigger context rule as well!
+					if(triggerContextHasAllRolesNeededForValuation(triggerChangeRule, initCharacter, respondCharacter, otherCharacter))
+						triggerChangeRule.valuation(initCharacter, respondCharacter, otherCharacter);
+					
+					//Actually add the context to the SFDB (important for goal evaluation later on).
+					cif.sfdb.addContext(triggerContext);
+						
+					for each (var triggerPredicate:Predicate in triggerChangeRule.predicates) {
+						LTAParsePredicate(triggerPredicate, contextXML.@initiator, contextXML.@responder, contextXML.@other);
+					}
+					//Debug.debug(this, "triggerContext: " + contextXML);
+				}
+				else if (contextXML.name() == "StatusContext") {
+					//Debug.debug(this, "status context");
+					//Debug.debug(this, "statusContext: " + contextXML);
+					var statusIndexString:String = "";
+					var statusContext:StatusContext = ParseXML.SFDBContextParse(contextXML) as StatusContext;
+					cif.sfdb.addContext(statusContext);
+					
+					firstString = "";
+					firstString = contextXML.@from;
+					
+					secondString = "";
+					secondString = contextXML.@to;
+					
+					if (secondString != "") {
+						//secondString += "*";
+					}
+					else {
+						secondString = "NA";
+					}
+
+					statusString = ""
+					statusString = contextXML.@status;
+					
+					negatedString = "";
+					negated = contextXML.@negated; // needs to be converted to a bool
+					if (negated == "true"){
+						negatedString = "ended";
+					}
+					else {
+						negatedString = "started";
+					}
+					
+					
+					//Maybe... don't need this any more! Social game context can handle all of this garbage!
+					if(negatedString == "started") // add the status
+						cif.cast.getCharByName(firstString).addStatus(Status.getStatusNumberByName(statusString), cif.cast.getCharByName(secondString));
+					else if (negatedString == "ended") // remove the status
+						cif.cast.getCharByName(firstString).removeStatus(Status.getStatusNumberByName(statusString), cif.cast.getCharByName(secondString));
+					
+						
+					firstString = firstString.toLowerCase();
+					secondString = secondString.toLowerCase();
+					
+					statusIndexString = firstString + "*" + secondString + "*" + statusString + "*" + negatedString;
+					statusIndexString = statusIndexString.toLowerCase();
+					var tinyStatusIndexString:String = statusString + "*" + negatedString;
+					//Debug.debug(this, "statusIndexString: " + statusIndexString);
+					tinyStatusIndexString = tinyStatusIndexString.toLowerCase();
+					
+					if (statuses[tinyStatusIndexString]) {
+						statuses[tinyStatusIndexString] += 1;
+					}
+					else {
+						statuses[tinyStatusIndexString] = 1;
+					}
+					
+					if (characterActions[statusIndexString]) {
+						characterActions[statusIndexString] += 1;
+					}
+					else {
+						characterActions[statusIndexString] = 1;
+					}
+					
+					//statusPredicate.setStatusPredicate(from, to, statusType, isNegated);	
+					
+					//LTAParsePredicate(statusPredicate, contextXML.@initiator, contextXML.@responder, contextXML.@other);
+				}
+				else if (contextXML.name() == "JuiceContext") {
+					
+					//Debug.debug(this, "found some juice!");
+					
+					/*
+					public static const TYPE_SWITCH_OUTCOME:Number = 0;
+					public static const TYPE_BUY_GAME:Number = 1;
+					public static const TYPE_BUY_RESULTS:Number = 2;
+					public static const TYPE_BUY_MOTIVES:Number = 3;
+					*/
+					
+					//Discover which type of juice was used and log it.
+					var juiceGameName:String = contextXML.@gameName;
+					var juiceInit:String = contextXML.@initiator;
+					var juiceRespond:String = contextXML.@responder;
+					var juiceType:String = contextXML.@type;
+					juiceType = getJuiceTypeNameByNumber(juiceType);
+					juiceType = juiceType.toLowerCase();
+					
+					if (juiceTotals[juiceType]) {
+						juiceTotals[juiceType] += 1;
+					}
+					else {
+						juiceTotals[juiceType] = 1;
+					}
+					
+					//Format for this will be:
+					//CAMPAIGNNAME-LEVELNAME-JUICETYPE-GAMENAME-INITNAME-RESPONDNAME
+					var longJuiceIndex:String = storyName.toLowerCase() + "*" + name.toLowerCase() + "*" + juiceType + "*" + juiceGameName + "*" + juiceInit + "*" + juiceRespond;
+					longJuiceIndex = longJuiceIndex.toLowerCase();
+					var juiceUsedThisTurnIndex:String = juiceGameName + "*" + juiceInit + "*" + juiceRespond + "*" + storyName.toLowerCase() + "*" + name.toLowerCase() + "*" + juiceType;
+					//Used to see if things weren't followed up!
+					juiceUsedThisTurn[juiceUsedThisTurnIndex.toLowerCase()] = true;
+					
+					if (juiceByCampaignAndLevel[longJuiceIndex]) {
+						juiceByCampaignAndLevel[longJuiceIndex] += 1;
+					}
+					else {
+						juiceByCampaignAndLevel[longJuiceIndex] = 1;
+					}
+					
+					
+					//Look at what the next social game is and log "game played after juice"
+					
+					//specifically note when juice was used on a social game and THEN that game was the next one played
+					
+					//when juice was used on a game and then a DIFFERENT game was played (which game was played?)
+					
+					
+					//Juice Contexts do not actually change the state at all!
+					//They merely enable the user to change the state in new ways (i.e. switch a
+					//responder reaction), but then the switched reaction would then be captured in
+					//a social game context.
+					//Debug.debug(this, "juice context");
+					//Debug.debug(this, "JuiceContext: " + contextXML);
+				}
+				else if (contextXML.name() == "SocialGameContext") {
+					
+					var sgc:SocialGameContext = ParseXML.SFDBContextParse(contextXML) as SocialGameContext;
+					
+					//Add this social game to our vector of 'social game contexts seen in the previous file'
+					tempString = contextXML.@gameName +"-" + contextXML.@initiator + "-" + contextXML.@responder;
+					tempString = tempString.toLowerCase();
+					socialGamesFromPreviousFile.push(tempString);
+					
+					socialGame = cif.socialGamesLib.getByName(contextXML.@gameName);
+					if (socialGame.name.toLowerCase() == "broke my heart!" && contextXML.@effectID == "22") {
+						//this is some weird case where it is complainign about seeing this in level traces
+						//but it doesn't actually exist in the social game library! Continue!
+						continue;
+					}
+					
+					//see if there was any 'wasted' juice.
+					for (var key:Object in juiceUsedThisTurn) {
+						var tempArray:Array = new Array();
+						tempString = key as String;
+						tempArray = tempString.split("*");
+						var gameName:String = tempArray[0];
+						var initName:String = tempArray[1];
+						var respondName:String = tempArray[2];
+						storyName = tempArray[3];
+						var levelName:String = tempArray[4];
+						juiceType = tempArray[5];
+						
+						var sgInit:String = contextXML.@initiator;
+						var sgRespond:String = contextXML.@responder;
+						
+						if (gameName.toLowerCase() != socialGame.name.toLowerCase() || initName.toLowerCase() != sgInit.toLowerCase() || respondName.toLowerCase() != sgRespond.toLowerCase()) {
+							//If we got here, then they spent juice on an sg-init-respond combination than is different than the actual game they spent juice on.
+							var longJuiceNotUsedIndex:String = storyName.toLowerCase() + "*" + levelName.toLowerCase() + "*" + juiceType + "*" + gameName.toLowerCase() + "*" + initName.toLowerCase() + "*" + respondName.toLowerCase();
+							longJuiceNotUsedIndex = longJuiceNotUsedIndex.toLowerCase();
+							
+							if(juiceThatWasNotFollowedUp[longJuiceNotUsedIndex])
+								juiceThatWasNotFollowedUp[longJuiceNotUsedIndex] += 1;
+							else
+								juiceThatWasNotFollowedUp[longJuiceNotUsedIndex] = 1;
+
+						}
+					}
+					
+					juiceUsedThisTurn = new Dictionary();
+					
+					//Increment the 'social games played by campaign' counter
+					var socialGamesByCampaignString:String = storyName.toLowerCase() + "*" + name.toLowerCase() + "*" + socialGame.name.toLowerCase();
+					socialGamesByCampaignString = socialGamesByCampaignString.toLowerCase();
+					if (socialGamesByCampaignAndLevel[socialGamesByCampaignString]) {
+						socialGamesByCampaignAndLevel[socialGamesByCampaignString] += 1;
+					}
+					else {
+						socialGamesByCampaignAndLevel[socialGamesByCampaignString] = 1;
+					}
+					
+					var totalSocialGamesPlayedByCampaignString:String = storyName.toLowerCase() + "*" + socialGame.name.toLowerCase();
+					totalSocialGamesPlayedByCampaignString = totalSocialGamesPlayedByCampaignString.toLowerCase();
+					if (totalGamesPlayedPerCampaign[totalSocialGamesPlayedByCampaignString]) {
+						totalGamesPlayedPerCampaign[totalSocialGamesPlayedByCampaignString] += 1;
+					}
+					else {
+						totalGamesPlayedPerCampaign[totalSocialGamesPlayedByCampaignString] = 1;
+					}
+					
+
+
+					
+					
+					var effect:Effect = socialGame.getEffectByID(contextXML.@effectID);
+					var changeRule:Rule = effect.change;
+					
+					/*
+					if (goalCurrentUserID == "1334856361_55849023" && contextXML.@gameName == "Ask Out") {
+						Debug.debug(this, "OK, haven't done any valuation yet.");
+						if (changeRule.evaluate(initCharacter, respondCharacter, otherCharacter, socialGame)) {
+							Debug.debug(this, "BAD. evaluated to true even before valuation!?!?!!?");
+						}
+						else {
+							Debug.debug(this, "GOOD. evaluated to false, because we haven't valuated yet.");
+						}
+					}
+					*/
+					
+					
+					
+					//Ok, I think I actually want to try to VALUATE things here! WoOOOOOOoooOOOOO!!!
+					//not doing it this way anymore! Now using the cif singleton thingy to enact changes!
+					changeRule.valuation(initCharacter, respondCharacter, otherCharacter, socialGame);
+					cif.sfdb.addContext(sgc);
+					
+					var storyLeadCharInitKey:String = currentStoryLeadCharacter.toLowerCase() + "-was initiator";
+					var storyLeadCharRespondKey:String = currentStoryLeadCharacter.toLowerCase() + "-was responder";
+					var storyLeadCharNotInvovledKey:String = currentStoryLeadCharacter.toLowerCase() + "-was not involved";
+					
+					if (initCharacter.characterName.toLowerCase() == currentStoryLeadCharacter.toLowerCase()) {
+						//Dealing with the case when the story lead character was the initiator of this social game!
+						if (leadCharacterInvolvedInSocialGames[storyLeadCharInitKey]) leadCharacterInvolvedInSocialGames[storyLeadCharInitKey] += 1;
+						else leadCharacterInvolvedInSocialGames[storyLeadCharInitKey] = 1;
+					}
+					else if (respondCharacter.characterName.toLowerCase() == currentStoryLeadCharacter.toLowerCase()) {
+						//Dealing with the case when the story lead character was the responder of this social game!
+						if (leadCharacterInvolvedInSocialGames[storyLeadCharRespondKey]) leadCharacterInvolvedInSocialGames[storyLeadCharRespondKey] += 1;
+						else leadCharacterInvolvedInSocialGames[storyLeadCharRespondKey] = 1;
+					}
+					else { // they weren't involved at all! How sad...
+						if (leadCharacterInvolvedInSocialGames[storyLeadCharNotInvovledKey]) leadCharacterInvolvedInSocialGames[storyLeadCharNotInvovledKey] += 1;
+						else leadCharacterInvolvedInSocialGames[storyLeadCharNotInvovledKey] = 1;	
+					}
+					
+					//cif.changeSocialState(sgc, currentLevel.cast);
+					
+					/*
+					if (goalCurrentUserID == "1334856361_55849023" && contextXML.@gameName == "Ask Out") {
+						Debug.debug(this, "This is a case where goal progress should be getting made, but it doesn't seem to be.");
+						for each(var tempPred:Predicate in changeRule.predicates){
+							if (tempPred.evaluate(initCharacter, respondCharacter, otherCharacter, socialGame)) {
+								Debug.debug(this, "This specific predicate valuated to true!");
+							}
+							else {
+								Debug.debug(this, "This predicate evaluated to false!");
+							}
+						}
+					}
+					*/
+					
+					
+					
+					//Store information for logging goal progress.
+					goalCurrentSocialGameName = socialGame.name;
+					goalCurrentEffectID = contextXML.@effectID;
+					goalCurrentInitiatorName = contextXML.@initiator;
+					goalCurrentResponderName = contextXML.@responder;
+					goalCurrentLevel = name;
+					
+					
+					for each (var socialGamePredicate:Predicate in changeRule.predicates) {
+						LTAParsePredicate(socialGamePredicate, contextXML.@initiator, contextXML.@responder, contextXML.@other);
+						//checkStoryProgress(socialGamePredicate, storyName, contextXML.@initiator, contextXML.@responder, contextXML.@other);
+					}
+					
+					//get which specific social game instantiations we saw the most!
+					var sgInstantiationsIndex:String = storyName.toLowerCase() + "*" + name.toLowerCase() + "*" + socialGame.name.toLowerCase() + "*" + effect.instantiationID + "*" + contextXML.@initiator + "*" + contextXML.@responder;
+					sgInstantiationsIndex = sgInstantiationsIndex.toLowerCase();
+					
+					var shortInstantiationIndex:String = socialGame.name.toLowerCase() + "*" + effect.instantiationID;
+					shortInstantiationIndex = shortInstantiationIndex.toLowerCase();
+					
+					
+					if (socialGameInstantiationsByCampaignAndlevel[sgInstantiationsIndex])
+						socialGameInstantiationsByCampaignAndlevel[sgInstantiationsIndex] += 1;
+					else
+						socialGameInstantiationsByCampaignAndlevel[sgInstantiationsIndex] = 1;
+						
+					if (instantiationTotals[shortInstantiationIndex])
+						instantiationTotals[shortInstantiationIndex] += 1;
+					else
+						instantiationTotals[shortInstantiationIndex] = 1;
+						
+					//Debug.debug(this, "game context");
+					//Debug.debug(this, "SocialGameContext: " + contextXML);
+				}
+				else {
+					Debug.debug(this, "Unrecognized context! name=" + contextXML.name());
+				}
+			}
+			
+			//I think that we want to update the to do list one lst time, after exiting
+			//the for each loop.
+			
+			/** COMMENT THIS OUT IF YOU WANT TO SKIP GOAL PROGRESS (there are three of them)**/
+			//updateToDoList(story);
+			
+			if (!thisFileHadGoalProgress) {
+				var noProgressKey:String = storyName + "*" + name + "*" + goalCurrentUserID + "*" + type;
+				Debug.debug(this, "I believe we found a file with no goal progress: " + noProgressKey + " turnsInthisLevel: " + (endTime-startTime));
+				fileNamesWithNoGoalProgress[noProgressKey] = endTime - startTime;
+			}
+			
+			/*
+			var statusContexts:XMLList = levelTraceXML.SFDB.StatusContext;
+			var triggerContexts:XMLList = levelTraceXML.SFDB.JuiceContext;
+			var juiceContexts:XMLList = levelTraceXML.SFDB.TriggerContext;
+			*/
+			
+			/*
+			for each (var sgContext:XML in sgContexts) {
+				Debug.debug(this, "sgContextXML: " + sgContext);
+			}
+			
+			for each (var statusContext:XML in statusContexts) {
+				Debug.debug(this, "statusContext: " + statusContext);
+			}
+			
+			for each (var triggerContext:XML in triggerContexts) {
+				Debug.debug(this, "triggerContext: " + triggerContext);
+			}
+			
+			for each (var juiceContext:XML in juiceContexts) {
+				Debug.debug(this, "juiceContext: " + juiceContext);
+			}
+			*/
+			
+			/*
+			for each (var contextXML:XMLList in levelTraceXML.SFDB) {
+				//if(contextXML.
+				Debug.debug(this, "***");
+				Debug.debug(this, "Here is the full thing: " + contextXML);
+				
+				Debug.debug(this, "TRIGGER!?!?!");
+				for each (var triggerXML:XML in contextXML..TriggerContext) {
+					Debug.debug(this, "hope this is a trigger: " + triggerXML);
+				}
+				Debug.debug(this, "***");
+				
+				
+			}
+			*/
+		}
+		
+		/**
+		 * Given the number of juice type, returns a string form of it.
+		 * @param	number A number between 0-3
+		 * @return 	The string representtation of the type (e.g. if the number was 0, returns "SWITCH_OUTCOME"
+		 */
+		public function getJuiceTypeNameByNumber(number:String):String {
+			var juiceType:String = "";
+			switch(number) {
+				case "0": // TYPE_SWITCH_OUTCOME:Number = 0;
+					juiceType = "SWITCH_OUTCOME";
+					break;
+				case "1": // TYPE_BUY_GAME:Number = 1;
+					juiceType = "BUY_GAME";
+					break;
+				case "2": //public static const TYPE_BUY_RESULTS:Number = 2;
+					juiceType = "BUY_RESULTS";
+					break;
+				case "3": // TYPE_BUY_MOTIVES:Number = 3;
+					juiceType = "BUY_MOTIVES";
+					break;
+				default:
+					break;
+			}
+			return juiceType;
+		}
+		
+		/**
+		 * A lot of the contexts will point towards predicates of various origins
+		 * This function will be smart enough to figure out what 'kind' of predicate
+		 * it is and update the appropriate dictionary!
+		 * @param	pred
+		 */
+		public function LTAParsePredicate(pred:Predicate, initName:String, responderName:String, otherName:String):void {
+			//Debug.debug(this, "Inside of LTAParsePredicate");
+			
+			var firstName:String = "";
+			var secondName:String = "";
+			var negatedString:String = "started";
+			if (pred.negated)
+				negatedString = "ended";
+			var indexString:String = "";
+			
+			
+			//Make sure we get the binding right between initiator/responder and people's names.
+			if (pred.first == "initiator")
+				firstName = initName;
+			else if (pred.first == "responder")
+				firstName = responderName;
+			else if (pred.first == "other")
+				firstName = otherName;
+				
+			if (pred.second == "initiator")
+				secondName = initName;
+			else if (pred.second == "responder")
+				secondName = responderName;
+			else if (pred.second == "other")
+				secondName = otherName;
+				
+			firstName = firstName.toLowerCase();
+			secondName = secondName.toLowerCase();
+				
+			if (firstName == "") {
+				Debug.debug(this, "I think first name is blank when it really shouldn't be by this point...");
+			}
+			
+			firstName = firstName.toLowerCase();
+			secondName = secondName.toLowerCase();
+			
+			switch(Predicate.getNameByType(pred.type).toLowerCase()) {
+				case "relationship":
+					//OK, because relationships don't matter whose name comes first, let's just 
+					//sort them alphabetically, maybe?
+					
+					var relationshipName:String = RelationshipNetwork.getRelationshipNameByNumber(pred.relationship)
+					if(firstName < secondName)
+						indexString = firstName + "*" + secondName + "*" + relationshipName + "*" + negatedString; 
+					else
+						indexString = secondName + "*" + firstName + "*" + relationshipName + "*" + negatedString; 
+					
+					//Increment the generic relationship counter.
+					var tinyRelationshipIndex:String = relationshipName + "*" + negatedString;
+					tinyRelationshipIndex = tinyRelationshipIndex.toLowerCase();
+					if (relationships[tinyRelationshipIndex]) // not our first case, just increment by one.
+						relationships[tinyRelationshipIndex] += 1;
+					else // we found our first case
+						relationships[tinyRelationshipIndex] = 1;
+						
+					break;
+				case "status":
+					var statusName:String = Status.getStatusNameByNumber(pred.status);
+					if (secondName == "" || secondName == " " || secondName == null)
+						indexString = firstName + "*" + "NA*" + statusName + "*" + negatedString; // only one person involved in this string!
+					else
+						indexString = firstName + "*" + secondName + "*" + statusName + "*" + negatedString; 
+						
+					//Increment the generic status counter.
+					var tinyStatusIndex:String = statusName + "*" + negatedString;
+					tinyStatusIndex = tinyStatusIndex.toLowerCase();
+					if (statuses[tinyStatusIndex])
+						statuses[tinyStatusIndex] += 1;
+					else	
+						statuses[tinyStatusIndex] = 1;
+					break;
+				default:
+					break;
+			}
+			
+			//increment the character specific actions (Mave became angry at Gunter, instead of just 'someone became angry at)
+			indexString = indexString.toLowerCase();
+			if (characterActions[indexString])
+				characterActions[indexString] += 1; // not our first time!  Just increment by a little!
+			else
+				characterActions[indexString] = 1; // our first time!
+			
+		}
+		
+		
+		
+		/**
+		 * Looks at the date of the file.  If it is a 'valid date'
+		 * past the cut off date, then return true.  Otherwise return false.
+		 * @param	levelTraceFile
+		 * @return
+		 */
+		public function validDate(levelTraceFile:File):Boolean {
+			//Debug.debug(this, "my level trace file: " + myXML);
+			
+			//OK!  Let's see what the date of this file is, and only deal with it if it is
+			//past a certain date. The name takes the form of something like this:
+			// 1326498708_65963461.xml  (so splitting on the '_' character should get the job done.
+			//Debug.debug(this, "this is the name of the file: " + levelTraceFile.name);
+			//Debug.debug(this, levelTraceFile.name.split("_")[0]);
+			
+			var timeStamp:Number = levelTraceFile.name.split("_")[0];
+			var date:Date = new Date(timeStamp * 1000);
+			//Debug.debug(this, "day: " + date.day + " month: " + date.month + " year: " + date.fullYear);
+			
+			//February 6th, 2012 is the date!  Anything before that--toss it out!
+			if (date.month >= MONTH_CUTOFF && date.date > DAY_CUTOFF && date.fullYear >= YEAR_CUTOFF) {
+				return true;
+			}
+			else{
+				return false;
+			}
+		}
+		
+		/**
+		 * Sets up the dictionaries with initial values (mainly a lot of 0s!)
+		 */
+		public function initializeDictionaries():void {
+			campaignsStarted = new Dictionary();
+			levelsStarted = new Dictionary();
+			relationships = new Dictionary();
+			statuses = new Dictionary();
+			characterActions = new Dictionary();
+			socialGamesByCampaignAndLevel = new Dictionary();
+			totalGamesPlayedPerCampaign = new Dictionary();
+			juiceTotals = new Dictionary();
+			juiceByCampaignAndLevel = new Dictionary();
+			juiceThatWasNotFollowedUp = new Dictionary();
+			juiceUsedThisTurn = new Dictionary();
+			socialGameInstantiationsByCampaignAndlevel = new Dictionary();
+			instantiationTotals = new Dictionary();
+			goalProgressDictionary = new Dictionary();
+			typeOfLevelTrace = new Dictionary();
+			fileNamesThatAreUsed = new Vector.<String>();
+			fileNamesWithNoGoalProgress = new Dictionary();
+			numberOfGoalsAchievedPerFile = new Dictionary();
+			socialGamesFromPreviousFile = new Vector.<String>();
+			simonGoalStats = new Dictionary();
+			leadCharacterInvolvedInSocialGames = new Dictionary();
+			
+			//campaignsStarted represents how many times someone has STARTED playing a campaign.
+			campaignsStarted["chloe"] = 0;
+			campaignsStarted["zack"] = 0;
+			campaignsStarted["doug"] = 0;
+			campaignsStarted["oswald"] = 0;
+			campaignsStarted["simon"] = 0;
+			campaignsStarted["monica"] = 0;
+			campaignsStarted["edward"] = 0;
+			campaignsStarted["lil"] = 0;
+			campaignsStarted["naomi"] = 0;
+			campaignsStarted["kate"] = 0;
+			campaignsStarted["nicholas"] = 0; // the secret campaign!
+			
+			levelsStarted["chloe"] = 0;
+			levelsStarted["zack"] = 0;
+			levelsStarted["doug"] = 0;
+			levelsStarted["oswald"] = 0;
+			levelsStarted["simon"] = 0;
+			levelsStarted["monica"] = 0;
+			levelsStarted["edward"] = 0;
+			levelsStarted["lil"] = 0;
+			levelsStarted["naomi"] = 0;
+			levelsStarted["kate"] = 0;
+			levelsStarted["nicholas"] = 0; // the secret campaign!
+			
+		}
+
+		/**
+		 * Outputs all of the cool new things that we've learned after going through all of the
+		 level traces!
+		 */
+		public function outputResults():void {
+			Debug.debug(this, "Printing Results To File");
+			var fileStream:FileStream = new FileStream();
+			var outputString:String = "";
+			var outputFile:File = new File();
+			//outputFile.resolvePath("LTAoutput.txt");
+			outputFile.addEventListener(Event.SELECT, dirSelected);
+			outputFile.browseForDirectory("Select a directory");
+			function dirSelected(e:Event):void {
+				
+				var fileName:String = "";
+				var todaysDate:Date = new Date();
+				fileName = "output-" + (todaysDate.month+1) + "-" + todaysDate.date + "-" + todaysDate.fullYear + "-" + todaysDate.hours + "-" + todaysDate.minutes + ".txt";
+				
+				outputFile = outputFile.resolvePath(fileName);
+				trace(outputFile.nativePath);
+			
+			
+			fileStream.open(outputFile, FileMode.WRITE );
+			
+			fileStream.writeUTFBytes("OUTPUT\n\n");
+			fileStream.close();
+			
+			fileStream.open(outputFile, FileMode.APPEND);
+			
+			
+			Debug.debug(this, "LEVELS STARTED WITH X AS STORY LEAD CHARACTER");
+			fileStream.writeUTFBytes("\n***LEVELS STARTED WITH X AS STORY LEAD CHARACTER\n");
+			for (var key:Object in levelsStarted) {
+				outputString = "Times that someone started a level starring [" + key + "] is [" + levelsStarted[key] + "]\n";
+				//Debug.debug(this, outputString);
+				fileStream.writeUTFBytes(outputString);
+			}
+			//Debug.debug(this, "\n");
+			
+			
+			Debug.debug(this, "TIMES SOMEONE STARTED A CHARACTER'S CAMPAIGN");
+			fileStream.writeUTFBytes("\n***TIMES SOMEONE STARTED A CHARACTER'S CAMPAIGN\n");
+			for (key in campaignsStarted) {
+				outputString = "Times that someone started a campaign with [" + key + "] is [" + campaignsStarted[key] + "]\n";
+				//Debug.debug(this, outputString);
+				fileStream.writeUTFBytes(outputString);
+			}
+			
+			Debug.debug(this, "TYPES OF LEVEL TRACE FILES");
+			fileStream.writeUTFBytes("\n***TYPES OF LEVEL TRACE FILES\n");
+			for (key in typeOfLevelTrace) {
+				outputString = "[" + key + "] is [" + typeOfLevelTrace[key] + "]\n";
+				//Debug.debug(this, outputString);
+				fileStream.writeUTFBytes(outputString);
+			}
+			
+			Debug.debug(this, "\n");
+			Debug.debug(this, "RELATIONSHIPS STARTED AND ENDED");
+			fileStream.writeUTFBytes("\n***RELATIONSHIPS STARTED AND ENDED\n")
+			for (key in relationships) {
+				outputString = key + " [" + relationships[key] + "]\n";
+				//Debug.debug(this, outputString);
+				fileStream.writeUTFBytes(outputString);
+			}
+			
+			Debug.debug(this, "\n");
+			Debug.debug(this, "STATUSES STARTED AND ENDED");
+			fileStream.writeUTFBytes("\n***STATUSES STARTED AND ENDED\n")
+			fileStream.writeUTFBytes("FORMAT: STATUS-STARTEDorENDED\n")
+			for (key in statuses) {
+				outputString = key + " [" + statuses[key] + "]\n";
+				//Debug.debug(this, outputString);
+				fileStream.writeUTFBytes(outputString);
+			}
+			
+			Debug.debug(this, "\n");
+			Debug.debug(this, "\nCHARACTER ACTIONS\n");
+			fileStream.writeUTFBytes("\n***CHARACTER ACTIONS\n")
+			fileStream.writeUTFBytes("FORMAT:INITIATOR-RESPONDER(if any)-STATUSorRELATIONSHIP-STARTEDorENDED\n")
+			for (key in characterActions) {
+				if (key == "-cassandra-cheated on by-started") {
+					Debug.debug(this, "an example of starting with a hyphen!");
+				}
+				outputString = key + " [" + characterActions[key] + "]\n";
+				//Debug.debug(this, outputString);
+				fileStream.writeUTFBytes(outputString);
+			}
+			
+			Debug.debug(this, "\n");
+			Debug.debug(this, "\nSOCIAL GAMES BY CAMPAIGN AND LEVEL\n");
+			fileStream.writeUTFBytes("\n***SOCIAL GAMES BY CAMPAIGN AND LEVEL\n")
+			fileStream.writeUTFBytes("FORMAT: CAMPAIGN*LEVEL*SOCIALGAME\n")
+			for (key in socialGamesByCampaignAndLevel) {
+				outputString = key + " [" + socialGamesByCampaignAndLevel[key] + "]\n";
+				//Debug.debug(this, outputString);
+				fileStream.writeUTFBytes(outputString);
+			}
+			
+			Debug.debug(this, "\n");
+			Debug.debug(this, "\nSOCIAL GAME TOTALS BY CAMPAIGN\n");
+			fileStream.writeUTFBytes("\n***SOCIAL GAME TOTALS BY CAMPAIGN\n")
+			fileStream.writeUTFBytes("FORMAT: CAMPAIGN*SOCIALGAME\n")
+			for (key in totalGamesPlayedPerCampaign) {
+				outputString = key + " [" + totalGamesPlayedPerCampaign[key] + "]\n";
+				//Debug.debug(this, outputString);
+				fileStream.writeUTFBytes(outputString);
+			}
+			
+			Debug.debug(this, "\n");
+			Debug.debug(this, "\nSOCIAL GAME INSTANTIATION TOTALS BY CAMPAIGN LEVEL AND INIT AND RESPOND\n");
+			fileStream.writeUTFBytes("\n***SOCIAL GAME INSTANTIATION TOTALS BY CAMPAIGN LEVEL AND INIT AND RESPOND\n")
+			fileStream.writeUTFBytes("FORMAT: CAMPAIGN*LEVEL*SOCIALGAME*INSTANTIATIONID*INIT*RESPOND\n")
+			for (key in socialGameInstantiationsByCampaignAndlevel) {
+				outputString = key + " [" + socialGameInstantiationsByCampaignAndlevel[key] + "]\n";
+				//Debug.debug(this, outputString);
+				fileStream.writeUTFBytes(outputString);
+			}
+			
+			Debug.debug(this, "\n");
+			Debug.debug(this, "\nINSTANTIATION TOTALS\n");
+			fileStream.writeUTFBytes("\n***INSTANTIATION TOTALS\n")
+			fileStream.writeUTFBytes("FORMAT: SOCIALGAME*INSTANTIATIONID\n")
+			for (key in instantiationTotals) {
+				outputString = key + " [" + instantiationTotals[key] + "]\n";
+				//Debug.debug(this, outputString);
+				fileStream.writeUTFBytes(outputString);
+			}
+			
+			Debug.debug(this, "\n");
+			Debug.debug(this, "\n***JUICE TOTALS\n");
+			fileStream.writeUTFBytes("\n***JUICE TOTALS\n")
+			for (key in juiceTotals) {
+				outputString = key + " [" + juiceTotals[key] + "]\n";
+				//Debug.debug(this, outputString);
+				fileStream.writeUTFBytes(outputString);
+			}
+			
+			Debug.debug(this, "\n");
+			Debug.debug(this, "\n***JUICE BY CAMPAIGN AND LEVEL\n");
+			fileStream.writeUTFBytes("\n***JUICE BY CAMPAIGN AND LEVEL\n")
+			fileStream.writeUTFBytes("FORMAT: CAMPAIGN-LEVEL-JUICETYPE-SOCIALGAME-INITIATOR-RESPONDER\n")
+			for (key in juiceByCampaignAndLevel) {
+				outputString = "<JUICEBYCAMPAIGNANDLEVEL>" + key + " [" + juiceByCampaignAndLevel[key] + "]\n";
+				//Debug.debug(this, outputString);
+				fileStream.writeUTFBytes(outputString);
+			}
+			
+			Debug.debug(this, "\n");
+			Debug.debug(this, "\n***JUICE THAT WAS SPENT BUT WAS NOT FOLLOWED UP ON\n");
+			fileStream.writeUTFBytes("\n***JUICE THAT WAS SPENT BUT WAS NOT FOLLOWED UP ON\n")
+			fileStream.writeUTFBytes("FORMAT: CAMPAIGN-LEVEL-JUICETYPE-SOCIALGAME-INITIATOR-RESPONDER\n")
+			for (key in juiceThatWasNotFollowedUp) {
+				outputString = "<JUICENOTFOLLOWEDUP>" + key + " [" + juiceThatWasNotFollowedUp[key] + "]\n";
+				//Debug.debug(this, outputString);
+				fileStream.writeUTFBytes(outputString);
+			}
+			
+			//dealing with microtheory rule stuff
+			Debug.debug(this, "\n");
+			Debug.debug(this, "\nMICROTHEORY DUMP DEFINITION SEPARATE\n");
+			fileStream.writeUTFBytes("\n***MICROTHEORY DUMP DEFINITION SEPARATE\n")
+			fileStream.writeUTFBytes("DEFINITION-PredsSeparatedBy|s-WEIGHT\n")
+			//for each(var mt:Microtheory in cif.microtheories) {
+			//	var microtheoryStrings:Vector.<String> = new Vector.<String>();
+			//	microtheoryStrings = microtheoryToString(mt);
+				
+			for each(var mtString:String in microtheoryStringsDefinitionSeparate) {
+				outputString = mtString + "\n";
+				//Debug.debug(this, outputString);
+				fileStream.writeUTFBytes(outputString);
+			}
+			
+			//8473
+			
+			//dealing with microtheory rule stuff
+			Debug.debug(this, "\n");
+			Debug.debug(this, "\nMICROTHEORY DUMP DEFINITION WITH PREDICATES (SO DEF IS KINDA APPEARINg TWICE SORTA)\n");
+			fileStream.writeUTFBytes("\n***MICROTHEORY DUMP DEFINITION WITH PREDICATES (SO DEF IS KINDA APPEARINg TWICE SORTA)\n")
+			fileStream.writeUTFBytes("DEFINITION-PredsSeparatedBy|sIncludingDefinitionPredicates-WEIGHT\n")
+			//for each(var mt:Microtheory in cif.microtheories) {
+			//	var microtheoryStrings:Vector.<String> = new Vector.<String>();
+			//	microtheoryStrings = microtheoryToString(mt);
+				
+			for each(var mtString2:String in microtheoryStringsDefinitionAnotherPredicate) {
+				outputString = mtString2 + "\n";
+				//Debug.debug(this, outputString);
+				fileStream.writeUTFBytes(outputString);
+			}
+			
+			//Dealing with Goal Progress
+			Debug.debug(this, "\n");
+			Debug.debug(this, "\n***GOAL PROGRESS\n");
+			fileStream.writeUTFBytes("\n***GOAL PROGRESS\n")
+			fileStream.writeUTFBytes("FORMAT: CAMPAIGN*LEVEL*GOALNAME*SOCIALGAME*INITIATOR*RESPONDER*TIMESTAMP*EFFECTID*USERID*PROGRESSTYPE[NUMTIMESOCCURED]\n")
+			for (key in goalProgressDictionary) {
+				outputString = "<GOALPROGRESS>" + key + " [" + goalProgressDictionary[key] + "]\n";
+				//Debug.debug(this, outputString);
+				fileStream.writeUTFBytes(outputString);
+			}
+			
+			//Print out all of the files that we actually looked at
+			Debug.debug(this, "\n");
+			Debug.debug(this, "\n***FiLES THAT WERE NOT THROWN OUT\n");
+			fileStream.writeUTFBytes("\n***FiLES THAT WERE NOT THROWN OUT\n")
+			for each(var fileNameIterator:String in fileNamesThatAreUsed) {
+				outputString = fileNameIterator + "\n";
+				fileStream.writeUTFBytes(outputString);
+			}
+			
+			//This is the amount of goal progress per level file (i.e. one level file maybe made like, three units of goal progress in it.
+			Debug.debug(this, "\n");
+			Debug.debug(this, "\n***AMOUNT OF GOAL PROGRESS BY FILE\n");
+			fileStream.writeUTFBytes("\n***AMOUNT OF GOAL PROGRESS BY FILE\n")
+			for (key in numberOfGoalsAchievedPerFile) {
+				outputString = key + " [" + numberOfGoalsAchievedPerFile[key] + "]\n";
+				//Debug.debug(this, outputString);
+				fileStream.writeUTFBytes(outputString);
+			}
+			
+			//These are files that were 'good' (i.e we looked at them for stats), but that seemed to have no goal progress in them.
+			Debug.debug(this, "\n");
+			Debug.debug(this, "\n***FILES THAT HAD NO GOAL PROGRESS\n");
+			fileStream.writeUTFBytes("\n***FILES THAT HAD NO GOAL PROGRESS\n")
+			for (key in fileNamesWithNoGoalProgress){
+				outputString = key + " [NumberOfTurnsInThisFile=" + fileNamesWithNoGoalProgress[key] + "]\n";
+				//Debug.debug(this, outputString);
+				fileStream.writeUTFBytes(outputString);
+			}
+			
+			//Print out cool stuff about Simon's campaign
+			Debug.debug(this, "\n");
+			Debug.debug(this, "\n***STATS ABOUT SIMONS CAMPAIGN\n");
+			fileStream.writeUTFBytes("\n***STATS ABOUT SIMONS CAMPAIGN\n")
+			for (key in simonGoalStats){
+				outputString = key + " [" + simonGoalStats[key] + "]\n";
+				//Debug.debug(this, outputString);
+				fileStream.writeUTFBytes(outputString);
+			}
+			
+			//Print out stuff about how involved the story lead character was in initiating or responding to social games 
+			Debug.debug(this, "\n");
+			Debug.debug(this, "\n***STATS ABOUT HOW INVOLVED STORY LEAD CHARACTERS WERE IN SOCIAL GAMES\n");
+			fileStream.writeUTFBytes("\n***STATS ABOUT HOW INVOLVED STORY LEAD CHARACTERS WERE IN SOCIAL GAMES\n")
+			for (key in leadCharacterInvolvedInSocialGames){
+				outputString = key + " [" + leadCharacterInvolvedInSocialGames[key] + "]\n";
+				//Debug.debug(this, outputString);
+				fileStream.writeUTFBytes(outputString);
+			}
+										
+			
+			//}
+			
+			Debug.debug(this, "\n");
+			
+			Debug.debug(this, "\n\nTotal Number of files looked at " + totalNumberOfFilesEver);
+			fileStream.writeUTFBytes("\n\n***Total Number of files looked at [" + totalNumberOfFilesEver + "]\n");
+			Debug.debug(this, "\n\nNumber of files we had to toss " + numberTossed);
+			fileStream.writeUTFBytes("\n\n***Number of files we had to toss [" + numberTossed + "]\n");
+			Debug.debug(this, "Number of files we kept[" + numberKept +"]");
+			fileStream.writeUTFBytes("\n\nNumber of files we kept [" + numberKept + "]\n");
+			Debug.debug(this, "Number of files with malformed XML [" + numberOfMalformedXML +"]");
+			fileStream.writeUTFBytes("\n\nNumber with malformed XML [" + numberOfMalformedXML + "]\n");
+			Debug.debug(this, "Number of tutorial files XML [" + numberOfTutorials +"]");
+			fileStream.writeUTFBytes("\n\nNumber of tutorial files [" + numberOfTutorials + "]\n");
+			Debug.debug(this, "Number of freeplay files [" + numberOfFreeplayMode +"]");
+			fileStream.writeUTFBytes("\n\nNumber of freeplay files [" + numberOfFreeplayMode + "]\n");
+			Debug.debug(this, "Number of bad date files [" + numberTossedDueToDate +"]");
+			fileStream.writeUTFBytes("\n\nNumber of bad date files [" + numberTossedDueToDate + "]\n");
+			Debug.debug(this, "Number of non end of story files [" + numberOfNonEndOfStoryTypes +"]");
+			fileStream.writeUTFBytes("\n\nNumber of non end of story files [" + numberOfNonEndOfStoryTypes + "]\n");
+			Debug.debug(this, "Number of trigger contexts that seemed to be missing stuff [" + numberOfTriggerContextsThatSeemedToLackInformation +"]");
+			fileStream.writeUTFBytes("\n\nNumber of trigger contexts that seemed to be missing stuff [" + numberOfTriggerContextsThatSeemedToLackInformation + "]\n");
+			
+			//simon stuff...
+			Debug.debug(this, "Number Simon's goal COMPLETES [" + simonGoalCOMPLETEnumber +"]");
+			fileStream.writeUTFBytes("\n\nNumber Simon's goal COMPLETES [" + simonGoalCOMPLETEnumber + "]\n");
+			
+			Debug.debug(this, "Number Simon's goal PROGRESSES [" + simonGoalPROGRESSnumber +"]");
+			fileStream.writeUTFBytes("\n\nNumber Simon's goal PROGRESSES [" + simonGoalPROGRESSnumber + "]\n");
+			
+			Debug.debug(this, "Number Simon's goal ANTIPROGRESSES [" + simonGoalANTInumber +"]");
+			fileStream.writeUTFBytes("\n\nNumber Simon's goal ANTIPROGRESSES [" + simonGoalANTInumber + "]\n");
+			
+			fileStream.close();
+			
+			}
+			
+		}
+		
+		/**
+		 * Give a microtheory mt, turns it into a vector of strings, where each rule
+		 * in the microtheory is it's own string.
+		 * @param	mt
+		 */
+		public function microtheoryToString(mt:CiF.Microtheory):void {
+			//var returnVector:Vector.<String> = new Vector.<String>();
+			//keep track of what the definition is.
+			var definition:Rule = mt.definition;
+			for each(var rule:InfluenceRule in mt.initiatorIRS.influenceRules) {
+				if(rule.weight != 0){ // only include things that have a non-zero weight.
+					var definitionSeparateString:String = "[DEF]" + mt.definition.generateRuleName() + "*" + rule.generateRuleName() + "*weight[" + rule.weight +"]";
+					
+					
+					//weave the 'definition' into the current rule.
+					for each(var p:Predicate in definition.predicates) {
+						rule.predicates.push(p);
+					}
+					//re-sort everything I guess?
+					rule.sortPredicates();
+					var definitionIncludedString:String = "[DEF]" + mt.definition.generateRuleName() + "*" + rule.generateRuleName() + "*weight[" + rule.weight +"]";
+					if (mt.definition.generatedName.indexOf("unknown") != -1) {
+						Debug.debug(this, "unknown status discovered");
+					}
+					//Debug.debug(this, stringToPush);
+					microtheoryStringsDefinitionSeparate.push(definitionSeparateString);
+					microtheoryStringsDefinitionAnotherPredicate.push(definitionIncludedString);
+					//returnVector.push(stringToPush);
+				}
+			}
+			//return returnVector;
+		}
+		
+		//The input is the EFFECT CHANGE predicate of a social game context, and all of the other
+		//pertinent information related to it (like initiator and responder and the campaign)
+		//Based on what the campaign is.
+		//
+		//What I'm thinking of doing right now, which kind of sucks, is based on the story
+		//going through each of the condition predicates in that story, and then just
+		//doing special case stuff on a per thing basis. I guess.
+		/*
+		public function checkStoryProgress(pred:Predicate, storyName:String, initiatorName:String, responderName:String, otherName:String):void {
+			
+			//OK, for now, I'm going to not worry about 'goal completed' and am instead just going to look at
+			//'gloal progress' and 'goal anti progress'.
+			
+			for each(var helper:goalProgressHelper in storyGoals) {
+				if (helper.storyLeadCharacter.toLowerCase() == storyName.toLowerCase()) {
+					//check progress against this goal.
+					for each(var goalPredicate:Predicate in helper.conditionRule.predicates) {
+						//this is where we do our wonderful check to see if the predicates match up in some marvelous way.
+						if (pred.type == goalPredicate.type) {
+							//Ok, they were the same type...
+							var firstName:String = "";
+							var secondName:String = "";
+							if (goalPredicate.first == "initiator")
+								firstName = initiatorName;
+							else if (goalPredicate.first == "responder")
+								firstName = responderName;
+							else if (goalPredicate.first == "other")
+								firstName = otherName;
+								
+							if (goalPredicate.second == "initiator")
+								secondName = initiatorName;
+							else if (goalPredicate.second == "responder")
+								secondName = responderName;
+							else if (goalPredicate.second == "other")
+								secondName = otherName;
+								
+							//if we get to this point and they are un-assigned, just assign them the character names that
+							//were printed in the file (I guess?)
+							
+							if (firstName == "")
+								firstName = goalPredicate.first;
+							if (secondName == "")
+								secondName = goalPredicate.second;
+								
+							//OK, great, now that we've gotten to this point, let us see if
+							//there is a match up between the people referenced in the social context predicate I guess?
+							
+							//OK, abandon ship, this is too hard.
+						}
+					}
+				}
+			}
+			*/
+			
+			/*
+			switch(storyName.toLowerCase()) {
+				case "chloe":
+					Debug.debug(this, "dealing with Chloe's campaign");
+					for each(var helper:goalProgressHelper in storyGoals) {
+						if (helper.storyLeadCharacter.toLowerCase == "chloe") {
+							checkChloeGoalProgress(pred, storyName, initiatorName, responderName, otherName, helper);
+						}
+					}
+					break;
+				case "zack":
+					Debug.debug(this, "dealing with Zack's campaign");
+					break;
+				case "doug":
+					Debug.debug(this, "dealing with Doug's campaign");
+					break;
+				case "oswald":
+					Debug.debug(this, "dealing with Oswald's campaign");
+					break;
+				case "simon":
+					Debug.debug(this, "dealing with Simon's campaign");
+					break;
+				case "monica":
+					Debug.debug(this, "dealing with Monica's campaign");
+					break;
+				case "edward":
+					Debug.debug(this, "dealing with Edward's campaign");
+					break;
+				case "naomi":
+					Debug.debug(this, "dealing with Naoi's campaign");
+					break;
+				case "kate":
+					Debug.debug(this, "dealing with Kate's campaign");
+					break;
+				case "lil":
+					Debug.debug(this, "dealing with Lil's campaign");
+					break;
+				default:
+					Debug.debug(this, "unrecognized campaign");
+			}
+			*/
+		//}
+		
+		/*
+		public function checkChloeGoalProgress(pred:Predicate, storyName:String, initiatorName:String, responderName:String, otherName:String, helper:goalProgressHelper):void {
+			
+		}
+		*/
+		
+		/*
+		public function parseStoryToDoList(storyXML:XML):void {
+			Debug.debug(this, "maybe get out the name, the condition, and the story that it comes from?");
+			//	var allContexts:XMLList = levelTraceXML.SFDB.children();
+			var storyLeadCharacter:String = storyXML.Story.@storyLeadCharacter;
+			var toDoName:String = "";
+			var toDoCondition:Rule = new Rule();
+			for each (var todoListXML:XML in storyXML..ToDoList)
+			{
+				//var todoItem:ToDoItem;
+				for each (var todoItemXML:XML in todoListXML..ToDoItem)
+				{
+					//todoItem = new ToDoItem();
+					var tempGoalProgressHelper:goalProgressHelper = new goalProgressHelper();
+					for each (var conditionXML:XML in todoItemXML..Condition)
+					{
+						for each (var ruleXML:XML in conditionXML..Rule)
+						{
+							toDoCondition = ParseXML.ruleParse(ruleXML);
+							toDoCondition.sortBySFDBOrder();
+							//todoItem.condition = ParseXML.ruleParse(ruleXML);
+							//todoItem.condition.sortBySFDBOrder();
+						}
+					}
+					
+					//initialize the predTruthValuesPerResponderOtherPair dictionaries
+					
+					toDoName = todoItemXML.@name;
+					Debug.debug(this, "Ok, I think I have parsed out the interesting things about todo data! (now need to store it in some way)");
+					tempGoalProgressHelper.storyLeadCharacter = storyLeadCharacter;
+					tempGoalProgressHelper.goalName = toDoName;
+					tempGoalProgressHelper.conditionRule = toDoCondition;
+					storyGoals.push(tempGoalProgressHelper);
+					//todoItem.name = todoItemXML.@name;
+					//ok.. er, hmm...
+					//create a new data structure that has the story lead character, the name, and the condition rule.
+					//LTA then has a vector of these data structures.
+					//each 'todoitem' is a new instance of this data structure.
+					
+					//when evaluating 'is rule achieved' we have to.. er..
+					//NAIVE WAY: assume that if the intent of the game (e.g. start dating) matches a predicate (two people are dating) and it was accepted
+					 //where matching a predicate is some scary hard thing to figure out
+					 //have to take special instances into account (i.e. if it is specifically OSWALD who has started dating)
+					
+					//medium way: instead of looking at the intent, actually look at the effect changes of that game.
+					///don't have to worry about the accept/reject thing now.
+					///for each predicate in the effect change, did it bring us closer to a goal.
+					///If yes, mark it down.
+					///also mark down if it got us further away from a goal, I guess? (maybe just involves looking at NOTS (i.e. ~)
+					///Somehow keep track of an understanding as to how much progress has been made towards the goal so far.
+					//If the goal has been 'totally achieved', write that down too, somehow.
+					
+					//I think medium way is going to be the way to go.
+					 
+					//HARD WAY: Actually keep track of the social state. YIKES.
+					//this.todoList.push(todoItem);
+				}
+			}
+			
+		}
+		*/
+		
+		/**
+		 * 
+		 * Taken directly from Prom Week's gameEngine.as
+		 * 
+		 * Loads the initial game state from the its original XML representation. This representation
+		 * should be linked to the game engine by main.mxml. CiF's time is reset to 0, the SFDB, cast,
+		 * social networks, relationships, and statuses are all reset to time=0 values.
+		 * 
+		 * @return
+		 */
+		public function resetGameState():void {
+			this.cif.time = 0;
+			this.cif.parseCiFState(this.cifStateXML, false);
+			//reform the character references in the level instances.
+			for each(var s:Story in this.stories) {
+				for each(var toDoItem:ToDoItem in s.todoList) {
+					toDoItem.predTruthValues = null;
+				}
+				for each(var l:Level in s.levels) {
+					l.refreshCast();
+				}
+			}
+			cif.clearProspectiveMemory();
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+/**
+		 * This function goes through all to do items and checks to see if their conditions are met, if so, we change the color of the text
+		 */
+		public function updateToDoList(story:Story, noGoalUpdatedNotifications:Boolean = false ):void
+		{
+			//PromWeek.StoryGoalWindow.updateGoalList(gameEngine.hudGroup.topBar.todoListList, gameEngine.hudGroup.topBar.responder, gameEngine.hudGroup.topBar.other, false,false);
+			//if (gameEngine.hudGroup.topBar.toDoItemComponent.toDoItem != null)
+			//{
+				//update the width of the topbar's progress
+				//gameEngine.hudGroup.topBar.toDoItemComponent.progressFGRect.width = gameEngine.hudGroup.topBar.toDoItemComponent.progressBGRect.width * gameEngine.hudGroup.topBar.toDoItemComponent.toDoItem.condition.getPercentageTrueForInitiator(CiFSingleton.getInstance().cast.getCharByName(gameEngine.currentStory.storyLeadCharacter), null, gameEngine.hudGroup.topBar.responder, gameEngine.hudGroup.topBar.other)["percent"] / 100;
+			//}
+			
+
+			
+			//Why is this getting marked with anti progress!?!?! I have absolutely no idea!!!!!
+			//<GOALPROGRESS>doug*friday: the prom*last minute date*confide in*doug*jordan*0*15*1329552431_633135720*antiprogress [1]
+			//Observation: all of doug's antiprogresses seem to happen at time stamp 0 (thought I fixed that with that special flag, but maybe not...)
+			//Observation 2: Why is there nothing that is getting marked with PROGRESS?  There should be ones for 'kinda nice guy' and 'kinda mean dude'
+			
+		
+			//Debug.debug(this, "this is the first time that we ever get in here... what is the value of 'pred truth values'?");
+			
+			if (goalCurrentUserID == "1329552431_633135720" || goalCurrentUserID == "1335277984_1664190014" || goalCurrentUserID == "1330371376_59863506" || goalCurrentUserID == "1334977833_100000603248023" || goalCurrentUserID == "1329813725_87960574" || goalCurrentUserID == "1334856860_55849023") {
+				if(goalCurrentTime == 12){
+					Debug.debug(this, "OK, this SHOULD count as an sfdb goal progress, I think, but it doesn't seem to be. Find out what is up!");
+					Debug.debug(this, "This is the value of goal current time: " + goalCurrentTime);
+				}
+			}
+			
+			//trying to discover the weird null things...
+			//if ( (currentStoryLeadCharacter.toLowerCase() == "zack") && (goalCurrentUserID == null || goalCurrentUserID == "")) {
+
+			
+			
+			var predToNaturalLanguage:String = "";
+			var primaryCharacter:Character;
+			var secondaryCharacter:Character;
+			var percentComplete:int;
+			
+			var toDoItem:ToDoItem;
+			
+			//this will be used to help make the progress bar get bigger.
+			var totalAdditionalPercentExtra:Number;
+			
+			for (var iiii:int = 0; iiii < story.todoList.length; iiii++ )
+			{
+				if (iiii == 3) {
+					//Debug.debug(this, "stop here for testing purposes for LTA goal debugging.");
+				}
+				
+				totalAdditionalPercentExtra = 0;
+				
+				var progressGood:Boolean = false;
+				
+				toDoItem = story.todoList[iiii];
+				
+				if (toDoItem.name.toLowerCase() == "kinda mean dude" && goalCurrentTime == 12 && goalCurrentUserID == "1334856860_55849023") {
+					Debug.debug(this, "I believe that this is the file that we care about... progress should be happening towards kinda mean dude!!");
+				}
+				
+				if (toDoItem.name.toLowerCase() == "sabotage the competition"){
+					Debug.debug(this, "ok.. I think we have encountered a different earth shattering problem now.");
+				}
+				
+				var weGottaMakeAGoalProgressNotification:Boolean = false;
+				
+				var pred:Predicate;
+				
+				// This is going to be a special thing that has not only the PERCENT towards completion, but also WHO made it so close to completion!
+				var percentAndResponderAndOther:Dictionary = toDoItem.condition.getPercentageTrueForInitiator(CiFSingleton.getInstance().cast.getCharByName(currentStoryLeadCharacter));
+				
+				var initiator:Character = CiFSingleton.getInstance().cast.getCharByName(currentStoryLeadCharacter);
+				var responder:Character = CiFSingleton.getInstance().cast.getCharByName(percentAndResponderAndOther["responder"]);
+				var other:Character = CiFSingleton.getInstance().cast.getCharByName(percentAndResponderAndOther["other"]);
+				
+				//create a vector of booleans that are going to store the truth values of each of the todoItem's condition
+				var predTruthValues:Vector.<Boolean> = new Vector.<Boolean>();
+				var predNumTimesValues:Vector.<Number> = new Vector.<Number>(); // this is so we can make an update when we increment (or decrement) a num time uniquely true predicate.
+				//you have to loop through each so we can index them by int, this has to do with the fact that we
+				//are skipping over things that are name type predicates.
+				for (var i:int = 0; i < toDoItem.condition.predicates.length; i++ )
+				{
+					predTruthValues.push(false);
+					predNumTimesValues.push(0);
+				}
+				
+				if (toDoItem.predTruthValues == null)
+				{
+					toDoItem.predTruthValues = predTruthValues;
+					toDoItem.predNumTimesTrue = predNumTimesValues;
+				}
+				var shouldDisplayCheck:Boolean;
+				
+				for (i = 0;  i < toDoItem.condition.predicates.length; i++ )
+				{
+					//UPDATE THE TEXT (if necessary...)
+
+					//PromWeek.StoryGoalWindow.updateGoalList(this.goalLists[iiii], null, null, false);
+					
+					//See if there has been any progress toward the goals
+					pred = toDoItem.condition.predicates[i];
+					//only add to the predicateList if the trait isn't about a name
+					if (!pred.isCharNameTrait())
+					{
+						var predicateChangeIndex:int;
+						if (pred.numTimesUniquelyTrueFlag)
+						{
+							var primChar:Character;
+							var secondChar:Character;
+							
+							if (pred.primary == "initiator")
+							{
+								primChar = initiator;
+							}
+							else if (pred.primary == "responder")
+							{
+								primChar = responder;
+							}
+							else if (pred.primary == "other")
+							{
+								primChar = other;
+							}
+							else 
+							{
+								primChar = cif.cast.getCharByName(pred.primary);
+							}
+							if (pred.secondary == "initiator")
+							{
+								secondChar = initiator;
+							}
+							else if (pred.secondary == "responder")
+							{
+								secondChar = responder;
+							}
+							else if (pred.secondary == "other")
+							{
+								secondChar = other;
+							}
+							else
+							{
+								secondChar = cif.cast.getCharByName(pred.secondary);
+							}
+							
+							
+							//Not sure if this is necessary, but I was trying to fix something with the progress notifications pictures and am tired and confused
+							var primaryToSendPicsOf:Character;
+							var secondaryToSendPicsOf:Character;
+							if (pred.numTimesRoleSlot == "first")
+							{
+								primaryToSendPicsOf = primChar;
+							}
+							else if (pred.numTimesRoleSlot == "second")
+							{
+								primaryToSendPicsOf = secondChar;
+							}
+							else if (pred.numTimesRoleSlot == "both")
+							{
+								primaryToSendPicsOf = primChar;
+								secondaryToSendPicsOf = secondChar;
+							}
+							
+							
+							//For numTimesUniquelyTrue. Refer to the predNumTimesTrue values
+							var dictionary:Dictionary = pred.evalForNumberUniquelyTrueKeepChars(primChar, secondChar);
+							var indexString:String = "";
+							if (primChar != null)
+							{
+								indexString += primChar.characterName;
+							}
+							if (secondChar != null)
+							{
+								indexString += secondChar.characterName;
+							}
+							//this variable is used to make sure we don't keep sending progress notifcations when the thing has already been marked as true or false and progress has been reported
+							var shouldEvenCheckForDisplay:Boolean;
+							
+							//this is where we make it so the progress bar increases with numTimesUniquelyTrue progress
+							if (dictionary["numTimesTrue"] < pred.numTimesUniquelyTrue)
+							{
+								//because there may be more than one numTimes pred in this todo item's pcondition, we use +=
+								//first find out how much that pred is true in itself. (between 0 and 1)
+								var percentPredTrue:Number = dictionary["numTimesTrue"] / pred.numTimesUniquelyTrue;
+								//next, find out how much significance this pred could have
+								var potentialSignificance:Number = 1.0 / toDoItem.condition.predicates.length;
+								//Finally, figure out what percent of that potential actuall is true
+								totalAdditionalPercentExtra += potentialSignificance * percentPredTrue;
+							}
+							
+							
+							if (dictionary["numTimesTrue"] > toDoItem.predNumTimesTrue[i])
+							{
+								//Check to make sure we haven't already reported this progress
+								shouldEvenCheckForDisplay = true;
+								if (dictionary["numTimesTrue"] > pred.numTimesUniquelyTrue)
+								{
+									if (toDoItem.predTruthValuesPerResponderOtherPair[i][indexString] != null)
+									{
+										if (toDoItem.predTruthValuesPerResponderOtherPair[i][indexString] == true)
+										{
+											shouldEvenCheckForDisplay = false;
+										}
+									}
+								}
+								
+								//if (pred.negated && shouldEvenCheckForDisplay)
+								//{
+									//shouldEvenCheckForDisplay = false;
+								//}
+								
+								if (shouldEvenCheckForDisplay)
+								{
+									//this means we have increased the number true
+									toDoItem.predNumTimesTrue[i] = dictionary["numTimesTrue"];
+									progressGood = true;
+									predicateChangeIndex = i;
+									weGottaMakeAGoalProgressNotification = true;
+									toDoItem.predTruthValuesPerResponderOtherPair[i][indexString] = true;
+									
+									// PENDING -- I believe this is where goal progress notification would come from!
+									//If we get to this point, I think that we have made progress!
+									if (shouldLogGoalProgress) {
+										//See if this is an actual goal completion, or just progress that has been made.
+										var progOrCompleteString:String = "complete";
+										if(!toDoItem.evaluateCondition(currentStoryLeadCharacter))
+											progOrCompleteString = "progress";
+										
+										var goalProgressString:String = currentStoryLeadCharacter + "*" + goalCurrentLevel + "*" +
+											toDoItem.name + "*" + goalCurrentSocialGameName + "*" + goalCurrentInitiatorName + "*" + goalCurrentResponderName + "*" + 
+											goalCurrentTime + "*" + goalCurrentEffectID + "*" + goalCurrentUserID + "*" + progOrCompleteString;
+										goalProgressString = goalProgressString.toLowerCase();
+										Debug.debug(this, "gps: " + goalProgressString);
+										if (goalProgressString.toLowerCase() == "zack*null*sabotage the competition*null*null*null*0*0*null*progress") {
+											Debug.debug(this, "ok, ok! Here we go something good! or bad I guess!");
+										}
+										//Debug.debug(this, "I think PROGRESS was made!!!!!!!");
+										if (goalProgressDictionary[goalProgressString])
+											goalProgressDictionary[goalProgressString] += 1;
+										else
+											goalProgressDictionary[goalProgressString] = 1;
+											
+										if (numberOfGoalsAchievedPerFile[goalCurrentUserID])
+											numberOfGoalsAchievedPerFile[goalCurrentUserID] += 1
+										else
+											numberOfGoalsAchievedPerFile[goalCurrentUserID] = 1
+											
+										if (currentStoryLeadCharacter.toLowerCase() == "simon") {
+											var simonInputString:String = progOrCompleteString + "*" + goalCurrentTime;
+											simonInputString = simonInputString.toLowerCase();
+											if (simonGoalStats[simonInputString])
+												simonGoalStats[simonInputString] += 1;
+											else
+												simonGoalStats[simonInputString] = 1;
+												
+											if (progOrCompleteString == "complete")
+												simonGoalCOMPLETEnumber++;
+											else if (progOrCompleteString == "progress")
+												simonGoalPROGRESSnumber++;
+											else if (progOrCompleteString == "antiprogress")
+												simonGoalANTInumber++;
+										}
+											
+										thisFileHadGoalProgress = true;
+											
+									}
+									/*
+									if (gameEngine.displayGoalProgressNotifications && !noGoalUpdatedNotifications)
+									{
+										predToNaturalLanguage =  PromWeek.GameEngine.getInstance().hudGroup.storyGoalWindow.toDoItemAccordion.getTaskNameText(pred, initiator, responder, other, false, false);
+										gameEngine.hudGroup.updatesGroup.createGoalProgressPopUp(toDoItemCompnent.toDoItem, predToNaturalLanguage, (pred.negated)?true:false, i,primaryToSendPicsOf, secondaryToSendPicsOf,(pred.negated)?"minusIcon":"plusIcon");
+									}
+									*/
+								}
+							}
+							else if (dictionary["numTimesTrue"] < toDoItem.predNumTimesTrue[i])
+							{
+								shouldEvenCheckForDisplay = true;
+								
+								//if (pred.negated && shouldEvenCheckForDisplay)
+								//{
+									//shouldEvenCheckForDisplay = false;
+								//}
+								//not sure I need to check for this case...
+								
+								//if (dictionary["numTimesTrue"] > pred.numTimesUniquelyTrue)
+								//{
+									//shouldEvenCheckForDisplay = false;
+								//}
+								if (shouldEvenCheckForDisplay)
+								{
+									//this means we have decreased the number true
+									toDoItem.predNumTimesTrue[i] = dictionary["numTimesTrue"];
+									progressGood = false;
+									predicateChangeIndex = i;
+									weGottaMakeAGoalProgressNotification = true;
+									toDoItem.predTruthValuesPerResponderOtherPair[i][indexString] = false;
+									
+									//PENDING I BeLIEVE this means that
+									//NEGATIVE progress was just made.
+									
+									if (shouldLogGoalProgress) {
+										
+										if (currentStoryLeadCharacter.toLowerCase() == "doug" && goalCurrentTime == 0) {
+											Debug.debug(this, "adding an anti progress to doug! Why do you think that is!?!?!?!");
+										}
+										
+										progOrCompleteString = "antiprogress";									
+											goalProgressString = currentStoryLeadCharacter + "*" + goalCurrentLevel + "*" +
+											toDoItem.name + "*" + goalCurrentSocialGameName + "*" + goalCurrentInitiatorName + "*" + goalCurrentResponderName + "*" + 
+											goalCurrentTime + "*" + goalCurrentEffectID + "*" + goalCurrentUserID + "*" + progOrCompleteString;
+										goalProgressString = goalProgressString.toLowerCase();
+										//Debug.debug(this, "I think ANTI goal progress was made in num times uniquely true land!");	
+										if (goalProgressDictionary[goalProgressString])
+											goalProgressDictionary[goalProgressString] += 1;
+										else
+											goalProgressDictionary[goalProgressString] = 1;
+											
+										if (numberOfGoalsAchievedPerFile[goalCurrentUserID])
+											numberOfGoalsAchievedPerFile[goalCurrentUserID] += 1
+										else
+											numberOfGoalsAchievedPerFile[goalCurrentUserID] = 1
+											
+										if (currentStoryLeadCharacter.toLowerCase() == "simon") {
+											simonInputString = progOrCompleteString + "*" + goalCurrentTime;
+											simonInputString = simonInputString.toLowerCase();
+											if (simonGoalStats[simonInputString])
+												simonGoalStats[simonInputString] += 1;
+											else
+												simonGoalStats[simonInputString] = 1;
+												
+											if (progOrCompleteString == "complete")
+												simonGoalCOMPLETEnumber++;
+											else if (progOrCompleteString == "progress")
+												simonGoalPROGRESSnumber++;
+											else if (progOrCompleteString == "antiprogress")
+												simonGoalANTInumber++;
+										}
+											
+											
+										thisFileHadGoalProgress = true;
+									}
+									
+									/*
+									if (gameEngine.displayGoalProgressNotifications && !noGoalUpdatedNotifications)
+									{
+										predToNaturalLanguage =  PromWeek.GameEngine.getInstance().hudGroup.storyGoalWindow.toDoItemAccordion.getTaskNameText(pred, initiator, responder, other, false, false);
+										gameEngine.hudGroup.updatesGroup.createGoalProgressPopUp(toDoItemCompnent.toDoItem, predToNaturalLanguage, (pred.negated)?false:true, i, primaryToSendPicsOf, secondaryToSendPicsOf,(pred.negated)?"plusIcon":"minusIcon");
+									}
+									*/
+								}
+							}
+						}
+						else
+						{
+							//For normal preds, use "predTruthValues" only
+							if (pred.evaluate(CiFSingleton.getInstance().cast.getCharByName(currentStoryLeadCharacter), CiFSingleton.getInstance().cast.getCharByName(percentAndResponderAndOther["responder"]), CiFSingleton.getInstance().cast.getCharByName(percentAndResponderAndOther["other"])))
+							{
+								predTruthValues[i] = true;
+								
+								//object.icon = rl.uiIcons["check"];
+								
+								if (!toDoItem.predTruthValues[i])
+								{
+									
+									//PENDING ANOTHER PLACE FOR A FLAG
+									if(shouldLogGoalProgress){
+										progOrCompleteString = "complete";
+										//Figure out if this was just progress or actual goal completion
+										for each (var tempBool:Boolean in predTruthValues) {
+											if (!tempBool)
+												progOrCompleteString = "progress";
+										}
+										
+										goalProgressString = currentStoryLeadCharacter + "*" + goalCurrentLevel + "*" +
+											toDoItem.name + "*" + goalCurrentSocialGameName + "*" + goalCurrentInitiatorName + "*" + goalCurrentResponderName + "*" + 
+											goalCurrentTime + "*" + goalCurrentEffectID + "*" + goalCurrentUserID + "*" + progOrCompleteString;
+										goalProgressString = goalProgressString.toLowerCase();
+										
+										Debug.debug(this, "gps: " + goalProgressString);
+										if (goalProgressString == "zack*null*sabotage the competition*null*null*null*0*0*null*progress") {
+											Debug.debug(this, "ok, ok! Here we go something good! or bad I guess!");
+										}
+										//Debug.debug(this, "Different place where Progress was made!!!!!!!");
+										if (goalProgressDictionary[goalProgressString])
+											goalProgressDictionary[goalProgressString] += 1;
+										else
+											goalProgressDictionary[goalProgressString] = 1;
+											
+										if (numberOfGoalsAchievedPerFile[goalCurrentUserID])
+											numberOfGoalsAchievedPerFile[goalCurrentUserID] += 1
+										else
+											numberOfGoalsAchievedPerFile[goalCurrentUserID] = 1
+											
+										if (currentStoryLeadCharacter.toLowerCase() == "simon") {
+											simonInputString = progOrCompleteString + "*" + goalCurrentTime;
+											simonInputString = simonInputString.toLowerCase();
+											if (simonGoalStats[simonInputString])
+												simonGoalStats[simonInputString] += 1;
+											else
+												simonGoalStats[simonInputString] = 1;
+												
+											if (progOrCompleteString == "complete")
+												simonGoalCOMPLETEnumber++;
+											else if (progOrCompleteString == "progress")
+												simonGoalPROGRESSnumber++;
+											else if (progOrCompleteString == "antiprogress")
+												simonGoalANTInumber++;
+										}
+											
+										thisFileHadGoalProgress = true;
+									}
+									//this means it became true!
+									progressGood = true;
+									predicateChangeIndex = i;
+									weGottaMakeAGoalProgressNotification = true;
+								}
+							}
+							else
+							{
+								predTruthValues[i] = false;
+								if (toDoItem.predTruthValues[i])
+								{
+									
+									//PENDING ANOTHRE FLAG GOES HERE
+									if (shouldLogGoalProgress) {
+										if (currentStoryLeadCharacter.toLowerCase() == "doug" && goalCurrentTime == 0) {
+											Debug.debug(this, "adding an anti progress to doug! Why do you think that is!?!?!?!");
+										}
+										progOrCompleteString = "antiprogress";									
+										goalProgressString = currentStoryLeadCharacter + "*" + goalCurrentLevel + "*" +
+											toDoItem.name + "*" + goalCurrentSocialGameName + "*" + goalCurrentInitiatorName + "*" + goalCurrentResponderName + "*" + 
+											goalCurrentTime + "*" + goalCurrentEffectID + "*" + goalCurrentUserID + "*" + progOrCompleteString;
+										goalProgressString = goalProgressString.toLowerCase();
+										//Debug.debug(this, "I think ANTI goal progress was made!");
+										if (goalProgressDictionary[goalProgressString])
+											goalProgressDictionary[goalProgressString] += 1;
+										else
+											goalProgressDictionary[goalProgressString] = 1;
+											
+										if (numberOfGoalsAchievedPerFile[goalCurrentUserID])
+											numberOfGoalsAchievedPerFile[goalCurrentUserID] += 1
+										else
+											numberOfGoalsAchievedPerFile[goalCurrentUserID] = 1
+											
+										if (currentStoryLeadCharacter.toLowerCase() == "simon") {
+											simonInputString = progOrCompleteString + "*" + goalCurrentTime;
+											simonInputString = simonInputString.toLowerCase();
+											if (simonGoalStats[simonInputString])
+												simonGoalStats[simonInputString] += 1;
+											else
+												simonGoalStats[simonInputString] = 1;
+												
+											if (progOrCompleteString == "complete")
+												simonGoalCOMPLETEnumber++;
+											else if (progOrCompleteString == "progress")
+												simonGoalPROGRESSnumber++;
+											else if (progOrCompleteString == "antiprogress")
+												simonGoalANTInumber++;
+										}
+											
+										thisFileHadGoalProgress = true;
+									}
+									//this means it became false!
+									progressGood = false;
+									predicateChangeIndex = i;
+									weGottaMakeAGoalProgressNotification = true;
+								}	
+								//object.icon = rl.uiIcons["cross"];
+							}
+						}
+					}
+				}
+				
+				//now update the truth values of the todoItem.
+				toDoItem.predTruthValues = predTruthValues;
+				
+				var shouldDisplayGoalProgress:Boolean = true;
+				//Do this!
+			/*	if (!gameEngine.displayGoalProgressNotifications || noGoalUpdatedNotifications)
+				{
+					shouldDisplayGoalProgress = false;
+				}
+				*/
+				//this.updatePerCharacterGoalProgress(shouldDisplayGoalProgress);
+
+				percentComplete = Math.round(100 * percentAndResponderAndOther["percent"]);//toDoItemCompnent.toDoItem.condition.getPercentageTrueForInitiator(CiFSingleton.getInstance().cast.getCharByName(story.storyLeadCharacter), null, responder, other)["percent"]);
+				
+			//	toDoItemCompnent.progressGroup.toolTip = this.percentComplete + "% Complete";
+				/*
+				if (toDoItemCompnent.toDoItem.evaluateCondition())
+				{
+					toDoItemCompnent.todoItemNameLabel.setStyle("color", "green");
+				}
+				else
+				{
+					toDoItemCompnent.todoItemNameLabel.setStyle("color", getStyle("contentAreaTextColor"));
+				}
+				*/
+						
+				var goalString:String = currentStoryLeadCharacter + "-" + toDoItem.name;
+				var goalComplete:Boolean = false;
+				var hasBeenSeenBefore:Boolean = false;
+				if (percentComplete > 95)
+				{
+					goalComplete = true;
+				}
+				//if (statisticsManager.goalsSeen[goalString])
+				//{
+				//	hasBeenSeenBefore = true;
+				//}
+				//toDoItemCompnent.updateProgressImage(goalComplete, hasBeenSeenBefore);
+				
+				//toDoItemCompnent.progressGroup.toolTip = Math.floor(this.percentComplete + totalAdditionalPercentExtra * 100) + "% Complete";
+				
+				//toDoItemCompnent.progressFGRect.width = toDoItemCompnent.progressBGRect.width * (this.percentComplete / 100 + totalAdditionalPercentExtra);
+				
+				//(ids[iiii] as CollapsiblePanel).removeAllElements();
+				//(ids[iiii] as CollapsiblePanel).addElement(goalVGroup);
+				
+				//if have made or lost progress on a task, display info!
+				if (weGottaMakeAGoalProgressNotification)
+				{
+					//gameEngine.hudGroup.updatesGroup.createGoalProgressPopUp(toDoItemCompnent.toDoItem, "", progressGood, predicateChangeIndex);
+					//gameEngine.hudGroup.topBar.displayProgress(goalLists[iiii],toDoItemComponents[iiii],predicateChangeIndex);
+				}
+			}
+		}
+		
+		
+		public function triggerContextHasAllRolesNeededForValuation(changeRule:Rule, initCharacter:Character, respondCharacter:Character, otherCharacter:Character):Boolean {
+			var boolToReturn:Boolean = true;
+			for each(var p:Predicate in changeRule.predicates) {
+				if (p.first == "initiator" || p.second == "initiator")
+					if (initCharacter == null) boolToReturn = false;
+				if (p.first == "responder" || p.second == "responder")
+					if (respondCharacter == null) boolToReturn = false;
+				if (p.first == "other" || p.second == "other")
+					if (otherCharacter == null) boolToReturn = false;
+			}
+			if (boolToReturn)
+				return true;
+			else {
+				numberOfTriggerContextsThatSeemedToLackInformation++
+				//Debug.debug(this, "EEK!  trigger context with stuff that doesn't seem to have requiste information!");
+				return false;
+			}
+		}
+		
+
+		
+		
+		
+		]]>
+	</fx:Script>
+	
+</mx:Application>

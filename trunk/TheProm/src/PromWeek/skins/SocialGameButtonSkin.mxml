@@ -1,0 +1,389 @@
+﻿<s:Skin 
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/mx" 
+	xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+	minWidth="21" minHeight="21"
+	alpha="1.0"
+	alpha.over="1.0"
+	alpha.down="1.0"
+	creationComplete="onCreationComplete()"
+	styleName="classicPromWeek">
+
+	<fx:Metadata>[HostComponent("PromWeek.SocialGameButton")]</fx:Metadata>
+    
+	<fx:Declarations>
+		<fx:Number id="backgroundFillColor">0x1F497D</fx:Number>
+		<fx:Number id="borderColor">0x000000</fx:Number>
+		<fx:Number id="textColor">0x000000</fx:Number>
+		<mx:Fade id="fadeOut" duration="500" alphaFrom="1.0" alphaTo="0.0"/>
+        <mx:Fade id="fadeIn" duration="500" alphaFrom="0.0" alphaTo="1.0"/>
+		
+		
+		<mx:Glow id="glowButton" duration="100"
+				alphaFrom="0" alphaTo="1"
+				blurXFrom="0.0" blurXTo="30.0" 
+				blurYFrom="0.0" blurYTo="30.0"  strength="2"
+				color="0xFFFFFF" target="{mainBtnGroup}"/>
+		
+		<mx:Glow id="unglowButton" duration="300"  
+				alphaFrom="1" alphaTo="0"
+				blurXFrom="30.0" blurXTo="0.0"
+				blurYFrom="30.0" blurYTo="0.0"  strength="2"
+				color="0xFFFFFF" target="{mainBtnGroup}"/>
+	</fx:Declarations>
+	
+    <!-- states -->
+    <s:states>
+		<s:State name="normal" />
+        <s:State name="up" />
+        <s:State name="over" />
+        <s:State name="down" />
+        <s:State name="disabled" />
+    </s:states>
+	
+	
+	
+	<s:Group id="mainBtnGroup" width="135" height="25" click="mainBtnClick(event)" >
+		<s:Rect width="100%" height="100%" radiusX="15">
+			<s:stroke>
+				<s:SolidColorStroke weight="3" color="{borderColor}" />
+			</s:stroke>
+			<s:fill>
+				<s:SolidColor id="mainButtonColor" color="{this.backgroundFillColor}" />
+			</s:fill>
+		</s:Rect>
+		<s:Rect width="100%" id="blackShadow" height="100%" radiusX="15" visible="false" alpha=".3">
+			<s:stroke>
+				<s:SolidColorStroke weight="3" color="#000000" />
+			</s:stroke>
+			<s:fill>
+				<s:SolidColor color="#000000" />
+			</s:fill>
+		</s:Rect>
+		<s:HGroup id="mainBtn" width="100%" height="100%" paddingLeft="5" paddingRight="5" paddingTop="5" paddingBottom="5" horizontalAlign="center">
+			<s:RichText id="mainBtnText" mouseEnabled="false" color="{getStyle('textColor')}" text="{hostComponent.label}" verticalAlign="middle" height="100%" />
+			<prom:RelationshipButtonIcon id="relIcon" visible="{hostComponent.showRelationshipIcon}" height="100%" />
+		</s:HGroup>
+	</s:Group>
+ 
+	 
+	<fx:Script>
+		<![CDATA[
+		
+		import CiF.CiFSingleton;
+		import CiF.Debug;
+		import CiF.RelationshipNetwork;
+		import CiF.SocialFactsDB;
+		import flash.events.MouseEvent;
+		import mx.graphics.SolidColor;
+		import mx.graphics.Stroke;
+		import mx.controls.Text
+		import spark.skins.spark.ButtonSkin;
+		import flash.display.Graphics;
+		import PromWeek.SocialGameButton;
+		import PromWeek.RelationshipButtonIcon;
+		import PromWeek.GameEngine;
+		import PromWeek.assets.ResourceLibrary
+		import flash.events.Event
+		
+		private var alphaValue:Number = 1.0;
+		private var shiftKeyPressed:Boolean = false
+		
+		public var buttonGlowing:Boolean = false;
+		
+		public function onCreationComplete():void {
+
+		}
+		
+		override protected function createChildren():void {
+			initializeButtons()
+			super.createChildren()
+		}
+			
+		/**
+		 * This is where we initialize the buttons! Put your text/images here! (you can also modify them post-construction,
+		 * but that's a big chunk of code to do externally!
+		 * Make sure to put "mouseEnabled=false" on all the pieces, just to make sure they don't have anything to do with 
+		 * the mouse (eg: highlighting text on a button)
+		 */
+		private function initializeButtons():void {
+			
+		}
+		
+		
+		
+		
+		
+		// took this out of updateDisplayList and moved it here for code clarity and so I could use it outside 
+		// of this class
+		public function styleThisButton():void {
+			
+			if (CiFSingleton.getInstance().socialGamesLib.getByName((hostComponent as SocialGameButton).gameName) == null)
+			{
+				//if this button doesn't have game to fill it
+				return;
+			}
+			
+			
+			
+			var ital:Boolean = CiFSingleton.getInstance().socialGamesLib.getByName((hostComponent as SocialGameButton).gameName).italic;
+			if (ital)
+			{
+				this.mainBtnText.setStyle("fontStyle","italic");
+			}
+			else
+			{
+				
+				this.mainBtnText.setStyle("fontStyle","normal");
+			}
+			//trace(ital);
+			if ((hostComponent as SocialGameButton).isSelected) 
+			{
+				this.borderColor = 0xFFFFFF;
+				/*if ((hostComponent as SocialGameButton).shouldGlow)
+				{
+					this.glowButton.play();
+					buttonGlowing = true;
+				}
+				else
+				{
+					this.unglowButton.play();
+					this.blackShadow.visible = true;
+					buttonGlowing = false;
+				}
+				return;*/
+			}
+			else 
+			{
+				this.borderColor = 0x000000;
+				/*if (buttonGlowing)
+					{
+						this.unglowButton.play();
+						buttonGlowing = false;
+						(hostComponent as SocialGameButton).shouldGlow = false
+						this.blackShadow.visible = false;
+						
+					}*/
+				//should we ever glow here? The button is not selected.
+				/*if ((hostComponent as SocialGameButton).shouldGlow)
+				{
+					if (buttonGlowing)
+					{
+						this.unglowButton.play();
+						buttonGlowing = false;
+						(hostComponent as SocialGameButton).shouldGlow = false
+						this.blackShadow.visible = false;
+						
+					}
+				}
+				else
+				{	
+					//this.unglowButton.play();
+						buttonGlowing = false;
+					this.blackShadow.visible = false;
+				}*/
+			}
+			
+			switch ((hostComponent as SocialGameButton).getIntentCategory()) {
+				case SocialGameButton.BUDDY:
+					styleAsBuddyIntent();
+					break;
+				case SocialGameButton.ROMANCE:
+					styleAsRomanceIntent();
+					break;
+				case SocialGameButton.COOL:
+					styleAsCoolIntent();
+					break;
+				case SocialGameButton.ENDING:
+					styleAsEnding();
+					break;
+				default:
+					styleAsDefault();
+			}
+		}
+		
+		override protected function commitProperties():void
+		{
+			super.commitProperties();
+			var gameEngine:GameEngine = GameEngine.getInstance();
+			//Debug.debug(this, "updateDisplayList() entered." );
+			//if (gameEngine.currentState == "Interaction" || gameEngine.currentState == "Performance" || gameEngine.currentState == "Results" || gameEngine.currentState == "LevelObjective" || gameEngine.currentState == "Pause") {
+				if (hostComponent) {
+					//Debug.debug(this, "updateDisplayList() game name: " + (hostComponent as SocialGameButton).label);
+					// Moved some code to make this function cleaner
+					styleThisButton();
+					//labelDisplay.text = (hostComponent as SocialGameButton).label;
+					if ((hostComponent as SocialGameButton).showRelationshipIcon) {
+						var relationshipType:Number;
+						var negated:Boolean = false;
+						switch ((hostComponent as SocialGameButton).relationshipTypeChanged) {
+							case SocialGameButton.FRIENDS_CHANGE:
+								relationshipType = RelationshipNetwork.FRIENDS;															
+								break;
+							case SocialGameButton.NOT_FRIENDS_CHANGE:
+								relationshipType = RelationshipNetwork.FRIENDS;															
+								break;
+							case SocialGameButton.DATING_CHANGE:
+								relationshipType = RelationshipNetwork.DATING;
+								break;
+							case SocialGameButton.NOT_DATING_CHANGE:
+								relationshipType = RelationshipNetwork.DATING;
+								break;
+							case SocialGameButton.ENEMIES_CHANGE:
+								relationshipType = RelationshipNetwork.ENEMIES;
+								break;
+							case SocialGameButton.NOT_ENEMIES_CHANGE:
+								relationshipType = RelationshipNetwork.ENEMIES;
+								break;
+						}
+						//this.relIcon = new RelationshipButtonIcon();
+						//give it an icon
+						//this.relIcon.loadRelationshipImagesToIcon(relationshipType, negated);
+						if ((hostComponent as SocialGameButton).showRelationshipIcon) {
+							this.relIcon.loadRelationshipImagesToIcon((hostComponent as SocialGameButton).relationshipTypeChanged, (hostComponent as SocialGameButton).showNegated);
+						} 
+					}
+					else if ((hostComponent as SocialGameButton).networkChangeType != -1)
+					{
+						this.relIcon.loadRelationshipImagesToIcon(-1, false,(hostComponent as SocialGameButton).networkChangeType);
+						this.relIcon.loadRelationshipImagesToIcon(-1, false,(hostComponent as SocialGameButton).networkChangeType);
+					}
+				}
+
+				//this.buttonBody.stroke = new Stroke(backgroundFillColor*0.8, 2, 1.0);
+				//this.buttonBody.fill = new SolidColor(backgroundFillColor);
+			//}
+			
+			//this.buttonBody.width = unscaledWidth;
+			//this.buttonBody.height = unscaledHeight;
+			//
+			/*graphics.clear();
+			graphics.lineStyle(2, 0x000033, 1.0);
+			graphics.beginFill(backgroundFillColor, alphaValue);
+			
+			graphics.drawRoundRectComplex(0, 0, unscaledWidth, unscaledHeight, 0, 20, 20, 0);
+			graphics.endFill();
+			*/
+		}
+		
+		private function styleAsBuddyIntent():void {
+			var buddyColor:Number = 0x3eff00;//getStyle('buddyColor');
+			switch (currentState) {
+				case "normal":
+				case "up":
+						mainButtonColor.color = buddyColor;
+						break;
+				case "over":
+						mainButtonColor.color = buddyColor;
+						break;
+				case "down":
+						mainButtonColor.color = buddyColor;
+						break;
+			}
+			this.textColor = 0x000000;
+			this.mainBtnText.setStyle("color",this.textColor);
+		}
+		
+		private function styleAsRomanceIntent():void {
+			var romanceColor:Number = 0xffabce;//getStyle('romanceColor');
+			switch (currentState) {
+				case "normal":
+				case "up":
+						mainButtonColor.color = romanceColor;
+						break;
+				case "over":
+						mainButtonColor.color = romanceColor;
+						break;
+				case "down":
+						mainButtonColor.color = romanceColor;
+						break;
+			}
+			this.textColor = 0x000000;
+			this.mainBtnText.setStyle("color",this.textColor);
+		}
+		
+		private function styleAsCoolIntent():void {
+			var coolColor:Number = 0x0047ff;//getStyle('coolColor');
+			switch (currentState) {
+				case "normal":
+				case "up":
+						mainButtonColor.color = coolColor;
+						break;
+				case "over":
+						mainButtonColor.color = coolColor;
+						break;
+				case "down":
+						mainButtonColor.color = coolColor;
+						break;
+			}
+			this.textColor = 0xFFFFFF;
+			this.mainBtnText.setStyle("color",this.textColor);
+		}
+		//0x3B7BCB
+		private function styleAsEnding():void {
+			switch (currentState) {
+				case "normal":
+				case "up":
+						mainButtonColor.color = getStyle('endingButtonColor');
+						break;
+				case "over":
+						mainButtonColor.color = getStyle('endingButtonColor');
+						break;
+				case "down":
+						mainButtonColor.color = getStyle('endingButtonColor');
+						break;
+			}
+			this.textColor = 0x000000;
+		}
+		//0x3B7BCB
+		private function styleAsDefault():void {
+			switch (currentState) {
+				case "normal":
+				case "up":
+						mainButtonColor.color = getStyle('backgroundColor');
+						break;
+				case "over":
+						mainButtonColor.color = getStyle('backgroundColor');
+						break;
+				case "down":
+						mainButtonColor.color = getStyle('backgroundColor');
+						break;
+			}
+			this.textColor = 0x000000;
+		}
+
+
+		/** Button event and fade specific functions **/
+		/**
+		 * the two fucntions to apply the fade in/out on the extra (upper and lower) button groups. These are 
+		 * called on rollOver and rollOut
+		 */
+		/*
+		private function fadeBtnsIn():void {
+			fadeIn.play([extraBtnGroup])
+		}
+		private function fadeBtnsOut():void {
+			fadeOut.play([extraBtnGroup])
+		}
+		*/
+		/**
+		 * Here are all the events that this button will be throwing!
+		 * 	buttonPressed - the center button is pressed
+		 *  extraBtnPressed - the extra button has been pressed!
+		*/
+		private function mainBtnClick(event:MouseEvent):void {
+			if (event.shiftKey) {
+				dispatchEvent(new Event("buttonPressedShift", true, true))
+			} else {
+				dispatchEvent(new Event("buttonPressed", true, true))
+			}
+		}
+        
+		private function extraBtnEvent():void {
+			dispatchEvent(new Event("extraBtnPressed",true,true))
+		}
+		
+		]]>
+	</fx:Script>
+</s:Skin>

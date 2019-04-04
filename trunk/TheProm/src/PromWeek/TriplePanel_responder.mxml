@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+				xmlns:s="library://ns.adobe.com/flex/spark"
+				xmlns:mx="library://ns.adobe.com/flex/mx"
+				xmlns:local="*"
+				xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+				creationComplete="onCreationComplete()"
+				initialize="initializeComponents()"
+				width="225"
+				height="90">
+	<fx:Declarations>
+		<fx:Number id="buttonWidth">25</fx:Number>
+		<fx:Number id="popOutPanelWidth">150</fx:Number>
+	</fx:Declarations>
+	
+	<fx:Style>
+		.tripanelstyle{
+			borderThicknessLeft: 0;
+			borderThicknessTop: 0;
+			borderThicknessBottom: 0;
+			borderThicknessRight: 0;
+			headerHeight: 0;
+			dropShadowEnabled: false;
+			headerColors: #d9d9d9, #ffffff;
+			borderAlpha: 1;
+			backgroundAlpha: 1;
+			backgroundColor: #1F497D;
+			paddingTop: 4;
+			paddingLeft: 4;
+			paddingRight: 4;
+			verticalGap: 4;
+		}
+	</fx:Style>
+	<s:HGroup width="{this.width}" height="{this.height}" gap="0">
+		<s:VGroup id="buttons" x="0" y="0" height="{this.height}" width="{buttonWidth}">
+			<s:Button id="btnA" label="A" click="cpAButton()" width="{buttons.width}" height="{buttons.height/3}" toolTip="" />
+			<s:Button id="btnB" label="B" click="cpBButton()" width="{buttons.width}" height="{buttons.height/3}" toolTip="" />
+			<s:Button id="btnC" label="C" click="cpCButton()" width="{buttons.width}" height="{buttons.height/3}" toolTip="" />
+			<!--<s:Button id="hide" label="Hide" click="openTab()" />-->
+		</s:VGroup>
+		<s:Group id="panelgroup" x="0" y="{buttons.height-5}" width="{this.width}">
+			<prom:CollapsiblePanel_horizontal id="cpA" defSize="{this.popOutPanelWidth}" width="{this.width}" height="{this.height}" styleName="triplepanelstyle" label="A" open="false" headerHeight="0" >
+				<mx:Box id="cpABox"></mx:Box>
+			</prom:CollapsiblePanel_horizontal>
+			<prom:CollapsiblePanel_horizontal id="cpB" defSize="{this.popOutPanelWidth}" width="{this.width}" height="{this.height}" styleName="triplepanelstyle" label="B" open="false" headerHeight="0" >
+				<mx:Box id="cpBBox"></mx:Box>
+			</prom:CollapsiblePanel_horizontal>
+			<prom:CollapsiblePanel_horizontal id="cpC" defSize="{this.popOutPanelWidth}" width="{this.width}" height="{this.height}" styleName="triplepanelstyle" label="C" open="false" headerHeight="0" >
+				<mx:Box id="cpCBox"></mx:Box>
+			</prom:CollapsiblePanel_horizontal>
+		</s:Group>
+	</s:HGroup>
+	<fx:Script>
+	<![CDATA[
+	import flash.display.Sprite;
+	import flash.events.*
+	import flash.geom.Rectangle;
+	import flash.net.FileFilter;
+	import flash.net.FileReference;
+	import flash.net.URLRequest;
+	import flash.utils.ByteArray;
+	
+	import mx.controls.Image;  import com.util.SmoothImage;
+	import mx.flash.UIMovieClip;
+	
+	private var aOpen:Boolean = false
+	private var bOpen:Boolean = false
+	private var cOpen:Boolean = false
+
+	public function cpAButton():void {
+		openTab(1)
+	}
+	public function cpBButton():void {
+		openTab(2)
+	}
+	public function cpCButton():void {
+		openTab(3)
+	}
+	
+	/**
+	 * This is the function to toggle the columns 
+	 * @param	id - The column number to toggle. Do not pass anything in to hide them all!
+	 */
+	public function openTab(id:Number = 0):void {
+		if(!cpA._openAnim.isPlaying && !cpB._openAnim.isPlaying && !cpC._openAnim.isPlaying)
+		switch(id) {
+			case 1:
+				cpA.toggleOpen()
+				if (cpB.open) cpB.toggleOpen()
+				if (cpC.open) cpC.toggleOpen()
+				break
+			case 2:
+				if (cpA.open) cpA.toggleOpen()
+				cpB.toggleOpen()
+				if (cpC.open) cpC.toggleOpen()
+				break
+			case 3:
+				if (cpA.open) cpA.toggleOpen()
+				if (cpB.open) cpB.toggleOpen()
+				cpC.toggleOpen()
+				break
+			default:
+				if (cpA.open) cpA.toggleOpen()
+				if (cpB.open) cpB.toggleOpen()
+				if (cpC.open) cpC.toggleOpen()
+		}
+	}
+	
+	public function onCreationComplete():void {
+		
+	}
+	
+	
+	
+	public function addEntry():void {
+		//test.addSSUEntry("Lil", "DOOOOOD")
+		var t:SmoothImage = new SmoothImage()
+		t.source = "../lib/simon-portrait.png"
+		t.width = 50
+		t.height = 50
+		//testbar._a1_container._container.addChild(t)
+		trace("Image created!")
+	}
+	
+	public function initializeComponents():void {
+		//var a:Button = new Button();
+		//a.label = "A";
+		//cpABox.addChild(a);
+		//var b:Button = new Button();
+		//b.label = "B";
+		//cpBBox.addChild(b);
+		//var c:Button = new Button();
+		//c.label = "C";
+		//cpCBox.addChild(c);
+	}
+
+	public function loadFiles(e:Event):void {
+		
+	}
+		
+	]]>
+	</fx:Script>
+</s:Group>

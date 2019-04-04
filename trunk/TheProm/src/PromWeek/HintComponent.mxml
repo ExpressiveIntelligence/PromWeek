@@ -1,0 +1,698 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 width="100%"
+		 height="100%"
+		 styleName="classicPromWeek">
+	
+	<fx:Declarations>
+		<fx:Number id="dropDownHeight">200</fx:Number>
+		<fx:Number id="tipFontSize">12</fx:Number>
+		<mx:Fade id="fadeOut" duration="300" alphaFrom="1.0" alphaTo="0.0" effectEnd="fadeOutDone(event)" />
+        <mx:Fade id="fadeIn" duration="300" alphaFrom="0.0" alphaTo="1.0" effectStart="fadeInStarted(event)" />
+	</fx:Declarations>
+
+	
+	
+	<s:HGroup id="tipGroup" width="100%" height="80%" y="25" paddingLeft="10" paddingRight="10" paddingTop="10" paddingBottom="10" gap="5">
+		<s:TextArea id="hintTextArea" height="100%" width="100%" contentBackgroundColor="{getStyle('contentAreaColor')}" color="{getStyle('textColor')}" fontSize="12" editable="false" selectable="false" horizontalScrollPolicy="off" />
+	</s:HGroup>
+	<!--<s:VGroup id="tipGroup" width="100%" height="80%" y="25" paddingLeft="10" paddingRight="10" paddingTop="10" paddingBottom="10" gap="5">
+		<s:HGroup width="100%" height="12%">
+			<s:RichText text="Tip for: " width="20%" color="{getStyle('contentAreaTextColor')}" fontWeight="bold"/>
+			<s:RichText id="titleRichText" width="80%" color="{getStyle('contentAreaTextColor')}"  />
+		</s:HGroup>
+        <mx:TabNavigator id="tipTabNav" width="100%" height="88%" color="0x323232" tabWidth="60" creationPolicy="all" verticalGap="0" paddingLeft="5" paddingRight="5" paddingBottom="5" paddingTop="5" backgroundColor="{getStyle('contentAreaColor')}">
+            <s:NavigatorContent id="freshmanTipTab" label="1" width="100%" height="100%" backgroundColor="{getStyle('backgroundColor')}">
+				<s:TextArea id="freshmanTipText" height="100%" width="100%" contentBackgroundColor="{getStyle('contentAreaColor')}" color="{getStyle('contentAreaTextColor')}" fontSize="{tipFontSize}" editable="false" selectable="false"/>
+            </s:NavigatorContent>
+            <s:NavigatorContent id="sophmoreTipTab" label="2" width="100%" height="100%" backgroundColor="{getStyle('backgroundColor')}">
+					<s:TextArea id="sophmoreTipText" height="100%" width="100%" contentBackgroundColor="{getStyle('contentAreaColor')}" color="{getStyle('contentAreaTextColor')}" fontSize="{tipFontSize}" editable="false" selectable="false"/>
+            </s:NavigatorContent>
+            <s:NavigatorContent id="juniorTipTab" label="3" width="100%" height="100%" backgroundColor="{getStyle('backgroundColor')}">
+				<s:TextArea id="juniorTipText" height="100%" width="100%" contentBackgroundColor="{getStyle('contentAreaColor')}" color="{getStyle('contentAreaTextColor')}" fontSize="{tipFontSize}" editable="false" selectable="false"/>
+            </s:NavigatorContent>
+            <s:NavigatorContent id="seniorTipTab" label="4" width="100%" height="100%" backgroundColor="{getStyle('backgroundColor')}">
+				<s:TextArea id="seniorTipText" height="100%" width="100%" contentBackgroundColor="{getStyle('contentAreaColor')}" color="{getStyle('contentAreaTextColor')}" fontSize="{tipFontSize}" editable="false" selectable="false"/>
+            </s:NavigatorContent>
+        </mx:TabNavigator>
+	</s:VGroup>-->	
+	<s:VGroup id="filterTopLevel" width="100%" height="100%" gap="0">
+		<s:VGroup id="mainFilterContainer" width="100%" height="100%" gap="0" paddingLeft="10" paddingRight="10">
+			<s:HGroup>
+				<s:RichText text="Hints" fontWeight="bold" fontSize="25" color="{getStyle('contentAreaTextColor')}"/>
+				<s:HGroup paddingLeft="90"><prom:PromWeekButton id="filterButton" label="Select Hint" width="70%" click="hintSearchClicked()" visible="false" /></s:HGroup>
+			</s:HGroup>
+			<s:Group id="hintSearchGroup" width="100%" height="90" alpha="0" visible="false">
+				<s:Rect width="100%" height="100%">
+					<s:stroke>
+						<s:SolidColorStroke color="{getStyle('backgroundStroke')}" weight="{getStyle('backgroundStrokeWeight')}"></s:SolidColorStroke>
+					</s:stroke>
+					<s:fill>
+						<s:SolidColor color="{getStyle('backgroundColor')}" alpha="{getStyle('backgroundColorAlpha')}"></s:SolidColor>
+					</s:fill>
+				</s:Rect>
+				<s:HGroup width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingTop="10" paddingBottom="10" rollOver="rollOverHintUI(event)" rollOut="rollOutHintUI(event)">
+					<s:VGroup width="60%" height="100%" >
+						<s:HGroup width="100%" height="33%">
+							<prom:ToggleableContainerButton id="friendsHintButton" width="33%" height="100%" click="relationshipClicked(event)" toggleable="false" boxPadding="0" toolTip="Friends" />
+							<prom:ToggleableContainerButton id="datingHintButton" width="33%" height="100%" click="relationshipClicked(event)" toggleable="false" boxPadding="0" toolTip="Dating" />
+							<prom:ToggleableContainerButton id="enemiesHintButton" width="33%" height="100%" click="relationshipClicked(event)" toggleable="false" boxPadding="0" toolTip="Enemies" />
+						</s:HGroup>
+						<s:HGroup width="100%" height="66%">
+							<prom:ToggleableContainerButton id="buddyUpButton" width="16%" height="100%" click="networkClicked(event)" toggleable="false" boxPadding="0" toolTip="Raising Buddy" />
+							<prom:ToggleableContainerButton id="buddyDownButton" width="16%" height="100%" click="networkClicked(event)" toggleable="false" boxPadding="0" toolTip="Lowering Buddy" />
+							<prom:ToggleableContainerButton id="romanceUpButton" width="16%" height="100%" click="networkClicked(event)" toggleable="false" boxPadding="0" toolTip="Raising Romance" />
+							<prom:ToggleableContainerButton id="romanceDownButton" width="16%" height="100%" click="networkClicked(event)" toggleable="false" boxPadding="0" toolTip="Lowering Romance" />
+							<prom:ToggleableContainerButton id="coolUpButton" width="16%" height="100%" click="networkClicked(event)" toggleable="false" boxPadding="0" toolTip="Raising Coolness" />
+							<prom:ToggleableContainerButton id="coolDownButton" width="16%" height="100%" click="networkClicked(event)" toggleable="false" boxPadding="0" toolTip="Lowering Coolness" />
+						</s:HGroup>
+					</s:VGroup>
+					<s:VGroup width="40%" height="100%">
+						<s:RichText text="Statuses:" width="100%" height="30%" color="{getStyle('contentAreaTextColor')}" fontSize="12"/>
+						<s:HGroup paddingLeft="10" width="100%">
+							<s:DropDownList id="statusDropDownList" prompt="---" width="100%" change="statusDropDownListChanged(event)" toolTip="Statuses" fontSize="12">
+								 <mx:ArrayCollection>
+									<fx:String>has a crush on</fx:String>
+									<fx:String>popular</fx:String>
+								</mx:ArrayCollection>
+							</s:DropDownList>
+						</s:HGroup>
+						<s:RichText text="Acts:" width="100%" height="30%" color="{getStyle('contentAreaTextColor')}" fontSize="12"/>
+						<s:HGroup paddingLeft="10" width="100%">
+							<s:DropDownList id="sfdbDropDownList" prompt="---" width="100%" change="sfdbDropDownListChanged(event)" toolTip="Acts" fontSize="12">
+								 <mx:ArrayCollection>
+									<fx:String>positive</fx:String>
+									<fx:String>negative</fx:String>
+								</mx:ArrayCollection>
+							</s:DropDownList>
+						</s:HGroup>
+					</s:VGroup>
+				</s:HGroup>
+			<!--</prom:CollapsiblePanel>-->
+			</s:Group>
+		</s:VGroup>
+	</s:VGroup>
+
+
+	<fx:Script>
+		<![CDATA[
+		import CiF.Predicate;
+		import CiF.RelationshipNetwork;
+		import CiF.SocialFactsDB;
+		import CiF.SocialNetwork;
+		import CiF.Status;
+		import flash.events.Event;
+		import flash.events.MouseEvent;
+		import flash.utils.Timer;
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import PromWeek.assets.ResourceLibrary;
+		import spark.components.Group;
+		import spark.events.IndexChangeEvent;
+		import flash.events.TimerEvent;
+
+		public static const FRESHMAN:int = 0;
+		public static const SOPHMORE:int = 1;
+		public static const JUNIOR:int = 2;
+		public static const SENIOR:int = 3;
+		
+		public var resourceLibrary:ResourceLibrary;
+		private var gameEngine:PromWeek.GameEngine;
+		
+		public var timer:Timer;
+		
+		public function fadeOutDone(e:Event):void
+		{
+			this.hintSearchGroup.visible = false;
+		}		
+		public function fadeInStarted(e:Event):void
+		{
+			this.hintSearchGroup.visible = true;
+		}
+		
+		public function statusDropDownListChanged(e:Event = null):void
+		{
+			var pred:Predicate = new Predicate();
+			pred.type = Predicate.STATUS;
+			
+			pred.status = Status.getStatusNumberByName(statusDropDownList.dataProvider[statusDropDownList.selectedIndex]);
+			
+			
+			//this.tipTabNav.selectedIndex = 0;
+			this.setHintText(pred,PromWeek.HintComponent.FRESHMAN);
+			
+			//statusDropDownList.selectedItem
+			fadeOut.play([hintSearchGroup])
+		}
+
+		public function sfdbDropDownListChanged(e:IndexChangeEvent = null):void
+		{
+			//sfdbDropDownList
+			var pred:Predicate = new Predicate();
+			pred.type = Predicate.SFDBLABEL;
+			
+			var labelName:String;
+			if (sfdbDropDownList.dataProvider[sfdbDropDownList.selectedIndex] == "positive")
+			{
+				labelName = "cat: positive";
+			}
+			else if (sfdbDropDownList.dataProvider[sfdbDropDownList.selectedIndex] == "positive")
+			{
+				labelName = "cat: negative";
+			}
+			else
+			{
+				labelName = sfdbDropDownList.dataProvider[sfdbDropDownList.selectedIndex];
+			}
+			
+			pred.sfdbLabel = SocialFactsDB.getLabelByName(labelName);
+			
+			
+			//this.tipTabNav.selectedIndex = 0;
+			this.setHintText(pred,PromWeek.HintComponent.FRESHMAN);
+			
+			fadeOut.play([hintSearchGroup])
+		}
+		
+		public function networkClicked(e:MouseEvent = null):void
+		{
+			fadeOut.play([hintSearchGroup])
+			var pred:Predicate = new Predicate();
+			pred.type = Predicate.NETWORK;
+			if (e.currentTarget.id == "buddyUpButton")
+			{
+				pred.networkType = SocialNetwork.BUDDY;
+				pred.operator = "+";
+			}
+			else if (e.currentTarget.id == "buddyDownButton")
+			{
+				pred.networkType = SocialNetwork.BUDDY;
+				pred.operator = "-";
+			}
+			else if (e.currentTarget.id == "romanceUpButton")
+			{
+				pred.networkType = SocialNetwork.ROMANCE;
+				pred.operator = "+";
+			}
+			else if (e.currentTarget.id == "romanceDownButton")
+			{
+				pred.networkType = SocialNetwork.ROMANCE;
+				pred.operator = "-";
+			}
+			else if (e.currentTarget.id == "coolUpButton")
+			{
+				pred.networkType = SocialNetwork.COOL;
+				pred.operator = "+";
+			}
+			else if (e.currentTarget.id == "coolDownButton")
+			{
+				pred.networkType = SocialNetwork.COOL;
+				pred.operator = "-";
+			}
+
+			//this.tipTabNav.selectedIndex = 0;
+			this.setHintText(pred, PromWeek.HintComponent.FRESHMAN);
+		}
+		
+		public function relationshipClicked(e:MouseEvent = null):void
+		{
+			fadeOut.play([hintSearchGroup]);
+			var pred:Predicate = new Predicate();
+			pred.type = Predicate.RELATIONSHIP;
+			if (e.currentTarget.id == "friendsHintButton")
+			{
+				pred.relationship = RelationshipNetwork.FRIENDS;
+			}
+			else if (e.currentTarget.id == "datingHintButton")
+			{
+				pred.relationship = RelationshipNetwork.DATING;
+			}
+			else if (e.currentTarget.id == "enemiesHintButton")
+			{
+				pred.relationship = RelationshipNetwork.ENEMIES;
+			}
+			//this.tipTabNav.selectedIndex = 0;
+			this.setHintText(pred,PromWeek.HintComponent.FRESHMAN);
+		}
+		
+		public function onCreationComplete():void
+		{
+			this.resourceLibrary = ResourceLibrary.getInstance();
+			this.gameEngine = PromWeek.GameEngine.getInstance();
+			//this.filterCollapsablePanel.setHeight(this.dropDownHeight);
+			//this.filterCollapsablePanel.invalidateSize();
+			//this.filterCollapsablePanel.setToClosed();
+			
+			
+			var image:SmoothImage = new SmoothImage();
+			image.width = this.friendsHintButton.mainContainer.height;
+			image.height = this.friendsHintButton.mainContainer.height;
+			image.source = resourceLibrary.relationshipIcons["friends"];
+			var group:Group = new Group();
+			group.addElement(image);
+			group.width = this.friendsHintButton.mainContainer.width;
+			group.height = this.friendsHintButton.mainContainer.height;
+			image.x = group.width / 2 - image.width / 2;
+			image.y = group.height / 2 - image.height / 2;
+			this.friendsHintButton.mainContainer.addElement(group);
+			
+			image = new SmoothImage();
+			image.width = this.datingHintButton.mainContainer.height;
+			image.height = this.datingHintButton.mainContainer.height;
+			image.source = resourceLibrary.relationshipIcons["dating"];
+			group = new Group();
+			group.addElement(image);
+			group.width = this.datingHintButton.mainContainer.width;
+			group.height = this.datingHintButton.mainContainer.height;
+			image.x = group.width / 2 - image.width / 2;
+			image.y = group.height / 2 - image.height / 2;
+			this.datingHintButton.mainContainer.addElement(group);
+			
+			image = new SmoothImage();
+			image.width = this.enemiesHintButton.mainContainer.height;
+			image.height = this.enemiesHintButton.mainContainer.height;
+			image.source = resourceLibrary.relationshipIcons["enemies"];
+			group = new Group();
+			group.addElement(image);
+			group.width = this.enemiesHintButton.mainContainer.width;
+			group.height = this.enemiesHintButton.mainContainer.height;
+			image.x = group.width / 2 - image.width / 2;
+			image.y = group.height / 2 - image.height / 2;
+			this.enemiesHintButton.mainContainer.addElement(group);
+			
+			
+			image = new SmoothImage();
+			image.width = this.buddyUpButton.mainContainer.width;
+			image.height = this.buddyUpButton.mainContainer.height;
+			image.source = resourceLibrary.networkArrowIcons["buddyUp"];
+			group = new Group();
+			group.addElement(image);
+			group.width = this.buddyUpButton.mainContainer.width;
+			group.height = this.buddyUpButton.mainContainer.height;
+			image.x = group.width / 2 - image.width / 2;
+			image.y = group.height / 2 - image.height / 2;
+			this.buddyUpButton.mainContainer.addElement(group);
+			
+			image = new SmoothImage();
+			image.width = this.buddyDownButton.mainContainer.width;
+			image.height = this.buddyDownButton.mainContainer.height;
+			image.source = resourceLibrary.networkArrowIcons["buddyDown"];
+			group = new Group();
+			group.addElement(image);
+			group.width = this.buddyDownButton.mainContainer.width;
+			group.height = this.buddyDownButton.mainContainer.height;
+			image.x = group.width / 2 - image.width / 2;
+			image.y = group.height / 2 - image.height / 2;
+			this.buddyDownButton.mainContainer.addElement(group);
+			
+			image = new SmoothImage();
+			image.width = this.romanceUpButton.mainContainer.width;
+			image.height = this.romanceUpButton.mainContainer.height;
+			image.source = resourceLibrary.networkArrowIcons["romanceUp"];
+			group = new Group();
+			group.addElement(image);
+			group.width = this.romanceUpButton.mainContainer.width;
+			group.height = this.romanceUpButton.mainContainer.height;
+			image.x = group.width / 2 - image.width / 2;
+			image.y = group.height / 2 - image.height / 2;
+			this.romanceUpButton.mainContainer.addElement(group);
+			
+			image = new SmoothImage();
+			image.width = this.romanceDownButton.mainContainer.width;
+			image.height = this.romanceDownButton.mainContainer.height;
+			image.source = resourceLibrary.networkArrowIcons["romanceDown"];
+			group = new Group();
+			group.addElement(image);
+			group.width = this.romanceDownButton.mainContainer.width;
+			group.height = this.romanceDownButton.mainContainer.height;
+			image.x = group.width / 2 - image.width / 2;
+			image.y = group.height / 2 - image.height / 2;
+			this.romanceDownButton.mainContainer.addElement(group);
+			
+			image = new SmoothImage();
+			image.width = this.coolUpButton.mainContainer.width;
+			image.height = this.coolUpButton.mainContainer.height;
+			image.source = resourceLibrary.networkArrowIcons["coolUp"];
+			group = new Group();
+			group.addElement(image);
+			group.width = this.coolUpButton.mainContainer.width;
+			group.height = this.coolUpButton.mainContainer.height;
+			image.x = group.width / 2 - image.width / 2;
+			image.y = group.height / 2 - image.height / 2;
+			this.coolUpButton.mainContainer.addElement(group);
+			
+			image = new SmoothImage();
+			image.width = this.coolDownButton.mainContainer.width;
+			image.height = this.coolDownButton.mainContainer.height;
+			image.source = resourceLibrary.networkArrowIcons["coolDown"];
+			group = new Group();
+			group.addElement(image);
+			group.width = this.coolDownButton.mainContainer.width;
+			group.height = this.coolDownButton.mainContainer.height;
+			image.x = group.width / 2 - image.width / 2;
+			image.y = group.height / 2 - image.height / 2;
+			this.coolDownButton.mainContainer.addElement(group);
+		}
+		
+		
+		public function hintSearchClicked(e:MouseEvent = null):void
+		{
+			//this.hintSearchGroup.visible = !this.hintSearchGroup.visible;
+			
+			//clear out the timer
+			if (this.timer != null)
+			{
+				this.timer.stop();
+				this.timer = null;
+			}
+
+			if (!this.hintSearchGroup.visible)
+			{
+				//this means we are making it visible and should start some timers
+				timer = new Timer(1500, 1);
+				timer.addEventListener(TimerEvent.TIMER, closeHintDropDown);
+				timer.start();
+			}
+			
+
+			if (this.hintSearchGroup.alpha > 0)
+			{
+				fadeOut.play([hintSearchGroup])
+			}
+			else
+			{
+				fadeIn.play([hintSearchGroup])
+			}
+		}
+		
+		
+		public function closeHintDropDown(e:Event=null):void
+		{
+			fadeOut.play([hintSearchGroup])
+			this.timer = null;
+		}
+		
+		public function rollOverHintUI(e:Event = null):void
+		{
+			if (this.timer != null)
+			{
+				this.timer.stop();
+				this.timer = null;
+			}
+		}
+		
+		public function rollOutHintUI(e:Event = null):void
+		{
+			//fadeOut.play([hintSearchGroup]);
+		}
+		
+		
+		/**
+		 * hide and show the panel (the button calls this)
+		 */
+		/*
+		public function toggleFilterVisible():void {
+			if (filterCollapsablePanel.open) {
+				fadeOut.play([filterCollapsablePanel])
+				filterCollapsablePanel.setToClosed();
+			} else {
+				fadeIn.play([filterCollapsablePanel])
+				filterCollapsablePanel.setToOpen();
+			}
+		}
+		*/
+		
+		public function setHintText(pred:Predicate,level:int, goalHint:String=""):void
+		{
+			if (!pred) return;
+			
+			this.tipGroup.visible = true;
+			
+			var hintText:String;
+			
+			if (goalHint != "")
+			{
+				hintTextArea.text = goalHint;
+			}
+			else
+			{
+				hintTextArea.text = pred.description;
+			}
+			
+			/*
+			//RELATIONSHIPS
+			if (pred.type == Predicate.RELATIONSHIP)
+			{
+				if (pred.relationship == RelationshipNetwork.FRIENDS)
+				{
+					if (pred.negated)
+					{
+						titleRichText.text = "Ending Friendship";
+						//ending friends
+						freshmanTipText.text = "Friendships end, with a bang (you cheated on my girl?!) or a whimper (we never hang out any more!). People who aren't friends are less likely to want to hang out, support each other, or care what happens to each other. The friendship relationship is two-way and non-exclusive: if Jordan stops being friends with Edward, Edward is also no longer friends with Jordan; this won't affect any of their other relationships. Stop Friendship games have a green background and a crossed-out smiley face symbol.";
+						sophmoreTipText.text = "End a friendship by having an initiator play a Stop Friendship social game like 'Leave Me Alone!' or 'Blow Off Plans' with the responder.";
+						juniorTipText.text = "Lowering a responder's buddy and cool networks will make it easier to stop a friendship. Mean or annoying actions can also bring things more swiftly to an end.";
+						seniorTipText.text = "An initiator who betrays a buddy by (say) stealing his girlfriend is likely to incur the wrath of the scorned.";
+					}
+					else
+					{
+						titleRichText.text = "Becoming Friends";
+						//gaining friends
+						freshmanTipText.text = "Friends, buddies, bros, BFFs: where would a high-schooler be without close companions? A friendship represents a bond of shared history, interest, or affinity. The friendship relationship is two-way and non-exclusive: if Simon is friends with Zack, Zack is also friends with Simon, although they can both be friends with whomever else they like. Start Friendship games have a green background and a smiley face symbol.";
+						sophmoreTipText.text = "Start a friendship by having an initiator play a Start Friendship social game like 'Make Plans' or 'Confide In' with the responder.";
+						juniorTipText.text = "High buddy scores make initiators want to start friendships and responders want to accept them. A decent cool score is also be important. Be careful that romance isn't too high, though, or the responder might want to start something other than friendship.";
+						seniorTipText.text = "If a responder's friends like an initiator, the responder's stock of the initator will rise, too. Try getting in good with a stubborn would-be buddy's friends first.";
+					}
+				}
+				else if (pred.relationship == RelationshipNetwork.DATING)
+				{
+					if (pred.negated)
+					{
+						titleRichText.text = "Stopping Dating";
+						//ending dating
+						freshmanTipText.text = "Tragedy can strike down even the most picture-perfect relationship. Two characters who stop dating are no longer an item and may have an unpleasant history going forward. The dating relationship is two-way and non-exclusive: if Oswald breaks up with Monica, Monica (no matter what her online profile says) is no longer dating Oswald. Stop Dating games have a pink background and a crossed-out heart symbol.";
+						sophmoreTipText.text = "Bring a romance to an end by having an initiator play a Stop Dating social game like 'Let's Be Friends!' or 'Txt Msg Breakup' with the responder.";
+						juniorTipText.text = "A responder inclined to stay in a relationship may soften her attitude if the initiator acts in unromantic ways, including playing romance down or buddy down games, or showing romantic interest in other people.";
+						seniorTipText.text = "To really want to break somebody's heart, try the time-tested way of scoundrels everywhere: start dating another responder and most significant others will immediately become angry.";
+					}
+					else
+					{
+						titleRichText.text = "Starting Dating";
+						//gaining dating
+						freshmanTipText.text = "Love is in the air during Prom Week (or maybe pumped through the ventilation system) and relationships will flower as often as wither and die. Two characters who are dating are committed to each other till Prom do us part. The dating relationship is two-way and non-exclusive: if Buzz is dating Oswald, Oswald is also dating Buzz; although they can each be dating other people (though this might have major consequences!). Start Dating games have a pink background and a heart symbol. ";
+						sophmoreTipText.text = "Start a romance by having an initiator play a Start Dating social game like 'Pick-Up Line' or 'Ask On A Date' with the responder.";
+						juniorTipText.text = "Unattached and lovelorn responders are more likely to take romatic proposals seriously. Try eliminating existing boy/girlfriends and crushes before moving in.";
+						seniorTipText.text = "Getting a would-be partner's friends on an initiator's good side can be key to raising the responder's opinion. Try befriending some of the responder's friends before moving in with a proposal.";
+					}
+				}
+				else if (pred.relationship == RelationshipNetwork.ENEMIES)
+				{
+					if (pred.negated)
+					{
+						titleRichText.text = "Ending Enemies";
+						//ending enemies
+						freshmanTipText.text = "Having enemies can be fun, but even the most cynical socialite can grow weary of constant war. Classmates who are no longer enemies are more open to taking nice actions with each other, including even crazy ones like becoming (omg!) friends. The enemy relationship is two-way and non-exclusive: if Doug stops being enemies with Cassandra, she is no longer enemies with him; their other enemy relationships are unaffected. Stop Enemy games have a green background and a crossed-out angry face symbol.";
+						sophmoreTipText.text = "Make peace with an enemy by having an initiator play a Stop Enemy social game like 'Make Up' or 'Concede' with the responder.";
+						juniorTipText.text = "It can take some doing to heal a long-festering conflict. Initiators who look for every opportunity to be nice to their enemies, even if these attempts are rejected, might find their eventual Stop Enemy proposals looked on more favorably.";
+						seniorTipText.text = "As crazy as it seems, sometimes establishing a new relationship with an enemy can be a path to losing the original status. If you can make an initiator become frenemies, enedating, or even frenedating (!) with a responder, it could be a stepping stone to dropping that enemy status and restoring some normalcy.";
+					}
+					else
+					{
+						titleRichText.text = "Becoming Enemies";
+						//gaining enemies
+						freshmanTipText.text = "Keep your friends close, but your enemies closer: whether actively scheming or quietly fuming, an enemy is someone who doesn't just dislikes but actively despises. Enemies take pleasure in each others' misfortune, enjoy initiating mean games with each other, and are unlikely to want to date or become friends. The enemy relationship is two-way and non-exclusive: if Lil is enemies with Nicholas, Nicholas is also enemies with Lil, and they each can have as many other enemies as a busy social calendar will support. Start Enemy games have a green background and a red angry face symbol.";
+						sophmoreTipText.text = "Make a new enemy by having an initiator play a Start Enemy social game like 'Bully' or 'Insult Friend Of' with the responder.";
+						juniorTipText.text = "A responder is more likely to want to be enemies with someone they have low buddy and cool scores for who has recently done unpleasant things to them (or their friends or loved ones).";
+						seniorTipText.text = "Social networking can go a long way towards lowering a responder's respect: if an initiator has consistently treated the responder's social group poorly, most responders will take umbrage. (Umbrage is a dish best served cold.)";
+					}
+				}
+			}
+			//NETWORKS
+			else if (pred.type == Predicate.NETWORK)
+			{
+				if (pred.networkType == SocialNetwork.BUDDY)
+				{
+					if (pred.operator == "+")
+					{
+						titleRichText.text = "Raising Buddy Feelings";
+						//raining buddy
+						freshmanTipText.text = "When classmates think of someone as a good buddy, they want to make friends, stop being mean, and are somewhat less interested in dating him. Buddy networks are one-way: just because Chloe like Monica doesn't mean Monica likes Chloe. Buddy Up games have a green background and an 'up' symbol.";
+						sophmoreTipText.text = "Raise a responder's buddy network towards an initiator by having the initiator play a Buddy Up social game like 'Back Me Up!' or 'Reminisce' with the responder.";
+						juniorTipText.text = "An initiator who treats a responder nicely in any way will generally receive a higher buddy network score in response. Memories can be long in high school, so repeatedly being nice instead of mean pays off. It's hard to be nice to an enemy; play a Stop Enemy game before trying to Buddy Up.";
+						seniorTipText.text = "If someone is popular (has at least five friends), everyone wants to be their new friend. If an initiator is being snubbed, try increasing her pool of friends with less-picky people to raise her appeal to the original responder.";
+					}
+					else if (pred.operator == "-")
+					{
+						titleRichText.text = "Lowering Buddy Feelings";
+						//lowering buddy
+						freshmanTipText.text = "A low buddy network means a classmate just isn't interested someone or actively dislikes him. Bullies looking for a target or members of a disinterested social group fall into this category. You might want to lower a buddy score to sunset a friendship, get a creeper to leave someone alone, or start a rivalry. Buddy networks are one-way: just Simon thinks he's best friends with Doug doesn't mean Doug feels the same way. Buddy Down games have a green background and a 'down' symbol.";
+						sophmoreTipText.text = "Lower a responder's buddy network towards an initiator by having the initiator play a Buddy Down social game like 'Annoy' or 'Insult' with the responder.";
+						juniorTipText.text = "Doing anything mean to someone generally lowers her buddy score, at least if she believes the initiator meant it seriously. Repeatedly being a jerk increases the likelihood the target gets that a previously friendly initiator has become a jerk.";
+						seniorTipText.text = "Stealing someone's date, pissing off his friends, repeatedly acting uncool or making failed romantic passes are all other ways to make a classmate like someone less.";
+					}
+				}
+				else if (pred.networkType == SocialNetwork.ROMANCE)
+				{
+					if (pred.operator == "+")
+					{
+						titleRichText.text = "Raising Feelings of Romance";
+						//raining romance
+						freshmanTipText.text = "Raising a responder's romance network makes him more aware of the initiator's romantic potential. A high value means hormones are raging, while medium or low values indicate low to gross-out levels of interest. It's much easier to start and keep dating a responder with a high romance value, and an initiator will need a high romance towards the responder to want to play amorous social games. Romance networks are, tragically, one-way: Cassandra can be the center of Simon's world even if she doesn't know he exists. Romance Up games have a pink background and an 'up' symbol.";
+						sophmoreTipText.text = "Raise a responder's romance network towards an initiator by having the initiator play a Romance Up social game like 'Woo' or 'Physical Flirt' with the responder.";
+						juniorTipText.text = "Responders are more inclined to accept romance up games from people who aren't rude or annoying to them, so lay off the unpleasant behavior before initiating an advance. And don't overdo it: too many failed attempts and a responder will get creeped out.";
+						seniorTipText.text = "The advanced Lothario uses all kinds of clever tricks to make a responder more interested: jealousy, making friends with the desired partner's friends, sabotaging their existing relationship, or making their secret crush turn against them. Cupid's arrow hath a cruel barb.";
+					}
+					else if (pred.operator == "-")
+					{
+						titleRichText.text = "Lowering Feelings of Romance";
+						//lowering romance
+						freshmanTipText.text = "Lowering a responder's romance network causes his amorous feelings to cool and, eventually, curdle. A low romance score means a relationship is running on fumes, and starting a new one? Unlikely. Romance networks are, tragically, one-way: Mave can be totally over her relationship with Edward even if he still worships the ground she walks on. Romance Down games have a pink background and a 'down' symbol.";
+						sophmoreTipText.text = "Lower a responder's romance network towards an initiator by having the initiator play a Romance Down social game like 'Shoot Down' or 'Brash Remark' with the responder.";
+						juniorTipText.text = "Lowering buddy or cool scores first might help make an initiator less attractive. Repeatedly playing mean-spirited games should eventually get through to a love-struck partner.";
+						seniorTipText.text = "There's no better way to cool off an interested party than by turning attentions to another suitor. Repeatedly showing romantic interest in someone else might make an infatuated classmate less interested.";
+					}
+				}
+				else if (pred.networkType == SocialNetwork.COOL)
+				{
+					if (pred.operator == "+")
+					{
+						titleRichText.text = "Raising Coolness";
+						//raising cool
+						freshmanTipText.text = "Raising a responder's cool network makes the initiator seem more happening, connected, and attention-worthy. A character is more inclined to date or befriend someone cool, and less likely to do mean things to them. Cool networks are one-way: Zack might think Naomi is cool, but she might not know he exists. Cool Up games have a blue background and an 'up' symbol.";
+						sophmoreTipText.text = "Raise a responder's cool network towards an initiator by having the initiator play a Cool Up social game like 'Idolize' or 'Brag' with the responder.";
+						juniorTipText.text = "Cool is all about perception and bravado. People with cool friends, or dating other cool people, or willing to take bold actions, might be seen as cooler than the more timid.";
+						seniorTipText.text = "You're only as cool as you think you are. Acting like a bad-ass often makes others think an initiator really is all that.";
+					}
+					else if (pred.operator == "-")
+					{
+						titleRichText.text = "Lowering Coolness";
+						//lowering cool
+						freshmanTipText.text = "Lowering a responder's cool network for someone makes the responder less inclined to hang out, be friends with, or date the initiator. Cool networks are one-way: Monica's cool might be Cassandra's drool. Cool Down games have a green background and a 'down' symbol. ";
+						sophmoreTipText.text = "Lower a responder's cool network towards an initiator by having the initiator play a Cool Down social game like 'Embarrass Self' or 'Weird Out' with the responder.";
+						juniorTipText.text = "Cool can be connected to friendship: sometimes doing mean or unpleasant things can lower cool along with buddy networks.";
+						seniorTipText.text = "Generally speaking, acting like a total geek is a time-honored way of becoming less cool. Look for chances for an initiator to make an ass out of himself.";
+					}
+				}
+			}
+			//STATUSES
+			else if (pred.type == Predicate.STATUS)
+			{
+				if (pred.status == Status.HAS_A_CRUSH_ON)
+				{
+					if (pred.negated)
+					{
+						titleRichText.text = "Ending a Crush";
+						//losing has a crush on
+						freshmanTipText.text = "";
+						sophmoreTipText.text = "";
+						juniorTipText.text = "";
+						seniorTipText.text = "";
+					}
+					else
+					{
+						//gaining has a crush on
+						titleRichText.text = "Gaining a Crush";
+						freshmanTipText.text = "";
+						sophmoreTipText.text = "";
+						juniorTipText.text = "";
+						seniorTipText.text = "";
+					}
+				}
+				else if (pred.status == Status.ANXIOUS)
+				{
+					if (pred.negated)
+					{
+						titleRichText.text = "Ending Being Anxious";
+						//losing anxious
+						freshmanTipText.text = "";
+						sophmoreTipText.text = "";
+						juniorTipText.text = "";
+						seniorTipText.text = "";
+					}
+					else
+					{
+						//gaining anxious
+						titleRichText.text = "Becoming Anxious";
+						freshmanTipText.text = "";
+						sophmoreTipText.text = "";
+						juniorTipText.text = "";
+						seniorTipText.text = "";
+					}
+				}
+				else if (pred.status == Status.POPULAR)
+				{
+					if (pred.negated)
+					{
+						titleRichText.text = "Becoming Unpopular";
+						//losing anxious
+						freshmanTipText.text = "Nobody is born popular: it's a judgment based on how other characters feel about someone. Popularity is a status that, unless the conditions are maintained, will expire after three turns.";
+						sophmoreTipText.text = "Lower other character's cool networks towards a character by playing Cool Down games to threaten his popular status.";
+						juniorTipText.text = "If a character ends his dating or friendship relationships with other popular characters, she also threatens her popular status.";
+						seniorTipText.text = "Burning bridges in general is a great way to become less popular: doing rude things, making enemies, and trimming down a burgeoning social circle.";
+					}
+					else
+					{
+						//gaining anxious
+						titleRichText.text = "Becoming Popular";
+						freshmanTipText.text = "Popularity is a measure of prestige and social status that's everything to some people and nothing to others. Popularity is a status that, unless the conditions are maintained, will expire after three turns.";
+						sophmoreTipText.text = "A character can become temporarily popular by dating a popular person or having at least two popular friends.";
+						juniorTipText.text = "For a character to gain lasting popularity, at least five people need to think he's cool, or eight people need to be his friend.";
+						seniorTipText.text = "Infiltrating an existing clique of popular people can give a character the foothold she needs to establish more permanent popularity.";
+					}
+				}
+				//and so on...
+			}
+			//SFDB LABELS
+			else if (pred.type == Predicate.SFDBLABEL)
+			{
+				if (pred.sfdbLabel == SocialFactsDB.CAT_POSITIVE)
+				{
+					//doing something cat_positive
+					titleRichText.text = "Doing Something Positive";
+					freshmanTipText.text = "A positive social exchange is one that made the responder feel generally good about the initiator. This category includes all the following types of exchanges: cool, romantic, funny, bad ass, and nice.";
+					sophmoreTipText.text = "Most accepted cool, buddy, or romance up exchanges, or Start Friendship or Start Dating exchanges, will result in a positive social exchange from the initiator.";
+					juniorTipText.text = "";
+					seniorTipText.text = "";
+				}
+				else if (pred.sfdbLabel == SocialFactsDB.CAT_NEGATIVE)
+				{
+					//doing something cat_negative
+					titleRichText.text = "Doing Something Negative";
+					freshmanTipText.text = "A negative social exchange is one that made the responder feel generally bad about the initiator. This category includes all the following types of exchanges: gross, mean, taboo and rude.";
+					sophmoreTipText.text = "Most accepted cool, buddy, or romance down exchanges, or Stop Friendship, Stop Dating, or Start Enemy exchanges, will result in a negative social exchange from the initiator.";
+					juniorTipText.text = "";
+					seniorTipText.text = "";
+
+				}
+				//and so on...
+			}
+			*/
+			
+		}
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			/*if(gameEngine.classicPromColors) {
+				this.setStyle("styleName", "classicPromWeek");
+			}
+			else if(gameEngine.greenPromColors) {
+				this.setStyle("styleName", "greenColor");
+			}
+			else if(gameEngine.redPromColors) {
+				this.setStyle("styleName", "redColor");
+			}*/
+			this.invalidateProperties();
+		}
+		
+		
+		]]>
+	</fx:Script>
+	
+</s:Group>

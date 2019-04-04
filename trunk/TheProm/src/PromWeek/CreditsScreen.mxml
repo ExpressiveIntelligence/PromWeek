@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 initialize="initializeCreditsScreen()"
+		 creationComplete="onCreationComplete()"
+		 width="100%"
+		 height="100%"
+		 styleName="classicPromWeek">
+		 
+		<fx:Metadata>
+		</fx:Metadata>
+		 
+		<fx:Declarations>
+		</fx:Declarations>
+		
+		<s:Rect id="background" width="100%" height="100%">
+			<s:fill>
+				<s:SolidColor id="backgroundFill" color="{getStyle('backgroundColor')}" />
+			</s:fill>
+		</s:Rect>
+		<s:HGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+			<s:Group id="centeringGroup" width="760" height="600">
+				<util:SmoothImage id="creditsImage" width="760" height="600"/>
+				<s:Group id="backButtonSpot" right="15" bottom="15"/>
+			 </s:Group>
+		</s:HGroup>
+		 <fx:Script>
+			 <![CDATA[
+		
+		import flash.events.MouseEvent;
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import CiF.CiFSingleton;
+		import PromWeek.MainMenuButton;
+		import PromWeek.assets.ResourceLibrary;
+		
+		private var rL:PromWeek.assets.ResourceLibrary;
+		private var cif:CiFSingleton;
+		private var gameEngine:GameEngine;
+		
+		public function initializeCreditsScreen():void {
+			this.gameEngine = GameEngine.getInstance();
+			rL = PromWeek.assets.ResourceLibrary.getInstance();
+			cif = CiFSingleton.getInstance();
+			this.addBackButton("Return to Main Menu");
+		}
+		
+		public function onCreationComplete():void
+		{
+			this.creditsImage.source = rL.uiIcons["credits"];
+		}
+		
+		public function addBackButton(buttonText:String):void {
+			var button:MainMenuButton = new MainMenuButton();
+			button.title = buttonText;
+			button.width = 270;
+			button.height = 45;
+			
+			var self:Object = this;
+			button.addEventListener("click", function(event:MouseEvent):void {
+				self.gameEngine.hudGroup.creditsScreen.visible = false;
+				self.gameEngine.currentState = "MainMenu";
+			});
+			backButtonSpot.addElement(button);
+		}
+		
+		
+		
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			/*if(gameEngine.classicPromColors) {
+				this.setStyle("styleName", "classicPromWeek");
+			}
+			else if(gameEngine.greenPromColors) {
+				this.setStyle("styleName", "greenColor");
+			}
+			else if(gameEngine.redPromColors) {
+				this.setStyle("styleName", "redColor");
+			}*/
+			this.invalidateProperties();
+		}
+			 
+			 ]]>
+		 </fx:Script>
+</s:Group>

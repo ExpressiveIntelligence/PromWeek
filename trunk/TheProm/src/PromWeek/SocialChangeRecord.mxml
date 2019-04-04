@@ -1,0 +1,659 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 styleName="classicPromWeek">
+	
+		 
+	<fx:Metadata>
+	</fx:Metadata>
+		
+	<fx:Declarations>
+		<fx:Number id="topPadding">10</fx:Number>
+		<fx:Number id="sidePadding">10</fx:Number>
+		
+		<fx:Number id="nextPrevButtonUpColor">0x3B7BCB</fx:Number>
+		<fx:Number id="nextPrevButtonDownColor">0x29578E</fx:Number>
+		
+		<fx:Number id="nextPrevButtonWidth">25</fx:Number>
+	</fx:Declarations>
+		 
+	
+	<s:Group id="secondaryStatusIconGroup" width="100%" height="100%" left="0" top="0">
+		<prom:StatusIconTwoChar id="secondaryStatus1" left="{sidePadding}" top="{topPadding}" width="{width/4 - 2*sidePadding}" height="{this.height - topPadding*2}" click="onSocialChangeFirstClicked();" />
+		<prom:SFDBNotificationIcon id="secondarySFDB1" left="{sidePadding}" top="{topPadding}" width="{width/4 - 2*sidePadding}" height="{this.height - topPadding*2}" click="onSocialChangeFirstClicked();" visible="false" />
+		<prom:RelationshipIconTwoChar id="relationshipIcon1" left="{sidePadding}" top="{topPadding}" width="{width/4 - 2*sidePadding}" height="{this.height - topPadding*2}"  click="onSocialChangeFirstClicked();"/>
+		<prom:NetworkIconTwoChar id="networkIcon1" left="{sidePadding}" top="{topPadding}" width="{width/4 - 2*sidePadding}" height="{this.height - topPadding*2}"  click="onSocialChangeFirstClicked();"/>
+		<s:Line id="line1" xFrom="{this.width/4}" yFrom="0" xTo="{this.width/4}" yTo="{this.height}" visible="false">
+					<s:stroke>
+						<s:SolidColorStroke color="{getStyle('backgroundStroke')}" alpha="1.0" weight="5" />
+					</s:stroke>
+				</s:Line>
+		<prom:StatusIconTwoChar id="secondaryStatus2" left="{this.width/4 + sidePadding}" top="{topPadding}" width="{this.width/4 - 2*sidePadding}" height="{this.height - topPadding*2}" click="onSocialChangeSecondClicked();"/>
+		<prom:SFDBNotificationIcon id="secondarySFDB2" left="{this.width/4 + sidePadding}" top="{topPadding}" width="{this.width/4 - 2*sidePadding}" height="{this.height - topPadding*2}" click="onSocialChangeSecondClicked();" visible="false"/>
+		<prom:RelationshipIconTwoChar id="relationshipIcon2" left="{this.width/4 + sidePadding}" top="{topPadding}" width="{this.width/4 - 2*sidePadding}" height="{this.height - topPadding*2}" click="onSocialChangeSecondClicked();" />
+		<prom:NetworkIconTwoChar id="networkIcon2" left="{this.width/4 + sidePadding}" top="{topPadding}" width="{this.width/4 - 2*sidePadding}" height="{this.height - topPadding*2}" click="onSocialChangeSecondClicked();"/>
+		<s:Line id="line2" xFrom="{this.width/2}" yFrom="0" xTo="{this.width/2}" yTo="{this.height}" visible="false">
+					<s:stroke>
+						<s:SolidColorStroke color="{getStyle('backgroundStroke')}" alpha="1.0" weight="5" />
+					</s:stroke>
+				</s:Line>
+		<prom:StatusIconTwoChar id="secondaryStatus3" left="{this.width/2 + sidePadding}" top="{topPadding}" width="{this.width/4 - 2*sidePadding}" height="{this.height - topPadding*2}" click="onSocialChangeThirdClicked();"/>
+		<prom:SFDBNotificationIcon id="secondarySFDB3" left="{this.width/2 + sidePadding}" top="{topPadding}" width="{this.width/4 - 2*sidePadding}" height="{this.height - topPadding*2}" click="onSocialChangeThirdClicked();" visible="false"/>
+		<prom:RelationshipIconTwoChar id="relationshipIcon3" left="{this.width/2 + sidePadding}" top="{topPadding}" width="{this.width/4 - 2*sidePadding}" height="{this.height - topPadding*2}" click="onSocialChangeThirdClicked();"/>
+		<prom:NetworkIconTwoChar id="networkIcon3" left="{this.width/2 + sidePadding}" top="{topPadding}" width="{this.width/4 - 2*sidePadding}" height="{this.height - topPadding*2}" click="onSocialChangeThirdClicked();"/>
+		<s:Line id="line3" xFrom="{3 * this.width/4}" yFrom="0" xTo="{3 * this.width/4}" yTo="{this.height}" visible="false">
+					<s:stroke>
+						<s:SolidColorStroke color="{getStyle('backgroundStroke')}" alpha="1.0" weight="5" />
+					</s:stroke>
+				</s:Line>
+		<prom:StatusIconTwoChar id="secondaryStatus4" left="{3 * this.width/4 + sidePadding}" top="{topPadding}" width="{this.width/4 - 2*sidePadding}" height="{this.height - topPadding*2}" click="onSocialChangeFourthClicked();"/>
+		<prom:SFDBNotificationIcon id="secondarySFDB4" left="{3 * this.width/4 + sidePadding}" top="{topPadding}" width="{this.width/4 - 2*sidePadding}" height="{this.height - topPadding*2}" click="onSocialChangeFourthClicked();" visible="false"/>
+		<prom:RelationshipIconTwoChar id="relationshipIcon4" left="{3 * this.width/4 + sidePadding}" top="{topPadding}" width="{this.width/4 - 2*sidePadding}" height="{this.height - topPadding*2}" click="onSocialChangeFourthClicked();"/>
+		<prom:NetworkIconTwoChar id="networkIcon4" left="{3 * this.width/4 + sidePadding}" top="{topPadding}" width="{this.width/4 - 2*sidePadding}" height="{this.height - topPadding*2}" click="onSocialChangeFourthClicked();"/>
+	</s:Group>
+	
+	<prom:NextPrevButton id="previousGroup" visible="false" left="{-nextPrevButtonWidth}" top="0" width="{nextPrevButtonWidth}" height="100%" click="prev();" isNext="false" isPrev="true"/>
+	<!--<s:Group id="previousGroup" visible="false" left="{-nextPrevButtonWidth}" top="0" width="{nextPrevButtonWidth}" height="100%" click="prev();" >
+		<s:Line xFrom="{nextPrevButtonWidth}" yFrom="0" xTo="0" yTo="{this.height/2}">
+			<s:stroke>
+				<s:SolidColorStroke color="black" alpha="1.0" weight="3" />
+			</s:stroke>
+		</s:Line>
+		<s:Line xFrom="0" yFrom="{this.height/2}" xTo="{nextPrevButtonWidth}" yTo="{this.height}">
+			<s:stroke>
+				<s:SolidColorStroke color="{getStyle('backgroundStroke')}" alpha="1.0" weight="3" />
+			</s:stroke>
+		</s:Line>	
+	</s:Group>-->
+		
+	<prom:NextPrevButton id="nextGroup" visible="false" x="{this.width}" y="0" width="{nextPrevButtonWidth}" height="100%" click="nextOne();" isNext="true" isPrev="false"/>
+	<!--<s:Group id="nextGroup" visible="false" x="{this.width}" y="0" width="{nextPrevButtonWidth}" height="100%" click="nextOne();" >
+		<s:Line xFrom="0" yFrom="0" xTo="{nextPrevButtonWidth}" yTo="{this.height/2}">
+			<s:stroke>
+				<s:SolidColorStroke color="black" alpha="1.0" weight="3" />
+			</s:stroke>
+		</s:Line>
+		<s:Line xFrom="{nextPrevButtonWidth}" yFrom="{this.height/2}" xTo="0" yTo="{this.height}">
+			<s:stroke>
+				<s:SolidColorStroke color="{getStyle('backgroundStroke')}" alpha="1.0" weight="3" />
+			</s:stroke>
+		</s:Line>	
+	</s:Group>-->
+	
+	<!--<util:SmoothImage id="previous" click="prev();"  left="-75" top="15" />-->
+	<!--<util:SmoothImage id="next" click="nextOne();"  left="400" top="15" />-->
+	
+	<fx:Script>
+		<![CDATA[
+		import CiF.CiFSingleton;
+		import flash.geom.Rectangle;
+		import flash.geom.Vector3D;
+		import flash.text.TextField;
+		import flash.text.TextFormat;
+		import flashx.textLayout.utils.CharacterUtil;
+		import mx.controls.Button;
+		import spark.components.Group;
+		import spark.components.Button;
+		import mx.graphics.SolidColor;
+		import mx.graphics.SolidColorStroke;
+		import spark.components.RichText;
+		import spark.primitives.*;
+		import flash.text.TextField;
+		import spark.components.Label;
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import flash.events.*;
+		import spark.filters.*;
+		import CiF.*;
+		import PromWeek.assets.ResourceLibrary;
+			
+			
+		public var socialChanges:Vector.<SocialChange> = new Vector.<SocialChange>(); // all of the social changes that make this up.
+		private var rectangle:Rectangle;
+		public var mainBodyFill:SolidColor;
+		public var mainBodyStroke:SolidColorStroke;
+		private var mainBody:Rect;
+		public var innerBodyStroke:SolidColorStroke;
+		public var vectorIndex:int;
+		private var NUM_THINGS_TO_SHOW:int = 4;
+		
+		private var resourceLibrary:PromWeek.assets.ResourceLibrary;
+		private var gameEngine:PromWeek.GameEngine;
+		
+		override protected function createChildren():void {
+			
+			//trace("Initializing SocialChangeRecord.mxml");
+			
+			//socialChanges = new Vector.<SocialChange>();
+			
+			mainBody = new Rect();
+			
+			vectorIndex = 0;
+			//NUM_THINGS_TO_SHOW = 4;
+			
+			//mainBodyFill= new SolidColor(0x1F497D, .4); //The Inner Fill (Color, Alpha (1.0 = completely solid))
+			mainBodyFill= new SolidColor(getStyle('contentAreaColor'), .8); //The Inner Fill (Color, Alpha (1.0 = completely solid))
+			mainBodyStroke = new SolidColorStroke(getStyle('backgroundStroke'), getStyle('backgroundStrokeWeight')); //THE BORDER
+			mainBodyStroke.weight = 6;
+			this.mainBody.x = 0;
+			this.mainBody.y = 0;
+			this.mainBody.height = this.height;
+			this.mainBody.width = this.width;//1080;
+			this.mainBody.stroke = mainBodyStroke;
+			this.mainBody.fill = mainBodyFill;
+			this.addElement(mainBody);
+			
+			SocialChange.currentGroup = 0;
+
+			
+			//this.previous.data = new String("M 0 0 L " + -previous.width + " " + this.height / 2 + " L 0 " + this.height); 
+			
+
+			
+			this.setElementIndex(this.secondaryStatusIconGroup, this.numElements - 1);
+			super.createChildren();
+		}
+			
+		
+		protected override function commitProperties():void {
+			super.commitProperties();
+			if(this.mainBodyStroke && this.mainBodyFill) {
+				this.mainBodyStroke = new SolidColorStroke(getStyle("contentAreaStroke"));
+				this.mainBodyFill = new SolidColor(getStyle("contentAreaAltColor"));
+			}
+		}
+		
+		
+		public function onCreationComplete():void {
+			//trace("SocialChangeRecord.mxml onCreationComplete...");
+			resourceLibrary = PromWeek.assets.ResourceLibrary.getInstance();
+			gameEngine = PromWeek.GameEngine.getInstance();
+			
+			//this.previous.source = resourceLibrary.socialChangeRecordArrows["previousgrey"];
+			//this.previous.scaleX = 2;
+			//this.previous.scaleY = 2;
+			//this.next.source = resourceLibrary.socialChangeRecordArrows["nextgrey"];
+			//this.next.scaleX = 2;
+			//this.next.scaleY = 2;
+		}
+		
+		/**
+		 * This function simply calls 'prev' a bunch to get us back to the 'beginning' (because adding a new one adds it to the
+		 * end, and so maybe you want the social change record to be set at the beginning, maybe?)
+		 */
+		public function rewindToBeginning():void {
+			while (vectorIndex > 0) {
+				this.prev();
+			}
+			
+			//this.initializeToInvisible();
+			
+			/*
+			this.invalidateProperties();
+			this.invalidateSize();
+			this.invalidateDisplayList();
+			*/
+		}
+		
+		/**
+		 * This function is called after all of the social changes of interest have been pushed into the
+		 * socialChanges vector.  It then calls 'fillBoxes', which essentially takes the first four items
+		 * in the vector and plops them into the social change record for iconic representation.  It also makes
+		 * sure that the 'prev' and 'next' arrows are set up nicely.
+		 */
+		public function initialBoxFill():void {
+			vectorIndex = 0;
+			fillBoxes();
+			
+			//Figure out how many guys we've got.  We may need to enable them to push 'next' right away.
+			if (socialChanges.length > 4) {
+				nextGroup.visible = true;
+			}
+			else {
+				nextGroup.visible = false;
+			}
+			
+			//They will never need to push 'prev' in the initial state
+			previousGroup.visible = false;
+		}
+		
+		/**
+		 * Fills the 4 'slots' or 'boxes' of the social change record with the appropriate icon.
+		 */
+		public function fillBoxes():void {
+			//Just for now, we are going to assume we have at least four.
+			//BOX NUMBER 1
+			if(socialChanges.length > 0){
+				if (socialChanges[vectorIndex + 0].type == "status") {
+					//trace ("first is a status");
+					relationshipIcon1.visible = false;
+					networkIcon1.visible = false;
+					secondarySFDB1.visible = false;
+					updateRecordIconStatus(this.secondaryStatus1, 0, socialChanges[vectorIndex + 0]);
+					secondaryStatus1.visible = true;
+					
+				}
+				else if (socialChanges[vectorIndex + 0].type == "sfdb") {
+					//trace ("first is a relationship");
+					secondaryStatus1.visible = false;
+					networkIcon1.visible = false;
+					updateRecordIconSFDB(this.secondarySFDB1, 0, socialChanges[vectorIndex + 0]);
+					secondarySFDB1.visible = true;
+					relationshipIcon1.visible = false;
+				}
+				else if (socialChanges[vectorIndex + 0].type == "relationship") {
+					//trace ("first is a relationship");
+					secondaryStatus1.visible = false;
+					networkIcon1.visible = false;
+					secondarySFDB1.visible = false;
+					updateRecordIconRelationship(this.relationshipIcon1, 0, socialChanges[vectorIndex + 0]);
+					relationshipIcon1.visible = true;
+				}
+				else if (socialChanges[vectorIndex + 0].type == "network") {
+					//trace ("first is a network");
+					secondaryStatus1.visible = false;
+					relationshipIcon1.visible = false;
+					secondarySFDB1.visible = false;
+					updateRecordIconNetwork(this.networkIcon1, 0, socialChanges[vectorIndex + 0]);
+					networkIcon1.visible = true;
+				}
+			}
+			//BOX NUMBER 2
+			if(socialChanges.length > 1){
+				if (socialChanges[vectorIndex + 1].type == "status") {
+					relationshipIcon2.visible = false;
+					updateRecordIconStatus(this.secondaryStatus2, 1, socialChanges[vectorIndex + 1]);
+					secondaryStatus2.visible = true;
+					networkIcon2.visible = false;
+					secondarySFDB2.visible = false;
+				}
+				else if (socialChanges[vectorIndex + 1].type == "sfdb") {
+					//trace ("first is a relationship");
+					secondaryStatus2.visible = false;
+					networkIcon2.visible = false;
+					updateRecordIconSFDB(this.secondarySFDB2, 1, socialChanges[vectorIndex + 1]);
+					secondarySFDB2.visible = true;
+					relationshipIcon2.visible = false;
+				}
+				else if (socialChanges[vectorIndex + 1].type == "relationship") {
+					relationshipIcon2.visible = true;
+					updateRecordIconRelationship(this.relationshipIcon2, 1, socialChanges[vectorIndex + 1]);
+					secondaryStatus2.visible = false;
+					networkIcon2.visible = false;
+					secondarySFDB2.visible = false;
+				}
+				else if (socialChanges[vectorIndex + 1].type == "network") {
+					networkIcon2.visible = true;
+					updateRecordIconNetwork(this.networkIcon2, 1, socialChanges[vectorIndex + 1]);
+					secondaryStatus2.visible = false;	
+					relationshipIcon2.visible = false;
+					secondarySFDB2.visible = false;
+				}
+			}
+			//BOX NUMBER 3
+			if(socialChanges.length > 2){
+				if (socialChanges[vectorIndex + 2].type == "status") {
+					relationshipIcon3.visible = false;
+					updateRecordIconStatus(this.secondaryStatus3, 2, socialChanges[vectorIndex + 2]);
+					secondaryStatus3.visible = true;
+					networkIcon3.visible = false;
+					secondarySFDB3.visible = false;
+				}
+				else if (socialChanges[vectorIndex + 2].type == "sfdb") {
+					//trace ("first is a relationship");
+					secondaryStatus3.visible = false;
+					networkIcon3.visible = false;
+					updateRecordIconSFDB(this.secondarySFDB3, 2, socialChanges[vectorIndex + 2]);
+					secondarySFDB3.visible = true;
+					relationshipIcon3.visible = false;
+				}
+				else if (socialChanges[vectorIndex + 2].type == "relationship") {
+					relationshipIcon3.visible = true;
+					updateRecordIconRelationship(this.relationshipIcon3, 2, socialChanges[vectorIndex + 2]);
+					secondaryStatus3.visible = false;
+					networkIcon3.visible = false;
+					secondarySFDB3.visible = false;
+				}
+				else if (socialChanges[vectorIndex + 2].type == "network") {
+					networkIcon3.visible = true;
+					updateRecordIconNetwork(this.networkIcon3, 2, socialChanges[vectorIndex + 2]);
+					secondaryStatus3.visible = false;
+					relationshipIcon3.visible = false;
+					secondarySFDB3.visible = false;
+				}
+			}
+			//BOX NUMBER 4
+			if(socialChanges.length > 3){
+				if (socialChanges[vectorIndex + 3].type == "status") {
+					relationshipIcon4.visible = false;
+					networkIcon4.visible = false;
+					secondarySFDB3.visible = false;
+					updateRecordIconStatus(this.secondaryStatus4, 3, socialChanges[vectorIndex + 3]);
+					secondaryStatus4.visible = true;
+					
+				}
+				else if (socialChanges[vectorIndex + 3].type == "sfdb") {
+					//trace ("first is a relationship");
+					secondaryStatus4.visible = false;
+					networkIcon4.visible = false;
+					updateRecordIconSFDB(this.secondarySFDB4, 3, socialChanges[vectorIndex + 3]);
+					secondarySFDB4.visible = true;
+					relationshipIcon4.visible = false;
+				}
+				else if (socialChanges[vectorIndex + 3].type == "relationship") {
+					secondaryStatus4.visible = false;
+					networkIcon4.visible = false;
+					secondarySFDB3.visible = false;
+					updateRecordIconRelationship(this.relationshipIcon4, 3,socialChanges[vectorIndex + 3]);
+					relationshipIcon4.visible = true;
+				}
+				else if (socialChanges[vectorIndex + 3].type == "network") {
+					secondaryStatus4.visible = false;
+					relationshipIcon4.visible = false;
+					secondarySFDB3.visible = false;
+					updateRecordIconNetwork(this.networkIcon4, 3, socialChanges[vectorIndex + 3]);
+					networkIcon4.visible = true;
+				}
+			}
+		}
+		
+		
+		/**
+		 * The handler function for the 'left arrow' being clicked.
+		 * Sets the vector index to one previous (assuming that we are not already at the beginning of the social changes vector)
+		 * and re-draws the social change record accordingly.
+		 */
+		public function prev():void {
+			//trace ("prev clicked! Vector index was: " + vectorIndex)
+			
+			this.initializeToInvisible();
+			
+			if (vectorIndex > 0)
+				vectorIndex -= 1;
+			else	
+				vectorIndex = 0;
+			//trace ("now it is: " + vectorIndex);
+			
+			//If there are nothing, then we want to return.
+			if (this.socialChanges.length == 0)
+				return;
+				
+			//Grey out the arrows if need be
+			if (vectorIndex == 0) {
+				//this.previous.fill = new SolidColor(nextPrevButtonUpColor, 0.8);
+				this.previousGroup.visible = false;
+				//this.previous.source = resourceLibrary.socialChangeRecordArrows["previousgrey"];
+			}
+			else {
+				//this.previous.fill = new SolidColor(nextPrevButtonDownColor, 0.8);
+				this.previousGroup.visible = true;
+				//this.previous.source = resourceLibrary.socialChangeRecordArrows["previous"];
+			}
+			if (this.socialChanges.length - vectorIndex <= 4) { // should be grade
+				//this.next.fill = new SolidColor(nextPrevButtonUpColor, 0.8);
+				this.nextGroup.visible = false;
+				//this.next.source = resourceLibrary.socialChangeRecordArrows["nextgrey"];
+			}
+			else {
+				//this.next.fill = new SolidColor(nextPrevButtonDownColor, 0.8);
+				this.nextGroup.visible = true;
+				//this.next.source = resourceLibrary.socialChangeRecordArrows["next"];
+			}
+			
+			fillBoxes();
+			
+			//Set up Dividers
+			setUpDividers();
+
+		}
+
+		
+		/**
+		 * The handler function for the 'right arrow' being clicked.
+		 * increments the vector index by one (assuming that we are not already at the end--note that
+		 * because four changes are drawn at a time, it is not the 'length' of the vector that marks the end
+		 * but rather the length - 3.)
+		 * and re-draws the social change record accordingly.
+		 */
+		public function nextOne():void {
+			//trace ("next clicked! Vector index was: " + vectorIndex);
+
+			this.initializeToInvisible();
+			
+			if (vectorIndex < socialChanges.length - NUM_THINGS_TO_SHOW)
+				vectorIndex += 1;
+			else {
+				vectorIndex = socialChanges.length - NUM_THINGS_TO_SHOW;
+				if (vectorIndex < 0) {
+					vectorIndex = 0;
+				}
+			}
+			
+			//If there are nothing, then we want to return.
+			if (this.socialChanges.length == 0)
+				return;
+			
+			//trace ("nw it is:  " + vectorIndex);
+			
+			//Grey out the arrows if need be
+			if (vectorIndex == 0) {
+				this.previousGroup.visible = false;
+			}
+			else {
+				this.previousGroup.visible = true;
+			}
+			if (this.socialChanges.length - vectorIndex <= 4) { // should be grey
+				this.nextGroup.visible = false;
+			}
+			else {
+				this.nextGroup.visible = true;
+			}
+			
+			fillBoxes();
+			
+			//Set up which dividers we need.
+			setUpDividers();
+
+		}
+
+		
+		/**
+		 * Updates an icon to be the appropriate picture and hover text, etc.
+		 * Most likely called after the 'next' or 'previous' buttons
+		 * have been pushed.
+		 * @param	the off-set of the vector index.
+		 */
+		private function updateRecordIconSFDB(secondarySFDB:PromWeek.SFDBNotificationIcon, i:int, socialChange:SocialChange):void {
+			if (socialChanges.length > vectorIndex + i) {
+				secondarySFDB.toolTip = socialChanges[vectorIndex + i].hoverText;
+				if (socialChanges[vectorIndex + i].typeID != -1 && socialChanges[vectorIndex + i].type.toLowerCase() == "sfdb")  {
+					var secondaryName:String = "";
+					if (socialChanges[vectorIndex + i].secondaryName != null) {
+						secondaryName = socialChanges[vectorIndex + i].secondaryName.toLowerCase();
+					}
+					secondarySFDB.loadImagesToIcon(socialChanges[vectorIndex + i].typeID, socialChanges[vectorIndex + i].primaryName.toLowerCase(), secondaryName, socialChange.pred);
+				}
+			}
+		}
+		
+		/**
+		 * Updates an icon to be the appropriate picture and hover text, etc.
+		 * Most likely called after the 'next' or 'previous' buttons
+		 * have been pushed.
+		 * @param	the off-set of the vector index.
+		 */
+		private function updateRecordIconStatus(secondaryStatus:StatusIconTwoChar, i:int, socialChange:SocialChange):void {
+			if (socialChanges.length > vectorIndex + i) {
+				secondaryStatus.toolTip = socialChanges[vectorIndex + i].hoverText;
+				if (socialChanges[vectorIndex + i].typeID != -1 && socialChanges[vectorIndex + i].type.toLowerCase() == "status")  {
+					var secondaryName:String = "";
+					if (socialChanges[vectorIndex + i].secondaryName != null) {
+						secondaryName = socialChanges[vectorIndex + i].secondaryName.toLowerCase();
+					}
+					secondaryStatus.loadStatusImagesToIcon(socialChanges[vectorIndex + i].typeID, socialChanges[vectorIndex + i].primaryName.toLowerCase(), secondaryName, socialChange.negated,socialChange.whyText, socialChange.pred); // DOESN'T TAKE NEGATED into account right now!
+				}
+			}
+		}
+		
+		//Similar to above function, but if the social change marked a change in a relationship (friends, dating, enemies).
+		private function updateRecordIconRelationship(relationshipIcon:RelationshipIconTwoChar, i:int, socialChange:SocialChange):void {
+			if(socialChanges.length > vectorIndex + i){
+				relationshipIcon.toolTip = socialChanges[vectorIndex + i].hoverText;
+				if (socialChanges[vectorIndex + i].typeID != -1 && socialChanges[vectorIndex + i].type.toLowerCase() == "relationship")  {
+					relationshipIcon.loadImagesToIcon(socialChange.typeID, socialChange.primaryName.toLowerCase(), socialChange.secondaryName.toLowerCase(),socialChange.negated,socialChange.whyText);
+				}
+			}
+		}
+		
+		//And this is for network values that have changed!
+		private function updateRecordIconNetwork(networkIcon:NetworkIconTwoChar, i:int, socialChange:SocialChange):void {
+			if(socialChanges.length > vectorIndex + i){
+				networkIcon.toolTip = socialChanges[vectorIndex + i].hoverText;
+				if (socialChanges[vectorIndex + i].typeID != -1 && socialChanges[vectorIndex + i].type.toLowerCase() == "network")  {
+					networkIcon.networkValue = socialChanges[vectorIndex + i].networkValue;
+					networkIcon.networkOperator = socialChanges[vectorIndex + i].comparator;
+					networkIcon.loadImagesToIcon(socialChanges[vectorIndex + i].typeID, socialChanges[vectorIndex + i].primaryName.toLowerCase(), socialChanges[vectorIndex + i].secondaryName.toLowerCase(),socialChange.negated, socialChange.whyText);
+					
+					var modifier:String = "";
+					if (socialChanges[vectorIndex + i].comparator == "+") modifier = "+";
+					else if (socialChanges[vectorIndex + i].comparator == "-") modifier = "-";
+					
+					//Print the number of the change in the appropriate color, based on the network involved.
+					if (socialChanges[vectorIndex + i].typeID == SocialNetwork.BUDDY)
+						networkIcon.networkValueText.setStyle("color", getStyle('buddyColor'));
+					if(socialChanges[vectorIndex + i].typeID == SocialNetwork.ROMANCE)
+						networkIcon.networkValueText.setStyle("color", getStyle('romanceColor'));
+					if(socialChanges[vectorIndex + i].typeID == SocialNetwork.COOL)
+						networkIcon.networkValueText.setStyle("color", getStyle('coolColor'));
+					
+					networkIcon.networkValueText.text = modifier 
+					networkIcon.networkValueText.text += networkIcon.networkValue.toString();
+				}
+			}
+		}
+		
+		/**
+		 * This is just a utility function that sets the index to the end
+		 * (i.e. the size of the vector).  This is so that whenever
+		 * a new thing is added, we always make sure that we see it appear
+		 * at the very end!
+		 */
+		public function setIndexToEnd():void {
+			this.vectorIndex = this.socialChanges.length - NUM_THINGS_TO_SHOW;
+		}
+		
+		/**
+		 * Just makes it so that every icon is invisible at the beginning.
+		 */
+		public function initializeToInvisible():void {
+			secondaryStatus1.visible = false;
+			secondaryStatus2.visible = false;
+			secondaryStatus3.visible = false;
+			secondaryStatus4.visible = false;
+			
+			relationshipIcon1.visible = false;
+			relationshipIcon2.visible = false;
+			relationshipIcon3.visible = false;
+			relationshipIcon4.visible = false;
+
+			networkIcon1.visible = false;
+			networkIcon2.visible = false;
+			networkIcon3.visible = false;
+			networkIcon4.visible = false;
+			
+			secondarySFDB1.visible = false;
+			secondarySFDB2.visible = false;
+			secondarySFDB3.visible = false;
+			secondarySFDB4.visible = false;
+		}
+			
+		/**
+		 * The handlers for when one of these little icons is clicked on.
+		 * Ultimately we will probably want something along the lines
+		 * of the 'what just happened' screen to pop up, or some other
+		 * kind of cool visualization of what just happened!
+		 */
+		public function onSocialChangeFirstClicked():void {
+			var changeICareABout:int = this.vectorIndex;
+			if(socialChanges.length > 0){
+				dispatchEvent(new Event("firstSocialChangeClicked", true, true));
+			}	
+		}
+		
+		//For when the second to left is clicked.
+		public function onSocialChangeSecondClicked():void {
+			var changeICareABout:int = this.vectorIndex + 1;
+			if(socialChanges.length > 1){
+				dispatchEvent(new Event("secondSocialChangeClicked", true, true));
+			}
+		}
+		
+		//For when the third to left is clicked.
+		public function onSocialChangeThirdClicked():void {
+			var changeICareABout:int = this.vectorIndex + 2;
+			if(socialChanges.length > 2){
+				dispatchEvent(new Event("thirdSocialChangeClicked", true, true));
+			}
+		}
+		
+		//For when the fourth to left is clicked.
+		public function onSocialChangeFourthClicked():void {
+			var changeICareABout:int = this.vectorIndex + 3;
+			if(socialChanges.length > 3){
+				dispatchEvent(new Event("fourthSocialChangeClicked", true, true));
+			}
+		}
+		
+		//makes the little lines appear between social changes if they came from different social games.
+		public function setUpDividers():void {
+			//Set up first divider.
+			//We want this divider if:
+			//1.) There are at least two pictures.
+			//2.) Specifically, picture 0 and picture 1 must have a different iD.
+			//A similar pattern follows for the rest of them.
+			if (socialChanges.length >= 2) {
+				if (socialChanges[vectorIndex + 0].groupID != socialChanges[vectorIndex + 1].groupID) {
+					line1.visible = true;
+				}
+				else {
+					line1.visible = false;
+				}
+			}
+			if (socialChanges.length >= 3) {
+				if (socialChanges[vectorIndex + 1].groupID != socialChanges[vectorIndex + 2].groupID) {
+					line2.visible = true;
+				}
+				else {
+					line2.visible = false;
+				}
+			}
+			if (socialChanges.length >= 4) {
+				if (socialChanges[vectorIndex + 2].groupID != socialChanges[vectorIndex + 3].groupID) {
+					line3.visible = true;
+				}
+				else {
+					line3.visible = false;
+				}
+			}
+		}
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			this.mainBodyFill = new SolidColor(this.getStyle("contentAreaStroke"));
+			this.mainBodyStroke = new SolidColorStroke(this.getStyle("contentAreaAltColor"));
+			this.nextGroup.setStyleName();
+			this.previousGroup.setStyleName();
+			this.invalidateProperties();
+		}
+		
+		]]>
+	</fx:Script>
+
+	
+</s:Group>

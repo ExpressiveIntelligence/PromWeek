@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 width="235" height="107" >
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+			 <fx:Number id="iconDim">20</fx:Number>
+		 </fx:Declarations>
+		 
+		 <util:SmoothImage id="thoughtBubbleImage" />
+		 
+		 <s:VGroup x="50" y="5" width="100%" height="100%" paddingLeft="15" paddingRight="15" paddingTop="15" paddingBottom="15">
+			<s:HGroup width="100%" height="33%">
+				<util:SmoothImage id="friendsIcon" width="{this.iconDim}" height="{this.iconDim}"/>
+				<s:RichText id="buddyText" width="100%" height="100%" textAlign="left" verticalAlign="middle" color="0x00FF00" styleName="subjectiveOpinionWords" />
+			</s:HGroup>
+			<s:HGroup width="100%" height="33%">
+				<util:SmoothImage id="datingIcon" width="{this.iconDim}" height="{this.iconDim}"/>
+				<s:RichText id="romText" width="100%" height="100%" textAlign="left" verticalAlign="middle" color="0xFF0000" styleName="subjectiveOpinionWords" />
+			</s:HGroup>
+			<s:HGroup width="100%" height="33%">
+				<util:SmoothImage id="enemiesIcon" width="{this.iconDim}" height="{this.iconDim}"/>
+				<s:RichText id="coolText" width="100%" height="100%" textAlign="left" verticalAlign="middle" color="0x0000FF" styleName="subjectiveOpinionWords" />
+			</s:HGroup>
+		 </s:VGroup>
+		 
+		 <s:VGroup id="directedStatusGroup" x="195" y="30">
+		 </s:VGroup>
+		 
+		 <util:SmoothImage id="objectOfThoughtImage" width="50" height="50" visible="false" x="10" y="30" />
+		 
+	<fx:Script>
+		<![CDATA[
+		import CiF.Character;
+		import CiF.CiFSingleton;
+		import CiF.RelationshipNetwork;
+		import CiF.Status;
+		import com.util.SmoothImage;
+		import flash.events.Event;
+		import flash.events.MouseEvent;
+		import flash.ui.Mouse;
+		import mx.effects.Glow;
+		import PromWeek.assets.ResourceLibrary;
+		import CiF.Debug;
+		import flash.filters.GlowFilter;
+		
+		
+		public var rL:ResourceLibrary;
+		public var cif:CiFSingleton;
+		public var currentPrimaryCharacter:Character;
+		public var currentSecondaryCharacter:Character;
+		
+		private var _objectOfThought:String;
+		
+		
+		
+		public function onCreationComplete():void 
+		{
+			rL = ResourceLibrary.getInstance();
+			cif = CiFSingleton.getInstance();
+			
+			thoughtBubbleImage.source = rL.uiIcons["thoughtBubble"];
+		}
+		
+		public function get objectOfThought():String
+		{
+			return this._objectOfThought;
+		}
+		public function set objectOfThought(str:String):void
+		{
+			this._objectOfThought = str;
+			
+			if (this._objectOfThought == "")
+			{
+				this.objectOfThoughtImage.visible = false;
+			}
+			else
+			{
+				this.objectOfThoughtImage.source = rL.charHeads[this._objectOfThought];
+				this.objectOfThoughtImage.visible = true;
+			}
+		}
+		
+		public function updateSubjectiveThoughtBubble(thinker:String,objectOfThought:String):void
+		{
+			
+			this.currentPrimaryCharacter = cif.cast.getCharByName(thinker);
+			this.currentSecondaryCharacter = cif.cast.getCharByName(objectOfThought);
+			
+			
+
+			var hasRelationship:Boolean;
+			var names:String = currentPrimaryCharacter.characterName + " and " + currentSecondaryCharacter.characterName;
+			//friends
+			hasRelationship = cif.relationshipNetwork.getRelationship(RelationshipNetwork.FRIENDS, currentPrimaryCharacter, currentSecondaryCharacter);
+			if (hasRelationship)
+			{
+				friendsIcon.source = rL.relationshipIcons["friends"];
+				friendsIcon.toolTip = names + " are friends";
+			}
+			else
+			{
+				friendsIcon.source = rL.relationshipIcons["notFriends"];
+				friendsIcon.toolTip = names + " are not friends";
+			}
+			
+			//dating
+			hasRelationship = cif.relationshipNetwork.getRelationship(RelationshipNetwork.DATING, currentPrimaryCharacter, currentSecondaryCharacter);
+			if (hasRelationship)
+			{
+				datingIcon.source = rL.relationshipIcons["dating"];
+				datingIcon.toolTip = names + " are dating";
+			}
+			else
+			{
+				datingIcon.source = rL.relationshipIcons["notDating"];
+				datingIcon.toolTip = names + " are not dating";
+			}
+			
+			//enemies
+			hasRelationship = cif.relationshipNetwork.getRelationship(RelationshipNetwork.ENEMIES, currentPrimaryCharacter, currentSecondaryCharacter);
+			if (hasRelationship)
+			{
+				enemiesIcon.source = rL.relationshipIcons["enemies"];
+				enemiesIcon.toolTip = names + " are enemies";
+			}
+			else
+			{
+				enemiesIcon.source = rL.relationshipIcons["notEnemies"];
+				enemiesIcon.toolTip = names + " are not enemies";
+			}
+			
+			buddyText.text = "My best pal!";
+			romText.text = "Ohhh la laa";
+			coolText.text = "Dorkity Dork";
+			
+			this.updateDirectedStatuses();
+
+		}
+		
+		public function updateDirectedStatuses():void
+		{
+			this.directedStatusGroup.removeAllElements();
+			
+			var status:Status;
+			var statusIcon:StatusIcon;
+			
+			var shouldDisplayStatus:Boolean;
+			for each (status in this.currentPrimaryCharacter.statuses)
+			{
+				shouldDisplayStatus = false;
+
+				if (status.type >= Status.FIRST_DIRECTED_STATUS && status.type < Status.STATUS_COUNT)
+				{
+					if (status.directedToward.toLowerCase() == this.currentSecondaryCharacter.characterName.toLowerCase())
+					{
+						shouldDisplayStatus = true;
+					}
+				}
+				
+				if (shouldDisplayStatus)
+				{
+					statusIcon = new PromWeek.StatusIcon();
+					statusIcon.width = 25;
+					statusIcon.height = 25;
+					statusIcon.loadStatusImagesToIcon(status.type, status.directedToward, status.remainingDuration);
+					this.directedStatusGroup.addElement(statusIcon);
+				}
+				
+			}
+		}
+		
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

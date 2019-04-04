@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Skin 
+    xmlns:fx="http://ns.adobe.com/mxml/2009" 
+    xmlns:s="library://ns.adobe.com/flex/spark"  
+	creationComplete="onCreationComplete()"
+	xmlns:util="com.util.*"
+    alpha.disabled="0.5"
+	width="{hostComponent.width}" height="{hostComponent.height}"> 
+ 
+     <fx:Metadata> 
+        [HostComponent("PromWeek.NEW_socialExchangeButton")] 
+    </fx:Metadata> 
+ 
+    <s:states> 
+		<!-- Not used -->
+		 <s:State name="up" />
+		 <s:State name="over" />
+		 <s:State name="down" />
+		 <s:State name="disabled" />
+		 
+		 <!-- Used -->
+		 <s:State name="unlockedOver" enterState="onEnterState(event)"/>
+		 <s:State name="unlockedUp" enterState="onEnterState(event)"/>
+		 <s:State name="unlockedDown" enterState="onEnterState(event)"/>
+		 <s:State name="lockedOver" enterState="onEnterState(event)"/>
+		 <s:State name="lockedUp" enterState="onEnterState(event)"/>
+		 <s:State name="lockedDown" enterState="onEnterState(event)"/>
+    </s:states>
+ 
+    <util:SmoothImage id="lockedUpImage" width="{hostComponent.width}" height="{hostComponent.height}"  maintainAspectRatio="false"/>
+    <util:SmoothImage id="lockedOverImage" width="{hostComponent.width}" height="{hostComponent.height}" maintainAspectRatio="false"/>
+    <util:SmoothImage id="lockedDownImage" width="{hostComponent.width}" height="{hostComponent.height}" maintainAspectRatio="false"/>
+	
+	<util:SmoothImage id="unlockedUpImage" visible="false" width="{hostComponent.width}" height="{hostComponent.height}" maintainAspectRatio="false"/>
+    <util:SmoothImage id="unlockedOverImage" visible="false" width="{hostComponent.width}" height="{hostComponent.height}" maintainAspectRatio="false"/>
+    <util:SmoothImage id="unlockedDownImage" width="{hostComponent.width}" height="{hostComponent.height}" maintainAspectRatio="false"/>
+ 
+	<s:VGroup width="100%" height="100%" verticalAlign="middle" paddingLeft="10">
+		<util:SmoothImage id="lockImage" visible="{hostComponent.locked}" width="60%" />
+	</s:VGroup>
+	
+	<!--<s:VGroup x="0" y="0" width="100%" height="100%" verticalAlign="middle" paddingTop="5" paddingBottom="5" paddingRight="5">-->
+		<util:SmoothImage id="socialExchangeIntentImage" y="5" width="19" height="19" alpha="0.6" />
+	<!--</s:VGroup>-->
+	
+	
+	<s:Label id="labelDisplay" 
+			 color="#000000"
+			 width="{hostComponent.width}" height="{hostComponent.height}"
+			 textAlign="center" 
+			 fontSize="14" fontSize.over="16" fontSize.down="16"
+			 styleName="socialExchangeButton"
+			 verticalAlign="middle" />
+ 
+    <fx:Script> 
+        <![CDATA[
+			import CiF.Predicate;
+			import flash.events.Event;
+			import PromWeek.assets.ResourceLibrary;
+		
+			public var rL:ResourceLibrary;
+		
+			public function onCreationComplete():void 
+			{
+				rL = ResourceLibrary.getInstance();
+				
+				this.lockImage.source = rL.uiIcons["lock"];
+				this.lockedUpImage.source = rL.uiIcons["lockedSocialExchangeButtonUp"];
+				this.lockedDownImage.source = rL.uiIcons["lockedSocialExchangeButtonDown"];
+				this.lockedOverImage.source = rL.uiIcons["lockedSocialExchangeButtonOver"];
+				this.unlockedUpImage.source = rL.uiIcons["unlockedSocialExchangeButtonUp"];
+				this.unlockedDownImage.source = rL.uiIcons["unlockedSocialExchangeButtonDown"];
+				this.unlockedOverImage.source = rL.uiIcons["unlockedSocialExchangeButtonOver"];
+			}
+		
+			
+			override protected function updateDisplayList(w:Number, h:Number):void {
+				super.updateDisplayList(w,h);
+				var offset:Number = 0;
+				var networkXOffset:Number = 5;
+				switch (hostComponent.intentPred.getIntentType())
+				{
+					case Predicate.INTENT_BUDDY_DOWN:
+						this.socialExchangeIntentImage.source = rL.networkArrowIcons["buddyDown"];
+						offset = networkXOffset;
+						break;
+					case Predicate.INTENT_BUDDY_UP:
+						this.socialExchangeIntentImage.source = rL.networkArrowIcons["buddyUp"];
+						offset = networkXOffset;
+						break;
+					case Predicate.INTENT_ROMANCE_DOWN:
+						this.socialExchangeIntentImage.source = rL.networkArrowIcons["romanceDown"];
+						offset = networkXOffset;
+						break;
+					case Predicate.INTENT_ROMANCE_UP:
+						this.socialExchangeIntentImage.source = rL.networkArrowIcons["romanceUp"];
+						offset = networkXOffset;
+						break;
+					case Predicate.INTENT_COOL_DOWN:
+						this.socialExchangeIntentImage.source = rL.networkArrowIcons["coolDown"];
+						offset = networkXOffset;
+						break;
+					case Predicate.INTENT_COOL_UP:
+						this.socialExchangeIntentImage.source = rL.networkArrowIcons["coolUp"];
+						offset = networkXOffset;
+						break;
+					case Predicate.INTENT_FRIENDS:
+						this.socialExchangeIntentImage.source = rL.relationshipIcons["friends"];
+						break;
+					case Predicate.INTENT_END_FRIENDS:
+						this.socialExchangeIntentImage.source = rL.relationshipIcons["endFriends"];
+						break;
+					case Predicate.INTENT_DATING:
+						this.socialExchangeIntentImage.source = rL.relationshipIcons["dating"];
+						break;
+					case Predicate.INTENT_END_DATING:
+						this.socialExchangeIntentImage.source = rL.relationshipIcons["endDating"];
+						break;
+					case Predicate.INTENT_ENEMIES:
+						this.socialExchangeIntentImage.source = rL.relationshipIcons["enemies"];
+						break;
+					case Predicate.INTENT_END_ENEMIES:
+						this.socialExchangeIntentImage.source = rL.relationshipIcons["endEnemies"];
+						break;
+				}
+				this.socialExchangeIntentImage.x = this.width - this.socialExchangeIntentImage.width + offset - 7;
+			}
+			
+			public function onEnterState(e:Event):void
+			{
+				
+				if (e.currentTarget.name == "unlockedUp")
+				{
+					this.lockedUpImage.visible = false;
+					this.lockedDownImage.visible = false;
+					this.lockedOverImage.visible = false;
+					this.unlockedUpImage.visible = true;
+					this.unlockedDownImage.visible = false;
+					this.unlockedOverImage.visible = false;
+					
+					this.lockImage.visible = false;
+				}
+				else if (e.currentTarget.name == "unlockedDown")
+				{
+					this.lockedUpImage.visible = false;
+					this.lockedDownImage.visible = false;
+					this.lockedOverImage.visible = false;
+					this.unlockedUpImage.visible = false;
+					this.unlockedDownImage.visible = true;
+					this.unlockedOverImage.visible = false;
+					
+					this.lockImage.visible = false;
+				}
+				else if (e.currentTarget.name == "unlockedOver")
+				{
+					this.lockedUpImage.visible = false;
+					this.lockedDownImage.visible = false;
+					this.lockedOverImage.visible = false;
+					this.unlockedUpImage.visible = false;
+					this.unlockedDownImage.visible = false;
+					this.unlockedOverImage.visible = true;
+					
+					this.lockImage.visible = false;
+				}
+				else if (e.currentTarget.name == "lockedUp")
+				{
+					this.lockedUpImage.visible = true;
+					this.lockedDownImage.visible = false;
+					this.lockedOverImage.visible = false;
+					this.unlockedUpImage.visible = false;
+					this.unlockedDownImage.visible = false;
+					this.unlockedOverImage.visible = false;
+					
+					this.lockImage.visible = true;
+				}
+				else if (e.currentTarget.name == "lockedDown")
+				{
+					this.lockedUpImage.visible = false;
+					this.lockedDownImage.visible = true;
+					this.lockedOverImage.visible = false;
+					this.unlockedUpImage.visible = false;
+					this.unlockedDownImage.visible = false;
+					this.unlockedOverImage.visible = false;
+					
+					this.lockImage.visible = true;
+				}
+				else if (e.currentTarget.name == "lockedOver")
+				{
+					this.lockedUpImage.visible = false;
+					this.lockedDownImage.visible = false;
+					this.lockedOverImage.visible = true;
+					this.unlockedUpImage.visible = false;
+					this.unlockedDownImage.visible = false;
+					this.unlockedOverImage.visible = false;
+					
+					this.lockImage.visible = true;
+				}
+			}
+           
+        ]]>
+    </fx:Script> 
+	
+	
+</s:Skin >

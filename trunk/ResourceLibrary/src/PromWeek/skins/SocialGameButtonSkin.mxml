@@ -1,0 +1,219 @@
+﻿<s:Skin 
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/mx" 
+	xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+	minWidth="21" minHeight="21"
+	alpha="1.0"
+	alpha.over="1.0"
+	alpha.down="1.0">
+
+	<fx:Metadata>[HostComponent("PromWeek.SocialGameButton")]</fx:Metadata>
+    
+	<fx:Declarations>
+		<fx:Number id="backgroundFillColor">0x1F497D</fx:Number>
+		<fx:Number id="borderColor">0x000000</fx:Number>
+		<fx:Number id="textColor">0x000000</fx:Number>
+	</fx:Declarations>
+	
+    <!-- states -->
+    <s:states>
+		<s:State name="normal" />
+        <s:State name="up" />
+        <s:State name="over" />
+        <s:State name="down" />
+        <s:State name="disabled" />
+    </s:states>
+	
+	
+	<s:Group>
+		<s:Rect id="buttonBody" width="100%" height="100%" x="0" y="0" topRightRadiusX="20" topRightRadiusY="20" bottomLeftRadiusX="20" bottomLeftRadiusY="20" alpha="1.0" alpha.over="1.0" alpha.down="1.0" >		
+			<s:fill>
+				<s:SolidColor color="{this.backgroundFillColor}" />
+			</s:fill>
+			<s:stroke>
+				<s:SolidColorStroke color="{this.borderColor}" weight="2" />
+			</s:stroke>
+		</s:Rect>
+		<s:HGroup paddingBottom="3" paddingTop="3" paddingLeft="3" paddingRight="3">	
+			<s:Label id="labelDisplay" color="{this.textColor}" text="{hostComponent.label}" textAlign="center" verticalAlign="middle" maxDisplayedLines="1" horizontalCenter="0" verticalCenter="1" left="10" right="10" top="2" bottom="2" creationComplete="onCreationComplete()" />
+			<prom:RelationshipButtonIcon id="relIcon" visible="{hostComponent.showRelationshipIcon}" />
+		</s:HGroup>	 
+	</s:Group>
+ 
+	 
+	<fx:Script>
+		<![CDATA[
+		
+		import CiF.Debug;
+		import CiF.RelationshipNetwork;
+		import CiF.SocialFactsDB;
+		import mx.graphics.SolidColor;
+		import mx.graphics.Stroke;
+		import spark.skins.spark.ButtonSkin;
+		import flash.display.Graphics;
+		import PromWeek.SocialGameButton;
+		import PromWeek.RelationshipButtonIcon;
+		import PromWeek.GameEngine;
+		
+		private var alphaValue:Number = 1.0;
+		
+		public function onCreationComplete():void {
+		}
+		
+		override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void
+		{
+			super.updateDisplayList(unscaledWidth, unscaledHeight);
+			var gameEngine:GameEngine = GameEngine.getInstance();
+			//Debug.debug(this, "updateDisplayList() entered." );
+			if (gameEngine.currentState == "Interaction" || gameEngine.currentState == "Performance" || gameEngine.currentState == "Results" || gameEngine.currentState == "LevelObjective" || gameEngine.currentState == "Pause") {
+				if (hostComponent) {
+					//Debug.debug(this, "updateDisplayList() game name: " + (hostComponent as SocialGameButton).label);
+					switch ((hostComponent as SocialGameButton).getIntentCategory()) {
+						case SocialGameButton.BUDDY:
+							styleAsBuddyIntent();
+							break;
+						case SocialGameButton.ROMANCE:
+							styleAsRomanceIntent();
+							break;
+						case SocialGameButton.COOL:
+							styleAsCoolIntent();
+							break;
+						case SocialGameButton.ENDING:
+							styleAsEnding();
+							break;
+						default:
+							styleAsDefault();
+					}
+					//labelDisplay.text = (hostComponent as SocialGameButton).label;
+					if ((hostComponent as SocialGameButton).showRelationshipIcon) {
+						var relationshipType:Number;
+						var negated:Boolean = false;
+						switch ((hostComponent as SocialGameButton).relationshipTypeChanged) {
+							case SocialGameButton.FRIENDS_CHANGE:
+								relationshipType = RelationshipNetwork.FRIENDS;															
+								break;
+							case SocialGameButton.NOT_FRIENDS_CHANGE:
+								relationshipType = RelationshipNetwork.FRIENDS;															
+								break;
+							case SocialGameButton.DATING_CHANGE:
+								relationshipType = RelationshipNetwork.DATING;
+								break;
+							case SocialGameButton.NOT_DATING_CHANGE:
+								relationshipType = RelationshipNetwork.DATING;
+								break;
+							case SocialGameButton.ENEMIES_CHANGE:
+								relationshipType = RelationshipNetwork.ENEMIES;
+								break;
+							case SocialGameButton.NOT_ENEMIES_CHANGE:
+								relationshipType = RelationshipNetwork.ENEMIES;
+								break;
+						}
+						//this.relIcon = new RelationshipButtonIcon();
+						//give it an icon
+						//this.relIcon.loadRelationshipImagesToIcon(relationshipType, negated);
+						if ((hostComponent as SocialGameButton).showRelationshipIcon) {
+							this.relIcon.loadRelationshipImagesToIcon((hostComponent as SocialGameButton).relationshipTypeChanged, (hostComponent as SocialGameButton).showNegated);
+						} 
+					}
+				}
+
+				//this.buttonBody.stroke = new Stroke(backgroundFillColor*0.8, 2, 1.0);
+				//this.buttonBody.fill = new SolidColor(backgroundFillColor);
+			}
+			
+			//this.buttonBody.width = unscaledWidth;
+			//this.buttonBody.height = unscaledHeight;
+			//
+			/*graphics.clear();
+			graphics.lineStyle(2, 0x000033, 1.0);
+			graphics.beginFill(backgroundFillColor, alphaValue);
+			
+			graphics.drawRoundRectComplex(0, 0, unscaledWidth, unscaledHeight, 0, 20, 20, 0);
+			graphics.endFill();
+			*/
+		}
+		
+		private function styleAsBuddyIntent():void {
+			switch (currentState) {
+				case "normal":
+				case "up":
+						backgroundFillColor = GameEngine.BUDDY_COLOR;
+						break;
+				case "over":
+						backgroundFillColor = GameEngine.BUDDY_COLOR;
+						break;
+				case "down":
+						backgroundFillColor = GameEngine.BUDDY_COLOR;
+						break;
+			}
+			this.textColor = 0x000000;
+		}
+		
+		private function styleAsRomanceIntent():void {
+			switch (currentState) {
+				case "normal":
+				case "up":
+						backgroundFillColor = GameEngine.ROMANCE_COLOR;
+						break;
+				case "over":
+						backgroundFillColor = GameEngine.ROMANCE_COLOR;
+						break;
+				case "down":
+						backgroundFillColor = GameEngine.ROMANCE_COLOR;
+						break;
+			}
+			this.textColor = 0x000000;
+		}
+		
+		private function styleAsCoolIntent():void {
+			switch (currentState) {
+				case "normal":
+				case "up":
+						backgroundFillColor = GameEngine.COOL_COLOR;
+						break;
+				case "over":
+						backgroundFillColor = GameEngine.COOL_COLOR;
+						break;
+				case "down":
+						backgroundFillColor = GameEngine.COOL_COLOR;
+						break;
+			}
+			this.textColor = 0xFFFFFF;
+		}
+		//0x3B7BCB
+		private function styleAsEnding():void {
+			switch (currentState) {
+				case "normal":
+				case "up":
+						backgroundFillColor = GameEngine.ENDING_DEFAULT;
+						break;
+				case "over":
+						backgroundFillColor = GameEngine.ENDING_HOVER;
+						break;
+				case "down":
+						backgroundFillColor = GameEngine.ENDING_DOWN;
+						break;
+			}
+			this.textColor = 0x000000;
+		}
+		//0x3B7BCB
+		private function styleAsDefault():void {
+			switch (currentState) {
+				case "normal":
+				case "up":
+						backgroundFillColor = GameEngine.DEFAULT_BLUE;
+						break;
+				case "over":
+						backgroundFillColor = GameEngine.DEFAULT_BLUE;
+						break;
+				case "down":
+						backgroundFillColor = GameEngine.DEFAULT_BLUE;
+						break;
+			}
+			this.textColor = 0x000000;
+		}
+
+		]]>
+	</fx:Script>
+</s:Skin>

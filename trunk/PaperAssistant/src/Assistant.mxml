@@ -1,0 +1,540 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<s:Application 
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark"
+	xmlns:mx = "library://ns.adobe.com/flex/halo"
+	xmlns:local = "*"
+	minWidth = "1280"
+	width="1280"
+	minHeight="1024"
+	frameRate="30"
+	creationComplete="onCreationComplete()">
+		
+		<fx:Declarations>
+			<fx:XML id="personalityDescriptions" source="personality-descriptions.xml" />
+			<fx:XML id="socialGames" source="social-games.xml" />
+			<mx:ArrayCollection id="characterNames" >
+				<fx:String>Mave</fx:String>
+				<fx:String>Edward</fx:String>
+				<fx:String>Bruce</fx:String>
+				<fx:String>Lily</fx:String>
+				<fx:String>Robert</fx:String>
+				<fx:String>Karen</fx:String>
+			</mx:ArrayCollection>
+			<fx:Vector id="goths" type="String">
+				<fx:String>Mave</fx:String>
+				<fx:String>Edward</fx:String>
+				<fx:String>Bruce</fx:String>
+			</fx:Vector>
+			<fx:Vector id="emos" type="String">
+				<fx:String>Lily</fx:String>
+				<fx:String>Robert</fx:String>
+				<fx:String>Karen</fx:String>
+			</fx:Vector>
+		</fx:Declarations>
+		
+		<s:layout>
+			<s:VerticalLayout/>
+		</s:layout>
+		
+		
+		<s:Panel id="charStatePanel" title="Character State" width="100%" height="200">
+			<s:layout>
+				<s:TileLayout/>
+			</s:layout>
+			<local:Character id="mave" type="goth" activeButtonClick="updateActivityLists" />
+			<local:Character id="edward" type="goth" activeButtonClick="updateActivityLists" />
+			<local:Character id="bruce" type="goth" activeButtonClick="updateActivityLists" />
+			<local:Character id="lily" type="emo" activeButtonClick="updateActivityLists" />
+			<local:Character id="robert" type="emo" activeButtonClick="updateActivityLists" />
+			<local:Character id="karen" type="emo" activeButtonClick="updateActivityLists" />
+			
+		</s:Panel>
+		
+		<s:Panel id="gameUI" title="Current Social Game" width="100%">
+			<s:layout>
+				<s:HorizontalLayout/>
+			</s:layout>
+			
+			
+			<s:VGroup>
+				<mx:Label id="gameName" text="SocialGame" />
+				<mx:Label id="white" text="white" />
+				<mx:Label id="black" text="black" />
+				<mx:Label id="ending" text="end" />
+			</s:VGroup>
+			
+			<!--<local:SocialGameWindow id="socialGameWindow"/>-->
+		</s:Panel>
+		
+		<s:Panel id="simPanel" title="Simulation Interface" width="100%">
+			<s:layout>
+				<s:HorizontalLayout/>
+			</s:layout>
+			<s:VGroup width="150" height="100%">
+				<s:Button id="updateCharacterStateButton" label="Update Character State" width="150" click="updateCharacterState()" enabled="true" />
+				<s:Button id="chooseGameButton" label="Choose Game" click="chooseGame()" width="150" enabled="true" />
+				<s:Button id="needRegenButton" label="Regenerate Needs" click="regenNeeds()" width="150" enabled="true" />
+				<s:CheckBox id="initiateAsWhiteOnlyCB" label="Only initiate as White" selected="true"  />
+				<s:CheckBox id="gasTankCB" label="Gas tank need display" selected="true" change="updateCharacterDisplays()" />
+			</s:VGroup> 
+			
+			<s:VGroup height="100%">
+				<s:CheckBox id="forceGameCB" label="force next social game"  />
+				<mx:Label text="Game forced:" />
+				<s:DropDownList id="gameForcedList"  width="200" />
+				<mx:Label text="Player as White:" />
+				<s:DropDownList id="playerAsWhiteForcedList"  width="200" close="checkCharacterActivity();" />
+				<mx:Label text="Player as Black:" />
+				<s:DropDownList id="playerAsBlackForcedList"  width="200" close="checkCharacterActivity();" />
+				
+			</s:VGroup>
+			
+			<s:VGroup>
+				<mx:Label text="Intents to consider:" />
+				<mx:HSlider id="formIntentSlider" 
+					snapInterval="1.0"
+					toolTip="intents to consider" 
+					minimum="1.0"
+					maximum="10.0"
+					value="{intentsToConsiderInIntentFormation}"
+					change="intentsToConsiderInIntentFormation=formIntentSlider.value"/>
+				<mx:Label text="Roles to consider in negotiation:" />
+				<mx:HSlider id="roleNegotiationSlider" 
+					snapInterval="1.0"
+					toolTip="roles to consider" 
+					minimum="1.0"
+					maximum="10.0"
+					value="{intentsToConsiderInRoleNegotiation}"
+					change="intentsToConsiderInRoleNegotiation=roleNegotiationSlider.value"/>
+			</s:VGroup>
+			
+		</s:Panel>
+		<fx:Script>
+		
+		<![CDATA[
+
+/*Computational Assistant
+ *
+ * Enable the "3 stage" games
+ * -Before a game is played
+ * 		* let the player know who will be involved
+ * 		* who initiated it and with what need drove the game selection/what preference will be performed through playing the game "in the spirit of the game"/white wins.
+ * -After a game is played, communicate to the player why an antithetical was chosen if it was (e.g. black was too dominant!)
+ * -Really, we need to talk this through a little more. Maybe for 15 minutes on Thurs we can touch on this.  
+ *
+ * xxx Initiator always picks white role (checkbox to toggle this behavior off and on).
+ * 
+ * xxx Controls to change the randomness of the PlanIntent and RoleNegotiation selections.
+ * 
+ * xxx Force black as well as white.
+ * 
+ * xxx Make needs regeneration it's own button.
+ * 
+ * xxx Change character needs display from satiation to gas tank model.
+ * 
+ */
+
+
+			
+			import edu.ucsc.eis.SocialEntity;
+			import edu.ucsc.eis.socialgame.*;
+			import edu.ucsc.eis.GameEngine;
+			import edu.ucsc.eis.AllXMLLoadedEvent;
+			import edu.ucsc.eis.socialservices.*;
+			import __AS3__.vec.Vector;
+			import mx.binding.utils.*;
+			import mx.managers.ToolTipManager;
+			
+			import mx.controls.ToolTip;
+
+
+			private var socials:Vector.<SocialEntity> = new Vector.<SocialEntity>();
+			private var inactiveSocials:Vector.<SocialEntity> = new Vector.<SocialEntity>();
+			private var sglib:SocialGameLibrary = new SocialGameLibrary();
+			private var util:SGutils = new SGutils();
+			private var currentSocialGame:SocialGame = new SocialGame();
+			private var socialGameEndTaken:int = -1;
+			
+			private var characterDisplays:Object = [];
+			
+			private var badForcedCharacterToolTip:ToolTip;
+			
+			[Bindable]
+			private var intentsToConsiderInIntentFormation:int = 1;
+			[Bindable]
+			private var intentsToConsiderInRoleNegotiation:int = 1;
+			
+			private function onCreationComplete():void {
+				
+				sglib.readXML(socialGames);
+				sglib.createSocialGameLibFromXML();
+				
+				for each(var name:String in characterNames) {
+					var socent:SocialEntity = new SocialEntity();
+					socent.setName(name);
+					socent.loadPersonalityDescriptionFromXML(personalityDescriptions);
+					socent.initializeVolitionMatrix(sglib);
+					socials.push(socent);
+					//trace(socials[socials.length -1]);
+				}
+				
+				characterDisplays["Mave"] = mave;
+				characterDisplays["Edward"] = edward;
+				characterDisplays["Bruce"] = bruce;
+				characterDisplays["Lily"] = lily;
+				characterDisplays["Robert"] = robert;
+				characterDisplays["Karen"] = karen;
+			
+				//init the character components
+				initCharacterDisplays();
+				
+				//set initial values of force game components
+				forceGameCB.selected = false;
+				
+				gameForcedList.dataProvider = sglib.getGameNames();
+				gameForcedList.selectedIndex = 0;
+				playerAsWhiteForcedList.dataProvider = characterNames;
+				playerAsWhiteForcedList.selectedIndex = 0;
+				playerAsBlackForcedList.dataProvider = characterNames;
+				playerAsBlackForcedList.selectedIndex = 0;
+
+				badForcedCharacterToolTip = ToolTipManager.createToolTip("The selected charcter is inactive and cannont be in a forced social game or one character is selected to fill both roles..", 
+					playerAsWhiteForcedList.right as Number,  
+					playerAsWhiteForcedList.top as Number, 
+					"errorTipRight")
+						as ToolTip;
+				badForcedCharacterToolTip.visible = false;
+
+				
+				//socialGameWindow.socialGame = currentSocialGame;
+				
+				//multidimensional vector test
+				/*var md:Vector.<Vector.<Vector.<String>>> = new Vector.<Vector.<Vector.<String>>>();
+				var i:int = new int();
+				var j:int = new int();
+				var k:int = new int();
+				
+				for (i=0; i < 6; ++i) {
+					md.push(new Vector.<Vector.<String>>());
+					for (j=0; j < 3; ++j) {
+						md[i].push(new Vector.<String>());
+						for (k=0; k < 2; ++k) {
+							md[i][j].push(new String(i.toString() + j.toString() + k.toString()));
+						}
+					}
+				}*/
+			}
+			
+			public function updateCharacterState(timeElapsed:Number = 1.0):void {
+				var socent:SocialEntity;
+				var i:int;
+				
+				for each (var charDisplay:Character in characterDisplays) {
+					//if the character is disabled,
+					// remove it from socials put it into the inactive socials vector
+					
+					//make sure it is current active before making it inactive
+					//var remove:Boolean = new Boolean(false);
+					
+					for (i = 0; i < socials.length; ++i ) {
+						//make sure it is currently in active list before making it inactive
+						if (socials[i].getName().toLowerCase() == charDisplay.characterName.toLowerCase()) {
+							if("inactive" == charDisplay.currentState) {
+								//later:if it is already in the inactiveSocials list, just splice it out (might be fishy)
+								inactiveSocials = inactiveSocials.concat(socials.splice(i, 1));
+								trace(charDisplay.characterName + " is now inactive.");
+							}else {
+								socials[i].volitionModifier = charDisplay.chanceModifier;
+							}
+							
+						}
+					}
+					//see if character is to be activated
+					for (i = 0; i < inactiveSocials.length; ++i) {
+						if (inactiveSocials[i].getName().toLowerCase() == charDisplay.characterName.toLowerCase() && "inactive" != charDisplay.currentState) {
+							//character is in the inactive list but is in active state.  flip its list membership
+							socials = socials.concat(inactiveSocials.splice(i, 1));
+							trace(charDisplay.characterName + " is now active.");
+						}
+					}	
+				}
+				
+				//update basic needs from previous round
+				for each (socent in socials) {	
+					//if socialGameEndTaken is less than 0, no ending was taken
+					if (currentSocialGame.getEndTaken() >= 0) {
+						//trace("socent.update");
+						socent.updateFromGameplay(currentSocialGame);
+					}
+					//this per character need regeneration is now in a separate button callback.
+					//socent.updateNeedState(timeElapsed);
+				}
+				
+				//update the displays
+				updateCharacterDisplays();
+				//socialGameWindow.socialGame = currentSocialGame;
+			}
+			
+			private function chooseGame():void {
+				var socent:SocialEntity;
+				var i:int;
+				
+				//clean social game library
+				sglib.unAssignAllRoles();
+				
+				
+				//SetGoals and PlanIntent for each social agent
+				for each (socent in socials) {
+					SetGoals(socent);
+					PlanIntent(socent, sglib);
+					//trace(socent.getTopAntiEndsByGame(5));
+					//trace(socent);
+				}
+			
+				
+				if (forceGameCB.selected) {
+					var bestVolition:Number = 0.0;
+					var bestRoleIndex:int = 0;
+					//var forcedPlayer:SocialEntity;
+					var whitePlayer:SocialEntity;
+					var blackPlayer:SocialEntity;
+					
+					var name:String = new String();
+					name = gameForcedList.selectedItem;
+					var gameIndex:int = sglib.getGameIndexByName(name);
+					currentSocialGame = sglib.getGameByName(name);
+					for each(socent in socials){
+						/*if (socent.getName() == playerForcedList.selectedItem){
+							forcedPlayer = socent;
+						}*/
+						if (socent.getName() == playerAsWhiteForcedList.selectedItem) {
+							whitePlayer = socent;
+						} else if (socent.getName() == playerAsBlackForcedList.selectedItem) {
+							blackPlayer = socent;
+						}
+					}
+					
+					//mini role negotiation process -- no longer needed as black is forced as well as white.
+					/*for (i = 0; i < currentSocialGame.getNumRoles(); ++i) {
+						var curVolition:Number = forcedPlayer.getVolitionMatrixValue(gameIndex, 0, i);
+						if (curVolition > bestVolition) {
+							bestVolition = curVolition;
+							bestRoleIndex = i;
+						}
+					}*/
+					//currentSocialGame.assignCharacterToRoleByName(playerForcedList.selectedItem, currentSocialGame.getRoleTitleString(bestRoleIndex));
+					currentSocialGame.assignCharacterToRoleByName(playerAsWhiteForcedList.selectedItem, "White");
+					currentSocialGame.assignCharacterToRoleByName(playerAsBlackForcedList.selectedItem, "Black");
+				} else {
+					//pick a social game and role combination with highest volition.
+					currentSocialGame = FormIntent(socials, sglib, initiateAsWhiteOnlyCB.selected, intentsToConsiderInIntentFormation);
+				}
+				
+				//trace(currentSocialGame.getAllRoles());
+				//role negotation 
+				currentSocialGame = NegotiateRoles(socials, currentSocialGame, sglib, intentsToConsiderInRoleNegotiation);
+				
+				gameName.text = "Social Game: " + currentSocialGame.getName();
+				black.text = "Black: " + currentSocialGame.getCharacterInRole("black");
+				white.text = "White: " + currentSocialGame.getCharacterInRole("white");
+				ending.text = "End: " + currentSocialGame.getDescriptionOfEvent(currentSocialGame.getEndTaken());
+				trace(currentSocialGame);
+				
+				//performance realization (pick game ending)				
+				for each (socent in socials) {
+					trace(socent.getName() + "'s volition modifier: " + socent.volitionModifier + " power: " + socent.getNeedState(0,"Power"));
+				}
+				
+				
+				//update the displays
+				updateCharacterDisplays();
+			}
+			
+			/**
+			 * Regenerates the basic needs of all active characters.
+			 * 
+			 * @param	amountToRegen The amount to regenerate.
+			 */
+			public function regenNeeds(amountToRegen:Number = 1.0):void {
+				for each (var socent:SocialEntity in socials) {
+					socent.updateNeedState(amountToRegen);
+				}
+				updateCharacterDisplays();
+			}
+			
+			
+			public function updateCharacterDisplays():void {
+				for each (var socent:SocialEntity in socials) {
+					characterDisplays[socent.getName()].tankRep = gasTankCB.selected;
+					
+					if (socent.getName() == "Mave") {
+						mave.vState = socent.getNeedState(0, "Vengeance");
+						mave.aState = socent.getNeedState(0, "Acceptance");
+						mave.sState = socent.getNeedState(0, "Status");
+						mave.pState = socent.getNeedState(0, "Power");
+						if ("Mave" == currentSocialGame.getCharacterInRole("black")) 
+							mave.currentState = "black";
+						else if ("Mave" == currentSocialGame.getCharacterInRole("white"))
+							mave.currentState = "white";
+						else
+							mave.currentState = mave.type;
+						mave.update();
+					}
+					edward
+					if (socent.getName() == "Edward") {
+						edward.vState = socent.getNeedState(0, "Vengeance");
+						edward.aState = socent.getNeedState(0, "Acceptance");
+						edward.sState = socent.getNeedState(0, "Status");
+						edward.pState = socent.getNeedState(0, "Power");
+						if ("Edward" == currentSocialGame.getCharacterInRole("black")) 
+							edward.currentState = "black";
+						else if ("Edward" == currentSocialGame.getCharacterInRole("white"))
+							edward.currentState = "white";
+						else
+							edward.currentState = edward.type;
+						mave.update();
+						edward.update();
+					}
+					if (socent.getName() == "Bruce") {
+						bruce.vState = socent.getNeedState(0, "Vengeance");
+						bruce.aState = socent.getNeedState(0, "Acceptance");
+						bruce.sState = socent.getNeedState(0, "Status");
+						bruce.pState = socent.getNeedState(0, "Power");
+						if ("Bruce" == currentSocialGame.getCharacterInRole("black")) 
+							bruce.currentState = "black";
+						else if ("Bruce" == currentSocialGame.getCharacterInRole("white"))
+							bruce.currentState = "white";
+						else
+							bruce.currentState = bruce.type;
+						bruce.update();
+					}
+					if (socent.getName() == "Lily") {
+						lily.vState = socent.getNeedState(0, "Vengeance");
+						lily.aState = socent.getNeedState(0, "Acceptance");
+						lily.sState = socent.getNeedState(0, "Status");
+						lily.pState = socent.getNeedState(0, "Power");
+						if ("Lily" == currentSocialGame.getCharacterInRole("black")) 
+							lily.currentState = "black";
+						else if ("Lily" == currentSocialGame.getCharacterInRole("white"))
+							lily.currentState = "white";
+						else
+							lily.currentState = lily.type;
+						lily.update();
+					}
+					if (socent.getName() == "Robert") {
+						robert.vState = socent.getNeedState(0, "Vengeance");
+						robert.aState = socent.getNeedState(0, "Acceptance");
+						robert.sState = socent.getNeedState(0, "Status");
+						robert.pState = socent.getNeedState(0, "Power");
+						if ("Robert" == currentSocialGame.getCharacterInRole("black")) 
+							robert.currentState = "black";
+						else if ("Robert" == currentSocialGame.getCharacterInRole("white"))
+							robert.currentState = "white";
+						else
+							robert.currentState = robert.type;
+						robert.update();
+					}
+					if (socent.getName() == "Karen") {
+						karen.vState = socent.getNeedState(0, "Vengeance");
+						karen.aState = socent.getNeedState(0, "Acceptance");
+						karen.sState = socent.getNeedState(0, "Status");
+						karen.pState = socent.getNeedState(0, "Power");
+						if ("Karen" == currentSocialGame.getCharacterInRole("black")) 
+							karen.currentState = "black";
+						else if ("Karen" == currentSocialGame.getCharacterInRole("white"))
+							karen.currentState = "white";
+						else
+							karen.currentState = karen.type;
+						karen.update();
+					}
+
+				}
+			}
+			
+			/**
+			 * Initializes the character displays and sets up the databinding
+			 * to the SocialEntities (closure safe finally!).
+			 */
+			public function initCharacterDisplays():void {
+				var socent:SocialEntity;
+				var i:int;
+				//test out binding a character component property to a SocialEntity property
+				for each (socent in socials) {
+					BindingUtils.bindSetter(socent.volitionModifierBinder, characterDisplays[socent.getName()], "chanceModifier");
+					BindingUtils.bindSetter(socent.powerStateBinder, characterDisplays[socent.getName()], "pState");
+					BindingUtils.bindSetter(socent.statusStateBinder, characterDisplays[socent.getName()], "sState");
+					BindingUtils.bindSetter(socent.acceptanceStateBinder, characterDisplays[socent.getName()], "aState");
+					BindingUtils.bindSetter(socent.vengeanceStateBinder, characterDisplays[socent.getName()], "vState");
+					characterDisplays[socent.getName()].pCap = socent.getCapacity(0, "Power");
+					characterDisplays[socent.getName()].sCap = socent.getCapacity(0, "Status");
+					characterDisplays[socent.getName()].aCap = socent.getCapacity(0, "Acceptance");
+					characterDisplays[socent.getName()].vCap = socent.getCapacity(0, "Vengeance");
+					characterDisplays[socent.getName()].characterName = socent.getName();
+				}
+				updateCharacterDisplays();
+				return;
+			}
+			
+			private function updateActivityLists():void {
+				var socent:SocialEntity;
+				var i:int;
+				
+				for each (var charDisplay:Character in characterDisplays) {
+					//if the character is disabled,
+					// remove it from socials put it into the inactive socials vector
+					
+					//make sure it is current active before making it inactive
+					//var remove:Boolean = new Boolean(false);
+					
+					for (i = 0; i < socials.length; ++i ) {
+						//make sure it is currently in active list before making it inactive
+						if (socials[i].getName().toLowerCase() == charDisplay.characterName.toLowerCase()) {
+							if("inactive" == charDisplay.currentState) {
+								//later:if it is already in the inactiveSocials list, just splice it out (might be fishy)
+								inactiveSocials = inactiveSocials.concat(socials.splice(i, 1));
+								trace(charDisplay.characterName + " is now inactive.");
+							}else if(charDisplay.increaseGameChance) {
+								socials[i].volitionModifier = 2.0;
+							}else if (!charDisplay.increaseGameChance) {
+								socials[i].volitionModifier = 1.0;
+							}
+							
+						}
+					}
+					//see if character is to be activated
+					for (i = 0; i < inactiveSocials.length; ++i) {
+						if (inactiveSocials[i].getName().toLowerCase() == charDisplay.characterName.toLowerCase() && "inactive" != charDisplay.currentState) {
+							//character is in the inactive list but is in active state.  flip its list membership
+							socials = socials.concat(inactiveSocials.splice(i, 1));
+							trace(charDisplay.characterName + " is now active.");
+						}
+					}	
+				}
+			}
+			
+			private function checkCharacterActivity():void {
+				
+				badForcedCharacterToolTip.visible = false;
+				
+				//both roles are forced to be filled by the same player! Bad news.
+				if (playerAsWhiteForcedList.selectedItem.toLowerCase() == playerAsBlackForcedList.selectedItem.toLowerCase()) {
+					badForcedCharacterToolTip.visible = true;
+					return;
+				}
+				
+				for each (var socent:SocialEntity in inactiveSocials) {
+					if (socent.getName().toLowerCase() == playerAsWhiteForcedList.selectedItem.toLowerCase() 
+						|| socent.getName().toLowerCase() == playerAsBlackForcedList.selectedItem.toLowerCase()) {
+						if(!badForcedCharacterToolTip.visible) {
+							badForcedCharacterToolTip.visible = true;
+						}
+						//return;
+					}
+				}
+			}
+			
+		]]>		
+	</fx:Script>
+	
+</s:Application>

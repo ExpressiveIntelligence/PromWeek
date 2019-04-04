@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+               xmlns:s="library://ns.adobe.com/flex/spark"
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:prom="PromWeek.*"
+			   creationComplete="onCreationComplete()"
+			   preinitialize="onPreinitialize()"
+			   width="760" height="600">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<!--<fx:XML id="cifStateXML" source="./PromWeekCharacters.xml" />-->
+		<fx:Number id="defaultResponderSubjectThoughtBubbleTop">150</fx:Number>
+		<s:ArrayList id="items">
+			<fx:Object charName="edward"/>
+			<fx:Object charName="mave"/>
+			<fx:Object charName="doug"/>
+			<fx:Object charName="monica"/>
+			<fx:Object charName="gunter"/>
+		</s:ArrayList>
+		<s:AnimateColor id="quickPlayColorEffect" targets="{[quickPlayBGRectColor]}"
+					colorFrom="0x00ff00" colorTo="0xFF0000" repeatCount="1" repeatBehavior="reverse"/>
+		<mx:WipeRight id="wipeRight" duration="500" effectEnd="quickPlayWipeEnded(event)"/>
+        <s:Animate id="moveUp" 
+                   duration="750" 
+                   target="{quickPlayTextGroup}" >
+            <s:SimpleMotionPath valueFrom="100"
+                                valueTo="0"
+                                property="top" />
+        </s:Animate>
+	</fx:Declarations>
+	
+
+	
+	<s:Group width="100%" height="100%" click="bgClicked(event)">
+		<s:Rect width="100%" height="100%">
+			<s:fill>
+				<mx:SolidColor color="0x0F0045"/>
+			</s:fill>
+		</s:Rect>
+	</s:Group>
+	
+	<s:List id="list" x="200" y="200"
+            width="400" height="250" 
+            itemRenderer="PromWeek.NEW_relationshipListItemRenderer"/>
+	
+	
+	<s:VGroup id="selectInitiatorGroup" left="10" bottom="5"  mouseEnabled="false">
+		<s:RichText id="selectACharacterText" color="0xFFFFFF" text="Select a character" styleName="myTmpTextStyle" />
+		<prom:NEW_initatorCharHeadSelectionGroup id="initSelectGroup" />
+	</s:VGroup>
+	
+	<prom:NEW_initatorSelectedComponent id="initiatorSelectedComponent" visible="false" left="10" bottom="5" mouseEnabled="false" />
+	<prom:NEW_subjectiveThoughtBubble id="responderSubjectiveThoughtBubble" top="{this.defaultResponderSubjectThoughtBubbleTop}" right="20" visible="false"  mouseEnabled="false"/>
+	<prom:NEW_responderThoughtBubble id="responderThoughtBubble" top="55" right="10" visible="false" mouseEnabled="false"/><!--This y setting is done to make it so the init though bubble and this resp though bubble's tops are the same -->
+	
+	<mx:Canvas id="quickPlayTextGroup" width="100%" height="75" visible="false" showEffect="{wipeRight}">
+		<s:Group width="100%" height="100%">
+			<s:Rect id="quickPlayBGRect" width="100%" height="100%">
+				<s:fill>
+					<mx:SolidColor id="quickPlayBGRectColor" color="0x00ff00"/>
+				</s:fill>
+			</s:Rect>
+		</s:Group>
+		<s:HGroup id="quickPlayTextGroupContents" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle"/>
+	</mx:Canvas>
+	
+	<prom:NEW_topBar id="topBar" visible="false"/>
+	
+	<!--<s:Group id="fireworksGroup" width="100%" height="100%" mouseEnabledWhereTransparent="true" mouseEnabled="false" mouseChildren="false" />-->
+	
+	<prom:NEW_ssuVisualizer width="100" height="100" x="100" y="200"/>
+	<fx:Script>
+		<![CDATA[
+		import CiF.Character;
+		import CiF.CiFSingleton;
+		import CiF.Debug;
+		import CiF.Predicate;
+		import CiF.RelationshipNetwork;
+		import CiF.SocialNetwork;
+		import flash.events.Event;
+		import flash.filters.BlurFilter;
+		import flash.filters.ColorMatrixFilter;
+		import mx.core.UIComponent;
+		import mx.events.EffectEvent;
+		import mx.events.ResizeEvent;
+		//import org.flintparticles.twoD.renderers.BitmapRenderer;
+		import PromWeek.NetworkIconTwoChar;
+		import PromWeek.NEW_firework;
+		import PromWeek.RelationshipIconTwoChar;
+		import PromWeek.skins.NEW_socialExchangeButtonSkin;
+		import spark.components.Group;
+		
+		public var cif:CiFSingleton;
+		
+		
+		
+		private static var _instance:HudGroup;
+		public static function getInstance():HudGroup
+		{
+			return _instance;
+		}
+		
+		private function onPreinitialize():void 
+		{
+			cif = CiFSingleton.getInstance();
+			//cif.parseCiFState(cifStateXML);
+		}
+		
+		//public function onApplicationComplete():void
+		//{
+			//if (!_instance)
+				//_instance = this;
+				//
+		//}
+		
+		public function onCreationComplete():void 
+		{	
+			var name:Vector.<String> = new Vector.<String>();
+			name.push("doug");
+			name.push("monica");
+			name.push("gunter");
+			name.push("edward");
+			name.push("cassandra");
+			name.push("oswald");
+			name.push("zack");
+			name.push("kate");
+			//name.push("chloe");
+			
+
+			//var panel:MinMaxPanel = new MinMaxPanel();
+			//panel.width = 200;
+			//panel.height = 200;
+			//panel.x = 100;
+			//panel.y = 100;
+			//this.addElement(panel);
+			
+			
+            list.dataProvider = items;
+			
+			
+			this.initSelectGroup.populateFromCast(name, 55);
+			
+			this.initiatorSelectedComponent.initSelectGroup.populateFromCast(name, 40);
+			
+			this.initiatorSelectedComponent.respSelectGroup.cast = name;
+			
+			//this.topBar.goalButton.update("oswald");
+			
+			this.addEventListener("INIT_FACE_CLICKED", initFaceClickedEvent);
+			
+		}
+		
+		public function quickPlayWipeEnded(e:EffectEvent):void
+		{
+			moveUp.play();
+			quickPlayColorEffect.play();
+		}
+		
+		
+		
+		public function updateSocialExchangeResponseThoughtBubble(sgName:String):void
+		{
+			this.initiatorSelectedComponent.initiatorThoughtBubble.visible = false;
+			
+			this.responderThoughtBubble.update(sgName);
+			
+			this.responderSubjectiveThoughtBubble.y = this.responderThoughtBubble.y + this.responderThoughtBubble.height;
+			this.responderSubjectiveThoughtBubble.top = this.responderThoughtBubble.y + this.responderThoughtBubble.height - 20;
+			
+			this.responderThoughtBubble.visible = true;
+		}
+		
+		
+		public static function getIntentImage(intentPred:Predicate, init:Character, resp:Character):Group 
+		{
+			var intentID:int = intentPred.getIntentType();
+			var returnGroup:Group = new Group();
+			if (intentPred.type == Predicate.RELATIONSHIP)
+			{
+				var relType:String;
+				if (intentPred.relationship == RelationshipNetwork.FRIENDS)
+				{
+					relType = "friends";
+				}
+				else if (intentPred.relationship == RelationshipNetwork.DATING)
+				{
+					relType = "dating";
+				}
+				else if (intentPred.relationship == RelationshipNetwork.ENEMIES)
+				{
+					relType = "enemies";
+				}
+				var relTwoChar:RelationshipIconTwoChar = new RelationshipIconTwoChar();
+				relTwoChar.loadImagesToIcon(intentPred.relationship, init.characterName.toLowerCase(), resp.characterName.toLowerCase(), intentPred.negated,"",true);
+				returnGroup.addElement(relTwoChar);
+			}
+			else if (intentPred.type == Predicate.NETWORK)
+			{
+				var netName:String;
+				if (intentPred.networkType == SocialNetwork.BUDDY)
+				{
+					netName = "buddy";
+				}
+				else if (intentPred.networkType == SocialNetwork.ROMANCE)
+				{
+					netName = "romance";
+				}
+				else if (intentPred.networkType == SocialNetwork.COOL)
+				{
+					netName = "cool";
+				}
+				var netTwoChar:NetworkIconTwoChar = new NetworkIconTwoChar();// init.characterName.toLowerCase(), resp.characterName.toLowerCase(), netName, intentPred.networkValue, intentPred.operator, true);
+				netTwoChar.loadImagesToIcon(intentPred.networkType, resp.characterName.toLowerCase(), init.characterName.toLowerCase(), intentPred.negated,"",intentPred.operator,true);
+				returnGroup.addElement(netTwoChar);
+			}
+			return returnGroup;
+		}
+		
+
+		public var uiComp:UIComponent;
+		private function bgClicked(e:Event):void 
+		{
+			this.topBar.goalButton.update("edward");
+			
+			this.responderSubjectiveThoughtBubble.visible = false;
+			this.responderSubjectiveThoughtBubble.top = GameEngine.getInstance().hudGroup.defaultResponderSubjectThoughtBubbleTop;
+			this.responderThoughtBubble.visible = false;
+			this.initiatorSelectedComponent.initiatorThoughtBubble.visible = false;
+			this.initiatorSelectedComponent.switchCharButton.visible = false;
+			this.initiatorSelectedComponent.visible = false;
+			
+			this.initSelectGroup.deselectAll();
+			this.selectInitiatorGroup.visible = true;
+
+			
+			
+/*
+			this.fireworksGroup.removeAllElements();;
+			
+			var uiComp:UIComponent = new UIComponent();
+			uiComp.width = this.width;
+			uiComp.height = this.height;
+			
+			var emitter:NEW_firework = new NEW_firework();
+			var renderer:BitmapRenderer = new BitmapRenderer( new Rectangle( 0, 0, this.width, this.height) );
+			renderer.addFilter( new BlurFilter( 2, 2, 1 ) );
+			renderer.addFilter( new ColorMatrixFilter( [ 1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0.95,0 ] ) );
+			renderer.addEmitter( emitter );
+			emitter.x = this.fireworksGroup.width/4;
+			emitter.y = this.fireworksGroup.height/4;
+			emitter.start();			
+			uiComp.addChild(renderer);
+			
+			emitter = new NEW_firework();
+			renderer = new BitmapRenderer( new Rectangle( 0, 0, this.width, this.height) );
+			renderer.addFilter( new BlurFilter( 2, 2, 1 ) );
+			renderer.addFilter( new ColorMatrixFilter( [ 1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0.95,0 ] ) );
+			renderer.addEmitter( emitter );
+			emitter.x = 3 * this.fireworksGroup.width/4;
+			emitter.y = this.fireworksGroup.height/4;
+			emitter.start();			
+			uiComp.addChild(renderer);
+			
+			this.fireworksGroup.addElement(uiComp);
+*/
+			
+		}
+		private function initFaceClickedEvent(e:Event):void 
+		{
+			Debug.debug(this, "initiatorSelectedEvent() " + e.target.charName + " clicked (the new one!!!)");
+
+			this.initiatorSelectedComponent.populateInitiatorSelectedComponent(e);
+			
+			this.selectInitiatorGroup.visible = false;
+			this.initiatorSelectedComponent.visible = true;
+		}
+		]]>
+			
+	</fx:Script>
+		
+</s:Group>

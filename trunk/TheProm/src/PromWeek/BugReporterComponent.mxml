@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 initialize="bugReporterInitialize()"
+		 width="300"
+		 height="350"
+		 styleName="classicPromWeek">
+	
+	<fx:Metadata>
+	</fx:Metadata>
+		
+	<fx:Declarations>
+	</fx:Declarations>
+	
+	<s:Rect id="Background" left="0" width="100%" height="100%">
+			<s:stroke>
+				<s:SolidColorStroke weight="10" color="{getStyle('backgroundStroke')}" caps="none" />
+			</s:stroke>
+			<s:fill>
+				<s:SolidColor color="{getStyle('backgroundColor')}" alpha="0.7" />
+			</s:fill>
+	</s:Rect>
+
+	<s:Label x="10" y="10" id="title" fontWeight="bold" fontSize="30" color="{getStyle('textColor')}" paddingBottom="0" textAlign="center">
+			<s:text></s:text>
+	</s:Label>
+	
+	<s:VGroup left="{this.width/6}" top="20">
+		<s:HGroup>
+			<s:Label id="reporterTitle" text="Bug Reporter" fontSize="20" />
+				<s:Group id="removeIconGroup" x="50" y="50" right="70" width="15" height="15" click="xClickedOn(event)" toolTip="Close Window">
+					<s:Rect width="{removeIconGroup.width}" height="{removeIconGroup.height}">
+						<s:stroke>
+							<s:SolidColorStroke color="black" alpha="1.0" />
+						</s:stroke>
+						<s:fill>
+							<s:SolidColor color="white" alpha="0.8" />
+						</s:fill>
+					</s:Rect>
+					<s:Line id="line1" xFrom="0" yFrom="0" xTo="{removeIconGroup.width}" yTo="{removeIconGroup.height}" >
+						<s:stroke>
+							<s:SolidColorStroke color="black" alpha="1.0" weight="2" />
+						</s:stroke>
+					</s:Line>
+					<s:Line id="line2" xFrom="0" yFrom="{removeIconGroup.height}" xTo="{removeIconGroup.width}" yTo="0" >
+						<s:stroke>
+							<s:SolidColorStroke color="black" weight="2"/>
+						</s:stroke>
+					</s:Line>		
+				</s:Group>
+		</s:HGroup>
+		<s:HGroup>
+			<s:Label id="categoryLabel" text="Category:" />
+			<s:DropDownList id="categoryDropDown" dataProvider="{dropDownDataProvider}" width="120" />
+		</s:HGroup>
+		
+		<s:Label id="notesLabel" text="Write down the bug details here." />
+		<s:Label id="notesLabel2" text="Then click 'report bug' to send it out for fixing!" />
+		<s:TextArea id="notesTextArea" width="200" />
+		<s:Button id="submitButton" label="Report Bug!" click="submitButtonClicked(event)" />
+	</s:VGroup>
+	
+	<fx:Script>
+		<![CDATA[
+		import CiF.Debug;
+		import flash.events.KeyboardEvent;
+		import PromWeek.assets.ResourceLibrary;
+		import flash.events.Event;
+		import mx.collections.ArrayCollection;
+		import flash.net.URLLoader;
+		import flash.net.URLVariables;
+		import flash.net.URLRequest;
+		import flash.net.URLRequestMethod;
+		import flash.net.URLLoaderDataFormat;
+		
+		public var statisticsManager:StatisticsManager;
+		public var gameEngine:GameEngine;
+		[Bindable]
+		private var dropDownDataProvider:ArrayCollection;
+		
+		public function bugReporterInitialize():void {
+			statisticsManager = StatisticsManager.getInstance();
+			gameEngine = GameEngine.getInstance();
+			dropDownDataProvider = new ArrayCollection();
+			dropDownDataProvider.addItem("Game Crash");
+			dropDownDataProvider.addItem("Graphics/Display Issue");
+			dropDownDataProvider.addItem("Characters Behaved Unbelievably");
+			dropDownDataProvider.addItem("Spelling/Grammar Error in Dialogue");
+			dropDownDataProvider.addItem("Other");
+			categoryDropDown.selectedIndex = 0;
+		}
+		
+		
+		public function submitButtonClicked(e:Event):void {
+			var my_date:Date = new Date();
+			
+			var dateString:String = (my_date.month + 1) + "/" + my_date.date + "/" + my_date.fullYear + "-" + my_date.hours + ":" + my_date.minutes + ":" + my_date.seconds;
+			
+			
+			Debug.debug(this, "Bug Reporter Button Clicked!");
+			Debug.debug(this, "The category that was selected is: " + categoryDropDown.selectedItem);
+			Debug.debug(this, "The contents of the notes-box is: " + this.notesTextArea.text);
+			Debug.debug(this, "The contents of the debug window are: " + gameEngine.hudGroup.debugInfo);
+			
+			
+			var sender_mail:String = "promweekbugs@gmail.com";
+			var sender_name:String = "Joe User";
+			var sender_subect:String = "PROM-BUG[" + categoryDropDown.selectedItem + "] " + dateString;
+			
+			var sender_message:String = "PROM BUG REPORT. \n  CATEGORY: " + categoryDropDown.selectedItem;
+			sender_message += "\n Description of bug: " + this.notesTextArea.text;
+			sender_message += "\n Contents of Debug Window: " + gameEngine.hudGroup.debugInfo;
+			
+			
+			var request:URLRequest = new URLRequest("sendMail.php");
+			request.method = URLRequestMethod.POST;
+			
+			var variables:URLVariables = new URLVariables();
+			
+			//variables.sender_mail = sender_mail;
+			//variables.sender_name = sender_name;
+			variables.sender_subject = sender_subect;
+			variables.sender_message = sender_message;
+			//variables.bitmapdata = Utility.getBitmapData(gameEngine);
+			
+			request.data = variables;
+			
+			var loader:URLLoader = new URLLoader (request);
+			loader.addEventListener(Event.COMPLETE, onMailComplete);
+			loader.dataFormat = URLLoaderDataFormat.VARIABLES;
+			loader.load(request);
+			
+		}
+		
+		public function onMailComplete (event:Event):void {
+			Debug.debug(this, "I think we finished mailing something? " + event.target.data);
+			var tempString:String = event.target.data;
+			if (tempString.indexOf("sent") >= 0) {
+				notesTextArea.text = "";
+				this.visible = false;
+			}
+			else {
+				this.notesTextArea.text = "OH OH!  I think there was a problem" + event.target.data;
+			}
+		}
+		
+		public function xClickedOn(e:Event):void {
+			Debug.debug(this, "Closed the window!");
+			this.visible = false;
+			notesTextArea.text = "";
+			gameEngine.shouldAcceptNormalKeyboardInput = true;
+		}
+		
+		]]>
+	</fx:Script>
+
+	
+</s:Group>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 initialize="AchievementGroupInitialize()"
+		 width="300"
+		 height="450">
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+		 </fx:Declarations>
+		 
+		<s:VGroup id="theGroup" width="100%" height="100%" top="25" verticalAlign="bottom">
+		</s:VGroup>
+		
+	<fx:Script>
+		<![CDATA[
+		import flash.events.MouseEvent;
+		import PromWeek.AchievementPopUp;
+		import PromWeek.assets.ResourceLibrary;
+		public var achievementVector:Vector.<PromWeek.AchievementPopUp>;
+		
+		public function onCreationComplete():void {
+			achievementVector = new Vector.<PromWeek.AchievementPopUp>();
+		}
+		
+		public function AchievementGroupInitialize():void{	
+			
+		}
+		
+		public function addAchievement(achievement:Achievement):void {
+			var popUp:PromWeek.AchievementPopUp = new PromWeek.AchievementPopUp();
+			popUp.setStyleName();
+			popUp.showAchievement(achievement);
+			theGroup.addElement(popUp);
+			achievementVector.push(popUp);
+		}
+		
+		public function update(time:Number):void {
+			for (var i:int = 0; i < achievementVector.length; i++ ) {
+				var achievements:PromWeek.AchievementPopUp = this.achievementVector[i];
+				achievements.update(time);
+				if (achievements.timeToDeleteMe){
+					this.theGroup.removeElement(achievements);
+					this.achievementVector.splice(i, 1);
+				}
+			}
+		}
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

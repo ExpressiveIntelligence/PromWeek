@@ -1,0 +1,1107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 preinitialize="tutorialPreinitialize()"
+		 creationComplete="onCreationComplete()">
+	
+		 
+	<fx:Metadata>
+	</fx:Metadata>
+		
+	<fx:Declarations>
+	</fx:Declarations>
+	
+
+	
+	<fx:Script>
+		<![CDATA[
+	
+		import CiF.CiFSingleton;
+		import CiF.LineOfDialogue;
+		import CiF.Trait;
+		import flash.display.DisplayObject;
+		import flash.events.MouseEvent;
+		import flash.events.Event;
+		import flash.geom.Point;
+		import mx.core.UIComponent;
+		import mx.effects.Glow;
+		//import flash.filters.GlowFilter;
+		import spark.filters.*;
+		import flash.utils.Dictionary; 
+		import CiF.Debug;
+		import flashx.textLayout.events.StatusChangeEvent;
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import flash.events.IEventDispatcher;
+		import mx.events.FlexEvent;
+		import flash.geom.Rectangle;
+		import spark.utils.TextFlowUtil;
+		import flashx.textLayout.elements.TextFlow;
+		import flashx.textLayout.factory.TextFlowTextLineFactory
+		import flashx.textLayout.elements.ParagraphElement;
+		import flashx.textLayout.elements.InlineGraphicElement;
+		import flashx.textLayout.elements.SpanElement;
+		import flashx.textLayout.elements.FlowLeafElement;
+		import PromWeek.assets.ResourceLibrary;
+		import flash.display.Bitmap;
+	
+		private var gameEngine:GameEngine;
+		private var statisticsManager:StatisticsManager;
+		private var resourceLibrary:PromWeek.assets.ResourceLibrary; 
+		
+		public var tutorialStepCounter:int = 0; // each time we display a pop-up, we'll increment this counter by one.
+		public var tutorialSteps:Vector.<TutorialStep>;
+		public var componentDictionary:Dictionary;
+		public var componentDictionarySize:Dictionary;
+		public var currentDisabledComponents:Dictionary;
+		
+		public var previousCameraPosition:Point;
+		public var previousCameraZoom:Number;
+		
+		/**
+		 * This just keeps track of which tutorial step we are on for access from other places
+		 */
+		public var currentStep:TutorialStep;
+		
+		private var flashyAlphaDelta:Number = -.02;
+		private const MIN_ALPHA_THRESHOLD:Number = .6
+		private var currentTypeOfEventAdded:String;
+		private var useAlphaAnimation:Boolean = false;
+		private var useGlow:Boolean = false;
+		
+		
+		public function tutorialPreinitialize():void
+		{
+		}
+		
+		public function onCreationComplete():void{
+			Debug.debug(this, "onCreationComplete()");
+		}
+		
+		public function prepare():void {
+			gameEngine = GameEngine.getInstance();
+			statisticsManager = StatisticsManager.getInstance();
+			resourceLibrary = PromWeek.assets.ResourceLibrary.getInstance();
+			tutorialSteps = new Vector.<TutorialStep>();
+			componentDictionary = new Dictionary();
+			componentDictionarySize = new Dictionary();
+			currentDisabledComponents = new Dictionary();
+		}
+		
+		/**
+		 * parseTutorialScript parses an XML file that has been formatted
+		 * to be a tutorial script!  The tutorial script consists of a 
+		 * collection of tutorialSteps, where each tutorial step has
+		 * information pertaining to what action needs to happen (click, mouse over, etc.)
+		 * what object it needs to be attached to (socialgamebutton, todolist, etc.),
+		 * and the 'popuptext' that should display when it DOES get clicked on.
+		 */
+		public function parseTutorialScript(script:XML):void {
+			
+			
+			
+			//Debug.debug(this, "parseTutorialScript() parsing script! " + script);
+			//Debug.debug(this, "Err,what is this gonna be: " + script.TutorialScript);
+			
+			for each (var tutorialStep:XML in script..TutorialStep) {
+				//Debug.debug(this, "OK! We have a tutorial step!");
+				var objectString:String = tutorialStep.@object;
+				var eventTypeString:String = tutorialStep.@eventType;
+				var popupString:String = tutorialStep.@popupText;
+				var nameString:String = tutorialStep.@name;
+				var preTextString:String = tutorialStep.@preText;
+				var postTextString:String = tutorialStep.@postText;
+				var disabledExceptions:String = tutorialStep.@disableExceptions;
+				var nextVisible:String = tutorialStep.@nextVisible;
+				//Debug.debug(this, "object String: " + objectString + " eventString: " + eventTypeString + " popupString: " + popupString);
+				var newTutorialStep:TutorialStep = new TutorialStep();
+				var internalText:String = tutorialStep.text();
+				var disableExceptionsButProgressTutorial:String = tutorialStep.@disableExceptionsButStillProgress;
+				var isOver:String = tutorialStep.@isOver;
+				var stop:String = tutorialStep.@stop;
+				var quadrant:int = tutorialStep.@quadrant;
+				newTutorialStep.eventType = eventTypeString;
+				newTutorialStep.popupText = popupString;
+				newTutorialStep.object = objectString;
+				newTutorialStep.name = (tutorialStep.@name.toString())?tutorialStep.@name:"";
+				newTutorialStep.sgName = (tutorialStep.@sgName.toString())?tutorialStep.@sgName:"";
+				newTutorialStep.centerOnCharacter = (tutorialStep.@centerOnCharacter.toString())?tutorialStep.@centerOnCharacter:"";
+				newTutorialStep.preText = preTextString;
+				newTutorialStep.postText = postTextString;
+				newTutorialStep.disableExceptions = disabledExceptions;
+				newTutorialStep.nextVisible = nextVisible;
+				newTutorialStep.internalText = internalText;
+				newTutorialStep.quadrant = quadrant;
+				newTutorialStep.disableExceptionsButStillProgress = disableExceptionsButProgressTutorial;
+				newTutorialStep.socialGameButtonNumber = (tutorialStep.@socialGameButtonNumber.toString())?tutorialStep.@socialGameButtonNumber:-1;
+				newTutorialStep.positionX = (tutorialStep.@positionX.toString())?tutorialStep.@positionX:-1;
+				newTutorialStep.positionY = (tutorialStep.@positionY.toString())?tutorialStep.@positionY:-1;
+				newTutorialStep.stateVizHead = (tutorialStep.@stateVizHead.toString())?tutorialStep.@stateVizHead:"";
+				if (isOver == "true") newTutorialStep.isOver = true; else newTutorialStep.isOver = false;
+				if (stop == "true") newTutorialStep.stop = true; else newTutorialStep.stop = false;
+				this.tutorialSteps.push(newTutorialStep);
+			}
+			
+			//(storyXML.@isTutorial.toString() == "true")?true:false;
+			
+			fillcomponentDictionary();
+			addTutorialEventHandler();
+		}
+		
+		/**
+		 * fillcomponentDictionary will go through each of the 'tutorialSteps' that we have parsed from the tutorial file,
+		 * and will look at the 'object' value in each of them.  It uses the object value to determine which
+		 * components get added to this dictionary!  Later on, we can then find them again and add
+		 * whatever event listeners we'll need.
+		 * 
+		 * TODO: addToDictionaryFunction
+		 * TODO: adding upper case and lower case references of each kind.
+		 */
+		public function fillcomponentDictionary():void {
+			//var searchString:String = "";
+			for each (var ts:TutorialStep in this.tutorialSteps) {
+				/*
+				if (ts.object.indexOf("avatar") == 0)
+					searchString = "avatar";
+				else	
+					searchString = ts.object;
+					*/
+				switch(ts.object) {
+					case "avatar":
+						//OK, cool!  But we care about WHICH avatar we are dealing with!
+						//that information is stored in the 'name' attribute of the tutorial step!
+						if (!componentDictionary["avatar-" + ts.name]) {
+							//Debug.debug(this, "think I'm adding an event listener to a specific avatar: " + gameEngine.worldGroup.avatars[ts.name].characterName);
+							componentDictionary["avatar-" + ts.name] = gameEngine.worldGroup.avatars[ts.name].clip;
+						}
+						break;
+					//GOALS
+					
+				}
+			}
+			
+			componentDictionary["goalButton"] = gameEngine.hudGroup.megaUI.goalButton;
+			componentDictionarySize["goalButton"] = "circle";
+			
+			componentDictionary["detailWindow"] = gameEngine.hudGroup.megaUI.rightSideContentGroup;
+			//componentDictionarySize["detailWindow"] = "large";
+			
+			componentDictionary["miniMapCharacterDrawer"] = gameEngine.hudGroup.megaUI.stateVisualizer.stateFilter.characterFilterGroup;
+			componentDictionarySize["miniMapCharacterDrawer"] = "circle";
+			
+			componentDictionary["miniMapCharacterDrawerAllButton"] = gameEngine.hudGroup.megaUI.stateVisualizer.stateFilter.characterFilterGroup.allButton;
+			componentDictionary["minimMapCharacterDrawerPresentButton"] = gameEngine.hudGroup.megaUI.stateVisualizer.stateFilter.characterFilterGroup.presentButton;
+			componentDictionary["miniMapCharacterDrawerNoneButton"] = gameEngine.hudGroup.megaUI.stateVisualizer.stateFilter.characterFilterGroup.noneButton;
+			
+			componentDictionary["megaUIBuddyFilter"] = gameEngine.hudGroup.megaUI.stateVisualizer.buddyFilterButton;
+			componentDictionarySize["megaUIBuddyFilter"] = "circle";
+			
+			componentDictionary["megaUIRomanceFilter"] = gameEngine.hudGroup.megaUI.stateVisualizer.romanceFilterButton;
+			componentDictionarySize["megaUIRomanceFilter"] = "circle";
+			
+			componentDictionary["megaUICoolFilter"] = gameEngine.hudGroup.megaUI.stateVisualizer.coolFilterButton;
+			componentDictionarySize["megaUICoolFilter"] = "circle";
+			
+			componentDictionary["miniMapFriends"] = gameEngine.hudGroup.megaUI.stateVisualizer.stateFilter.filterFriendsCastButton;
+			componentDictionarySize["miniMapFriends"] = "circle";
+			
+			componentDictionary["miniMapDating"] = gameEngine.hudGroup.megaUI.stateVisualizer.stateFilter.filterDatingCastButton;
+			componentDictionarySize["miniMapDating"] = "circle";
+			
+			componentDictionary["miniMapEnemies"] = gameEngine.hudGroup.megaUI.stateVisualizer.stateFilter.filterEnemiesCastButton;
+			componentDictionarySize["miniMapEnemies"] = "circle";
+			
+			componentDictionary["socialGameButton0"] = gameEngine.hudGroup.socialGameButtonRing.socialGameButtons[0];
+			componentDictionary["socialGameButton1"] = gameEngine.hudGroup.socialGameButtonRing.socialGameButtons[1];
+			componentDictionary["socialGameButton2"] = gameEngine.hudGroup.socialGameButtonRing.socialGameButtons[2];
+			componentDictionary["socialGameButton3"] = gameEngine.hudGroup.socialGameButtonRing.socialGameButtons[3];
+			componentDictionary["socialGameButton4"] = gameEngine.hudGroup.socialGameButtonRing.socialGameButtons[4];
+			componentDictionary["goButton"] = gameEngine.hudGroup.megaUI.playSGButton;
+			componentDictionary["character1Button"] = gameEngine.hudGroup.megaUI.initiatorCharButton;
+			componentDictionary["character2Button"] = gameEngine.hudGroup.megaUI.responderCharButton;
+			
+			componentDictionary["megaUIRelationshipButton"] = gameEngine.hudGroup.megaUI.relationshipButton;
+			componentDictionarySize["megaUIRelationshipButton"] = "circle";
+			
+			componentDictionary["selectedGameButton"] = gameEngine.hudGroup.megaUI.socialExchangeButton;
+			
+			componentDictionary["minimizeButton"] = gameEngine.hudGroup.megaUI.minimizeButton;
+			componentDictionarySize["minimizeButton"] = "circle";
+			
+			componentDictionary["relationshipSummaryButton"] = gameEngine.hudGroup.socialGameButtonRing.relationshipSummaryButton.relSummaryButton;
+			//componentDictionary["megaUISocialExchangeButton"] = gameEngine.hudGroup.megaUI.socialExchangeButton;
+			
+			//componentDictionary["initiatorIntentGroup"] = gameEngine.hudGroup.megaUI.sgInfo.initiatorIntentGroup;
+			
+			
+			componentDictionary["juiceBar"] = gameEngine.hudGroup.juiceBar;
+			componentDictionarySize["juiceBar"] = "circle";
+			
+			componentDictionary["megaUIInitiatorIntentButton"] = gameEngine.hudGroup.megaUI.sgInfo.initiatorIntentButton;
+			componentDictionary["megaUIInitiatorMotivesButton"] = gameEngine.hudGroup.megaUI.sgInfo.initiatorMotivesButton;
+			componentDictionary["megaUIResponderMotivesButton"] = gameEngine.hudGroup.megaUI.sgInfo.responderMotivesButton;
+			componentDictionary["megaUIResultsButton"] = gameEngine.hudGroup.megaUI.sgInfo.resultsButton;
+			componentDictionary["megaUISwitchOutcomeButton"] = gameEngine.hudGroup.megaUI.sgInfo.switchOutcomeButton;
+			componentDictionary["stars"] = gameEngine.hudGroup.megaUI.starGroup; // .getElementAt(0);
+			componentDictionary["detailsButton"] = gameEngine.hudGroup.postSGSFDBEntry.detailsButton;
+			componentDictionary["continueButton"] = gameEngine.hudGroup.postSGSFDBEntry.continueButton;
+			componentDictionary["initiatorIntentButton"] = gameEngine.hudGroup.postSGSFDBEntry.sgInfoComponent.initiatorIntentButton;
+			componentDictionary["initiatorMotivesButton"] = gameEngine.hudGroup.postSGSFDBEntry.sgInfoComponent.initiatorMotivesButton;
+			componentDictionary["responderMotivesButton"] = gameEngine.hudGroup.postSGSFDBEntry.sgInfoComponent.responderMotivesButton;
+			
+		
+			//componentDictionary["clickAnywhere"] = gameEngine.hudGroup;
+
+			componentDictionary["levelClock"] = gameEngine.hudGroup.megaUI.levelClock;
+			componentDictionarySize["levelClock"] = "circle";
+			
+			componentDictionary["levelSkipYes"] = gameEngine.hudGroup.skipLevelOptionMenu.yesButton;
+            componentDictionary["levelSkipNo"] = gameEngine.hudGroup.skipLevelOptionMenu.noButton;
+			
+			componentDictionary["notificationsButton"] = gameEngine.hudGroup.megaUI.notificationButton;
+			componentDictionarySize["notificationsButton"] = "circle";
+				
+			componentDictionary["singleCharFilterButton"] = gameEngine.hudGroup.megaUI.characterSheetToggleButton;
+			componentDictionarySize["singleCharFilterButton"] = "circle";
+			
+			componentDictionary["twoCharFilterButton"] = gameEngine.hudGroup.megaUI.relationshipToggleButton;
+			componentDictionarySize["twoCharFilterButton"] = "circle";
+			
+			//componentDictionary["exploreStateToggleButton"] = gameEngine.hudGroup.megaUI.exploreStateToggleButton;
+			componentDictionary["exploreStateButton"] = gameEngine.hudGroup.megaUI.exploreStateButton;
+			componentDictionarySize["exploreStateButton"] = "circle";
+			
+			componentDictionary["initiatorIntentImage"] = gameEngine.hudGroup.megaUI.sgInfo.intentImageGroup;
+			componentDictionarySize["initiatorIntentImage"] = "circle";
+			
+			componentDictionary["initiatorDesireIntensity"] = gameEngine.hudGroup.megaUI.sgInfo.intensityLabel;
+			componentDictionary["responderResponse"] = gameEngine.hudGroup.megaUI.sgInfo.predictionLabel;
+			componentDictionary["responderResponseIntensity"] = gameEngine.hudGroup.megaUI.sgInfo.responderIntensityLabel;
+			
+			//componentDictionary["storyGoalExitX"] = gameEngine.hudGroup.storyGoalWindow.toDoItemAccordion.removeIconGroup;
+			//componentDictionarySize["storyGoalExitX"] = "circle";
+			
+		}
+		
+		//questions for Josh
+		//1.) If we want to do something like 'click on a specific avatar', that seems weird (since we dont know the avatars available until we pick a specific level? Or this is why we need a specific tutorial level?  Really, I don't think we have, like, any avatars.
+		////--change it so that we are dealing with loading the tutorial AFTER story selection.  That deals with almost everything.
+		///---Pass a function or an event, to get it hooked up properly at the right time and the right place, 
+		//two events: 
+		///1.)Set up tutorial framework
+		///2.) Tear down tutorial framework.
+		///Events that gameEngine can fire and that main.mxml can listen to.
+		//2.) The prom timer clock and it's subcomponents e.g. to-do list button seem weird.
+		
+		//ADD ON ENTER FRAME EVENT
+		//MAKE IT FLASHY!!!!!!!
+		//INCREMENT OR DECREMENT THE ALPHA!!
+		
+		/**
+		 * this function looks at what the current tutorialStepCounter is
+		 * and adds the appropriate UI component to the dictionary.
+		 * It assumes that there IS in fact still a remaining tutorial
+		 * step to set up.
+		 * 
+		 * It also is going to add even dispatchers to every OTHER type of thing, too, just to experiment a little.
+		 * we're going to add 'do nothing' even listeners to these other components, so that we don't 
+		 * 
+		 * DO A CHECK FOR IMPLEMENTS EVENT DISPATCHER, 
+		 * 'iEventDispatcher' is for the interface?
+		 * Add that to XML -- what kind of attention do we want to draw to this (color border? flashing thing? sparkle? etc.)
+		 */
+		public function addTutorialEventHandler():void {
+			//Debug.debug(this, "addTutorialEventHandler() -- current step is: " + this.tutorialStepCounter);
+			var ts:TutorialStep = this.tutorialSteps[tutorialStepCounter];
+			var objectSearchString:String = getIndexOfComponentDictionary(ts);
+			var isObject:Boolean = true;
+			
+			//I think we might have to loop through all of the 'disablement' things too,
+			//because... oh crap
+			//no, not necessarily.  Sometimes you'll want multiple things to progress the tutorial
+			// E.G. EITHER the "go" button OR the "Social Game Button" should progress it.
+			// And other times you DON'T want that.
+			// GARHHH. Do we need to have two sets of disablements?  Disablement that progress the tutorial, and disablement that doesn't.
+			//I think maybe we might.
+			//OR... maybe all disablement DOES progress the tutorial?
+			//NO.  THERE ARE TWO SETS and I HAVe THEM NOW
+			//They live ins omething like 'disableButStillProgressTheTutorial!  They are awesome.
+			//I think this is just as easy as making this a loop and it doesn't only look at the object, it also looks at the disable exceptions.
+			
+			var exceptionComponentsProgressTutorial:Array = ts.disableExceptionsButStillProgress.split(",");
+			var progressTutorialComponents:Array = new Array();
+			progressTutorialComponents.push(objectSearchString);
+			if(exceptionComponentsProgressTutorial) // only concat if this is not null, i.e. there was actually something there.
+				progressTutorialComponents = progressTutorialComponents.concat(exceptionComponentsProgressTutorial);
+			
+			//Handle all disablement (i.e. make it so that you can't click on things that you aren't supposed to click on!)
+			//Which, by default, is everything.  However, inside of tutorial script files, you can specify exceptions.
+			disableNonExceptions(ts);
+			
+			for each(var searchString:String in progressTutorialComponents) {
+				if (searchString == "") continue; // we don't want to deal with empty search strings!
+				var currentComponent:IEventDispatcher = componentDictionary[searchString] as IEventDispatcher;
+				
+				/*
+				for (var key:String in componentDictionary) {
+					Debug.debug(this, "this is the value of key: " + key);
+					if (key.toLowerCase() == searchString.toLowerCase()) {
+						Debug.debug(this, "This is what I DO want to add the event listener to!  It should progress the tutorial like normal!");
+					}
+					else {
+						Debug.debug(this, "this is what I want to 'disable' the event listener to.  make it so that it doesn't progress anything.");
+					}
+				}
+				*/
+				
+				//Figure out which event handler we we want to add e.g. click or over
+				if (ts.object == "" || ts.object == "none") { // Don't add an event listener to something that doesn't exist!
+					Debug.debug(this, "addTutorialEventHandler() don't actualy need to add an event handler here");
+				}
+				else {
+					switch(ts.eventType.toLowerCase()) { // add the event listener.
+						case "click":
+							currentComponent.addEventListener(MouseEvent.CLICK, progressTutorial, false);
+							currentTypeOfEventAdded = MouseEvent.CLICK;
+							break;
+						case "over":
+							currentComponent.addEventListener(MouseEvent.MOUSE_OVER, progressTutorial, false);
+							currentTypeOfEventAdded = MouseEvent.MOUSE_OVER;
+							break;
+						case "deselect":
+							//Ok.. so... what I want to do here is do some kind of check for when the
+							//the character (specified by avatar and 'name')... shouldn't be too hard right.
+							//Might have to add an event listener maybe...
+							currentComponent.addEventListener(Event.ENTER_FRAME, checkForDeselect, false);
+							break;
+						default:
+							Debug.debug(this, "addTutorialHandler() unrecognized event type");
+					}
+					//Debug.debug(this, "addTutorialEventListener() " + ts.preText)
+				
+					//ADD teh glowy flashy effect!
+					//Only want to add this to the 'object' I think.  That is my claim.
+					if(isObject && ts.eventType.toLowerCase() != "deselect"){
+						currentComponent.addEventListener(Event.ENTER_FRAME, makeFlashy, false);
+						isObject = false;
+					}
+				}
+			}
+			
+			
+			//HANDLE RICH TEXT STUFF!
+			var tempTextFlow:TextFlow = new TextFlow(); // the 'text flow' is how special things like colors and images are handled!
+			
+			//THIS WORKS GREAT!
+			//tempTextFlow = TextFlowUtil.importFromString(ts.preText); // We start off by grabbing the starting text flow as specified in the tutorial script.
+			
+			//Try using the 'internal' text instead!
+			tempTextFlow = TextFlowUtil.importFromString(ts.internalText); // We start off by grabbing the starting text flow as specified in the tutorial script.
+			
+			
+			var leaf:FlowLeafElement; // used for iteration
+			leaf = tempTextFlow.getFirstLeaf();
+			var rootPara:ParagraphElement = tempTextFlow.getChildAt(0) as ParagraphElement;  //We'll be adding our new 'span' elements to this paragraph element.
+			var tempGraphic:InlineGraphicElement;
+			
+	
+			//We are going to loop through all of the span elements that were specified in the tutorial file, to see if any of the 'special codes' indicating
+			//images were specified.
+			var leafIndex:int = 0; // Used to figure out WHERE an image should go, if anywhere.
+			var shouldDeleteALeaf:Boolean = false;
+			//while ((leaf = SpanElement(leaf.getNextLeaf())) != null) {
+			while (leaf != null) {
+				tempGraphic = new InlineGraphicElement(); //Used for placing an image inside of the rich text component.
+				if (leaf.text == "FRIENDS") {
+					tempGraphic.source = resourceLibrary.relationshipIcons["friends"];
+					tempGraphic.width = 20;
+					tempGraphic.height = 20;
+					//rootPara.removeChild(leaf);
+					//rootPara.removeChildAt(leafIndex);
+					shouldDeleteALeaf = true;
+					rootPara.addChildAt(leafIndex, tempGraphic);
+				}
+				else if (leaf.text == "ENDFRIENDS") {
+					tempGraphic.source = resourceLibrary.relationshipIcons["endFriends"];
+					tempGraphic.width = 20;
+					tempGraphic.height = 20;
+					//rootPara.removeChild(leaf);
+					shouldDeleteALeaf = true;
+					rootPara.addChildAt(leafIndex, tempGraphic);
+				}
+				else if (leaf.text == "DATING") {
+					tempGraphic.source = resourceLibrary.relationshipIcons["dating"];
+					tempGraphic.width = 20;
+					tempGraphic.height = 20;
+					//rootPara.removeChild(leaf);
+					shouldDeleteALeaf = true;
+					rootPara.addChildAt(leafIndex, tempGraphic);
+				}
+				else if (leaf.text == "ENDDATING") {
+					tempGraphic.source = resourceLibrary.relationshipIcons["endDating"];
+					tempGraphic.width = 20;
+					tempGraphic.height = 20;
+					//rootPara.removeChild(leaf);
+					shouldDeleteALeaf = true;
+					rootPara.addChildAt(leafIndex, tempGraphic);
+				}
+				else if (leaf.text == "ENEMIES") {
+					tempGraphic.source = resourceLibrary.relationshipIcons["enemies"];
+					tempGraphic.width = 20;
+					tempGraphic.height = 20;
+					//rootPara.removeChild(leaf);
+					shouldDeleteALeaf = true;
+					rootPara.addChildAt(leafIndex, tempGraphic);
+				}
+				else if (leaf.text == "ENDENEMIES") {
+					tempGraphic.source = resourceLibrary.relationshipIcons["endEnemies"];
+					tempGraphic.width = 20;
+					tempGraphic.height = 20;
+					//rootPara.removeChild(leaf);
+					//rootPara.removeChildAt(leafIndex);
+					shouldDeleteALeaf = true;
+					rootPara.addChildAt(leafIndex, tempGraphic);
+				}
+				else if (leaf.text == "LOCK") {
+					tempGraphic.source = resourceLibrary.uiIcons["lock"];
+					tempGraphic.width = 20;
+					tempGraphic.height = 20;
+					//rootPara.removeChild(leaf);
+					shouldDeleteALeaf = true;
+					rootPara.addChildAt(leafIndex, tempGraphic);
+				}
+				else if (leaf.text == "PLAYBUTTON") {
+					tempGraphic.source = resourceLibrary.uiIcons["playIcon"];
+					tempGraphic.width = 40;
+					tempGraphic.height = 40;
+					//rootPara.removeChild(leaf);
+					shouldDeleteALeaf = true;
+					rootPara.addChildAt(leafIndex, tempGraphic);
+				}
+				leafIndex++;
+				leaf = SpanElement(leaf.getNextLeaf());
+				if (shouldDeleteALeaf) {
+					shouldDeleteALeaf = false;
+					rootPara.removeChildAt(leafIndex);
+				}
+			}
+			
+			//Now that we've manipulated our tempTextFlow to be what we want, stuff it into the actual richText's text flow property!
+			gameEngine.tutorialPopup.tutorialText.textFlow = tempTextFlow;
+			
+			
+			//Determine whether or not the 'next' button shoudl be visible -- it is specified inside of the tutorial.xml file.
+			//it really SHOULD be specified every time 
+			if (ts.nextVisible == "true") {
+				gameEngine.tutorialPopup.nextButton.visible = true;
+				//if (!gameEngine.tutorialPopup.nextButton.hasEventListener(MouseEvent.CLICK))
+				gameEngine.tutorialPopup.nextButton.addEventListener(MouseEvent.CLICK, nextButtonClicked, false);
+			} else {
+				gameEngine.tutorialPopup.nextButton.visible = false;
+				if (!gameEngine.tutorialPopup.nextButton.hasEventListener(MouseEvent.CLICK))
+					gameEngine.tutorialPopup.nextButton.removeEventListener(MouseEvent.CLICK, nextButtonClicked, false);
+			}
+			
+			
+			//if there is a character name, a social game name, and a the object is socialGameButton{1-5}, we want to make 
+			//the social game button n on that character's ring be about the social game name.
+			//(ts.object.substring(0, 16) == "socialGameButton")
+			//(this.componentDictionary[ts.object] is SocialGameButton)
+			var sgb:PromWeek.SocialGameButton;
+			for each(sgb in this.gameEngine.hudGroup.socialGameButtonRing.socialGameButtons) {
+				sgb.gameManuallySet = false;
+				sgb.setGameName = "";
+			}
+			Utility.log(this, "addTutorialEventHander() about to test for set social game button application." + ts.socialGameButtonNumber + " as " + ts.sgName);
+			if ( ts.socialGameButtonNumber > -1 && ts.sgName.length > 0) {
+				sgb = this.componentDictionary["socialGameButton" + ts.socialGameButtonNumber];
+				Utility.log(this, "addTutorialEventHander() setting socialGameButton" + ts.socialGameButtonNumber + " as " + ts.sgName);
+				
+				sgb.gameManuallySet = true;
+				sgb.setGameName = ts.sgName;
+				//sgb.updateStateBasedOnGameName(ts.sgName);
+				//sgb.invalidateProperties();
+				//sgb.invalidateDisplayList();
+				if ((gameEngine.primaryAvatarSelection != "" && gameEngine.secondaryAvatarSelection != "")
+					&& (gameEngine.primaryAvatarSelection != null && gameEngine.secondaryAvatarSelection != null))
+				{
+					gameEngine.hudGroup.socialGameButtonRing.updateSocialGameButtonText();
+				}
+				
+				//var index:Number = ts.object.substring(16, 17) as Number;
+				//this.gameEngine.hudGroup.socialGameButtonRing.socialGameButtons[index].updateStateBasedOnGameName(ts.sgName);
+				//this.gameEngine.hudGroup.socialGameButtonRing.socialGameButtons[index].invalidateDisplayList();
+			}
+			
+			if (ts.stop) {
+				gameEngine.tutorialPopup.stopButton.visible = true;
+				gameEngine.tutorialPopup.stopButton.addEventListener(MouseEvent.CLICK, stopTutorialAndContinueLevel, false);
+				gameEngine.tutorialStopped = true;
+			}else if (gameEngine.tutorialPopup.stopButton.visible && !ts.stop) {
+				gameEngine.tutorialPopup.stopButton.visible = false;
+				gameEngine.tutorialPopup.stopButton.removeEventListener(MouseEvent.CLICK, stopTutorialAndContinueLevel);
+			}
+			
+			this.currentStep = ts;
+			
+			//OK, hey, here is an idea, let's figure out if the Finish Tutorial Button should appear here.  I guess maybe we should add the 'finish tutorial' button
+			//to the pop up menu.
+			if (ts.isOver) {
+				gameEngine.tutorialPopup.finishButton.visible = true;
+				gameEngine.tutorialPopup.finishButton.addEventListener(MouseEvent.CLICK, finishButtonClicked, false);
+				gameEngine.tutorialStopped = true;
+				this.currentStep = null;
+			}
+			
+		}
+		
+		/**
+		 * Generally speaking we want there to be structure to the tutorial--we don't want to click on everything.
+		 * In fact, generally speaking we only want them to click on ONE thing.  However, there may be cases where we
+		 * want people to be able to click on multiple things.  The logic to determine whose event handler's get
+		 * turned on and off happens here.
+		 * @return
+		 */
+		public function disableNonExceptions(ts:TutorialStep):void {
+			//I think, what we ca do is go through every thing in the component dictionary,
+			//add a 'do nothing' event listener,
+			//and then go through the exceptions, and remove that very same 'do nothing' event
+			//listener we just created.
+			
+			if (ts.eventType == "deselect")
+			{
+				gameEngine.tutorialDisallowBackgroundClicks = false;
+			}
+			else
+			{
+				gameEngine.tutorialDisallowBackgroundClicks = true;
+			}
+			
+			for (var index:String in componentDictionary) {
+				var easyIndex:String = ts.object;
+				//Debug.debug(this, "index is: " + index);
+				//Debug.debug(this, "index subset is: " + index.substr(0, 6));
+				if (index.substr(0, 6) == "avatar") {
+					easyIndex = ts.object + "-" + ts.name;
+				}
+				
+				//if (index == "socialGameButton3") {
+					//(componentDictionary[index] as SocialGameButton).enabled = false;
+				//}
+				
+				//OK... this is maybe a little crazy, but
+				//let's try REMOVING the event listeners first...
+				//what happens if you try to remove an event listener that it doesn't actually have.
+				componentDictionary[index].removeEventListener(MouseEvent.CLICK, doNothing, false);
+				componentDictionary[index].removeEventListener(MouseEvent.MOUSE_OVER, doNothing, false);
+				
+				if(index.toLowerCase() != easyIndex.toLowerCase()){
+				//if(index.toLowerCase() != ts.object.toLowerCase() && (index.substr(0,6) == "avatar" && index.toLowerCase() != (ts.object + "-" + ts.name))){ // don't bother adding these guys if we are looking at the component that we want the user to click on.
+					componentDictionary[index].addEventListener(MouseEvent.CLICK, doNothing, false, 100);
+					componentDictionary[index].addEventListener(MouseEvent.MOUSE_OVER, doNothing, false, 100);
+				}
+			}
+			
+			//Go through all of the exceptions that were specified, and remove the event handlers that
+			//we just added on those!
+			//Note that there are two flavors of exceptions -- the ones that progress the tutorial, and the ones that don't.
+			var exceptionComponents:Array = ts.disableExceptions.split(",");
+			var exceptionComponentsProgressTutorial:Array = ts.disableExceptionsButStillProgress.split(",");
+			exceptionComponents = exceptionComponents.concat(exceptionComponentsProgressTutorial);
+			for each(var indexString:String in exceptionComponents) {
+				if(indexString != ""){
+					componentDictionary[indexString].removeEventListener(MouseEvent.CLICK, doNothing, false);
+					componentDictionary[indexString].removeEventListener(MouseEvent.MOUSE_OVER, doNothing, false);
+				}
+			}
+		}
+		
+		
+		
+		
+		
+		
+		/**
+		 * This is the function that is passed in to the new event handlers that we create
+		 * throughout the tutorial process.  Perhaps by the end we will decide that we will want
+		 * to have several different functions, and we can specify the name of the actual function
+		 * we want to use per handler inside of the tutorial script.
+		 */
+		public function progressTutorial(e:MouseEvent):void {
+			//make the tutorial pop up be on the very top!
+			//setElementIndex(gameEngine.tutorialPopup, gameEngine.hudGroup.numChildren-1);
+			if (tutorialStepCounter < tutorialSteps.length) { // just a safeguard (we shouldn't be getting here if it Iis >=)
+				
+				//Debug.debug(this, "target is: " + e.target + " and current target is: " + e.currentTarget);
+				//Debug.debug(this, "progressTutorial()");
+				var ts:TutorialStep = this.tutorialSteps[tutorialStepCounter];
+				
+				Debug.debug(this, "Interested in 'internal text' value: " + ts.internalText);
+				
+				var searchString:String = getIndexOfComponentDictionary(ts);
+				var currentComponent:Object = componentDictionary[searchString] as Object;
+				
+
+
+				
+				var currentComponentForListeners:IEventDispatcher = componentDictionary[searchString] as IEventDispatcher;
+				//Make the popup box display
+				//Debug.debug(this, "progressTutorial() Pop up box needs to display! But here is the text: " + ts.postText);
+				
+				//gameEngine.tutorialPopup.tutorialText.text = ts.postText;
+				//gameEngine.tutorialPopup.tutorialText. = ts.postText;
+				gameEngine.tutorialPopup.tutorialText.textFlow = TextFlowUtil.importFromString(ts.postText);
+				
+				//Disable the event handler, so that you can't click on the same thing again!
+				//Debug.debug(this, "progressTutorial() Disable the existing event handler!");
+				if(currentComponentForListeners){
+					currentComponentForListeners.removeEventListener(currentTypeOfEventAdded, progressTutorial, false);
+					currentComponentForListeners.removeEventListener(Event.ENTER_FRAME, makeFlashy);
+					currentComponentForListeners.removeEventListener(Event.ENTER_FRAME, checkForDeselect);
+					currentComponent.alpha = 1; // we want to make sure that the highlight turns back to 'normal'!
+					if(this.useGlow)
+						(currentComponent as UIComponent).filters = null; // turn off any active filters
+				}
+				//Increment the step counter!
+				this.tutorialStepCounter++;
+				
+				
+				ts = this.tutorialSteps[tutorialStepCounter];
+				
+				this.currentStep = ts;
+				
+				zoomToCharacter(ts);
+				
+				//deal with placing the tutorail filter thing
+				searchString = getIndexOfComponentDictionary(ts);
+				currentComponent = componentDictionary[searchString] as Object;
+				
+				if (ts.stateVizHead != "")
+				{
+					for each (var charRep:PortraitIcon in gameEngine.hudGroup.megaUI.stateVisualizer.characterRepresentations)
+					{
+						if (charRep.characterName.toLowerCase() == ts.stateVizHead.toLowerCase())
+						{
+							currentComponent = charRep;
+						}
+					}
+				}
+				
+				if (currentComponent && ts.eventType.toLowerCase() != "deselect")
+				{	
+					//this is for all other 
+					var pt:Point;					
+					if (ts.object.indexOf("avatar") == 0)
+					{
+						gameEngine.tutorialAvatarName = searchString.substring(7);
+						
+						gameEngine.tutorialScreenFilter.source = resourceLibrary.uiIcons["characterFilter"];
+						
+						gameEngine.tutorialFilterFollowingWidth = 0;
+						gameEngine.tutorialFilterFollowingHeight = 0;
+						pt = currentComponent.localToGlobal(new Point(0,0));
+					}
+					else
+					{
+						gameEngine.tutorialAvatarName = "";
+						
+						
+						if (!this.componentDictionarySize[searchString])
+						{
+							//default to the short one
+							if (ts.stateVizHead != "")
+							{
+								//unless it is a state vizualizer highlight
+								gameEngine.tutorialScreenFilter.source = resourceLibrary.uiIcons["tutorialFilter"];
+							}
+							else
+							{
+								gameEngine.tutorialScreenFilter.source = resourceLibrary.uiIcons["tutorialFilterShort"];
+							}
+						}
+						else
+						{
+							if (this.componentDictionarySize[searchString] == "circle")	
+							{
+								gameEngine.tutorialScreenFilter.source = resourceLibrary.uiIcons["tutorialFilter"];
+							}
+						}
+						
+						gameEngine.tutorialFilterFollowingWidth = currentComponent.width / 2;
+						gameEngine.tutorialFilterFollowingHeight = currentComponent.height / 2;
+						pt = currentComponent.localToGlobal(new Point(currentComponent.width/2,currentComponent.height/2));
+					}
+					//if (ts.stateVizHead != "")
+					//{
+						//trace("frfewf");
+					//}
+					
+					//this means we are an avatar, so we gotta place outselves differently
+					gameEngine.tutorialFilter.x = pt.x + gameEngine.filterOffsetX;
+					gameEngine.tutorialFilter.y = pt.y + gameEngine.filterOffsetY;
+					
+					gameEngine.tutorialFilterFollowing = currentComponent as DisplayObject;
+				
+					gameEngine.tutorialFilterFadeIn.play([gameEngine.tutorialFilter]);
+					gameEngine.tutorialFilter.visible = true;
+				}
+				//else if (ts.positionX != -1 && ts.positionY != -1)
+				//{
+					// this means we have hand authored placement for the tutorial step
+					//gameEngine.tutorialScreenFilter.source = resourceLibrary.uiIcons["tutorialFilter"];
+					//gameEngine.tutorialFilterFollowingWidth = 0;
+					//gameEngine.tutorialFilterFollowingHeight = 0;
+					//var pt1:Point = gameEngine.hudGroup.localToGlobal(new Point(ts.positionX + gameEngine.filterOffsetX,ts.positionY + gameEngine.filterOffsetY));
+					//var pt1:Point = new Point(0,0);
+					//gameEngine.tutorialFilter.x = pt1.x// + ts.positionX + gameEngine.filterOffsetX;
+					//gameEngine.tutorialFilter.y = pt1.y// + ts.positionY + gameEngine.filterOffsetY;
+					//gameEngine.tutorialFilterFadeIn.play([gameEngine.tutorialFilter]);
+					//gameEngine.tutorialFilter.visible = true;
+				//}
+				else
+				{	
+					gameEngine.tutorialAvatarName = "";
+					gameEngine.tutorialFilterFollowing = null;
+					
+					//gameEngine.tutorialFilter.visible = false;
+					gameEngine.tutorialFilterFadeOut.play([gameEngine.tutorialFilter]);
+				}
+				
+				
+				
+				
+				//And set up the next tutorial Event Handler!
+				if (tutorialStepCounter < tutorialSteps.length){
+					positionPopUpWindow();
+					addTutorialEventHandler();
+				}
+				else {
+					//Debug.debug(this, "progressTutorial() you are done with the tutorial!");
+				}
+			}
+		}
+		
+		/**
+		 * Zooms to character if ts.centerOnCharacter is set in ts. Stores and restores previous
+		 * camera position if ts.centerOnCharacter not set.
+		 * 
+		 * @param	ts
+		 */
+		public function zoomToCharacter(ts:TutorialStep = null):void
+		{
+			if (!ts)
+			{
+				ts = this.tutorialSteps[0];
+			}
+			
+			//set the camera centering to a specified character
+			var cif:CiFSingleton = CiFSingleton.getInstance();
+			if (cif.cast.getCharByName(ts.centerOnCharacter))
+			{
+				var avatar:Avatar = gameEngine.worldGroup.avatars[ts.centerOnCharacter.toLowerCase()];
+				if (avatar)
+				{
+					previousCameraPosition = new Point(gameEngine.camera.destinationInWorldCoordinates.x, gameEngine.camera.destinationInWorldCoordinates.y);
+					previousCameraZoom = gameEngine.camera.zoom;
+					
+					gameEngine.camera.absolutePositionCenter(avatar.locX,avatar.locY, 1.5);
+				}
+			}
+			else if (previousCameraPosition)
+			{
+				//gameEngine.camera.absolutePosition(previousCameraPosition.x,previousCameraPosition.y,previousCameraZoom);
+				gameEngine.camera.zoom = 0.75;
+
+				previousCameraPosition = null;
+			}	
+		}
+		
+		
+		public function makeGlow(target:UIComponent):void {
+			var glow:GlowFilter = new spark.filters.GlowFilter(0xFFFFFF, 0.9, 6, 6, 2, 1, false, false);
+			target.filters = [glow];
+		}
+		
+		/**
+		 * makeFlashy is a way to draw attention to the 'active' tutorial event that we care about.
+		 * it is a funtion that is added to the onEnterFrame event listener for the object.  For starters
+		 * we will just adjust the alpha a little bit!
+		 */
+		public function makeFlashy(e:Event):void {
+			if (!this.useAlphaAnimation) return;
+			
+			if(tutorialStepCounter < this.tutorialSteps.length){
+				var ts:TutorialStep = this.tutorialSteps[tutorialStepCounter];
+				var searchString:String = getIndexOfComponentDictionary(ts);
+				var currentComponent:Object = componentDictionary[searchString] as Object;
+				if(currentComponent){
+					if (this.useGlow) {
+						if ((currentComponent as UIComponent).filters.length == 0) {
+							this.makeGlow(currentComponent as UIComponent);
+						}
+					}
+					//var dispObj:DisplayObject = currentComponent as DisplayObject;
+					//var glow:Glow = new Glow(dispObj);
+					//var filtersArray:Array = new Array(dropShadow);
+					//dispObj.filters 
+					
+					if(this.useAlphaAnimation) {
+					currentComponent.alpha += flashyAlphaDelta;
+						if (currentComponent.alpha <= MIN_ALPHA_THRESHOLD) {
+							flashyAlphaDelta = .02;
+						}
+						else if (currentComponent.alpha >= 1) {
+							flashyAlphaDelta = -.02;
+						}
+					}
+				}
+			}
+		}
+		
+		
+		
+		
+		/**
+		 * This function is meant to be a nice little check if the currently selected object has
+		 * been deselected or not.  If it DOES get deselected, I guess... progress the tutorial?
+		 * I'm not sure!  
+		 * @param	e
+		 */
+		public function checkForDeselect(e:Event):void {
+			if(tutorialStepCounter < this.tutorialSteps.length){
+				var ts:TutorialStep = this.tutorialSteps[tutorialStepCounter];
+				var searchString:String = getIndexOfComponentDictionary(ts);
+				var currentComponent:Object = componentDictionary[searchString] as Object;
+				if(currentComponent){
+					//OK, so the 'current component' is the clip... but what I care about is if the 'avatar' is selected or not.
+					//but that information lives in 'game engine'... that might be all I need.
+					if ( (gameEngine.primaryAvatarSelection && (gameEngine.primaryAvatarSelection.toLowerCase() == ts.name.toLowerCase() ) ) || (gameEngine.secondaryAvatarSelection &&(gameEngine.secondaryAvatarSelection.toLowerCase() == ts.name.toLowerCase())) ) {
+						//The pereson is still selected... don't do anything?
+					}
+					else {
+						//I think the person is no longer selected! make a big fuss!
+						Debug.debug(this, "I think you deselected the person!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! " + ts.name + " is no longer selected!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+						progressTutorial(e as MouseEvent);
+					}
+				}
+			}
+		}
+		
+		/**
+		 * although most of the time the index of the dictionary is going to be explicitly what
+		 * it was named in the 'object' field in a tutorial script, occasionally, such as with 
+		 * avatars, it is a conjunction between both the contents of the 'name' field and the
+		 * 'object' field.  getIndexOfComponentDictionary gets the appropriate index, based on the
+		 * context, and returns it for use in indexing the dictionary.
+		 * @param	ts the current tutorial step the tutorial is on.
+		 * @return the index of the component dictionary that stores the object we care about for this step of the tutorial
+		 */
+		public function getIndexOfComponentDictionary(ts:TutorialStep):String {
+			var searchString:String = "";
+			if (ts.object.indexOf("avatar") == 0){
+				searchString = "avatar-" + tutorialSteps[tutorialStepCounter].name;
+				//Debug.debug(this, "getIndexOfComponentDictionary() search string should be avatar related: " + searchString);
+			}
+			else{	
+				searchString = ts.object;
+				//Debug.debug(this, "getIndexOfComponentDictionary() search string is normal i hope: " + searchString);
+			}
+			return searchString
+		}
+		
+		/**
+		 * Disables all other clicks (I hope!) so that you can only click on what the tutorial wants you to click on.
+		 * @param	e the mouse event
+		 */
+		public function doNothing(e:MouseEvent):void {
+			//Debug.debug(this, "not doing anything!  You need to click on the thing that we want you to click on!");
+			if("Performance" != gameEngine.currentState)
+				e.stopImmediatePropagation(); //
+			
+			//Things to do when you get back from lunch!
+			
+			//1.)make it so that avatars are handled better with the event adding/unadding
+			//2.)add the rest of the tutorial.
+			//3.)Make sure that I remove all of the 'fake' event listeners that I added successfully.
+			
+			//Maybe we can do something fancy with skinning here, as well?
+		}
+		
+		public function nextButtonClicked(e:MouseEvent):void {
+			//Debug.debug(this, "next button was clicked!  We want to progress the tutorial!");
+			
+			//If the results screen is up, lets make it go away when you push this button.
+			//if (gameEngine.hudGroup.postSGSFDBEntry && gameEngine.hudGroup.postSGSFDBEntry.visible) {
+				//gameEngine.hudGroup.postSGSFDBEntry.visible = false;
+			//}
+			
+			progressTutorial(e);
+		}
+		
+
+		/**
+		 * Stops the tutorial from running, resets the tutorial step count, removes all event handlers.
+		 * This does not transition to new levels or end stories or reset state -- it simple stops the tutorial 
+		 * mechanisms.
+		 * 
+		 * @param	e
+		 */
+		public function stopTutorialAndContinueLevel(e:MouseEvent=null,resetingStory:Boolean = false):void {
+			//Debug.debug(this, "You finished the tutorial!!!!!! Excellent work!!!!");
+			
+			//1.) Reset the important parts of the tutorial to be ready for new tutorials!
+			tutorialStepCounter = 0;
+			
+			
+			gameEngine.tutorialPopup.finishButton.visible = false;
+			
+			gameEngine.tutorialDisallowBackgroundClicks = false;
+			
+			//Take out all of those 'do Nothing' event handlers we added!
+			for each(var component:IEventDispatcher in componentDictionary) {
+				component.removeEventListener(MouseEvent.CLICK, doNothing, false);
+				component.removeEventListener(MouseEvent.MOUSE_OVER, doNothing, false);
+				component.removeEventListener(MouseEvent.CLICK, progressTutorial, false);
+				component.removeEventListener(MouseEvent.MOUSE_OVER, progressTutorial, false);
+				component.removeEventListener(Event.ENTER_FRAME, checkForDeselect, false);
+				component.removeEventListener(Event.ENTER_FRAME, makeFlashy, false);
+
+			}
+			
+			//2.)Mark in the statistics manager that the completed tutorial is, in fact, completed.
+			statisticsManager.tutorialsDone[gameEngine.currentStory.title] = true;
+			//gameEngine.hudGroup.tutorialSelectionScreen.onInitialization();
+			gameEngine.hudGroup.tutorialSelectionScreen.updateTutorialButton(gameEngine.currentStory.title);
+			gameEngine.tutorialPopup.visible = false;
+			gameEngine.tutorialFilter.visible = false;
+			
+			gameEngine.camera.centerOnAllCharacters();
+			
+			if (!gameEngine.currentStory.isQuickPlay && !resetingStory)
+			{
+				if (gameEngine.currentLevelIndex == 0 && (gameEngine.currentStory.storyLeadCharacter.toLowerCase() == "zack" || gameEngine.currentStory.storyLeadCharacter.toLowerCase() == "chloe"))
+				{
+					gameEngine.hudGroup.customAlert.title.text = "Story Mode";
+					var hisOrHer:String;
+					if (CiFSingleton.getInstance().cast.getCharByName(gameEngine.currentStory.storyLeadCharacter).hasTrait(Trait.MALE))
+					{
+						hisOrHer = "his";
+					}
+					else
+					{
+						hisOrHer = "her";
+					}
+					gameEngine.hudGroup.customAlert.message.text = "Click the button on the top left to explore " + LineOfDialogue.toInitialCap(gameEngine.currentStory.storyLeadCharacter) + "'s goals. How " + hisOrHer + " prom night ends is shaped by everything you do!";
+					gameEngine.hudGroup.customAlert.visible = true;
+					//this.hudGroup.customAlert.shouldTurnOnTutorial = true;
+				}
+			}
+			
+		}
+		
+		/**
+		 * The callback function for when the 'finish' button is clicked.  This should
+		 * 1.)End the tutorial
+		 * 2.)Mark in the statistics manager that the completed tutorial is, in fact, completed.
+		 * 3.)Revert the social state back to the start state
+		 * 4.)Transport the player back to the tutorial selection screen (where should now be a nice green check mark indicating that the tutorial is done!)
+		 * @param	e
+		 */
+		public function finishButtonClicked(e:MouseEvent):void {
+			//Debug.debug(this, "You finished the tutorial!!!!!! Excellent work!!!!");
+			
+			
+			//1.) Reset the important parts of the tutorial to be ready for new tutorials!
+			tutorialStepCounter = 0;
+			gameEngine.tutorialPopup.finishButton.visible = false;
+			
+			//Take out all of those 'do Nothing' event handlers we added!
+			for each(var component:IEventDispatcher in componentDictionary) {
+				component.removeEventListener(MouseEvent.CLICK, doNothing, false);
+				component.removeEventListener(MouseEvent.MOUSE_OVER, doNothing, false);
+				component.removeEventListener(MouseEvent.CLICK, progressTutorial, false);
+				component.removeEventListener(MouseEvent.MOUSE_OVER, progressTutorial, false);
+				component.removeEventListener(Event.ENTER_FRAME, checkForDeselect, false);
+				component.removeEventListener(Event.ENTER_FRAME, makeFlashy, false);
+
+			}
+			
+			//2.)Mark in the statistics manager that the completed tutorial is, in fact, completed.
+			statisticsManager.tutorialsDone[gameEngine.currentStory.title] = true;
+			//gameEngine.hudGroup.tutorialSelectionScreen.onInitialization();
+			gameEngine.hudGroup.tutorialSelectionScreen.updateTutorialButton(gameEngine.currentStory.title);
+			
+			
+			
+			//3.) Revert the social state back to the start state
+			gameEngine.resetGameState();
+			
+			
+			//3.5) Clean up the UI elements that might be left lingering.
+			gameEngine.tutorialPopup.visible = false;
+			gameEngine.tutorialFilter.visible = false
+			gameEngine.hudGroup.megaUI.visible = false;
+			//gameEngine.hudGroup.levelClock.visible = false;
+			//gameEngine.hudGroup.topBar.visible = false;
+			gameEngine.hudGroup.juiceBar.visible = false;
+			gameEngine.hudGroup.socialGameButtonRing.visible = false;
+			gameEngine.hudGroup.ssuVisualizer.visible = false;
+			gameEngine.tutorialFilter.visible = false;
+			//for (var i:int = 0; i < gameEngine.hudGroup.updatesGroup.numElements; i++){
+				//gameEngine.hudGroup.updatesGroup.getElementAt(i).visible = false;
+			//}
+			
+			//Do some things like cleaning out 'goals' and juice points and stuff.
+			gameEngine.returnToMainMenuCleanUp();
+			
+			//4.) Transport the player back to the tutorial selection screen.
+			gameEngine.currentState = "TutorialScreen";
+		}
+		
+		public function addTextLineCallback(textLine:UIComponent):void {
+			//addElement(textLine);
+		}
+		
+		public function positionPopUpWindow():void {
+			if (this.tutorialSteps == null) return;
+			if (this.tutorialSteps[tutorialStepCounter] == null) return;
+			//Maybe move the textFlow box, based on quadrant (0 to 3)
+			var ts:TutorialStep = this.tutorialSteps[tutorialStepCounter];
+			Debug.debug(this, "This is the value of quadrant: " + ts.quadrant + " this is the value of the text: " + ts.internalText);
+			if (ts.quadrant == 0) {
+				//The default location
+				gameEngine.tutorialPopup.x = 25;
+				//gameEngine.tutorialPopup.left = 25;
+				gameEngine.tutorialPopup.y = 50;
+				//gameEngine.tutorialPopup.top = 50;
+			}
+			else if (ts.quadrant == 1) {
+				//The default location
+				gameEngine.tutorialPopup.x = gameEngine.APPLICATION_WIDTH - gameEngine.tutorialPopup.width - 25;
+				//gameEngine.tutorialPopup.right = 25;
+				gameEngine.tutorialPopup.y = 50;
+				//gameEngine.tutorialPopup.top = 50;
+			}
+			else if (ts.quadrant == 2) {
+				//The default location
+				gameEngine.tutorialPopup.x = gameEngine.APPLICATION_WIDTH - gameEngine.tutorialPopup.width - 25;
+				//gameEngine.tutorialPopup.right = 25;
+				gameEngine.tutorialPopup.y = gameEngine.APPLICATION_HEIGHT - gameEngine.tutorialPopup.height - 25;
+				//gameEngine.tutorialPopup.bottom = 25;
+			}
+			else if (ts.quadrant == 3) {
+				//The default location
+				gameEngine.tutorialPopup.x = 25;
+				//gameEngine.tutorialPopup.left = 25;
+				gameEngine.tutorialPopup.y = gameEngine.APPLICATION_HEIGHT - gameEngine.tutorialPopup.height - 25;
+				//gameEngine.tutorialPopup.bottom = 25;
+			}
+
+		}
+		
+		]]>
+	</fx:Script>
+		
+	
+</s:Group>

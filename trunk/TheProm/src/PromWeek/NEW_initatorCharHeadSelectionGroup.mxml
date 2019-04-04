@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()">
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+		 </fx:Declarations>
+		 
+		
+		 
+		<s:HGroup id="initiatorSelectionGroup" />
+		 
+	<fx:Script>
+		<![CDATA[
+		import CiF.Character;
+		import flash.events.Event;
+		import flash.events.MouseEvent;
+		import flash.ui.Mouse;
+		import mx.effects.Glow;
+		import PromWeek.assets.ResourceLibrary;
+		import CiF.Debug;
+		public var rL:ResourceLibrary;
+		
+		public var currentlySelected:String;
+		
+		public var charFaceButtons:Vector.<NEW_charFaceButton>;
+		
+		private var gameEngine:PromWeek.GameEngine;
+		
+		public function onCreationComplete():void 
+		{
+			rL = ResourceLibrary.getInstance();
+			gameEngine = GameEngine.getInstance();
+			charFaceButtons = new Vector.<NEW_charFaceButton>();
+			
+			this.addEventListener("INIT_FACE_CLICKED",charFaceClickedEvent);
+		}
+		
+		
+		public function charFaceClickedEvent(e:Event = null, charName1:String = "", switchingChar:Boolean = false):void 
+		{
+			var charName:String;
+			if (e == null)
+			{
+				charName = charName1;
+			}
+			else
+			{
+				charName = e.target.charName;
+			}
+			Debug.debug(this, "charFaceClickedEvent " + charName + " clicked!");
+			
+			
+			
+			
+			if (!switchingChar)
+			{
+				gameEngine.hudGroup.responderThoughtBubble.visible = false;
+				gameEngine.hudGroup.responderSubjectiveThoughtBubble.visible = false;
+				gameEngine.hudGroup.responderSubjectiveThoughtBubble.top = GameEngine.getInstance().hudGroup.defaultResponderSubjectThoughtBubbleTop;
+				gameEngine.hudGroup.initiatorSelectedComponent.initiatorThoughtBubble.visible = false;
+				gameEngine.hudGroup.initiatorSelectedComponent.switchCharButton.visible = false;
+				
+				if (gameEngine.hudGroup.initiatorSelectedComponent.characterSheet.visible)
+				{
+					gameEngine.hudGroup.initiatorSelectedComponent.characterSheet.updateCharacterSheet(charName);
+				}
+			}
+			this.deselectAll();
+			for each (var charFaceButton:NEW_charFaceButton in this.charFaceButtons)
+			{
+				if (charFaceButton.charName == charName)
+				{
+					charFaceButton.selected = true;
+				}
+				else
+				{
+					charFaceButton.selected = false;
+				}
+			}
+			this.currentlySelected = charName;
+		}
+		
+
+		
+		public function populateFromCast(chars:Vector.<Character>,size:Number=55):void 
+		{
+			charFaceButtons = new Vector.<NEW_charFaceButton>();
+			this.initiatorSelectionGroup.removeAllElements();
+			for each (var char:Character in chars)
+			{
+				var charFaceButton:PromWeek.NEW_charFaceButton = new PromWeek.NEW_charFaceButton();
+				charFaceButton.charName = char.characterName;
+				charFaceButton.mode = "initiator";
+				charFaceButton.width = size;
+				charFaceButton.height = size;
+				this.initiatorSelectionGroup.addElement(charFaceButton);
+				charFaceButtons.push(charFaceButton);
+			}
+			
+		}
+		
+		public function deselectAll():void
+		{
+			for each (var charFaceButton:NEW_charFaceButton in this.charFaceButtons)
+			{
+				charFaceButton.selected = false;
+			}
+			this.currentlySelected = "";
+		}
+		
+		
+		public function selectCharFaceByName(name:String):void 
+		{
+			this.deselectAll();
+			for each (var charFaceButton:NEW_charFaceButton in charFaceButtons)
+			{
+				if (charFaceButton.charName.toLowerCase() == name.toLowerCase())
+				{
+					charFaceButton.selected = true;
+					this.currentlySelected = name;
+				}
+			}
+		}
+
+		
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication 
+  xmlns:fx="http://ns.adobe.com/mxml/2009" 
+  xmlns:s="library://ns.adobe.com/flex/spark"
+  xmlns:mx = "library://ns.adobe.com/flex/halo"
+  creationComplete="onCreationComplete()"
+  enterFrame="onEnterFrame()"
+  width="1280"
+  height="720">
+	  
+	<fx:Style source="main.css"/>
+	
+	<fx:Script>
+	  <![CDATA[
+	  import eis.GameEngine;
+		  
+	  private var gameEngine:GameEngine = new GameEngine();
+		  
+	  public function onCreationComplete():void {
+		  gameEngine.onCreationCompete();
+		  addElement(gameEngine);
+	  }
+	  
+	  public function onEnterFrame():void {
+		 gameEngine.onEnterFrame(); 
+	  }
+	  ]]>
+	</fx:Script>
+	  
+</s:WindowedApplication>

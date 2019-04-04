@@ -1,0 +1,1086 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 preinitialize="onPreinitialize()"
+		 creationComplete="onCreationComplete()" 
+		 initialize="initializeStateVisualizer()"
+		 width="100%"
+		 height="100%"
+		 styleName="classicPromWeek">
+		 
+		<fx:Metadata>
+		</fx:Metadata>
+		 
+		<fx:Declarations>
+			<s:RadioButtonGroup id="networkFilterRadioButtonGroup"/>
+		</fx:Declarations>
+		
+		
+		<s:HGroup x="10" y="10" width="100%" height="100%">
+			<s:VGroup width="25%" height="100%">
+				<s:RichText text="Social Summary:" fontSize="12" fontWeight="bold" color="{getStyle('contentAreaTextColor')}"/>
+				<mx:Spacer height="25"></mx:Spacer>
+				<s:VGroup id="networkFilterRadioButtons">
+					<s:VGroup gap="5">
+						<s:RadioButton id="buddyFilterButton" label="Buddy" color="{getStyle('textColor')}" groupName="networkFilterRadioButtonGroup" selected="true" click="updateNetworkLines()" fontSize="14" />
+						<s:RadioButton id="romanceFilterButton" label="Romance" color="{getStyle('textColor')}" groupName="networkFilterRadioButtonGroup" click="updateNetworkLines()" fontSize="14"/>
+						<s:RadioButton id="coolFilterButton" label="Cool" color="{getStyle('textColor')}" groupName="networkFilterRadioButtonGroup" click="updateNetworkLines()" fontSize="14"/>
+					</s:VGroup>
+				</s:VGroup>
+			</s:VGroup>
+			<prom:StateFilter id="stateFilter" width="35" height="100%" />
+			<s:Group id="stateVisualizerGroup" width="282" height="92%" y="15">
+				<s:Rect x="0" y="0" 
+					radiusX="4" radiusY="4" topRightRadiusX="20" topRightRadiusY="20" 
+					height="100%" width="100%">
+					<s:stroke>
+						<s:SolidColorStroke weight="2" color="{getStyle('backgroundStrokeWeight')}" caps="none" alpha="0.3" />
+					</s:stroke>
+					<s:fill>
+						<s:SolidColor color="{getStyle('backgroundColor')}" alpha="0.3" />
+					</s:fill>
+				</s:Rect> 
+				<s:Group id="characterInfoGroup" width="90%" height="90%" >
+					<s:Group id="networkRepresentationGroup" width="100%" height="100%" >
+						
+					</s:Group>
+					<s:Group id="characterRepresentationGroup" width="100%" height="100%">
+						
+					</s:Group>
+					<s:Group id="friendsRepresentationGroup" width="100%" height="100%">
+						
+					</s:Group>
+					<s:Group id="datingRepresentationGroup" width="100%" height="100%">
+						
+					</s:Group>
+					<s:Group id="enemiesRepresentationGroup" width="100%" height="100%">
+						
+					</s:Group>
+				</s:Group>
+			</s:Group>
+		</s:HGroup>
+		<prom:CharPortraitDrawer id="switchPortraitDrawer" visible="true" downward="false" maintainList="false" x="20" y="-270" />
+		
+		<fx:Script>
+		<![CDATA[
+			
+		import flash.geom.Point;
+		import flash.geom.Vector3D;
+		import flash.text.TextField;
+		import flash.text.TextFormat;
+		import flashx.textLayout.utils.CharacterUtil;
+		import mx.collections.ArrayCollection;
+		import spark.components.Group;
+		import spark.components.Button;
+		import mx.graphics.SolidColor;
+		import mx.graphics.SolidColorStroke;
+		import spark.components.HGroup;
+		import spark.components.RichText;
+		import spark.effects.supportClasses.AnimateTransitionShaderInstance;
+		import spark.primitives.*;
+		import flash.text.TextField;
+		import spark.components.Label;
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import flash.events.*;
+		import CiF.*;
+		import flashx.textLayout.formats.TextAlign;
+		import PromWeek.*;
+		import PromWeek.assets.ResourceLibrary;
+
+		public static const MINI_PORTRAIT_WIDTH:Number = 30;
+		public static const MINI_PORTRAIT_HEIGHT:Number = 30;
+		
+		public static const SELECTED_PORTRAIT_WIDTH:Number = 40;
+		public static const SELECTED_PORTRAIT_HEIGHT:Number = 40;
+		
+		public static const MINI_RELATIONSHIP_ICON_WIDTH:Number = 20;
+		public static const MINI_RELATIONSHIP_ICON_HEIGHT:Number = 20;
+		
+		public static const SMALL_LINE_THICKNESS:Number = 2;
+		public static const MEDIUM_LINE_THICKNESS:Number = 3;
+		public static const LARGE_LINE_THICKNESS:Number = 4;
+		
+		private var resourceLibrary:PromWeek.assets.ResourceLibrary;
+		private var cif:CiFSingleton;
+		private var gameEngine:GameEngine;
+		
+		public var charactersToDisplay:Vector.<Character>;
+		public var characterRepresentations:Vector.<PortraitIcon>;
+		public var selectedCharacter:Character;
+		public var selectedCharacterRepresentation:PortraitIcon;
+		
+		public var buddyNetworkSelected:Boolean = false;
+		public var romanceNetworkSelected:Boolean = false;
+		public var coolNetworkSelected:Boolean = false;
+		public var friendsSelected:Boolean = false;
+		public var datingSelected:Boolean = false;
+		public var enemiesSelected:Boolean = false;
+		
+		//these exist because I don't have internet access and I want to test something...
+		//for use with placement to stop the dimensions from growing
+		public var characterRepresentationGroupWidth:Number;
+		public var characterRepresentationGroupHeight:Number;
+		private var _selChar:Character;
+		private var _chars:Vector.<Character>;
+		
+		public function onCreationComplete():void
+		{
+			//resourceLibrary = ResourceLibrary.getInstance();
+			//cif = CiFSingleton.getInstance();
+			//gameEngine = GameEngine.getInstance();
+		}
+		
+		
+		private function onPreinitialize():void {
+			resourceLibrary = ResourceLibrary.getInstance();
+			cif = CiFSingleton.getInstance();
+			gameEngine = GameEngine.getInstance();
+			
+			this._selChar = CiFSingleton.getInstance().cast.getCharByName("Zack");
+			this._chars = CiFSingleton.getInstance().cast.characters;
+		}
+		
+		public function initializeStateVisualizer():void 
+		{		
+			this.charactersToDisplay = new Vector.<Character>();
+			
+			this.addEventListener("UPDATE_NETWORK_LINES", updateNetworkLines);
+			
+			this.addEventListener("ALL_CAST_CLICKED", addAllCastClicked);
+			this.addEventListener("LEVEL_CAST_CLICKED", addLevelCastClicked);
+			this.addEventListener("FRIENDS_FILTER_CLICKED", filterFriendsClicked);
+			this.addEventListener("DATING_FILTER_CLICKED", filterDatingClicked);
+			this.addEventListener("ENEMIES_FILTER_CLICKED", filterEnemiesClicked);
+			this.addEventListener("NO_ONE_CLICKED", noOneClicked);
+			
+			//this.addEventListener("ADD_CHARACTER_TO_VISUALIZER", addCharacterToVisualizer);
+			//this.addEventListener("REMOVE_CHARACTER_FROM_VISUALIZER", removeCharacterFromVisualizer);
+			this.stateFilter.characterFilterGroup.addEventListener("charPortraitClicked", updateVisualizerToFilter);
+			this.addEventListener("centralCharacterChanged", switchCharacters);
+
+			this.characterRepresentationGroupWidth = 305//this.characterRepresentationGroup.width;//450
+			this.characterRepresentationGroupHeight = 125//this.characterRepresentationGroup.height;//225
+			
+			
+			//friendsFilterButton.setStyle("icon", resourceLibrary.relationshipIcons["friends"]);
+			//datingFilterButton.setStyle("icon", resourceLibrary.relationshipIcons["dating"]);
+			//enemiesFilterButton.setStyle("icon", resourceLibrary.relationshipIcons["enemies"]);
+
+		}
+		
+		override protected function commitProperties():void {
+			super.commitProperties();
+			//this.characterInfoGroup.width = this.characterInfoGroup.height;
+			
+			var char:Character;
+			//var image:Image;
+			
+			var image:PortraitIcon;
+			
+			this.selectedCharacter = _selChar;
+			switchPortraitDrawer.hiderBtn.label = this._selChar.characterName;
+			
+			//update characters to represent
+			this.charactersToDisplay = new Vector.<Character>();
+			//update the list of characters to represent
+			this.characterRepresentations = new Vector.<PortraitIcon>();
+			var foundTheSelectedChar:Boolean = false;
+			for each (char in _chars)
+			{
+				if (this.selectedCharacter.characterName != char.characterName)
+				{
+					this.charactersToDisplay.push(char.clone());
+					image = new PortraitIcon();
+
+					//image.source = resourceLibrary.charHeads[char.characterName.toLowerCase()];
+					image.loadPortraitImageToIcon(char.characterName,false,true,StateVisualizer.MINI_PORTRAIT_WIDTH,StateVisualizer.MINI_PORTRAIT_HEIGHT);
+
+					//image.portraitImage.alpha = 0.1;
+					
+					image.addEventListener(MouseEvent.CLICK,portraitClickedHandler);
+					
+					this.characterRepresentations.push(image);
+				}
+			}
+
+			
+			//add the main character sheet char to the center
+			image = new PortraitIcon();
+			if(this.selectedCharacter)
+				image.loadPortraitImageToIcon(this.selectedCharacter.characterName,false,false,StateVisualizer.SELECTED_PORTRAIT_WIDTH,StateVisualizer.SELECTED_PORTRAIT_HEIGHT);
+			this.selectedCharacterRepresentation = image;
+			
+			//clear the previous portraits and networkLines
+			this.characterRepresentationGroup.removeAllElements();
+			this.friendsRepresentationGroup.removeAllElements();
+			this.datingRepresentationGroup.removeAllElements();
+			this.enemiesRepresentationGroup.removeAllElements();
+			
+			//make it so characterRepresentations containts all the portraits we want in the right positions
+			//this.circularLayout();
+			this.halfCircleLayout();
+			//this.halfCircleLayoutGoingDownward();
+			
+			//create and place relationship icons
+			this.createAndPlaceRelationships();
+			
+			//create and add the network lines
+			this.updateNetworkLines();
+			
+			//add the portraits to the list
+			for each (var img:PortraitIcon in this.characterRepresentations)
+			{
+				this.characterRepresentationGroup.addElement(img);
+			}
+			this.characterRepresentationGroup.addElement(this.selectedCharacterRepresentation);
+			
+			if (!this.gameEngine.facadeState)
+			{
+				this.stateFilter.characterFilterGroup.updateIndividualCharacterFilterGroup(this.charactersToDisplay);
+			}
+			
+			this.dispatchEvent(new Event("STATE_VIZ_CHARS_CHANGED",true,true));
+		}
+		
+		public function updateCharacterInfoGroup(selChar:Character, chars:Vector.<Character>):void
+		{
+			_selChar = selChar;
+			_chars = chars;
+			this.invalidateProperties();
+			this.invalidateSize();
+			this.invalidateDisplayList();
+		}
+		
+		public function switchCharacters(e:Event):void {
+			this._selChar = cif.cast.getCharByName(switchPortraitDrawer.characterLastClicked);
+			commitProperties();
+		}
+		
+		public function isCharacterInVisualizer(charName:String):Boolean
+		{
+			for each (var char:Character in this.charactersToDisplay)
+			{
+				if (char.characterName.toLowerCase() == charName.toLowerCase())
+				{
+					//this means the character is already in the visualizer
+					return true;
+				}
+			}			
+			return false;
+		}
+		
+		
+		public function updateVisualizerToFilter(e:Event):void
+		{	
+			//this.stateFilter.characterFilterGroup.selectedChars[this.stateFilter.characterFilterGroup.characterLastClicked.toLowerCase()] = !this.stateFilter.characterFilterGroup.selectedChars[this.stateFilter.characterFilterGroup.characterLastClicked.toLowerCase()];
+			//this.stateFilter.characterRepresentations[this.stateFilter.characterFilterGroup.characterLastClicked.toLowerCase()].toggleSelected();// = !this.characterRepresentations[e.currentTarget.characterName].selected;
+			this.stateFilter.characterRepresentations[this.stateFilter.characterFilterGroup.characterLastClicked.toLowerCase()].selected = this.stateFilter.characterFilterGroup.selectedChars[this.stateFilter.characterFilterGroup.characterLastClicked.toLowerCase()];
+			for each (var charPort:PortraitIcon in this.stateFilter.characterRepresentations)
+			{
+				if (this.stateFilter.characterFilterGroup.selectedChars[charPort.characterName.toLowerCase()])
+				{
+					if (!this.isCharacterInVisualizer(charPort.characterName.toLowerCase()))
+					{
+						//Debug.debug(this,"Should add " + this.stateFilter.lastCharClicked)
+						this.addCharacterToVisualizer();
+						//this.stateFilter.characterFilterGroup.selectedChars[charPort.characterName.toLowerCase()] = true;
+					}
+				}
+				else
+				{
+					if (this.isCharacterInVisualizer(charPort.characterName))
+					{
+						//Debug.debug(this,"Should remove " + this.stateFilter.lastCharClicked)
+						this.removeCharacterFromVisualizer();
+						//this.stateFilter.characterFilterGroup.selectedChars[charPort.characterName.toLowerCase()] = false;
+					}
+				}
+			}
+		}
+		
+		private function addCharacterToVisualizer(e:Event=null):void 
+		{
+			var char:Character = cif.cast.getCharByName(this.stateFilter.characterFilterGroup.characterLastClicked.toLowerCase())
+			this.charactersToDisplay.push(char);
+			this.updateCharacterInfoGroup(this.selectedCharacter, this.charactersToDisplay);
+		}
+		
+		private function removeCharacterFromVisualizer(e:Event=null):void
+		{
+			//var portrait:PromWeek.PortraitIcon;
+			//portrait.selected
+			//Debug.debug(this,"Selected? " + this.stateFilter.characterRepresentations[this.stateFilter.lastCharClicked].selected)
+			//Debug.debug(this, "CHAR NAME: " + this.stateFilter.lastCharClicked);
+			var char:Character;
+			for (var i:int = 0; i < this.charactersToDisplay.length; i++ )
+			{
+				char = this.charactersToDisplay[i];
+				if (char.characterName.toLowerCase() == this.stateFilter.characterFilterGroup.characterLastClicked.toLowerCase())
+				{
+					//if the character is already in there, remove it!
+					this.charactersToDisplay.splice(i, 1);
+					this.updateCharacterInfoGroup(this.selectedCharacter, this.charactersToDisplay);
+				}
+			}
+		}
+		
+		private function portraitClickedHandler(e:MouseEvent):void 
+		{
+			return;
+			//only allow gragging if we are not in the visualizer
+			if (e.currentTarget.canRemove)
+			{
+				//remove the clicked on portrait
+				for (var i:int = 0; i < this.charactersToDisplay.length; i++)
+				{
+					if (this.charactersToDisplay[i].characterName == e.currentTarget.characterName)
+					{
+						this.charactersToDisplay.splice(i, 1);
+						this.updateCharacterInfoGroup(this.selectedCharacter,this.charactersToDisplay);
+						return;
+					}
+				}
+			}
+			/*
+			else if (e.currentTarget.canAdd)
+			{
+				this.charactersToDisplay.push(cif.cast.getCharByName(e.currentTarget.characterName));
+				this.updateCharacterInfoGroup(this.selectedCharacter,this.charactersToDisplay);
+			}
+			*/
+        }
+		
+		public function addAllCastClicked(e:Event=null):void
+		{
+			//this.charactersToDisplay = cif.cast.characters;
+			
+			this.updateCharacterInfoGroup(this.selectedCharacter,cif.cast.characters);
+			
+		}
+		
+		public function addLevelCastClicked(e:Event=null):void
+		{
+			//this.charactersToDisplay = gameEngine.currentLevel.cast;
+			
+			this.updateCharacterInfoGroup(this.selectedCharacter,gameEngine.currentLevel.cast);
+		}
+		public function noOneClicked(e:Event=null):void
+		{
+			this.charactersToDisplay = new Vector.<Character>();
+			this.updateCharacterInfoGroup(this.selectedCharacter,this.charactersToDisplay);
+			
+		}
+		
+		public function filterFriendsClicked(e:Event=null):void
+		{
+			this.charactersToDisplay = new Vector.<Character>();
+			var char:Character;
+			for (var i:int = 0; i < cif.cast.characters.length; i++ )
+			{
+				char = cif.cast.characters[i];
+				
+				if (cif.relationshipNetwork.getRelationship(RelationshipNetwork.FRIENDS,char, this.selectedCharacter))
+				{ 
+					this.charactersToDisplay.push(char.clone());
+				}
+			}
+			this.updateCharacterInfoGroup(this.selectedCharacter,this.charactersToDisplay);
+		}
+		
+		
+		public function filterDatingClicked(e:Event=null):void
+		{
+			this.charactersToDisplay = new Vector.<Character>();
+			var char:Character;
+			for (var i:int = 0; i < cif.cast.characters.length; i++ )
+			{
+				char = cif.cast.characters[i];
+				
+				if (cif.relationshipNetwork.getRelationship(RelationshipNetwork.DATING,char, this.selectedCharacter))
+				{ 
+					this.charactersToDisplay.push(char.clone());
+				}
+			}
+			this.updateCharacterInfoGroup(this.selectedCharacter,this.charactersToDisplay);
+		}
+		public function filterEnemiesClicked(e:Event=null):void
+		{
+			this.charactersToDisplay = new Vector.<Character>();
+			var char:Character;
+			for (var i:int = 0; i < cif.cast.characters.length; i++ )
+			{
+				char = cif.cast.characters[i];
+				
+				if (cif.relationshipNetwork.getRelationship(RelationshipNetwork.ENEMIES,char, this.selectedCharacter))
+				{ 
+					this.charactersToDisplay.push(char.clone());
+				}
+			}
+			this.updateCharacterInfoGroup(this.selectedCharacter,this.charactersToDisplay);
+		}
+		
+		public function halfCircleLayout():void
+		{
+			//var midx:Number = this.characterRepresentationGroup.width / 2;
+			//var midy:Number = this.characterRepresentationGroup.height;
+			//var radx:Number = 0.75 * this.characterRepresentationGroup.width / 2;
+			//var rady:Number = 0.75 * this.characterRepresentationGroup.height;
+
+			var midx:Number = this.characterRepresentationGroupWidth / 2;
+			var midy:Number = this.characterRepresentationGroupHeight - StateVisualizer.MINI_PORTRAIT_HEIGHT;
+			var radx:Number = 0.75 * this.characterRepresentationGroupWidth / 2;
+			var rady:Number = 0.75 * this.characterRepresentationGroupHeight;
+			
+			//var offsetForFirstLocation:Number = Math.PI * 0.75;
+			var offsetForFirstLocation:Number = 0;
+			var iterativeOffset:Number = 2 * Math.PI / (this.charactersToDisplay.length - 1);
+			
+			var modifiedI:Number;
+			
+			//trace("iterativeOffset: " + iterativeOffset);
+			
+			if (this.charactersToDisplay.length == 1)
+			{
+				// deal with length equals 1: it was doing stupid stuff
+				this.characterRepresentations[0].x = midx - MINI_PORTRAIT_WIDTH/2// - radx * Math.cos(offsetForFirstLocation - modifiedI * iterativeOffset);
+				this.characterRepresentations[0].y = 0 //midy - MINI_PORTRAIT_HEIGHT / 2 + rady * Math.sin(offsetForFirstLocation - modifiedI * iterativeOffset);
+				this.selectedCharacterRepresentation.x = midx - SELECTED_PORTRAIT_WIDTH/2;
+				this.selectedCharacterRepresentation.y = midy - SELECTED_PORTRAIT_HEIGHT/2;
+			}
+			else
+			{
+				this.selectedCharacterRepresentation.x = midx - SELECTED_PORTRAIT_WIDTH/2;
+				this.selectedCharacterRepresentation.y = midy - SELECTED_PORTRAIT_HEIGHT/2;
+				for (var i:Number = 0; i < this.charactersToDisplay.length; ++i) 
+				{
+					modifiedI = i / 2;
+					/*
+					 * We are subtracting to get the next location in stead of adding
+					 * as to grow the location list in a clockwise direction. This
+					 * is due to the y-axis being flipped from the standard Cartesian
+					 * representation.
+					 */
+					this.characterRepresentations[i].x = midx - MINI_PORTRAIT_WIDTH/2 - radx * Math.cos(offsetForFirstLocation - modifiedI * iterativeOffset);
+					this.characterRepresentations[i].y = midy - MINI_PORTRAIT_HEIGHT / 2 + rady * Math.sin(offsetForFirstLocation - modifiedI * iterativeOffset);
+					
+					if (characterRepresentations[i].y < this.characterRepresentationGroup.height/2)
+					{
+						//we're on the top
+						characterRepresentations[i].displayXOnTop = false;
+					}
+					else
+					{
+						characterRepresentations[i].displayXOnTop = true;
+					}
+				}
+			}
+
+		}
+		
+		
+		public function halfCircleLayoutGoingDownward():void
+		{
+			//var midx:Number = this.characterRepresentationGroup.width / 2;
+			//var midy:Number = this.characterRepresentationGroup.height;
+			//var radx:Number = 0.75 * this.characterRepresentationGroup.width / 2;
+			//var rady:Number = 0.75 * this.characterRepresentationGroup.height;
+
+			var midx:Number = this.characterRepresentationGroupWidth / 2;
+			var midy:Number = 0//this.characterRepresentationGroupHeight - StateVisualizer.MINI_PORTRAIT_HEIGHT;
+			var radx:Number = 0.75 * this.characterRepresentationGroupWidth / 2;
+			var rady:Number = 0//0.75 * this.characterRepresentationGroupHeight;
+			
+			//var offsetForFirstLocation:Number = Math.PI * 0.75;
+			var offsetForFirstLocation:Number = 0;
+			var iterativeOffset:Number = 2 * Math.PI / (this.charactersToDisplay.length - 1);
+			
+			var modifiedI:Number;
+			
+			//trace("iterativeOffset: " + iterativeOffset);
+			
+			if (this.charactersToDisplay.length == 1)
+			{
+				// deal with length equals 1: it was doing stupid stuff
+				this.characterRepresentations[0].x = midx - MINI_PORTRAIT_WIDTH/2// - radx * Math.cos(offsetForFirstLocation - modifiedI * iterativeOffset);
+				this.characterRepresentations[0].y = 0//midy - MINI_PORTRAIT_HEIGHT / 2 + rady * Math.sin(offsetForFirstLocation - modifiedI * iterativeOffset);
+			}
+			else
+			{
+				
+				this.selectedCharacterRepresentation.x = midx - SELECTED_PORTRAIT_WIDTH/2;
+				this.selectedCharacterRepresentation.y = midy - SELECTED_PORTRAIT_HEIGHT/2;
+				for (var i:Number = 0; i < this.charactersToDisplay.length; ++i) 
+				{
+					modifiedI = i / 2;
+					/*
+					 * We are subtracting to get the next location in stead of adding
+					 * as to grow the location list in a clockwise direction. This
+					 * is due to the y-axis being flipped from the standard Cartesian
+					 * representation.
+					 */
+					this.characterRepresentations[i].x = midx - MINI_PORTRAIT_WIDTH/2 - radx * Math.cos(offsetForFirstLocation - modifiedI * iterativeOffset);
+					this.characterRepresentations[i].y = midy - MINI_PORTRAIT_HEIGHT / 2 - rady * Math.sin(offsetForFirstLocation - modifiedI * iterativeOffset);
+					//this.characterRepresentations[i].y = midy - MINI_PORTRAIT_HEIGHT / 2 - rady * Math.sin(offsetForFirstLocation - i * iterativeOffset);
+					
+					if (characterRepresentations[i].y < this.characterRepresentationGroup.height/2)
+					{
+						//we're on the top
+						characterRepresentations[i].displayXOnTop = false;
+					}
+					else
+					{
+						characterRepresentations[i].displayXOnTop = true;
+					}
+				}
+			}
+		}
+		
+		/**
+		 * Places the character representations in a ciruclar layout in the
+		 * canvas.
+		 */
+		public function circularLayout():void 
+		{
+			//var midx:Number = this.characterRepresentationGroup.width / 2;
+			//var midy:Number = this.characterRepresentationGroup.height / 2;
+			//var radx:Number = 0.75 * this.characterRepresentationGroup.width / 2;
+			//var rady:Number = 0.75 * this.characterRepresentationGroup.height / 2 ;
+
+			var midx:Number = this.characterRepresentationGroupWidth / 2;
+			var midy:Number = this.characterRepresentationGroupHeight / 2;
+			var radx:Number = 0.75 * this.characterRepresentationGroupWidth / 2;
+			var rady:Number = 0.75 * this.characterRepresentationGroupHeight / 2 ;
+			
+			//var offsetForFirstLocation:Number = Math.PI * 0.75;
+			var offsetForFirstLocation:Number = 0;
+			var iterativeOffset:Number = 2 * Math.PI / this.charactersToDisplay.length;
+			
+			//trace("iterativeOffset: " + iterativeOffset);
+			
+			this.selectedCharacterRepresentation.x = midx - MINI_PORTRAIT_WIDTH/2;
+			this.selectedCharacterRepresentation.y = midy - MINI_PORTRAIT_HEIGHT/2;
+			for (var i:Number = 0; i < this.charactersToDisplay.length; ++i) 
+			{
+				
+				/*
+				 * We are subtracting to get the next location in stead of adding
+				 * as to grow the location list in a clockwise direction. This
+				 * is due to the y-axis being flipped from the standard Cartesian
+				 * representation.
+				 */
+				this.characterRepresentations[i].x = midx - MINI_PORTRAIT_WIDTH/2 - radx * Math.sin(offsetForFirstLocation - i * iterativeOffset);
+				this.characterRepresentations[i].y = midy - MINI_PORTRAIT_HEIGHT / 2 - rady * Math.cos(offsetForFirstLocation - i * iterativeOffset);
+				
+				if (characterRepresentations[i].y < this.characterRepresentationGroup.height/2)
+				{
+					//we're on the top
+					characterRepresentations[i].displayXOnTop = false;
+				}
+				else
+				{
+					characterRepresentations[i].displayXOnTop = true;
+				}
+				//Debug.debug(this,"centers : " + this.charReps[i].horizontalCenter + ", " + this.charReps[i].verticalCenter);
+				//Debug.debug(this,"position: " + this.charReps[i].left+ ", " + this.charReps[i].top);
+				
+			 /* if (this.characterRepresentations[i].x > this.selectedCharacterRepresentation.x)
+				{
+					//we're on the left
+					this.characterRepresentations[i].scaleX = -1;
+					this.characterRepresentations[i].x += PromWeek.StateVisualizer.MINI_PORTRAIT_WIDTH;
+				}*/
+			}
+		}
+		
+		
+		public function updateNetworkLines(e:Event=null):void
+		{
+			this.networkRepresentationGroup.removeAllElements();
+			
+			//this.buddyRepresentationGroup.removeAllElements();
+			//this.romanceRepresentationGroup.removeAllElements();
+			//this.coolRepresentationGroup.removeAllElements();
+		
+			/*
+			var numNetworkLayersTrue:int = 0;
+			//figure out how many network layers are true
+			if (buddyFilterButton.selected)
+			{
+				numNetworkLayersTrue++;
+			}
+			if (romanceFilterButton.selected)
+			{
+				numNetworkLayersTrue++;
+			}
+			if (coolFilterButton.selected)
+			{
+				numNetworkLayersTrue++;
+			}
+			*/
+			//Debug.debug(this,"updateNetworkLines() numTrue: " + numNetworkLayersTrue);
+			
+			var lineThickness:Number = 1;
+			lineThickness = PromWeek.StateVisualizer.LARGE_LINE_THICKNESS;
+			 /* For now, do not have dynamic line size because we are only using one network type at a time
+			if (numNetworkLayersTrue <= 1)
+			{
+				lineThickness = PromWeek.StateVisualizer.LARGE_LINE_THICKNESS;
+			}
+			else if (numNetworkLayersTrue == 2)
+			{
+				lineThickness = PromWeek.StateVisualizer.MEDIUM_LINE_THICKNESS;
+			}
+			else if (numNetworkLayersTrue == 3)
+			{
+				lineThickness = PromWeek.StateVisualizer.SMALL_LINE_THICKNESS;
+			}
+			*/
+			
+			var arrowLength:Number = (lineThickness + lineThickness / 4);
+			
+			var char:Character;
+			var charImage:PromWeek.PortraitIcon;
+			var i:int;
+
+			var value:Number;
+			var networkLineLength:Number;
+			var distanceBetween:Number;
+			var pathString:String;
+
+			var primaryToSecondaryPath:Path;
+			var secondaryToPrimaryPath:Path;
+			/*
+			var primaryToSecondaryBuddyPath:Path;
+			var secondaryToPrimaryBuddyPath:Path;
+			var primaryToSecondaryRomancePath:Path;
+			var secondaryToPrimaryRomancePath:Path;
+			var primaryToSecondaryCoolPath:Path;
+			var secondaryToPrimaryCoolPath:Path;
+			*/
+			
+			var circle:Ellipse;
+			
+			var deltaX:Number;
+			var deltaY:Number;
+			var theta:Number;
+			var offsetX:Number = 0//MINI_PORTRAIT_WIDTH / 2;
+			var selectedOffsetX:Number = SELECTED_PORTRAIT_WIDTH / 2;
+			var offsetYInc:Number = arrowLength * 1.5;
+			var offsetY:Number;
+			
+			var buddyStrokeColor:SolidColorStroke = new SolidColorStroke(getStyle('buddyColor'),lineThickness);
+			//var romanceStrokeColor:SolidColorStroke = new SolidColorStroke(0xFF0000,lineThickness);
+			var romanceStrokeColor:SolidColorStroke = new SolidColorStroke(getStyle('romanceColor'),lineThickness);
+			var coolStrokeColor:SolidColorStroke = new SolidColorStroke(getStyle('coolColor'),lineThickness);
+			
+			for (i = 0; i < this.charactersToDisplay.length; i++ )
+			{
+				char = this.charactersToDisplay[i];
+				charImage = this.characterRepresentations[i];
+				
+				var pt1:Point = new Point(charImage.x + MINI_PORTRAIT_WIDTH/2 + offsetX, charImage.y + MINI_PORTRAIT_HEIGHT/2);
+				var pt2:Point = new Point(this.selectedCharacterRepresentation.x + SELECTED_PORTRAIT_WIDTH/2, this.selectedCharacterRepresentation.y + SELECTED_PORTRAIT_HEIGHT/2);
+				
+				deltaX = pt1.x - pt2.x;//charImage.x - this.selectedCharacterRepresentation.x;
+				deltaY = pt1.y - pt2.y;//charImage.y - this.selectedCharacterRepresentation.y;
+				//distanceBetween = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
+				//Debug.debug(this, "Old Way Distance: " + distanceBetween)
+				
+				
+				
+				//HACK!
+				/*
+				if (this.selectedCharacterRepresentation.x >= charImage.x)
+				{
+					distanceBetween = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2)) +  + PromWeek.StateVisualizer.SELECTED_PORTRAIT_WIDTH/2;
+				}
+				else 
+				{
+					distanceBetween = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2)) - MINI_PORTRAIT_WIDTH;	
+				}
+				*/
+				
+				
+				//distanceBetween = distance;//Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
+				
+				//Debug.debug(this, "Distance for " + char.characterName + ": " + distanceBetween);
+				
+				theta = Math.atan(deltaY / deltaX)  * 180 / Math.PI;
+				//make the theta right...
+				if (deltaX < 0)
+				{
+					//fromChar on the right
+					if (deltaY > 0)
+					{
+						//above
+						theta = 180 + theta;
+					}
+					else
+					{
+						//below
+						theta = 180 - theta;
+						theta *= -1;
+					}
+				}
+				//else
+				//{
+					//theta = 360 - theta;//90;
+					//Debug.debug(this,"theta: "+theta);
+				//}
+
+				//Debug.debug(this,"theta: "+theta);
+				
+				offsetY = 0//-offsetYInc;
+				
+				//draw from selected char to charToDisplay[i]
+				primaryToSecondaryPath = new Path();
+				
+				distanceBetween = Point.distance(pt1, pt2) - selectedOffsetX - offsetX - MINI_PORTRAIT_WIDTH/2;
+				
+				
+				var isSelectedCharInLevel:Boolean = false;
+				if (gameEngine.currentLevel) 
+					isSelectedCharInLevel = gameEngine.isCharInLevel(this.selectedCharacter);
+				var selectedCharAvatar:Avatar
+				if (isSelectedCharInLevel) 
+					selectedCharAvatar = gameEngine.worldGroup.avatars[this.selectedCharacter.characterName.toLowerCase()];
+				
+				var isCharInLevel:Boolean = false
+				if (gameEngine.currentLevel) 
+					isCharInLevel = gameEngine.isCharInLevel(char);
+				var charAvatar:Avatar;
+				
+				var areTheCharsInLevel:Boolean = isSelectedCharInLevel && isCharInLevel;
+				
+				if(isCharInLevel) charAvatar = gameEngine.worldGroup.avatars[char.characterName.toLowerCase()];
+
+				/*xxx need to change this to something that's akin to subjective opinion lines*/
+				if (this.buddyFilterButton.selected)
+				{
+					if(areTheCharsInLevel && !isNaN(selectedCharAvatar.subjectiveGreenOpinions[char.networkID])) {
+							value = selectedCharAvatar.subjectiveGreenOpinions[char.networkID];
+					}else {
+						value = cif.buddyNetwork.getWeight(this.selectedCharacter.networkID, char.networkID) / 100;
+					}
+					primaryToSecondaryPath.stroke = buddyStrokeColor;
+				}
+				else if (this.romanceFilterButton.selected)
+				{
+					if(areTheCharsInLevel && !isNaN(selectedCharAvatar.subjectiveRedOpinions[char.networkID])) {
+						value = selectedCharAvatar.subjectiveRedOpinions[char.networkID];
+					}else {
+						value = cif.romanceNetwork.getWeight(this.selectedCharacter.networkID, char.networkID) / 100;
+					}
+					primaryToSecondaryPath.stroke = romanceStrokeColor;
+				}
+				else if (this.coolFilterButton.selected)
+				{
+					if(areTheCharsInLevel && !isNaN(selectedCharAvatar.subjectiveBlueOpinions[char.networkID])) {
+						value = selectedCharAvatar.subjectiveBlueOpinions[char.networkID];
+					}else {
+						value = cif.coolNetwork.getWeight(this.selectedCharacter.networkID, char.networkID) / 100;
+					}
+					primaryToSecondaryPath.stroke = coolStrokeColor;
+				}
+				//networkLineLength = (value / 100 * (distanceBetween - fromOffsetX - PromWeek.StateVisualizer.SELECTED_PORTRAIT_WIDTH/2));
+				networkLineLength = value  * distanceBetween;
+				pathString = "";
+				pathString += "m " + selectedOffsetX + " " + offsetY + " ";
+				//pathString += "m 0 0 ";
+				pathString += "l " + networkLineLength + " 0 "//" " + offsetY + " ";
+				pathString += "l " + -arrowLength + " " + arrowLength + " ";
+				pathString += "m " + arrowLength + " " + -arrowLength + " ";
+				pathString += "l " + -arrowLength + " " + -arrowLength + " ";
+				primaryToSecondaryPath.data = new String(pathString);
+				//HACK!!!
+				primaryToSecondaryPath.x = pt2.x;// this.selectedCharacterRepresentation.x + PromWeek.StateVisualizer.SELECTED_PORTRAIT_WIDTH / 2;
+				primaryToSecondaryPath.y = pt2.y;// this.selectedCharacterRepresentation.y + PromWeek.StateVisualizer.SELECTED_PORTRAIT_HEIGHT / 2;
+				primaryToSecondaryPath.rotation = theta;
+				this.networkRepresentationGroup.addElement(primaryToSecondaryPath);
+				
+				//draw from charToDisplay[i] to selected char
+				secondaryToPrimaryPath = new Path();
+				distanceBetween = Point.distance(pt1, pt2) - offsetX - selectedOffsetX;
+				//offsetX = PromWeek.StateVisualizer.MINI_PORTRAIT_WIDTH / 4;
+				offsetY += offsetYInc * 2;
+				
+
+				if (this.buddyFilterButton.selected)
+				{
+					if(areTheCharsInLevel && !isNaN(charAvatar.subjectiveGreenOpinions[this.selectedCharacter.networkID])) {
+						value = charAvatar.subjectiveGreenOpinions[this.selectedCharacter.networkID];
+					}else {
+						value = cif.buddyNetwork.getWeight(char.networkID, selectedCharacter.networkID) / 100;
+					}
+					secondaryToPrimaryPath.stroke = buddyStrokeColor;
+				}
+				else if (this.romanceFilterButton.selected)
+				{
+					if(areTheCharsInLevel && !isNaN(charAvatar.subjectiveRedOpinions[this.selectedCharacter.networkID])) {
+						value = charAvatar.subjectiveRedOpinions[this.selectedCharacter.networkID];
+					}else {
+						value = cif.romanceNetwork.getWeight(char.networkID, selectedCharacter.networkID) / 100;
+					}
+					secondaryToPrimaryPath.stroke = romanceStrokeColor;
+				}
+				else if (this.coolFilterButton.selected)
+				{
+					if(areTheCharsInLevel && !isNaN(charAvatar.subjectiveBlueOpinions[this.selectedCharacter.networkID])) {
+						value = charAvatar.subjectiveBlueOpinions[this.selectedCharacter.networkID];
+					}else {
+						value = cif.coolNetwork.getWeight(char.networkID, selectedCharacter.networkID) / 100;
+					}
+					secondaryToPrimaryPath.stroke = coolStrokeColor;
+				}
+				//networkLineLength = (value / 100 * (distanceBetween - offsetX - fromOffsetX - PromWeek.StateVisualizer.MINI_PORTRAIT_WIDTH/2));
+				networkLineLength = value * distanceBetween;
+				//networkLineLength = (value / 100 * (distanceBetween - offsetX));
+				pathString = "";
+				pathString += "m " + offsetX + " " + offsetY + " ";
+				//pathString += "m 0 0 "
+				pathString += "l " + networkLineLength + " 0 "//offsetY + " ";
+				pathString += "l " + -arrowLength + " " + arrowLength + " ";
+				pathString += "m " + arrowLength + " " + -arrowLength + " ";
+				pathString += "l " + -arrowLength + " " + -arrowLength + " ";
+				secondaryToPrimaryPath.data = new String(pathString);
+				secondaryToPrimaryPath.x = pt1.x//charImage.x + PromWeek.StateVisualizer.MINI_PORTRAIT_WIDTH/2;
+				secondaryToPrimaryPath.y = pt1.y//charImage.y + PromWeek.StateVisualizer.MINI_PORTRAIT_HEIGHT/2;
+				secondaryToPrimaryPath.rotation = 180 + theta;
+				this.networkRepresentationGroup.addElement(secondaryToPrimaryPath);
+				
+				
+				/* Commenting these out because we are only allowing one to be seen at a time now
+				if (this.buddyRepresentationGroup.visible)
+				{
+					
+					//buddy
+					primaryToSecondaryBuddyPath = new Path();
+					value = cif.buddyNetwork.getWeight(this.selectedCharacter.networkID, char.networkID);
+					networkLineLength = (value / 100 * (distanceBetween - fromOffsetX - PromWeek.StateVisualizer.SELECTED_PORTRAIT_WIDTH));
+					pathString = "";
+					pathString += "m " + offsetX + " " + offsetY + " ";
+					//pathString += "m 0 0 ";
+					pathString += "l " + networkLineLength + " 0 "//" " + offsetY + " ";
+					pathString += "l " + -arrowLength + " " + arrowLength + " ";
+					pathString += "m " + arrowLength + " " + -arrowLength + " ";
+					pathString += "l " + -arrowLength + " " + -arrowLength + " ";
+					primaryToSecondaryBuddyPath.data = new String(pathString);
+					primaryToSecondaryBuddyPath.stroke = buddyStrokeColor;
+					primaryToSecondaryBuddyPath.x = this.selectedCharacterRepresentation.x + PromWeek.StateVisualizer.SELECTED_PORTRAIT_WIDTH/2;
+					primaryToSecondaryBuddyPath.y = this.selectedCharacterRepresentation.y + PromWeek.StateVisualizer.SELECTED_PORTRAIT_HEIGHT/2;
+					primaryToSecondaryBuddyPath.rotation = theta;
+					this.buddyRepresentationGroup.addElement(primaryToSecondaryBuddyPath);
+					
+					secondaryToPrimaryBuddyPath = new Path();
+					//offsetX = PromWeek.StateVisualizer.MINI_PORTRAIT_WIDTH / 4;
+					offsetY += offsetYInc;
+					value = cif.buddyNetwork.getWeight(char.networkID, this.selectedCharacter.networkID);
+					networkLineLength = (value / 100 * (distanceBetween - offsetX - fromOffsetX - PromWeek.StateVisualizer.MINI_PORTRAIT_WIDTH/2));
+					//networkLineLength = (value / 100 * (distanceBetween - offsetX));
+					pathString = "";
+					pathString += "m " + fromOffsetX + " " + (-1*offsetY) + " ";
+					//pathString += "m 0 0 "
+					pathString += "l " + networkLineLength + " 0 "//offsetY + " ";
+					pathString += "l " + -arrowLength + " " + arrowLength + " ";
+					pathString += "m " + arrowLength + " " + -arrowLength + " ";
+					pathString += "l " + -arrowLength + " " + -arrowLength + " ";
+					secondaryToPrimaryBuddyPath.data = new String(pathString);
+					secondaryToPrimaryBuddyPath.stroke = buddyStrokeColor;
+					secondaryToPrimaryBuddyPath.x = charImage.x + PromWeek.StateVisualizer.MINI_PORTRAIT_WIDTH/2;
+					secondaryToPrimaryBuddyPath.y = charImage.y + PromWeek.StateVisualizer.MINI_PORTRAIT_HEIGHT/2;
+					secondaryToPrimaryBuddyPath.rotation = 180 + theta;
+					this.buddyRepresentationGroup.addElement(secondaryToPrimaryBuddyPath);
+				}
+				
+				if (this.romanceRepresentationGroup.visible)
+				{
+					//romance
+					primaryToSecondaryRomancePath = new Path();
+					//offsetX = PromWeek.StateVisualizer.MINI_PORTRAIT_WIDTH / 4;
+					offsetY += offsetYInc;
+					value = cif.romanceNetwork.getWeight(this.selectedCharacter.networkID, char.networkID);
+					networkLineLength = (value / 100 * (distanceBetween - fromOffsetX - PromWeek.StateVisualizer.SELECTED_PORTRAIT_WIDTH));
+					pathString = "";
+					pathString += "m " + offsetX + " " + offsetY + " ";
+					//pathString += "m 0 0 "
+					pathString += "l " + networkLineLength + " 0 "//" " + offsetY + " ";
+					pathString += "l " + -arrowLength + " " + arrowLength + " ";
+					pathString += "m " + arrowLength + " " + -arrowLength + " ";
+					pathString += "l " + -arrowLength + " " + -arrowLength + " ";
+					primaryToSecondaryRomancePath.data = new String(pathString);
+					primaryToSecondaryRomancePath.stroke = romanceStrokeColor;
+					primaryToSecondaryRomancePath.x = this.selectedCharacterRepresentation.x + PromWeek.StateVisualizer.SELECTED_PORTRAIT_WIDTH/2;
+					primaryToSecondaryRomancePath.y = this.selectedCharacterRepresentation.y + PromWeek.StateVisualizer.SELECTED_PORTRAIT_HEIGHT/2;
+					primaryToSecondaryRomancePath.rotation = theta;
+					this.romanceRepresentationGroup.addElement(primaryToSecondaryRomancePath);
+					
+					secondaryToPrimaryRomancePath = new Path();
+					//offsetX = PromWeek.StateVisualizer.MINI_PORTRAIT_WIDTH / 4;
+					offsetY += offsetYInc;
+					value = cif.romanceNetwork.getWeight(char.networkID, this.selectedCharacter.networkID);
+					networkLineLength = (value / 100 * (distanceBetween - offsetX - fromOffsetX - PromWeek.StateVisualizer.MINI_PORTRAIT_WIDTH/2));
+					pathString = "";
+					pathString += "m " + fromOffsetX + " " + (-1*offsetY) + " ";
+					//pathString += "m 0 0 "
+					pathString += "l " + networkLineLength + " 0 "//" " + offsetY + " ";
+					pathString += "l " + -arrowLength + " " + arrowLength + " ";
+					pathString += "m " + arrowLength + " " + -arrowLength + " ";
+					pathString += "l " + -arrowLength + " " + -arrowLength + " ";
+					secondaryToPrimaryRomancePath.data = new String(pathString);
+					secondaryToPrimaryRomancePath.stroke = romanceStrokeColor;
+					secondaryToPrimaryRomancePath.x = charImage.x + PromWeek.StateVisualizer.MINI_PORTRAIT_WIDTH/2;
+					secondaryToPrimaryRomancePath.y = charImage.y + PromWeek.StateVisualizer.MINI_PORTRAIT_HEIGHT/2;
+					secondaryToPrimaryRomancePath.rotation = 180 + theta;
+					this.romanceRepresentationGroup.addElement(secondaryToPrimaryRomancePath);
+				}
+				
+				if (this.coolRepresentationGroup.visible)
+				{
+					//cool
+					primaryToSecondaryCoolPath = new Path();
+					//offsetX = PromWeek.StateVisualizer.MINI_PORTRAIT_WIDTH / 4;
+					offsetY += offsetYInc;
+					value = cif.coolNetwork.getWeight(this.selectedCharacter.networkID, char.networkID);
+					networkLineLength = (value / 100 * (distanceBetween - fromOffsetX - PromWeek.StateVisualizer.SELECTED_PORTRAIT_WIDTH));
+					pathString = "";
+					pathString += "m " + offsetX + " " + offsetY + " ";
+					//pathString += "m 0 0 "
+					pathString += "l " + networkLineLength + " 0 "//" " + offsetY + " ";
+					pathString += "l " + -arrowLength + " " + arrowLength + " ";
+					pathString += "m " + arrowLength + " " + -arrowLength + " ";
+					pathString += "l " + -arrowLength + " " + -arrowLength + " ";
+					primaryToSecondaryCoolPath.data = new String(pathString);
+					primaryToSecondaryCoolPath.stroke = coolStrokeColor;
+					primaryToSecondaryCoolPath.x = this.selectedCharacterRepresentation.x + PromWeek.StateVisualizer.SELECTED_PORTRAIT_WIDTH/2;
+					primaryToSecondaryCoolPath.y = this.selectedCharacterRepresentation.y + PromWeek.StateVisualizer.SELECTED_PORTRAIT_HEIGHT/2;
+					primaryToSecondaryCoolPath.rotation = theta;
+					this.coolRepresentationGroup.addElement(primaryToSecondaryCoolPath);
+					
+					secondaryToPrimaryCoolPath = new Path();
+					//offsetX = PromWeek.StateVisualizer.MINI_PORTRAIT_WIDTH / 4;
+					offsetY += offsetYInc;
+					value = cif.coolNetwork.getWeight(char.networkID, this.selectedCharacter.networkID);
+					networkLineLength = (value / 100 * (distanceBetween - offsetX - fromOffsetX - PromWeek.StateVisualizer.MINI_PORTRAIT_WIDTH/2));
+					pathString = "";
+					pathString += "m " + fromOffsetX + " " + (-1*offsetY) + " ";
+					//pathString += "m 0 0 "
+					pathString += "l " + networkLineLength + " 0 "//" " + offsetY + " ";
+					pathString += "l " + -arrowLength + " " + arrowLength + " ";
+					pathString += "m " + arrowLength + " " + -arrowLength + " ";
+					pathString += "l " + -arrowLength + " " + -arrowLength + " ";
+					secondaryToPrimaryCoolPath.data = new String(pathString);
+					secondaryToPrimaryCoolPath.stroke = coolStrokeColor;
+					secondaryToPrimaryCoolPath.x = charImage.x + PromWeek.StateVisualizer.MINI_PORTRAIT_WIDTH/2;
+					secondaryToPrimaryCoolPath.y = charImage.y + PromWeek.StateVisualizer.MINI_PORTRAIT_HEIGHT/2;
+					secondaryToPrimaryCoolPath.rotation = 180 + theta;
+					this.coolRepresentationGroup.addElement(secondaryToPrimaryCoolPath);
+				}
+				*/
+			}
+		}
+		
+		public function createAndPlaceRelationships():void
+		{
+			var char:Character;
+			var charImage:PromWeek.PortraitIcon;
+			var imageToAdd:SmoothImage;
+			
+			for (var i:int = 0; i < this.charactersToDisplay.length; i++ )
+			{
+				char = this.charactersToDisplay[i];
+				charImage = this.characterRepresentations[i];
+				
+				if (cif.relationshipNetwork.getRelationship(RelationshipNetwork.FRIENDS,char, this.selectedCharacter))
+				{ 
+					imageToAdd = new SmoothImage();
+					imageToAdd.source = resourceLibrary.relationshipIcons["friends"];
+					imageToAdd.width = PromWeek.StateVisualizer.MINI_RELATIONSHIP_ICON_WIDTH;
+					imageToAdd.height = PromWeek.StateVisualizer.MINI_RELATIONSHIP_ICON_HEIGHT;
+					
+					imageToAdd.x = charImage.x - PromWeek.StateVisualizer.MINI_RELATIONSHIP_ICON_WIDTH/3;
+					
+					if (charImage.y < this.selectedCharacterRepresentation.y)
+					{
+						//we're on the top
+						imageToAdd.y = charImage.y - PromWeek.StateVisualizer.MINI_RELATIONSHIP_ICON_HEIGHT/4;
+					}
+					else
+					{
+						imageToAdd.y = charImage.y + PromWeek.StateVisualizer.MINI_PORTRAIT_HEIGHT - PromWeek.StateVisualizer.MINI_PORTRAIT_HEIGHT/4;
+					}
+					friendsRepresentationGroup.addElement(imageToAdd);
+				}
+				if (cif.relationshipNetwork.getRelationship(RelationshipNetwork.DATING,char, this.selectedCharacter))
+				{ 
+					imageToAdd = new SmoothImage();
+					imageToAdd.source = resourceLibrary.relationshipIcons["dating"];
+					imageToAdd.width = PromWeek.StateVisualizer.MINI_RELATIONSHIP_ICON_WIDTH;
+					imageToAdd.height = PromWeek.StateVisualizer.MINI_RELATIONSHIP_ICON_HEIGHT;
+					
+					imageToAdd.x = charImage.x + 2 * StateVisualizer.MINI_RELATIONSHIP_ICON_WIDTH/3 + (2 * StateVisualizer.MINI_RELATIONSHIP_ICON_WIDTH/3 + PromWeek.StateVisualizer.MINI_PORTRAIT_WIDTH - 3 * PromWeek.StateVisualizer.MINI_RELATIONSHIP_ICON_WIDTH)/2;
+					
+					//(2w/4 + W - 3w)/2
+					
+					if (charImage.y < this.selectedCharacterRepresentation.y)
+					{
+						//we're on the top
+						imageToAdd.y = charImage.y - PromWeek.StateVisualizer.MINI_RELATIONSHIP_ICON_HEIGHT/4;
+					}
+					else
+					{
+						imageToAdd.y = charImage.y + PromWeek.StateVisualizer.MINI_PORTRAIT_HEIGHT - PromWeek.StateVisualizer.MINI_PORTRAIT_HEIGHT/4;
+					}
+					//imageToAdd.y = charImage.y - PromWeek.StateVisualizer.MINI_RELATIONSHIP_ICON_HEIGHT/2 + PromWeek.StateVisualizer.MINI_RELATIONSHIP_ICON_HEIGHT;
+					datingRepresentationGroup.addElement(imageToAdd);
+				}
+				if (cif.relationshipNetwork.getRelationship(RelationshipNetwork.ENEMIES,char, this.selectedCharacter))
+				{ 
+					imageToAdd = new SmoothImage();
+					imageToAdd.source = resourceLibrary.relationshipIcons["enemies"];
+					imageToAdd.width = PromWeek.StateVisualizer.MINI_RELATIONSHIP_ICON_WIDTH;
+					imageToAdd.height = PromWeek.StateVisualizer.MINI_RELATIONSHIP_ICON_HEIGHT;
+					
+					imageToAdd.x = charImage.x + StateVisualizer.MINI_PORTRAIT_WIDTH - 2 * StateVisualizer.MINI_RELATIONSHIP_ICON_WIDTH / 3;
+					
+					if (charImage.y < this.selectedCharacterRepresentation.y)
+					{
+						//we're on the top
+						imageToAdd.y = charImage.y - PromWeek.StateVisualizer.MINI_RELATIONSHIP_ICON_HEIGHT/4;
+					}
+					else
+					{
+						imageToAdd.y = charImage.y + PromWeek.StateVisualizer.MINI_PORTRAIT_HEIGHT - PromWeek.StateVisualizer.MINI_PORTRAIT_HEIGHT/4;
+					}
+					
+					enemiesRepresentationGroup.addElement(imageToAdd);
+				}
+			}
+		}
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			/*if(gameEngine.classicPromColors) {
+				this.setStyle("styleName", "classicPromWeek");
+			}
+			else if(gameEngine.greenPromColors) {
+				this.setStyle("styleName", "greenColor");
+			}
+			else if(gameEngine.redPromColors) {
+				this.setStyle("styleName", "redColor");
+			}*/
+			this.switchPortraitDrawer.setStyleName();
+			this.stateFilter.setStyleName();
+			this.invalidateProperties();
+		}
+		
+		
+		]]>
+		</fx:Script>
+		 
+</s:Group>

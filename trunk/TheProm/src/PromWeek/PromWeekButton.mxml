@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<s:Button xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 skinClass="PromWeek.skins.PromWeekButtonSkin"
+		 styleName="classicPromWeek"
+		 width="70"
+		 height="20">
+
+	<fx:Declarations>
+		<fx:Boolean id="toggleStatus">false</fx:Boolean>
+		<fx:Number id="offsetX" />
+		<fx:Number id="offsetY" />
+		<fx:Boolean id="shouldTextBeBlack">false</fx:Boolean>
+		<fx:Number id="cornerRoundness">10</fx:Number>
+	</fx:Declarations>
+		 
+	<fx:Script>
+
+		
+	<![CDATA[	 
+		
+	private var gameEngine:GameEngine;
+	
+		public function setDimentions(w:Number, h:Number):void
+		{
+			this.width = w;
+			this.height = h;
+		}
+		
+		public function onCreationComplete():void {
+			gameEngine = PromWeek.GameEngine.getInstance();
+			this.currentState = "up";
+		}
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			/*gameEngine = PromWeek.GameEngine.getInstance();
+			if(gameEngine.classicPromColors) {
+				this.setStyle("styleName", "classicPromWeek");
+			}
+			else if(gameEngine.greenPromColors) {
+				this.setStyle("styleName", "greenColor");
+			}
+			else if(gameEngine.redPromColors) {
+				this.setStyle("styleName", "redColor");
+			}*/
+			//this.currentState = "up";
+			this.invalidateProperties();
+			this.invalidateSkinState();
+		}
+	]]>
+	</fx:Script>
+	
+	
+</s:Button>

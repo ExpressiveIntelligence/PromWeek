@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+               xmlns:s="library://ns.adobe.com/flex/spark" 
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+			   height="0"
+			   width="150"
+			   styleName="classicPromWeek"
+			   initialize="initializeComponents()">	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<fx:Number id="sizes">55</fx:Number>
+		<fx:Number id="supposedHeight">350</fx:Number>
+		<fx:Number id="buttonWidth">70</fx:Number>
+		<fx:String id="buttonLabel">Show</fx:String>
+		<mx:Fade id="fadeOut" duration="300" alphaFrom="1.0" alphaTo="0.0"/>
+        <mx:Fade id="fadeIn" duration="300" alphaFrom="0.0" alphaTo="1.0"/>
+	</fx:Declarations>
+	
+	<s:VGroup id="topLevel" verticalAlign="bottom" width="100%" height="100%" gap="0">
+		<s:VGroup id="mainContainer" verticalAlign="bottom" gap="0">
+			<prom:CollapsiblePanel id="cpanel" height="0" defSize="{supposedHeight}" width="175" styleName="classicPromWeek" label="this is a label" open="false" rollOut="autoClose()">
+				<s:HGroup gap="0" width="100%">
+					<s:VGroup id="boxcontainer" gap="0">
+						<s:HGroup gap="0">
+							<util:SmoothImage id="buzzPortrait" width="{this.sizes}" height="{this.sizes}" alpha="0.5" toolTip="Buzz" rollOver="rollOverChar(event)" rollOut="rollOutChar(event)" />
+							<util:SmoothImage id="cassandraPortrait" width="{this.sizes}" height="{this.sizes}" alpha="0.5" toolTip="Cassandra" rollOver="rollOverChar(event)" rollOut="rollOutChar(event)" />
+							<util:SmoothImage id="chloePortrait" width="{this.sizes}" height="{this.sizes}" alpha="0.5" toolTip="Chloe" rollOver="rollOverChar(event)" rollOut="rollOutChar(event)" />
+						</s:HGroup>
+						<s:HGroup gap="0">
+							<!--<util:SmoothImage id="debbiePortrait" width="{this.sizes}" height="{this.sizes}" alpha="0.5" toolTip="Debbie" />-->
+							<util:SmoothImage id="dougPortrait" width="{this.sizes}" height="{this.sizes}" alpha="0.5" toolTip="Doug" rollOver="rollOverChar(event)" rollOut="rollOutChar(event)" />
+							<util:SmoothImage id="edwardPortrait" width="{this.sizes}" height="{this.sizes}" alpha="0.5" toolTip="Edward" rollOver="rollOverChar(event)" rollOut="rollOutChar(event)" />
+							<util:SmoothImage id="gunterPortrait" width="{this.sizes}" height="{this.sizes}" alpha="0.5" toolTip="Gunter" rollOver="rollOverChar(event)" rollOut="rollOutChar(event)" />
+						</s:HGroup>
+						<s:HGroup gap="0">
+							<util:SmoothImage id="jordanPortrait" width="{this.sizes}" height="{this.sizes}" alpha="0.5" toolTip="Jordan" rollOver="rollOverChar(event)" rollOut="rollOutChar(event)" />
+							<util:SmoothImage id="katePortrait" width="{this.sizes}" height="{this.sizes}" alpha="0.5" toolTip="Kate" rollOver="rollOverChar(event)" rollOut="rollOutChar(event)" />
+							<!--<util:SmoothImage id="karenPortrait" width="{this.sizes}" height="{this.sizes}" alpha="0.5" toolTip="Karen" />-->
+							<util:SmoothImage id="lilPortrait" width="{this.sizes}" height="{this.sizes}" alpha="0.5" toolTip="Lil" rollOver="rollOverChar(event)" rollOut="rollOutChar(event)" />
+						</s:HGroup>
+						<s:HGroup gap="0">
+							<util:SmoothImage id="lucasPortrait" width="{this.sizes}" height="{this.sizes}" alpha="0.5" toolTip="Lucas" rollOver="rollOverChar(event)" rollOut="rollOutChar(event)" />
+							<util:SmoothImage id="mavePortrait" width="{this.sizes}" height="{this.sizes}" alpha="0.5" toolTip="Mave" rollOver="rollOverChar(event)" rollOut="rollOutChar(event)" />
+							<util:SmoothImage id="monicaPortrait" width="{this.sizes}" height="{this.sizes}" alpha="0.5" toolTip="Monica" rollOver="rollOverChar(event)" rollOut="rollOutChar(event)" />
+						</s:HGroup>
+						<s:HGroup gap="0">
+							<util:SmoothImage id="naomiPortrait" width="{this.sizes}" height="{this.sizes}" alpha="0.5" toolTip="Naomi" rollOver="rollOverChar(event)" rollOut="rollOutChar(event)" />
+							<!--<util:SmoothImage id="nelsonPortrait" width="{this.sizes}" height="{this.sizes}" alpha="0.5" toolTip="Nelson" />-->
+							<util:SmoothImage id="nicholasPortrait" width="{this.sizes}" height="{this.sizes}" alpha="0.5" toolTip="Nicholas" rollOver="rollOverChar(event)" rollOut="rollOutChar(event)" />
+							<util:SmoothImage id="oswaldPortrait" width="{this.sizes}" height="{this.sizes}" alpha="0.5" toolTip="Oswald" rollOver="rollOverChar(event)" rollOut="rollOutChar(event)" />
+						</s:HGroup>
+						<s:HGroup gap="0">
+							<util:SmoothImage id="phoebePortrait" width="{this.sizes}" height="{this.sizes}" alpha="0.5" toolTip="Phoebe" rollOver="rollOverChar(event)" rollOut="rollOutChar(event)" />
+							<!--<util:SmoothImage id="robertPortrait" width="{this.sizes}" height="{this.sizes}" alpha="0.5" toolTip="Robert" />-->
+							<util:SmoothImage id="simonPortrait" width="{this.sizes}" height="{this.sizes}" alpha="0.5" toolTip="Simon" rollOver="rollOverChar(event)" rollOut="rollOutChar(event)" />
+							<util:SmoothImage id="zackPortrait" width="{this.sizes}" height="{this.sizes}" alpha="0.5" toolTip="Zack" rollOver="rollOverChar(event)" rollOut="rollOutChar(event)" />
+						</s:HGroup>
+					</s:VGroup>
+				</s:HGroup>
+				<s:HGroup id="filterButtonGroup" gap="0" width="100%">
+					<prom:PromWeekButton id="allButton" label="All" width="58" click="buttonClicked(event)" scaleX="0.9" scaleY="0.9" toolTip="Select all characters" />
+					<prom:PromWeekButton id="presentButton" label="Present" width="58" click="buttonClicked(event)" scaleX="0.9" scaleY="0.9" toolTip="Select characters in level" />
+					<prom:PromWeekButton id="noneButton" label="None" width="58" click="buttonClicked(event)" scaleX="0.9" scaleY="0.9" toolTip="Deselect all characters" />
+				</s:HGroup>
+				</prom:CollapsiblePanel>
+		</s:VGroup>
+		<prom:PromWeekButton label="{this.buttonLabel}" id="hiderBtn" click="toggleVisible()" width="{buttonWidth}" />
+	</s:VGroup>
+	
+	<fx:Script>
+		<![CDATA[
+		
+		/**
+		 * This is the CharPortraitDrawer! When you click on a person's picture, it tosses an event up.
+		 * It also maintains a public dictionary (selectedChars) which shows who's currently selected.
+		 * The dictionary can be accessed like so: selectedChars["zack"]
+		 * and a true entry there means "It's selected"
+		 * 
+		 * From outside of this component, make sure you keep
+		 */
+		import flash.events.MouseEvent;
+		import flash.utils.Dictionary;
+		import CiF.CiFSingleton;
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import PromWeek.assets.ResourceLibrary;
+		import flash.events.Event;
+		import CiF.*;
+		
+		
+		private var rl:ResourceLibrary = ResourceLibrary.getInstance()
+		private var cif:CiFSingleton = CiFSingleton.getInstance()
+		private var gameEngine:PromWeek.GameEngine;
+		public var characterLastClicked:String = ""
+		public var characterLastRolledOver:String = ""
+		public var selectedChars:Dictionary
+		public var portraitDict:Dictionary
+		public var maintainList:Boolean
+		public var downward:Boolean
+		public var panelOpen:Boolean
+		
+		
+		public function  rollOverChar(e:MouseEvent):void
+		{
+			var tim:SmoothImage = e.target as SmoothImage;
+			this.characterLastRolledOver = tim.id.split("Portrait").join("");
+			this.dispatchEvent(new Event("charPortraitRolledOver", true, false));
+		}		
+		
+		public function  rollOutChar(e:MouseEvent):void
+		{
+			this.characterLastRolledOver = "";
+			this.dispatchEvent(new Event("charPortraitRolledOut", true, false));
+		}
+		
+		
+		
+		/**
+		 * We have to do the event listeners here so it knows what clicks
+		 */
+		public function initializeComponents():void {
+			gameEngine = PromWeek.GameEngine.getInstance();
+			selectedChars = new Dictionary()
+			portraitDict = new Dictionary()
+			if (downward) {
+				topLevel.swapElements(hiderBtn, mainContainer)
+			}
+			else {
+				mainContainer.height = 300
+				topLevel.paddingBottom = 300
+			}
+			
+			cpanel.setStyle("headerHeight", 0);
+			cpanel.alpha = 0.0;
+			cpanel.setStyle("backgroundAlpha", 0.9);
+			
+			buzzPortrait.source = rl.charHeads["buzz"];
+			buzzPortrait.addEventListener(MouseEvent.CLICK, tossEvent)
+			portraitDict["buzz"] = buzzPortrait
+			
+			
+			cassandraPortrait.source = rl.charHeads["cassandra"];
+			cassandraPortrait.addEventListener(MouseEvent.CLICK, tossEvent)
+			portraitDict["cassandra"] = cassandraPortrait
+			
+			
+			chloePortrait.source = rl.charHeads["chloe"];
+			chloePortrait.addEventListener(MouseEvent.CLICK, tossEvent)
+			portraitDict["chloe"] = chloePortrait
+			
+			
+			//debbiePortrait.source = rl.charHeads["debbie"];
+			//debbiePortrait.addEventListener(MouseEvent.CLICK,tossEvent)
+			
+            dougPortrait.source = rl.charHeads["doug"];
+			dougPortrait.addEventListener(MouseEvent.CLICK, tossEvent)
+			portraitDict["doug"] = dougPortrait
+			
+			
+            edwardPortrait.source = rl.charHeads["edward"];
+			edwardPortrait.addEventListener(MouseEvent.CLICK, tossEvent)
+			portraitDict["edward"] = edwardPortrait
+			
+            gunterPortrait.source = rl.charHeads["gunter"];
+			gunterPortrait.addEventListener(MouseEvent.CLICK, tossEvent)
+			portraitDict["gunter"] = gunterPortrait
+			
+            jordanPortrait.source = rl.charHeads["jordan"];
+			jordanPortrait.addEventListener(MouseEvent.CLICK, tossEvent)
+			portraitDict["jordan"] = jordanPortrait
+			
+            //karenPortrait.source = rl.charHeads["karen"];
+			//karenPortrait.addEventListener(MouseEvent.CLICK,tossEvent)
+			
+            katePortrait.source = rl.charHeads["kate"];
+			katePortrait.addEventListener(MouseEvent.CLICK, tossEvent)
+			portraitDict["kate"] = katePortrait
+			
+            lilPortrait.source = rl.charHeads["lil"];
+			lilPortrait.addEventListener(MouseEvent.CLICK, tossEvent)
+			portraitDict["lil"] = lilPortrait
+			
+            lucasPortrait.source = rl.charHeads["lucas"];
+			lucasPortrait.addEventListener(MouseEvent.CLICK, tossEvent)
+			portraitDict["lucas"] = lucasPortrait
+			
+            mavePortrait.source = rl.charHeads["mave"];
+			mavePortrait.addEventListener(MouseEvent.CLICK, tossEvent)
+			portraitDict["mave"] = mavePortrait
+			
+            monicaPortrait.source = rl.charHeads["monica"];
+			monicaPortrait.addEventListener(MouseEvent.CLICK, tossEvent)
+			portraitDict["monica"] = monicaPortrait
+			
+            naomiPortrait.source = rl.charHeads["naomi"];
+			naomiPortrait.addEventListener(MouseEvent.CLICK, tossEvent)
+			portraitDict["naomi"] = naomiPortrait
+			
+            //nelsonPortrait.source = rl.charHeads["nelson"];
+			//nelsonPortrait.addEventListener(MouseEvent.CLICK,tossEvent)
+			
+            nicholasPortrait.source = rl.charHeads["nicholas"];
+			nicholasPortrait.addEventListener(MouseEvent.CLICK, tossEvent)
+			portraitDict["nicholas"] = nicholasPortrait
+			
+            oswaldPortrait.source = rl.charHeads["oswald"];
+			oswaldPortrait.addEventListener(MouseEvent.CLICK, tossEvent)
+			portraitDict["oswald"] = oswaldPortrait
+			
+            phoebePortrait.source = rl.charHeads["phoebe"];
+			phoebePortrait.addEventListener(MouseEvent.CLICK, tossEvent)
+			portraitDict["phoebe"] = phoebePortrait
+			
+            //robertPortrait.source = rl.charHeads["robert"];
+			//robertPortrait.addEventListener(MouseEvent.CLICK,tossEvent)
+			
+            simonPortrait.source = rl.charHeads["simon"];
+			simonPortrait.addEventListener(MouseEvent.CLICK, tossEvent)
+			portraitDict["simon"] = simonPortrait
+			
+            zackPortrait.source = rl.charHeads["zack"];
+			zackPortrait.addEventListener(MouseEvent.CLICK, tossEvent)
+			portraitDict["zack"] = zackPortrait
+			
+            //grace.source = rl.charHeads["grace"];
+			//gracePortrait.addEventListener(MouseEvent.CLICK, tossEvent)
+			//portraitDict["grace"] = gracePortrait
+			//
+            //tripPortrait.source = rl.charHeads["trip"];
+			//tripPortrait.addEventListener(MouseEvent.CLICK, tossEvent)
+			//portraitDict["trip"] = tripPortrait
+			
+			
+			for (var char:String in portraitDict) {
+				selectedChars[char]=false
+			}
+			
+			//If the list isn't suppose to keep track of which character is selected, then they are all selected and the all/present/none are gone
+			if (!maintainList) {
+				buzzPortrait.alpha = 1.0
+				cassandraPortrait.alpha = 1.0
+				chloePortrait.alpha = 1.0
+				dougPortrait.alpha = 1.0
+				edwardPortrait.alpha = 1.0
+				gunterPortrait.alpha = 1.0
+				jordanPortrait.alpha = 1.0
+				katePortrait.alpha = 1.0
+				lilPortrait.alpha = 1.0
+				lucasPortrait.alpha = 1.0
+				mavePortrait.alpha = 1.0
+				monicaPortrait.alpha = 1.0
+				naomiPortrait.alpha = 1.0
+				nicholasPortrait.alpha = 1.0
+				oswaldPortrait.alpha = 1.0
+				phoebePortrait.alpha = 1.0
+				simonPortrait.alpha = 1.0
+				zackPortrait.alpha = 1.0
+				filterButtonGroup.visible = false;
+			}
+		}
+		
+		public function setStyleName():void {
+			
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			this.allButton.setStyleName();
+			this.presentButton.setStyleName();
+			this.noneButton.setStyleName();
+			this.hiderBtn.setStyleName();
+			this.cpanel.styleName = PromWeek.GameEngine.getInstance().activeStyleName;
+			this.invalidateProperties();
+		}
+		
+		/**
+		 * this is how this component communicates meaning to other guys!
+		 * In your code, add an event listener to this component for "charPortraitClicked". 
+		 * And you can see who's chosen by accessing selectedChars! (or, you can test individual chars).
+		 * @param	e
+		 */
+		public function tossEvent(e:Event):void {
+			if(maintainList) {
+				var tim:SmoothImage = e.target as SmoothImage
+				characterLastClicked = tim.id.split("Portrait").join("")
+				selectedChars[characterLastClicked] = !selectedChars[characterLastClicked];
+				selectedChars[characterLastClicked] ? tim.alpha = 1 : tim.alpha = 0.5
+				this.dispatchEvent(new Event("charPortraitClicked", true, false))
+			}
+			else {
+				var k:SmoothImage = e.target as SmoothImage
+				characterLastClicked = k.id.split("Portrait").join("")
+				this.dispatchEvent(new Event("centralCharacterChanged", true, false))
+				toggleVisible()
+			}
+		}
+		
+		/**
+		 * 
+		 */
+		public function buttonClicked(event:MouseEvent):void {
+			switch(event.target.label) {
+				case "All":
+					dispatchEvent(new Event("ALL_CAST_CLICKED",true,true))
+					break
+				case "Present":
+					dispatchEvent(new Event("LEVEL_CAST_CLICKED",true,true))
+					break
+				case "None":
+					dispatchEvent(new Event("NO_ONE_CLICKED",true,true))
+					break
+			}
+			
+		}		
+		/**
+		 * This was used to update the heads before. I think it will work pretty similarly for the window. Will be called whenever something interacts
+		 * with it other than a click.
+		 * @param	charsInViz
+		 */
+		
+		public function updateIndividualCharacterFilterGroup(charsInViz:Vector.<Character>):void
+		{
+			var charInVisualizer:Boolean;
+			for each (var charInCast:Character in this.cif.cast.characters)
+			{
+				charInVisualizer = false;
+				for each (var char:Character in charsInViz)
+				{
+					if (char.characterName.toLowerCase() == charInCast.characterName.toLowerCase())
+					{
+						charInVisualizer = true;
+					}
+				}
+				if (charInVisualizer)
+				{
+					//if (this.characterRepresentations[charInCast.characterName.toLowerCase()].characterName == "monica")
+					//{
+						//Debug.debug(this, "in filterDatingCastButton monica is selected: " + this.characterRepresentations[charInCast.characterName.toLowerCase()].selected);
+					//}
+					this.selectedChars[charInCast.characterName.toLowerCase()] = true;
+					this.portraitDict[charInCast.characterName.toLowerCase()].alpha = 1;
+				}
+				else
+				{
+					this.selectedChars[charInCast.characterName.toLowerCase()] = false;
+					this.portraitDict[charInCast.characterName.toLowerCase()].alpha = .5;
+				}
+			}
+		}
+		
+		/**
+		 * Event that automatically closes the cpanel if it is open and rolled out of.
+		 */
+		public function autoClose():void {
+			if (panelOpen) {
+				fadeOut.play([cpanel])
+				cpanel.toggleOpen()
+				panelOpen = false
+			}
+			dispatchEvent(new Event("charPortDrawerClosed", true, true));
+		}
+		
+		/**
+		 * hide and show the panel (the button calls this)
+		 */
+		public function toggleVisible():void {
+			if (cpanel.open) {
+				fadeOut.play([cpanel])
+				panelOpen = false
+			} else {
+				fadeIn.play([cpanel])
+				panelOpen = true
+			}
+			cpanel.toggleOpen()
+		}
+		
+		/**
+		 * function designed to make it easy to fill and empty this guy
+		 * Essentially selecting all and none
+		 */
+		public function fill():void {
+			for each(var tim:SmoothImage in portraitDict) {
+				tim.alpha = 1.0
+			}
+			for (var i:String in selectedChars) {
+				selectedChars[i] = true
+			}
+		}
+		// clears the selection, basically
+		public function empty():void {
+			for each(var tim:SmoothImage in portraitDict) {
+				tim.alpha = 0.5
+			}
+			for (var i:String in selectedChars) {
+				selectedChars[i] = false
+			}
+		}
+		
+		/**
+		 * Sets all the characters in cast to be active. The rest are deactivated
+		 * @param	cast - a vector of Characters
+		 */
+		public function setCastActive(cast:Vector.<Character>):void {
+			empty()
+			for each(var c:Character in cast) {
+				portraitDict[c.characterName.toLowerCase()].alpha = 1.0
+				selectedChars[c.characterName.toLowerCase()] = true
+			}
+		}
+		
+		]]>
+	</fx:Script>
+	
+</s:Group>

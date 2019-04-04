@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 preinitialize="onPreinitialize()"
+		 width="100%" height="100%">
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>					
+		 </fx:Declarations>
+		 
+		 <s:VGroup width="100%" height="100%">
+			 <s:HGroup width="100%" height="25%" verticalAlign="middle">
+				 <s:Button id="backButton" width="30" height="30" click="backButtonClickHandler(event)" skinClass="PromWeek.skins.NEW_backButtonSkin" />
+				 <s:RichText id="socialExchangeInfoTitleText" styleName="bigThoughtBubbleTitleStyle" width="100%" height="100%" verticalAlign="middle" />
+			 </s:HGroup>
+			<s:HGroup width="100%" height="40%" paddingLeft="10" paddingRight="10" paddingTop="10" paddingBottom="10">
+				<s:RichText id="initiatorMotivesText" width="100%" height="100%" verticalAlign="middle" styleName="considerationTextStyle"/>
+			</s:HGroup>
+			<s:HGroup width="100%" height="15%" horizontalAlign="right">
+				<s:Button id="moreMotivesButton" label="More..." width="25%" height="100%" click="moreMotivesButtonClicked(event)" skinClass="PromWeek.skins.NEW_moreButtonSkin"  />
+			</s:HGroup>
+			<s:HGroup width="100%" height="20%" horizontalAlign="center">
+				<s:Button id="playSocialExchangeButton" width="60%" height="100%" label="Do it!" click="playSocialExchangeClicked(event)" skinClass="PromWeek.skins.NEW_playSocialExchangeButtonSkin" />
+			</s:HGroup>
+			 <!-- START OF OLDNEW DESIRE/MOTIVES AREA-->
+			 <!--<s:HGroup width="100%" height="20%" verticalAlign="middle" horizontalAlign="center">
+				 <prom:NEW_bigThoughtBubToggleButton id="desireToggleButton" label="Desire" width="40%" height="100%" click="toggleButtonClicked(event)"/>
+				 <prom:NEW_bigThoughtBubToggleButton id="motivesToggleButton" label="Motives" width="40%" height="100%" click="toggleButtonClicked(event)" />
+			 </s:HGroup>
+			<s:HGroup width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingTop="10" paddingBottom="10">
+				<s:TextArea id="initiatorMotivesText" width="100%" height="100%" fontSize="12" editable="false" selectable="false"  />
+			</s:HGroup>
+			<s:Group width="100%" height="55%">
+				 <s:Group id="motivesGroup" width="100%" height="100%" visible="false">
+					<s:HGroup width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingTop="10" paddingBottom="10">
+						<s:TextArea id="initiatorMotivesText" width="100%" height="100%" fontSize="12" editable="false" selectable="false"  />
+					</s:HGroup>
+				 </s:Group>
+				 <s:VGroup id="desireGroup" width="100%" height="100%" visible="false" paddingLeft="30">
+					<s:HGroup width="100%" height="60%" horizontalAlign="center" verticalAlign="middle">
+						<s:HGroup width="35%" height="100%" verticalAlign="middle">
+							<s:Label text="Intent:" fontSize="11" width="100%" />
+						</s:HGroup>
+						<s:HGroup id="intentImageGroup" width="65%" height="100%" verticalAlign="middle"/>
+					</s:HGroup>
+					<s:HGroup width="100%" height="40%" horizontalAlign="center" verticalAlign="middle">
+						<s:HGroup width="35%" height="100%" verticalAlign="middle">
+							<s:Label id="initIntensityLabel" text="Intensity:" fontSize="11" width="100%" />
+						</s:HGroup>
+						<s:RichText id="intensityLabel" fontSize="20" verticalAlign="middle" width="65%" height="100%"/>
+					</s:HGroup>
+				 </s:VGroup>
+			 </s:Group>-->
+			 <!-- END OF OLDNEW DESIRE/MOTIVES AREA-->
+		 </s:VGroup>
+
+	<fx:Script>
+		<![CDATA[
+		import CiF.CiFSingleton;
+		import CiF.LineOfDialogue;
+		import CiF.Predicate;
+		import CiF.RelationshipNetwork;
+		import CiF.SocialGameContext;
+		import CiF.SocialNetwork;
+		import flash.events.MouseEvent;
+		import flash.utils.Dictionary;
+		import PromWeek.assets.ResourceLibrary;
+
+		private var rL:ResourceLibrary;
+		private var cif:CiFSingleton;
+		private var dm:DifficultyManager;
+		private var gameEngine:PromWeek.GameEngine;
+		
+		public var sgc:SocialGameContext;
+		public var initiator:String;
+		public var responder:String;
+		public var initiatorMotivesVector:Vector.<String>;
+		public var motivesIndex:Number;
+		public var intentString:String;
+		public var intensityString:String;
+		
+		private function onPreinitialize():void 
+		{
+			rL = ResourceLibrary.getInstance();
+		}
+		
+		public function onCreationComplete():void 
+		{
+			cif = CiFSingleton.getInstance();
+			dm = DifficultyManager.getInstance();
+			gameEngine = PromWeek.GameEngine.getInstance();
+		}
+		
+		public function update(sgName:String):void 
+		{
+			initiator = GameEngine.getInstance().hudGroup.initiatorSelectedComponent.currentInitiator;
+			responder = GameEngine.getInstance().hudGroup.initiatorSelectedComponent.currentResponder;
+			
+			/*
+			var somethingSelected:Boolean = false;
+			if (this.motivesToggleButton.selected || this.desireToggleButton.selected)
+			{
+				somethingSelected = true;
+			}
+			if (!somethingSelected)
+			{
+				this.desireToggleButton.selected = true;
+				desireToggleButton.invalidateSkinState();
+				this.desireGroup.visible = true;
+			}
+			*/
+			this.sgc = cif.playGame(cif.socialGamesLib.getByName(sgName), cif.cast.getCharByName(initiator), cif.cast.getCharByName(responder), null, cif.cast.characters, gameEngine.currentLevel.cast, false, dm.getVolitionThreshold("responder"), dm.getResponderBoostFromDictionary(initiator, responder, sgName));
+			
+			if (gameEngine.currentStory.title == "QP6")
+			{
+				if (cif.time == 1 
+					&& sgc.gameName == "Confide In" 
+					&& sgc.initiator.toLowerCase() == "zack"
+					&& sgc.responder.toLowerCase() == "naomi"
+					&& sgc.effectID != 29)
+				{
+					if (!cif.relationshipNetwork.getRelationship(RelationshipNetwork.ENEMIES, cif.cast.getCharByName("zack"), cif.cast.getCharByName("monica")))
+					{
+						sgc.effectID = 1;
+					}
+				}
+			}
+			
+			
+			var initMotivesDict:Vector.<Dictionary> = gameEngine.getInitiatorMotives(
+				sgc, 
+				true, 
+				cif.getPredicateRelevance(sgc, 
+				cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder), 
+				cif.cast.getCharByName(sgc.other), "initiator", gameEngine.currentLevel.cast) , 
+				sgc.initiator, 
+				sgc.responder);
+			var addedSoFar:Vector.<String> = new Vector.<String>();
+			this.initiatorMotivesVector = new Vector.<String>();
+			for each (var dictionary:Dictionary in initMotivesDict)
+			{
+				if (this.stringNotInVector(addedSoFar, dictionary["motive"]))
+				{
+					addedSoFar.push(dictionary["motive"]);
+					//this.initiatorMotivesText.text += dictionary["percent"] + "% " + dictionary["motive"] + "\n";
+					var firstPersonLine:String = Utility.makeStringFirstPerson(dictionary["motive"],sgc.initiator,sgc.responder,sgc.other);
+					this.initiatorMotivesVector.push(LineOfDialogue.preprocessLine(firstPersonLine));
+				}
+			}
+			motivesIndex = -1;
+			this.intentString = this.getIntentString();
+			this.intensityString = gameEngine.NEW_getIntensityOfDesireToDoWhatTheCharacterDid("initiator", sgc);
+			//update the motives text to be the intent string
+			this.initiatorMotivesText.text = this.intentString + this.intensityString;
+			
+			this.socialExchangeInfoTitleText.text = LineOfDialogue.preprocessLine(Utility.getSocialGameConsiderationPhraseForInitiator(sgName, responder));
+			this.socialExchangeInfoTitleText.text += "?";
+			
+			
+			
+			//this.populateInitiatorMotives();
+			//this.populateInitiatorIntent();
+		}
+		
+		public function getIntentString():String
+		{
+			var intentPred:Predicate = cif.socialGamesLib.getByName(sgc.gameName).intents[0].predicates[0];
+			var returnString:String = "";
+			//cif.cast.getCharByName(this.responder)
+			if (intentPred.type == Predicate.RELATIONSHIP)
+			{
+				if (intentPred.relationship == RelationshipNetwork.FRIENDS)
+				{
+					if (intentPred.negated)
+					{
+						returnString = "to stop being friends with " + responder;
+					}
+					else
+					{
+						returnString = responder + " to be my friend";
+					}
+				}
+				else if (intentPred.relationship == RelationshipNetwork.DATING)
+				{
+					if (intentPred.negated)
+					{
+						returnString = "to stop dating " + responder;
+					}
+					else
+					{
+						returnString = "to start dating " + responder;
+					}
+				}
+				else if (intentPred.relationship == RelationshipNetwork.ENEMIES)
+				{
+					if (intentPred.negated)
+					{
+						returnString = "to stop being enemies with " + responder;
+					}
+					else
+					{
+						returnString = "to become enemies with " + responder;
+					}
+				}
+			}
+			else if (intentPred.type == Predicate.NETWORK)
+			{
+				if (intentPred.networkType == SocialNetwork.BUDDY)
+				{
+					if (intentPred.operator == "+")
+					{
+						returnString = responder + " to like me more";
+					}
+					else if (intentPred.operator == "-")
+					{
+						returnString = responder + " to like me less"
+					}
+				}
+				else if (intentPred.networkType == SocialNetwork.ROMANCE)
+				{
+					if (intentPred.operator == "+")
+					{
+						returnString = responder + " to be more attracted to me";
+					}
+					else if (intentPred.operator == "-")
+					{
+						returnString = responder + " to be less attracted to me";
+					}
+				}
+				else if (intentPred.networkType == SocialNetwork.COOL)
+				{
+					if (intentPred.operator == "+")
+					{
+						returnString = responder + " to think I'm cooler";
+					}
+					else if (intentPred.operator == "-")
+					{
+						returnString = responder + " to think I'm less cool";
+					}
+				}
+			}
+			var extraWords:String = "I do want ";
+			if (Math.random() < 0.5)
+			{
+				extraWords = "Well, " + extraWords;
+			}
+			return extraWords + LineOfDialogue.preprocessLine(returnString);
+		}
+		
+	
+		
+		public function moreMotivesButtonClicked(e:MouseEvent):void
+		{
+			motivesIndex++;
+			if (motivesIndex > (this.initiatorMotivesVector.length - 1))
+			{
+				//this means we got to the end of the motives
+				motivesIndex = -1;
+			}
+			
+			if (motivesIndex == -1)
+			{
+				//only going to go here if we looped around
+				this.initiatorMotivesText.text = this.intentString + this.intensityString;
+			}
+			else
+			{
+				this.initiatorMotivesText.text = this.initiatorMotivesVector[motivesIndex];
+			}
+		}
+		
+		public function playSocialExchangeClicked(e:MouseEvent):void
+		{
+			gameEngine.playTheGame(this.sgc.gameName);
+		}
+		/*
+		public function populateInitiatorMotives():void
+		{
+			//this.sgc = sgc1;
+			var initMotivesDict:Vector.<Dictionary> = gameEngine.getInitiatorMotives(
+				sgc, 
+				true, 
+				cif.getPredicateRelevance(sgc, 
+				cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder), 
+				cif.cast.getCharByName(sgc.other), "initiator", gameEngine.currentLevel.cast) , 
+				sgc.initiator, 
+				sgc.responder);
+			this.initiatorMotivesText.text = "";
+			var addedSoFar:Vector.<String> = new Vector.<String>();
+			for each (var dictionary:Dictionary in initMotivesDict)
+			{
+				if (this.stringNotInVector(addedSoFar, dictionary["motive"]))
+				{
+					addedSoFar.push(dictionary["motive"]);
+					//this.initiatorMotivesText.text += dictionary["percent"] + "% " + dictionary["motive"] + "\n";
+					var firstPersonLine:String = Utility.makeStringFirstPerson(dictionary["motive"],sgc.initiator,sgc.responder,sgc.other);
+					this.initiatorMotivesText.text += "- " + LineOfDialogue.preprocessLine(firstPersonLine) + "\n";
+				}
+			}
+		}
+		*/
+		
+		
+		public function stringNotInVector(vect:Vector.<String>, str:String):Boolean
+		{
+			for each (var s:String in vect)
+			{
+				if (s == str)
+				{
+					return false;
+				}
+			}
+			
+			return true;
+		}
+		/*
+		public function populateInitiatorIntent():void
+		{
+			//this.sgc = sgc1;
+			//set the intent picture and intensity
+			this.intentImageGroup.removeAllElements();
+			var intentPred:Predicate = cif.socialGamesLib.getByName(sgc.gameName).intents[0].predicates[0];
+			this.intentImageGroup.addElement(HUDGroup.getIntentImage(intentPred, cif.cast.getCharByName(this.initiator), cif.cast.getCharByName(this.responder),this.initiator));
+
+			//this.initIntentLabel.text = gameEngine.hudGroup.megaUI.currentPrimaryCharacter.characterName + " intends:";
+			
+			this.intensityLabel.text = LineOfDialogue.toInitialCap(gameEngine.getIntensityOfDesireToDoWhatTheCharacterDid("initiator", sgc));
+		}
+		*/
+		
+		public function backButtonClickHandler(e:MouseEvent = null):void
+		{
+			gameEngine.hudGroup.responderThoughtBubble.visible = false;
+			gameEngine.hudGroup.responderPreResponseThoughtBubble.visible = false;
+			gameEngine.hudGroup.responderSubjectiveThoughtBubble.thoughtBubbleImageStem.visible = true;
+			
+			GameEngine.getInstance().hudGroup.initiatorSelectedComponent.initiatorThoughtBubble.socialExchangeSelectionGroup.visible = true;
+			GameEngine.getInstance().hudGroup.initiatorSelectedComponent.initiatorThoughtBubble.socialExchangeInfoGroup.visible = false;
+		}
+		
+
+		
+		/*
+		public function toggleButtonClicked(e:MouseEvent):void
+		{
+			if (e.target.id == "desireToggleButton")
+			{
+				if (this.desireToggleButton.selected)
+				{
+					return;
+				}
+				else
+				{
+					this.desireToggleButton.selected = true;
+					this.motivesToggleButton.selected = false;
+					
+					this.motivesGroup.visible = false;
+					this.desireGroup.visible = true;
+				}
+				
+			}
+			else if (e.target.id == "motivesToggleButton")
+			{
+				if (this.motivesToggleButton.selected)
+				{
+					return;
+				}
+				else
+				{
+					this.motivesToggleButton.selected = true;
+					this.desireToggleButton.selected = false;
+					
+					this.motivesGroup.visible = true;
+					this.desireGroup.visible = false;
+				}
+			}
+			
+			motivesToggleButton.invalidateSkinState();
+			desireToggleButton.invalidateSkinState();
+		}
+		*/
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

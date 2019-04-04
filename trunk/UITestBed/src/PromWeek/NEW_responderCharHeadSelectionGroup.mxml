@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()">
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+		 </fx:Declarations>
+		 
+		
+		<s:Group x="0" y="0">
+			<prom:NEW_subjectiveThoughtBubble id="subjectiveThoughtBubble2" visible="false" />
+			<s:Group id="responderSelectionGroup2" x="0" y="0"/>
+			<prom:NEW_subjectiveThoughtBubble id="subjectiveThoughtBubble1" visible="false" />
+			<s:Group id="responderSelectionGroup1" x="0" y="0" />
+		</s:Group>
+		 
+	<fx:Script>
+		<![CDATA[
+		import flash.events.Event;
+		import flash.events.MouseEvent;
+		import flash.ui.Mouse;
+		import mx.effects.Glow;
+		import PromWeek.assets.ResourceLibrary;
+		import CiF.Debug;
+		public var rL:ResourceLibrary;
+		
+		public var currentlySelected:String = "";
+		
+		public var charFaceButtons:Vector.<NEW_charFaceButton>;
+		public var cast:Vector.<String>;
+		
+		public function onCreationComplete():void 
+		{
+			rL = ResourceLibrary.getInstance();
+			
+			charFaceButtons = new Vector.<NEW_charFaceButton>();
+			
+			this.addEventListener("RESP_FACE_CLICKED",charFaceClickedEvent);
+		}
+		
+		public function charFaceClickedEvent(e:Event = null, charName:String=""):void 
+		{
+			var nameToUse:String;
+			if (e == null)
+			{
+				nameToUse = charName;
+			}
+			else
+			{
+				nameToUse = e.target.charName;
+			}
+			Debug.debug(this, "charFaceClickedEvent " + nameToUse + " clicked!");
+			
+			for each (var charFaceButton:NEW_charFaceButton in this.charFaceButtons)
+			{
+				if (charFaceButton.charName == nameToUse)
+				{
+					//if (charFaceButton.selected)
+					//{
+						//this means the responder that was just clicked is already selected. Time to Unselect!
+						//charFaceButton.selected = false;
+					//}
+					//else
+					//{
+						charFaceButton.selected = true;
+					//}
+				}
+				else
+				{
+					charFaceButton.selected = false;
+				}
+			}
+			this.currentlySelected = nameToUse;
+		}
+		
+		
+		public function populateFromCast(currentSelection:String,size:Number=55,gapAmount:Number=5):void
+		{
+			this.currentlySelected = "";
+			
+			responderSelectionGroup1.removeAllElements();
+			responderSelectionGroup2.removeAllElements();
+			this.charFaceButtons = new Vector.<NEW_charFaceButton>();
+			var countInGroup1:int = 0;
+			var countInGroup2:int = 0;
+			for each (var name:String in cast)
+			{
+				if (name != currentSelection)
+				{
+					var charFaceButton:PromWeek.NEW_charFaceButton = new PromWeek.NEW_charFaceButton();
+					charFaceButton.mode = "responder";
+					charFaceButton.charName = name;
+					charFaceButton.width = size;
+					charFaceButton.height = size;
+					if (charFaceButtons.length < 4)
+					{
+						if (countInGroup1 == 0)
+						{
+							charFaceButton.y = 0;
+						}
+						else
+						{
+							charFaceButton.y = size * countInGroup1 + gapAmount;
+						}
+						this.responderSelectionGroup1.addElement(charFaceButton);
+						countInGroup1++;
+					}
+					else
+					{
+						if (countInGroup2 == 0)
+						{
+							charFaceButton.y = 0;
+						}
+						else
+						{
+							charFaceButton.y = size * countInGroup2 + gapAmount;
+						}
+						this.responderSelectionGroup2.addElement(charFaceButton);
+						countInGroup2++;
+					}
+					charFaceButtons.push(charFaceButton);
+				}
+			}
+			responderSelectionGroup2.x = size + 5;
+			//position the second row so it looks nice
+			//responderSelectionGroup2.y = (responderSelectionGroup1.height - responderSelectionGroup2.height) / 2;
+			responderSelectionGroup2.y = (170 - size * countInGroup2) / 2;
+			
+			
+		}
+
+		
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

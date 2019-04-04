@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ToggleButton xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 creationComplete="onCreationComplete()"
+		 initialize="goButtonInitialize()"
+		 visible="false"
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 skinClass="PromWeek.skins.goButtonSkin"
+		 styleName="classicPromWeek"
+		 height="40"
+		 width="110">
+
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+		 </fx:Declarations>
+		 
+    <s:states>
+        <s:State name="unlockedClick" enterState="invalidateSkinState()" />
+        <s:State name="unlockedOver" enterState="invalidateSkinState()" />
+        <s:State name="locked" enterState="invalidateSkinState()" />
+        <s:State name="unlocked" enterState="invalidateSkinState()" />
+    </s:states>
+		 
+	<fx:Script>
+		<![CDATA[
+		 
+			import spark.components.Button;
+			import flash.events.MouseEvent;
+			import spark.components.ToggleButton;
+			import CiF.Debug;
+			import mx.graphics.SolidColor;
+			import mx.graphics.SolidColorStroke;
+			import flash.events.MouseEvent;
+			
+			public var toggleStatus:Boolean;
+			
+			private var isOver:Boolean;
+			private var clicked:Boolean;
+			
+			public var _isUnlocked:Boolean;
+			private var gameEngine:GameEngine;	
+			
+			public function onCreationComplete():void {
+				this.addEventListener(MouseEvent.MOUSE_OVER, onMouseOver);
+				this.addEventListener(MouseEvent.MOUSE_OUT, onMouseOut);
+				this.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
+				this.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+				gameEngine = GameEngine.getInstance();
+			}
+			
+			public function goButtonInitialize():void {
+				toggleStatus = false;
+				isUnlocked = false;
+			}
+			
+			//Returns which skin state we want to be looking at.
+			//all skin states are defined inside of JuicePointButtonSkin.mxml
+			override protected function getCurrentSkinState():String {
+				//Debug.debug(this, "the label of this button is: " + this.label);
+				if (_isUnlocked) {
+					//dealing with it IS UNLOCKED
+					if (isOver) {
+						//dealing with clicking
+						if (clicked) {
+							//The mouse is clicking it
+							return "unlockedClick";
+						}
+						else{
+							//The mouse is HOVERING over it
+							return "unlockedOver"; // unlocked, hover, ~selected
+						}
+					}
+					else {
+						//Mouse is NOT HOVERING over it.
+						return "unlocked"; // unlocked, ~hover, ~selected
+					}
+				}
+				else{
+					// dealing with it IS LOCKED 
+					return "locked"; // ~unlocked, ~hover, ~selected
+				}
+				//else
+				//	return currentState;
+			}
+				
+			public function set isUnlocked(value:Boolean):void {
+				_isUnlocked = value;
+				
+				//Debug.debug(this, "setting the value of isUnlocked to: " + value);
+				
+				
+				this.invalidateSkinState();
+				//this.setCurrentState("locked");
+				
+				//this.commitProperties();
+				//this.invalidateDisplayList();
+			}
+			
+			public function invalidating():void {
+				invalidateSkinState();
+			}
+			
+			private function onMouseOver(e:MouseEvent):void {
+				isOver = true;
+				invalidateSkinState();
+			}
+			
+			private function onMouseDown(e:MouseEvent):void {
+				if(_isUnlocked) {
+					clicked = true;
+					invalidateSkinState();
+				}
+			}
+			
+			private function onMouseUp(e:MouseEvent):void {
+				if(_isUnlocked) {
+					clicked = false;
+					invalidateSkinState();
+				}
+			}
+			
+			private function onMouseOut(e:MouseEvent):void {
+				isOver = false;
+				invalidateSkinState();
+			}
+			
+			/**
+			 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+			 * their style at the same time.
+			 */
+			public function setStyleName():void {
+				this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+				/*if(gameEngine.classicPromColors) {
+					this.setStyle("styleName", "classicPromWeek");
+				}
+				else if(gameEngine.greenPromColors) {
+					this.setStyle("styleName", "greenColor");
+				}
+				else if(gameEngine.redPromColors) {
+					this.setStyle("styleName", "redColor");
+				}*/
+				this.invalidateProperties();
+			}
+
+		]]>
+
+	</fx:Script>
+	
+</s:ToggleButton>

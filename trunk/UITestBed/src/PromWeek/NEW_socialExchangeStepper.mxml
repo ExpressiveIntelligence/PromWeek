@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 preinitialize="onPreinitialize()"
+		 width="100%" height="100%">
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+					
+		 </fx:Declarations>
+		
+		 <s:VGroup horizontalAlign="center" width="100%" height="100%">
+			<s:VGroup id="socialExchangeButtonGroup" width="100%" height="83%" gap="3" />
+			<s:HGroup id="stepperButtonsGroup" width="100%" height="17%" horizontalAlign="center" verticalAlign="middle" paddingLeft="30" paddingRight="30">
+				<s:Button id="stepUpButton" width="50%" height="100%" click="stepUpButtonClicked(event)" skinClass="PromWeek.skins.NEW_triangleButtonSkin" />
+				<s:Button id="stepDownButton" width="50%" height="100%" click="stepDownButtonClicked(event)" skinClass="PromWeek.skins.NEW_triangleButtonSkin" scaleY="-1" />
+			</s:HGroup>
+		</s:VGroup>
+		 
+	<fx:Script>
+		<![CDATA[
+		import CiF.LineOfDialogue;
+		import flash.events.MouseEvent;
+		import flash.filters.ConvolutionFilter;
+		import flash.sampler.NewObjectSample;
+		import PromWeek.assets.ResourceLibrary;
+		
+		public const numButtonsToShow:int = 4;
+		
+		private var rL:ResourceLibrary;
+		
+		public var socialGameNames:Vector.<String>;
+		public var socialGamesLockedState:Vector.<Boolean>;
+		public var superSocialExchangeButtons:Vector.<NEW_superSocialExchangeButton>;
+		private var _currentIndex:int;
+		
+		public function onCreationComplete():void 
+		{
+			this.superSocialExchangeButtons = new Vector.<NEW_superSocialExchangeButton>();
+			for (var i:int = 0; i < numButtonsToShow; i++ )
+			{
+				var superSocialExchangeButton:NEW_superSocialExchangeButton = new NEW_superSocialExchangeButton();
+				this.superSocialExchangeButtons.push(superSocialExchangeButton);
+				this.socialExchangeButtonGroup.addElement(superSocialExchangeButton);
+			}
+		}
+		
+		private function onPreinitialize():void 
+		{
+			rL = ResourceLibrary.getInstance();
+		}
+
+		public function set currentIndex(index:int):void
+		{
+			this._currentIndex = index;
+			
+			this.updateSocialExchangeButtons();
+		}
+		
+		public function get currentIndex():int
+		{
+			return this._currentIndex;
+		}
+		
+		public function stepUpButtonClicked(e:MouseEvent = null):void
+		{
+			this.currentIndex = this.currentIndex - 1;
+		}
+		
+		
+		public function stepDownButtonClicked(e:MouseEvent = null):void
+		{
+			this.currentIndex = this.currentIndex + 1;
+		}
+		
+		public function updateSocialExchangeButtons():void
+		{
+			if ((this.currentIndex + numButtonsToShow) >= this.socialGameNames.length)
+			{
+				this.stepDownButton.enabled = false;
+			}
+			else
+			{
+				this.stepDownButton.enabled = true;
+			}
+			
+			if (this.currentIndex <= 0)
+			{
+				this.stepUpButton.enabled = false;
+			}
+			else
+			{
+				this.stepUpButton.enabled = true;
+			}
+
+			var numberAdded:int = 0;
+			for each (var superSocialExchangeButton:PromWeek.NEW_superSocialExchangeButton in this.superSocialExchangeButtons)
+			{
+				if ((this.currentIndex + numberAdded) < this.socialGameNames.length)
+				{
+					superSocialExchangeButton.socialExchangeButton.sgName = this.socialGameNames[this.currentIndex + numberAdded];
+					superSocialExchangeButton.sgName = this.socialGameNames[this.currentIndex + numberAdded];
+					superSocialExchangeButton.visible = true;
+					
+					var initName:String = LineOfDialogue.toInitialCap(GameEngine.getInstance().hudGroup.initiatorSelectedComponent.currentInitiator);
+					var respName:String = LineOfDialogue.toInitialCap(GameEngine.getInstance().hudGroup.initiatorSelectedComponent.currentResponder);
+					
+					superSocialExchangeButton.infoButton.toolTip = initName + "'s thoughts about the social exchange \"" + this.socialGameNames[this.currentIndex + numberAdded] + "\" with " + respName;
+					superSocialExchangeButton.responseButton.toolTip = "Click to see what " + respName + " thinks about the social exchange \"" + this.socialGameNames[this.currentIndex + numberAdded] + "\" with " + initName;
+					
+					if (this.socialGamesLockedState[currentIndex + numberAdded] == true)
+					{
+						superSocialExchangeButton.socialExchangeButton.locked = true;
+					}
+					else
+					{
+						superSocialExchangeButton.socialExchangeButton.locked = false;
+					}
+					superSocialExchangeButton.socialExchangeButton.invalidateSkinState();
+					numberAdded++;
+				}
+				else
+				{
+					superSocialExchangeButton.visible = false;
+					this.stepUpButton.enabled = false;
+					this.stepDownButton.enabled = false;
+				}
+			}
+		}
+
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

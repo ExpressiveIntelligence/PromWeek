@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+				xmlns:s="library://ns.adobe.com/flex/spark"
+				xmlns:mx="library://ns.adobe.com/flex/mx"
+				creationComplete="onCreationComplete()" 
+				preinitialize="onPreinitialize()"
+				resize="onResize()"
+				height="100%"
+				width="100%">
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<fx:Number id="scaleFactor">.25</fx:Number>
+	</fx:Declarations>
+
+	<!--  preloader="MyPrettyPreloader" Spark preloader! Make it a separate file! Itr is its own class! And then in "preloader" above in Application have it equal the class that we make! -->
+
+	
+	
+	
+	<s:TextArea id="textArea" text="Testing that it is different and still different." width="300" height="200" x="40" y="40" visible="true" />
+	
+	
+	
+	<!--s:BitmapImage id="GunterFace" source="@Embed('../lib/images/gunter-portrait.png')" x="10" y="10" scaleX="{scaleFactor}" scaleY="{scaleFactor}" /-->
+	<!--s:BitmapImage id="ChloeFace" source="@Embed('../lib/images/chloe-portrait.png')" x="30" y="30" scaleX="{scaleFactor}" scaleY="{scaleFactor}"/>
+	<s:BitmapImage id="KateFace" source="@Embed('../lib/images/debbie-portrait.png')" x="20" y="40" scaleX="{scaleFactor}" scaleY="{scaleFactor}"/>
+	<s:BitmapImage id="MaveFace" source="@Embed('../lib/images/mave-portrait.png')" x="10" y="20" scaleX="{scaleFactor}" scaleY="{scaleFactor}"/>
+	<s:BitmapImage id="SimonFace" source="@Embed('../lib/images/simon-portrait.png')" x="100" y="40" scaleX="{scaleFactor}" scaleY="{scaleFactor}"/-->
+	<!--s:BitmapImage id="background" source="@Embed('../lib/images/aquaBackground.png')" x="-175" y="-250" /-->
+	<s:Rect id="background" top="0" left="0" height="{this.height}" width="{this.width}" >
+		<s:fill>
+			<mx:SolidColor color="0xa5dfde" />
+		</s:fill>
+	</s:Rect>
+	
+	<s:Label id="versionLabel" text="" visible="true" />
+	
+	<mx:SWFLoader id="contentLoader" />
+	
+	<fx:Script>
+		<![CDATA[
+		//preinitialize="onPreinitialize()"
+		//creationComplete="loadSWFWithGreensock()
+		//import com.greensock.loading.*;
+		//import com.greensock.*;
+		//import com.greensock.loading.*;
+		//import com.greensock.events.LoaderEvent;
+		//import com.greensock.loading.display.*;
+		import flash.system.SecurityDomain;
+		import mx.managers.SystemManager;
+		import flash.events.Event;
+		import flash.display.Sprite;
+		import flash.events.ProgressEvent;
+		import flash.system.ApplicationDomain;
+		import mx.core.FlexGlobals;
+		//create a LoaderMax named "mainQueue" and set up onProgress, onComplete and onError listeners
+		//var queue:LoaderMax = new LoaderMax({name:"mainQueue", onProgress:progressHandler, onComplete:completeHandler, onError:errorHandler});
+		private var version:String;
+		//private var bgshape:Sprite;
+		private var default_bg_color:uint = 0x318eef;
+
+
+		
+		private function onCreationComplete():void {
+			version = FlexGlobals.topLevelApplication.parameters["version"];
+			//LoaderInfo(this.root.loaderInfo).parameters.PromWeekVersion.toString();
+            versionLabel.text += "\n version number: " + version;
+			//bgshape = new Sprite();
+			//bgshape.graphics.beginFill(default_bg_color);
+			//bgshape.graphics.drawRect(0, 0, stage.stageWidth, stage.stageHeight);
+			//addChildAt(bgshape, 0);
+			//stage.addEventListener(Event.RESIZE, resizeBGWithStage);
+			loadPromWeek();
+			
+			//var preloader:MyPrettyPreloader = new MyPrettyPreloader();
+		}
+		
+		/*
+		private function changeBGColor(color:uint):void {
+			bgshape.graphics.beginFill(color);
+			bgshape.graphics.drawRect(0, 0, stage.stageWidth, stage.stageHeight);
+		}
+		
+		private function resizeBGWithStage(e:Event):void {
+			try {
+				bgshape.width = stage.stageWidth;
+				bgshape.height = stage.stageHeight;
+			} catch (e:Event) {}
+		}
+		*/
+		
+		
+		private function onResize():void {
+			var scale:Number = this.height / 600;
+			this.scaleX = this.scaleY = scale;
+		}
+		
+		private function loadPromWeek():void {
+			var context:LoaderContext = new LoaderContext();
+			/* Specify the current application's security domain. */
+			context.securityDomain = SecurityDomain.currentDomain;
+			
+			/* Specify a new ApplicationDomain, which loads the sub-app into a 
+			  peer ApplicationDomain. */
+			context.applicationDomain = new ApplicationDomain();
+
+			contentLoader.loaderContext = context;                 
+			//contentLoader.source = "PromWeek." + version + ".swf";
+			
+			
+			//contentLoader.addEventListener(ProgressEvent.PROGRESS, myProgressEvent);
+			//contentLoader.addEventListener(Event.COMPLETE, contentLoaderComplete);
+			//contentLoader.loaderInfo.addEventListener(Event.COMPLETE, contentLoaderComplete);
+			
+			
+			contentLoader.source = "PromWeek.swf";
+			//contentLoader.source = "PromWeek.withDebugger.swf";
+			//MIGHT HAVE TO HOOK UP THE PRELOADER THAT WE SPECIFIED HERE!
+			//contentLoader.source = "PromWeek.2400.swf";
+		}
+		
+		private function contentLoaderComplete(e:Event):void {
+			//background.visible = false;
+			contentLoader.content.height = this.height;
+			contentLoader.content.width = this.width;
+			contentLoader.content.x = 0;
+			contentLoader.content.y = 0;
+			this.addChildAt(contentLoader.content,0)
+		}
+		
+		private function myProgressEvent(e:ProgressEvent):void {
+			var percent:int = e.bytesLoaded / e.bytesTotal * 100; trace(percent, "%");
+			
+			graphics.clear();
+			graphics.lineStyle(3);
+			graphics.beginFill(0xFF0000);
+			graphics.drawRect(100,100,percent * 5,100);
+			graphics.endFill(); 
+			
+		}
+		
+		private function onPreinitialize():void {
+			//GunterFace.x = Math.random() * (this.width);
+			//GunterFace.y = Math.random() * (this.height);
+			
+			/*
+			ChloeFace.x = Math.random() * (this.width);
+			ChloeFace.y = Math.random() * (this.height);
+			
+			SimonFace.x = Math.random() * (this.width);
+			SimonFace.y = Math.random() * (this.height);
+			
+			KateFace.x = Math.random() * (this.width);
+			KateFace.y = Math.random() * (this.height);
+			
+			MaveFace.x = Math.random() * (this.width);
+			MaveFace.y = Math.random() * (this.height);
+			*/
+			
+			//this.addEventListener(Event.ENTER_FRAME, this.onEnterFrame);
+			
+		}
+		//private function loadSWFWithGreensock():void {
+			//append several loaders
+			//LoaderMax.contentDisplayClass = FlexContentDisplay;
+			//var loader:com.greensock.loading.SWFLoader = new com.greensock.loading.SWFLoader("PromWeek.swf", {container:this, width:600, height:760});
+			//loader.load();
+			//queue.append( new XMLLoader("xml/data.xml", {name:"xmlDoc"}) );
+			//queue.append( new ImageLoader("img/photo1.jpg", {name:"photo1", estimatedBytes:2400, container:this, alpha:0, width:250, height:150, scaleMode:"proportionalInside"}) );
+			//queue.append( new SWFLoader("swf/child.swf", {name:"childClip", estimatedBytes:3000, container:this, x:250, autoPlay:false}) );
+			//queue.append( new MP3Loader("mp3/audio.mp3", {name:"audio", repeat:2, autoPlay:true}) );
+
+			//prioritize the loader named "photo1"
+			//LoaderMax.prioritize("photo1");  //same as LoaderMax.getLoader("photo1").prioritize();
+
+			//start loading
+			//queue.load();
+		//}
+		
+		
+		
+		private function onEnterFrame(e:Event):void {
+			//Make the pictures fly by!
+			//GunterFace.x -= 5;
+			/*
+			KateFace.x -= 5;
+			MaveFace.x -= 5;
+			SimonFace.x -= 5;
+			ChloeFace.x -= 5;
+			*/
+			
+			textArea.text += "fun! ";
+			
+		}
+		
+		
+		
+		/**
+		 * THINGS TO TEST FOR A PRELOADER
+		 
+		 1.) Updating the preloader (e.g. inside of index.html we have: var swfUrl = "PromWeek.swf";/?=" + rand_no;/  -- we want something similar for the loading of the preloader (we would uncomment the "rand_no" part, update it every time the preloader has anew version).
+			--- maybe test by putting some simple text box or label just to make sure that it is changing
+			--- And maybe take out loading of PromWeek embed, just because the preloader goes so fast.
+		 2.) Make sure that it is actually loading promweek.sft with the correct version number tag.  Josh is fairly sure this will work because this is the part that he tested!
+		3.) Make sure that the Prom week.swf with the correct version number is BEING loaded -- we want to make sure that the url that the url that the preloader does... if the version name of the swf and the version that's specified in teh flash variables that were passed in from index.html have a mismatch, then that is an error and we want to make sure that we grab the version that WAS specified in the index.html (This is testing our "force update" mechanism)
+		4.) Making sure that this actually pulls down a new swf.
+		   ---- Ptting a version number, for example, on the splash screen.
+		 
+		So remember, the places to change version numbers each time are:
+			1.) The splash screen number (which proves that we do in fact have the latest prom week swf
+			2.) The Index.html (which the preloader uses to actually download teh CORRECT swf for teh player)
+			3.) The file name on teh server (PromWeek.v#.swf) (which is what the aforementioned index.html points to
+			
+		5.) And then of course, oen of the actual things that we care about is making it so that the preloader is full of something beautiful happening while the prom downloads.
+		 
+		 */
+		]]>
+	</fx:Script>
+</s:Application>

@@ -1,0 +1,209 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<s:ToggleButton xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 creationComplete="onCreationComplete()"
+		 initialize="juicePointButtonInitialize()"
+		 visible="false"
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 skinClass="PromWeek.skins.JuicePointButtonSkin"
+		 styleName="classicPromWeek"
+		 width="100%"
+		 height="100%"
+		 click="onClickHandler()">
+
+		 
+		 <fx:Metadata>
+			 [SkinState("lockedover")]
+			 [SkinState("unlockedover")]
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+		 </fx:Declarations>
+		 
+    <s:states>
+		<s:State name="normal" enterState="invalidateSkinState()" />
+        <s:State name="up" enterState="invalidateSkinState()" />
+        <s:State name="over" enterState="invalidateSkinState()" />
+		<s:State name="downAndSelected" enterState="invalidateSkinState()" />
+		<s:State name="disabledAndSelected" enterState="invalidateSkinState()" />
+		<s:State name="overAndSelected" enterState="invalidateSkinState()" />
+		<s:State name="upAndSelected" enterState="invalidateSkinState()" />
+        <s:State name="down" enterState="invalidateSkinState()" />
+        <s:State name="disabled" enterState="invalidateSkinState()" />
+        <!-- s:State name="locked" enterState="invalidateSkinState()" /-->
+        <!-- s:State name="unlocked" / -->
+    </s:states>
+		 
+	<fx:Script>
+		<![CDATA[
+		 
+			import spark.components.Button;
+			import flash.events.MouseEvent;
+			import spark.components.ToggleButton;
+			import CiF.Debug;
+			import mx.graphics.SolidColor;
+			import mx.graphics.SolidColorStroke;
+			import flash.events.MouseEvent;
+			import PromWeek.assets.SoundLibrary;
+			
+			public var toggleStatus:Boolean;
+			
+			
+			
+			private var isOver:Boolean;
+			
+			public var offsetX:Number;
+			public var offsetY:Number;
+			public var _isUnlocked:Boolean;
+			public var cost:Number;
+			private var gameEngine:GameEngine;	
+			private var jpm:JuicePointManager;
+			private var soundLibrary:SoundLibrary;
+			
+			public function onCreationComplete():void {
+				this.addEventListener(MouseEvent.MOUSE_OVER, onMouseOver);
+				this.addEventListener(MouseEvent.MOUSE_OUT, onMouseOut);
+				gameEngine = GameEngine.getInstance();
+				soundLibrary = PromWeek.assets.SoundLibrary.getInstance();
+				
+			}
+			
+			public function juicePointButtonInitialize():void 
+			{
+				//this.addEventListener(MouseEvent.CLICK, clickHander);
+				//this.height = 20;
+				//this.width = 70;
+				toggleStatus = false;
+				isUnlocked = false;
+				cost = 0; // This is how much it costs to unlock this.
+				jpm = JuicePointManager.getInstance();
+			}
+			
+			//Returns which skin state we want to be looking at.
+			//all skin states are defined inside of JuicePointButtonSkin.mxml
+			override protected function getCurrentSkinState():String {
+				//Debug.debug(this, "the label of this button is: " + this.label);
+				if (this.label.toLowerCase() == "results") {
+					//Debug.debug(this, "dealing with results juice button skinning");
+				}
+				if (_isUnlocked) {
+					//dealing with it IS UNLOCKED
+					if (isOver){
+						//The mouse is HOVERING over it
+						if (this.selected) {
+							//This button is currently selected.
+							return "unlockedOverAndSelected"; // unlocked, hover, and selected
+						}
+						else {
+							//NOT SELECTED
+							return "unlockedOver"; // unlocked, hover, ~selected
+						}
+					}
+					else {
+						//Mouse is NOT HOVERING over it.
+						if (this.selected) {
+							//SELECTED
+							return "unlockedSelected";// unlocked, ~hover, selected
+						}
+						else {
+							//NOT SELECTED
+							return "unlocked"; // unlocked, ~hover, ~selected
+						}
+					}
+				}
+				else{
+					// dealing with it IS LOCKED 
+					if (jpm.currentJuicePoints < this.cost) { // we can't afford this!
+						Debug.debug(this, "returning disabled");
+						return "disabled";
+					}
+					if (isOver) {
+						if (this.selected) {
+							return "lockedOverSelected"; // ~unlocked, hover, selected
+						}
+						else {
+							return "lockedOver"; // ~unlocked, hover, ~selected
+						}
+					}
+					else {
+						if (this.selected) {
+							return "lockedSelected"; // ~unlocked, ~hover, selected
+						}
+						else {
+							return "locked"; // ~unlocked, ~hover, ~selected
+						}
+					}
+				}
+				//else
+				//	return currentState;
+			}
+				
+			public function set isUnlocked(value:Boolean):void {
+				_isUnlocked = value;
+				
+				//Debug.debug(this, "setting the value of isUnlocked to: " + value);
+				
+				
+				this.invalidateSkinState();
+				//this.setCurrentState("locked");
+				
+				//this.commitProperties();
+				//this.invalidateDisplayList();
+			}
+			
+			private function onMouseOver(e:MouseEvent):void {
+				isOver = true;
+				if(!this._isUnlocked)
+					gameEngine.hudGroup.juiceBar.phantomJuiceBar(this.cost);
+				invalidateSkinState();
+			}
+			
+			private function onMouseOut(e:MouseEvent):void {
+				isOver = false;
+				gameEngine.hudGroup.juiceBar.phantomJuiceHide();
+				invalidateSkinState();
+			}
+			
+			//Most juice point functionality is handled inside of the megaUI component.
+			//But, there are some things that are universal, such as playing the
+			//juice point sound, that we want to happen all the time with juice point buttons!!
+			private function onClickHandler():void {
+				var sound:Sound;
+				if (!this._isUnlocked) {
+					//Dealing with it being LOCKED!  So maybe we will play the unlocked sound.
+					//if (jpm.currentJuicePoints >= this.cost) {
+					if (jpm.currentJuicePoints >= jpm.getCostForSwitchOutcome(gameEngine.hudGroup.megaUI.sgInfo.sgc)) {
+						//We can afford it! Play the happy unlock sound!
+						sound = new soundLibrary.uiSounds["juice_unlocked"]() as Sound;
+						sound.play();//1000, 3);
+					}
+					else {
+						// we can't afford it! Play the sad, you aren't rich enough sound.
+					}
+				}
+			}
+			
+			/**
+			 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+			 * their style at the same time.
+			 */
+			public function setStyleName():void {
+				this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+				/*if(gameEngine.classicPromColors) {
+					this.setStyle("styleName", "classicPromWeek");
+				}
+				else if(gameEngine.greenPromColors) {
+					this.setStyle("styleName", "greenColor");
+				}
+				else if(gameEngine.redPromColors) {
+					this.setStyle("styleName", "redColor");
+				}*/
+				this.invalidateProperties();
+			}
+
+		]]>
+
+	</fx:Script>
+	
+</s:ToggleButton>

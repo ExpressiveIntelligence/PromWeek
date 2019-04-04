@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- 
+Some notes on writing tutorial scripts:
+object: This is the name of the object or UI element that you want the user to click on.  For the full list of objects, see the 'fillComponentDictionary' function of Tutorial.mxml.  Not every object is currently supported.  If you see something you want, you can add it yourself by simply adding the component to the fillComponentDictionary function.  Or e-mail Ben and he'll do it for you!  Leave it blank if you just want to present information, and have the user progress the tutorial by pushing next.
+name: some objects require more specification (e.g. avatars).  To specify which avatar you care about, use the name field. (e.g. object='avatar', name='zack')
+eventType: "click" or "over".  Click means you click on the object, over means you highlight your mouse over it.  More events can be added as well, though you should probably ask Ben to add it for you.
+preText: This is text that shows up BEFORE you do the event.  I.e. the contents of this text should tell you WHAT to click on "e.g. click on Zack!"
+postText: DEPRECATED The contents of this text shows up AFTER you do the event (e.g. 'good job, you just clicked on Zack!").  This doesn't work quite as well as it used to.  The new recommended way to do this is to introduce a new tutorial step that just has a blank 'object'
+disableExceptions: Normally, everything EXCEPT for the object specified will be disabled, i.e. you won't be able to click on them.  However, there may be times when you DO want people to be able to click on a couple of things that aren't the specified thing to click on.  You can specify what those 'exceptions' are using this attribute.  Use the same names that you would put in the 'object' tag.  If you want to reference something that would use the name attribute, specify it with a hyphen between the object and the name (e.g. avatar-zack).  To specify multiple excpetions, specify them with a comma (e.g. avatar-zack,avatar-chloe,miniMapFriends).  Be careful about spaces i.e. dont use them!
+nextVisible: if true, the 'progress tutorial' button will show up.  If false, it will not.  If the object is left blank, then make sure that this is set to true, or there is no way to progress the tutorial.
+
+MAKING USE OF RICH TEXT:
+-If you want to do special things like have differently colored text, or to have pictures appear in the middle of the text, you'll need to embed the sentence in a paragraph tag.  Due to the nature of mxml, you'll have to escape the angle brackets (less than sign and greater than sign) which looks pretty ugly.  It looks like this:
+		OPENINING PARAGRAPH TAG: &lt;p&gt
+		CLOSING PARAGRAPH TAG: &lt;/p&gt;
+	You'll then have to use Span tags to actually do the effect that you want (change the color or have there be a picture).  See below.
+	
+TO HAVE SPECIAL COLORED TEXT: 
+-place the text that you want to have be a special color within a 'span' tag.  Again, becuase we have to escape the opening and closing angle brackets, it looks a little weird.  For example, this write "this is green text" in the color Green, you would do the following:
+		DIFFERENT COLOR EXAMPLE: &lt;span color='0x00FF00'&gt; this is green text &lt;/span&gt;
+
+TO HAVE A PICTURE embedded in the text:
+-Use span tags again, using one of a variety of special codes between the span tags. For some weird reason, in order for the span tags to be recognized, you need to specify their color attribute.  I dunno, it's weird.  I don't think the value of the color attribute matters. Be careful about spaces: there shouldn't be any!  New special codes can be added easily.  Contact Ben if the code you want isn't here.
+		FRIENDSHIP SMILE FACE:  &lt;span color='0xFFFF00' &gt;FRIENDS&lt;/span&gt;
+		DATING HEART:  &lt;span color='0xFFFF00' &gt;DATING&lt;/span&gt;
+		ENEMY ANGRY FACE:  &lt;span color='0xFFFF00' &gt;ENEMIES&lt;/span&gt;
+		END FRIENDSHIP: &lt;span color='0xFFFF00' &gt;ENDFRIENDS&lt;/span&gt;
+		END DATING: &lt;span color='0xFFFF00' &gt;ENDDATING&lt;/span&gt;
+		EMD ENEMIES: &lt;span color='0xFFFF00' &gt;ENDENEMIES&lt;/span&gt;
+		JUICE POINT LOCK: &lt;span color='0xFFFF00' &gt;LOCK&lt;/span&gt;
+		
+-->
+
+<TutorialScript>
+	
+	<!--TutorialStep object="" name="" eventType="click" preText="Minimap should be unavailable" postText="" nextVisible="true" />	
+	<TutorialStep object="miniMapFriends" name="" eventType="click" preText="minimap should be available" postText="" nextVisible="true" />	
+	<TutorialStep object="" name="" eventType="click" preText="friends not available again" postText="" nextVisible="true" /-->	
+	
+	<!--TutorialStep object="" name="" eventType="click" preText="&lt;p&gt; &lt;span color='0xFFFF00' &gt;ENDENEMIES&lt;/span&gt; &lt;span color='0x00FF00' &gt; Buddy Exchanges (green) &lt;/span&gt; will affect the liklihood of the initiator and responder becoming friends (or enemies!) This is FRIGGIN AWESOME &lt;span color='0xFFFF00' &gt;FRIENDS&lt;/span&gt; &lt;span &gt;FRIENDS&lt;/span&gt; &lt;span &gt;FRIENDS&lt;/span&gt; &lt;span &gt;FRIENDS&lt;/span&gt; &lt;span color='0xFFFF00' &gt;FRIENDS&lt;/span&gt; &lt;span &gt;FRIENDS&lt;/span&gt; &lt;span &gt;FRIENDS&lt;/span&gt;    &lt;/p&gt;" postText="" nextVisible="true" />
+	
+	<TutorialStep object="" name="" eventType="click" preText="&lt;p&gt; &lt;span color='0xFFFF00' &gt;ENDENEMIES&lt;/span&gt; &lt;span color='0x00FF00' &gt; Buddy Exchanges (green) &lt;/span&gt; will affect the liklihood of the initiator and responder becoming friends (or enemies!)     that was not enemies  and here is not friends: &lt;span &gt;ENDFRIENDS&lt;/span&gt; and hey how about dating &lt;span &gt;DATING&lt;/span&gt; This is FRIGGIN AWESOME &lt;span &gt;FRIENDS&lt;/span&gt; &lt;span &gt;FRIENDS&lt;/span&gt; &lt;span &gt;FRIENDS&lt;/span&gt; &lt;span &gt;FRIENDS&lt;/span&gt; &lt;span &gt;FRIENDS&lt;/span&gt; &lt;span &gt;FRIENDS&lt;/span&gt; &lt;span &gt;FRIENDS&lt;/span&gt;    &lt;/p&gt;" postText="" nextVisible="true" />
+	
+	<TutorialStep object="" name="" eventType="click" preText="&lt;p&gt; &lt;span color='0xFFFF00' &gt;ENDENEMIES&lt;/span&gt; &lt;span color='0x00FF00' &gt; Buddy Exchanges (green) &lt;/span&gt; &lt;span color='0xFFFF00' &gt;FRIENDS&lt;/span&gt;will affect the liklihood of the initiator and responder becoming friends (or enemies!)     that was not enemies  and here is not friends: &lt;span &gt;ENDFRIENDS&lt;/span&gt; and hey how about dating &lt;span &gt;DATING&lt;/span&gt; This is FRIGGIN AWESOME &lt;span &gt;FRIENDS&lt;/span&gt; &lt;span &gt;FRIENDS&lt;/span&gt; &lt;span &gt;FRIENDS&lt;/span&gt; &lt;span &gt;FRIENDS&lt;/span&gt; &lt;span &gt;FRIENDS&lt;/span&gt; &lt;span &gt;FRIENDS&lt;/span&gt; &lt;span &gt;FRIENDS&lt;/span&gt;    &lt;/p&gt;" postText="" nextVisible="true" />
+	
+	<TutorialStep object="" name="" eventType="click" preText="&lt;p&gt; Lets take a moment to talk about FRIENDSHIP affect how much the characters want to smooch each other. &lt;/p&gt;" postText="" nextVisible="true" />
+	
+	<TutorialStep object="" name="" eventType="click" preText="&lt;p&gt; Lets take a moment to talk about &lt;img source=&quot;{resourceLibrary.relationshipIcons['friends']}&quot;&gt;FRIENDSHIP&lt;/img&gt; affect how much the characters want to smooch each other. &lt;/p&gt;" postText="" nextVisible="true" /-->
+	
+	<TutorialStep object="" name="" eventType="click" preText="Welcome to Prom Week!" postText="" disableExceptions="" nextVisible="true" />
+	
+	<TutorialStep object="miniMapFriends" name="" eventType="click" preText="In Prom Week, you will control the fates of eighteen high-school students over the drama-filled days leading up to the Prom!" postText="" disableExceptions="" nextVisible="true" />
+	
+	<!--TutorialStep object="" name="" eventType="click" preText="&lt;p&gt; Lets take a moment to talk about &lt;inlineGraphicElement  &gt;FRIENDSHIP&lt;/inlineGraphicElement&gt; affect how much the characters want to smooch each other. &lt;/p&gt;" postText="" nextVisible="true" /-->
+	
+	<TutorialStep object="" name="" eventType="click" preText="You'll see on stage, we now have two of these eighteen characters." postText="" disableExceptions="" nextVisible="true" />
+	
+	<TutorialStep object="" name="" eventType="click" preText="The guy with a penguin on his shirt is Zack.  The girl with the fetching streak in her hair is Chloe.  Hi Zack and Chloe! (You may have to click and drag to see them!)"  postText="" disableExceptions="" nextVisible="true" />
+	
+	<TutorialStep object="avatar" name="zack" eventType="click" preText="Go ahead and give Zack a click!"  postText="" disableExceptions="" nextVisible="false" />
+	
+	<TutorialStep object="" name="" eventType="click" preText="Woah!  Check out that gnarly green circle underneath our new best friend!  And all that stuff on that bottom panel changed a bunch!" disableExceptions="" nextVisible="true" />
+	
+	<TutorialStep object="avatar" name="chloe" eventType="click" preText="Lets worry about that stuff later.  For now, let's get to know Chloe a little better--give her a click now!" disableExceptions="" nextVisible="false" />
+	
+	<TutorialStep object="" name="" eventType="click" preText="WOAH MAN! Everything old is new again!  Let's break it down a little bit." postText="" nextVisible="true" />
+	
+	<TutorialStep object="" name="" eventType="click" preText="Because you selected Zack first, you marked him as the 'initiator' (that's what that green circle means!)" postText="" nextVisible="true" />
+	
+	<TutorialStep object="" name="" eventType="click" preText="And, you guessed it, clicking on Chloe second designated her as the 'responder' (the secret of the yellow circle: revealed!)" postText="" nextVisible="true" />
+	
+	<TutorialStep object="" name="" eventType="click" preText="You may have also noticed that there are now five mysterious multi-colored buttons floating innocuously above Chloe's head." postText="" nextVisible="true" />
+	
+	<TutorialStep object="" name="" eventType="click" preText="These are the things that Zack wants to do with Chloe more than anything in the world." postText="" nextVisible="true" />
+	
+	<TutorialStep object="" name="" eventType="click" preText="But he won't always want to do these things!  He's picked these top 'social exchanges' based on a multitude of factors, including his current relationship with Chloe, their past history together, and his own personality." postText="" nextVisible="true" />
+	
+	<TutorialStep object="" name="" eventType="click" preText="The color of the button clues you in on the intent of the social exchange--that is, what Zack hopes to accomplish by trying it out." postText="" nextVisible="true" />
+	
+	<TutorialStep object="" name="" eventType="click" preText="&lt;p&gt;  &lt;span color='0x00FF00' &gt; Buddy Exchanges (green) &lt;/span&gt; will affect the liklihood of the initiator and responder becoming friends (&lt;span color='0xFFFF00' &gt;FRIENDS&lt;/span&gt;) (or enemies! &lt;span color='0xFFFF00' &gt;ENEMIES&lt;/span&gt;)  &lt;/p&gt;" postText="" nextVisible="true" />
+	
+	<TutorialStep object="" name="" eventType="click" preText="&lt;p&gt;  Friends who are mean to each other may want to break off friendships with each other (&lt;span color='0xFFFF00' &gt;ENDFRIENDS&lt;/span&gt;), and enemies who are nice may let bygones be bygones (&lt;span color='0xFFFF00' &gt;ENDENEMIES&lt;/span&gt;) &lt;/p&gt;" postText="" nextVisible="true" />
+	
+	<TutorialStep object="" name="" eventType="click" preText="&lt;p&gt;  &lt;span color='0xFF99CE' &gt; Romance Exchanges (pink) &lt;/span&gt; affect how much the characters want to smooch each other and start dating (&lt;span color='0xFFFF00' &gt;DATING&lt;/span&gt;). &lt;/p&gt;" postText="" nextVisible="true" />
+	
+	<TutorialStep object="" name="" eventType="click" preText="&lt;p&gt;  &lt;span color='0x0000FF' &gt; Cool Exchanges (blue) &lt;/span&gt; are meant to affect, what else, how cool the responder finds the initiator!  Coolness has lots of neat indirect effects, and can lead to &lt;span color='0xFFFF00' &gt;FRIENDS&lt;/span&gt;, &lt;span color='0xFFFF00' &gt;DATING&lt;/span&gt;, &lt;span color='0xFFFF00' &gt;ENDENEMIES&lt;/span&gt; if high or &lt;span color='0xFFFF00' &gt;ENDFRIENDS&lt;/span&gt;, &lt;span color='0xFFFF00' &gt;ENDDATING&lt;/span&gt;, &lt;span color='0xFFFF00' &gt;ENEMIES&lt;/span&gt; if low! &lt;/p&gt;" postText="" nextVisible="true" />
+	
+	<TutorialStep object="socialGameButton0" name="" eventType="click" preText="Phew, OK enough talking for now! Try clicking on the 'Brag' button to make Zack wow Chloe with his past exploits and hopefully make her think he's a cool dude." postText="" nextVisible="false" />
+	
+	<TutorialStep object="" name="" eventType="click" preText="OK, we lied, a little more talking.  The bottom panel is now over-flowing with useful tips about the selected social exchange.  We'll cover it later, but in short, you can use this to plan your moves." postText="" nextVisible="true" />
+	
+	<TutorialStep object="goButton" name="" eventType="click" preText="But for now, let's throw caution to the wind!  Make Zack 'brag' by clicking on the 'go' button (or clicking on the brag button again)" postText="" disableExceptions="socialGameButton0" nextVisible="false" />
+	
+	<TutorialStep object="" name="" eventType="click" preText="Victory!  Welcome to the results screen, where you can see that your master plan was a rousing success--Chloe thinks Zack is way cooler now!  Mouse over those icons for the specifics of your accomplishment." postText="" disableExceptions="socialGameButton0" nextVisible="true" />
+	
+	<TutorialStep object="" name="" eventType="click" preText="Great!  You now know everything there is to become a master at Prom Week!  Have fun!" postText="" disableExceptions="" nextVisible="false" />
+	
+	<!--TutorialStep object="" name="" eventType="click" preText="&lt;p&gt;  &lt;span color='0x663399' &gt; COLORED &lt;/span&gt; NON COLORED &lt;/p&gt;" postText="" nextVisible="true" /-->
+	
+	<!--TutorialStep object="megauiinitiatorintentbutton" name="" eventType="click" preText="Could you click on the Primary Portrait for me?" postText="Great job clicking on the Primary Portrait!" />
+	<TutorialStep object="megauiinitiatormotivesbutton" name="" eventType="click" preText="Could you click on the Primary Portrait for me?" postText="Great job clicking on the Primary Portrait!" />
+	<TutorialStep object="megauirespondermotivesbutton" name="" eventType="click" preText="Could you click on the Primary Portrait for me?" postText="Great job clicking on the Primary Portrait!" />
+	<TutorialStep object="megauiforecastbutton" name="" eventType="click" preText="Could you click on the Primary Portrait for me?" postText="Great job clicking on the Primary Portrait!" />
+	<TutorialStep object="megauiresultsbutton" name="" eventType="click" preText="Could you click on the Primary Portrait for me?" postText="Great job clicking on the Primary Portrait!" />
+	<TutorialStep object="avatar" name="zack" eventType="click" preText="Yup! now it is time to click on an avatar! Click on Zack!" postText="you clicked it! I can't believe you really clicked it!" />
+	<TutorialStep object="megauibuddyfilter" name="" eventType="click" preText="OK, NOW click on the secondary portrait!" postText="that second portrait never knew what hit it!" />
+	<TutorialStep object="goalbutton" name="" eventType="click" preText="OK, NOW click on the secondary portrait!" postText="that second portrait never knew what hit it!" />
+	<TutorialStep object="goal1" name="" eventType="click" preText="OK, NOW click on the secondary portrait!" postText="that second portrait never knew what hit it!" />
+	<TutorialStep object="goal2" name="" eventType="click" preText="OK, NOW click on the secondary portrait!" postText="that second portrait never knew what hit it!" />
+	<TutorialStep object="goal1" name="" eventType="click" preText="OK, NOW click on the secondary portrait!" postText="that second portrait never knew what hit it!" /-->
+	
+	
+	<!--TutorialStep object="todolist" name="" eventType="click" preText="Could you click on the ToDoList for me?" postText="I'm so proud of you!" />
+	<TutorialStep object="todolistcomponent" name="" eventType="over" preText="Please ROLL YOUR MOUSE OVER don't click! one of the items on the do list!" postText="Neato!"/>
+	
+	<TutorialStep object="zoominbutton" name="" eventType="click" preText="OK, NOW click on the zoom in button" postText="incredible!"/>
+	<TutorialStep object="zoomoutbutton" name="" eventType="click" preText="OK, NOW click on the zoom out button!" postText="wow!" />
+	<TutorialStep object="ssubutton" name="" eventType="click" preText="OK, NOW click on the ssu button" postText="delightful" />
+	
+	<TutorialStep object="socialgamebutton0" name="" eventType="click" preText="OK, NOW click on the first most social game button" postText="you rock!" />
+	<TutorialStep object="socialgamebutton1" name="" eventType="click" preText="OK, NOW click on the second most social game button!" postText="U D B" />
+	<TutorialStep object="socialgamebutton2" name="" eventType="click" preText="OK, NOW click on the third most social game button!" postText="cool!" />
+	<TutorialStep object="socialgamebutton3" name="" eventType="click" preText="OK, NOW click on the fourth most social game button!" postText="nice!" />
+	<TutorialStep object="socialgamebutton4" name="" eventType="click" preText="OK, NOW click on the fifth most social game button!" postText="I love it!" />
+	
+	<TutorialStep object="charactersheettabs" name="" eventType="click" preText="OK, NOW click on the tabs area on the character sheet!" postText="please go on a date with me" />
+	
+	<TutorialStep object="charactersheetbuddyfilter" name="" eventType="click" preText="OK, NOW click on the buddy filter in the character sheet!" postText="great!" />
+	<TutorialStep object="charactersheetromancefilter" name="" eventType="click" preText="OK, NOW click on the romance filter in the character sheet!" postText="good!" />
+	<TutorialStep object="charactersheetcoolfilter" name="" eventType="click" preText="OK, NOW click on the cool filter in the character sheet!" postText="sweet!" />
+	
+	<TutorialStep object="charactersheetlevelcastbutton" name="" eventType="click" preText="OK, NOW click on the level cast button!" postText="you... you!" />
+	<TutorialStep object="charactersheetallbutton" name="" eventType="click" preText="OK, NOW click on the character sheet all button!" postText="yippee!" />
+	<TutorialStep object="charactersheetfriendsbutton" name="" eventType="click" preText="OK, NOW click on the character sheet friend button!" postText="excellent!" />
+	<TutorialStep object="charactersheetdatingbutton" name="" eventType="click" preText="OK, NOW click on the character sheet dating button!" postText="very nice" />
+	<TutorialStep object="charactersheetenemiesbutton" name="" eventType="click" preText="OK, NOW click on the character sheet enemies button" postText="awwesome!" />
+	
+	<TutorialStep object="charactersheethistorybutton" name="" eventType="click" preText="OK, NOW click on the character sheet history button!" postText="THE END!" /-->
+
+</TutorialScript>

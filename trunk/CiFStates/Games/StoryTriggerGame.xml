@@ -1,0 +1,22 @@
+<CiFLibraries>
+  <SocialGameLibrary>
+    <SocialGame name="StoryTriggerGame">
+      <PatsyRule>
+        <Rule name="Anonymous Rule" id="-1"/>
+      </PatsyRule>
+      <Intents/>
+      <Preconditions>
+        <Rule name="Anonymous Rule" id="0">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="friends" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="relationship" first="initiator" second="responder" relationship="friends" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </Rule>
+      </Preconditions>
+      <InitiatorInfluenceRuleSet/>
+      <ResponderInfluenceRuleSet/>
+      <Effects/>
+      <Instantiations/>
+    </SocialGame>
+  </SocialGameLibrary>	
+</CiFLibraries>
+
+    

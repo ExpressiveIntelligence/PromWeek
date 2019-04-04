@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 styleName="classicPromWeek"
+		 width="100%" height="100%">
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+			<mx:WipeRight id="wipeRight" duration="500" effectEnd="endingTitleWipeRightEnded(event)"/>
+			<mx:WipeLeft id="wipeLeft" duration="500" effectEnd="endingTitleWipeLeftEnded(event)"/>
+		 </fx:Declarations>
+		 
+		 
+		<mx:Canvas id="endingTitleGroup" width="100%" height="60" visible="false" showEffect="{wipeRight}" hideEffect="{wipeLeft}" top="100">
+			<s:Group width="100%" height="100%">
+				<s:Rect width="100%" height="100%">
+					<s:fill>
+						<mx:SolidColor color="{getStyle('backgroundColor')}" alpha="0.7"/>
+					</s:fill>
+				</s:Rect>
+			</s:Group>
+			<s:HGroup id="endingTitleTextGroupContents" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle"/>
+		</mx:Canvas>
+		 
+	<fx:Script>
+		<![CDATA[
+		import flash.events.TimerEvent;
+		import flash.utils.Timer;
+		import mx.events.EffectEvent;
+		import spark.components.HGroup;
+		import spark.components.VGroup;
+
+		public var moveTimer:Timer;
+		
+		public function populateEndingTitle(titleText:String):void
+		{
+			this.endingTitleTextGroupContents.removeAllElements();
+			//this is the line that calls your generate hgroup thingy!
+			var groupToAdd:VGroup = VisibilityManager.getInstance().createGroupWithTextAndImages(titleText);
+			this.endingTitleTextGroupContents.addElement(groupToAdd);
+			this.visible = true;
+			this.endingTitleGroup.visible = true;
+		}
+		
+		public function endingTitleWipeRightEnded(e:EffectEvent):void
+		{
+			this.moveTimer = new Timer(2000, 1);
+			this.moveTimer.start();
+			this.moveTimer.addEventListener(TimerEvent.TIMER_COMPLETE,moveTimerComplete);
+		}
+		
+
+		private function moveTimerComplete(e:TimerEvent):void
+		{
+			this.endingTitleGroup.visible = false;
+		}
+
+		public function endingTitleWipeLeftEnded(e:EffectEvent):void
+		{
+			this.visible = false;
+		}
+		
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

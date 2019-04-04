@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 preinitialize="onPreinitialize()"
+		 width="260" height="260">
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>					
+		 </fx:Declarations>
+		 
+		 
+		<util:SmoothImage id="bigThoughtBubbleImage" width="100%" height="100%" />
+		<util:SmoothImage id="bigThoughtBubbleStemImage" y="250" />
+		
+		<s:HGroup id="socialExchangeSelectionGroup" width="100%" height="100%" paddingLeft="20" paddingRight="20" paddingTop="30" paddingBottom="15">
+			<s:VGroup width="100%" height="100%">
+				<s:RichText id="whatInitiatorWantsToDoText" width="100%" height="25%" styleName="bigThoughtBubbleTitleStyle" />
+				<prom:NEW_socialExchangeStepper id="socialExchangeStepper" width="100%" height="75%" />
+			</s:VGroup>
+		</s:HGroup>
+		<s:HGroup id="socialExchangeInfoGroup" visible="false" width="100%" height="100%" paddingLeft="20" paddingRight="20" paddingTop="30" paddingBottom="30">
+			<prom:NEW_initiatorSocialExchangeInfoComponent id="initiatorSocialExchangeInfo" width="100%" height="100%" />
+		</s:HGroup>
+		 
+	<fx:Script>
+		<![CDATA[
+		import CiF.CiFSingleton;
+		import flash.events.MouseEvent;
+		import PromWeek.assets.ResourceLibrary;
+
+		private var rL:ResourceLibrary;
+		private var cif:CiFSingleton;
+		
+		public function onCreationComplete():void 
+		{
+			this.bigThoughtBubbleImage.source = rL.uiIcons["bigThoughtBubble"];
+			this.bigThoughtBubbleStemImage.source = rL.uiIcons["bigThoughtBubbleStem"];
+		}
+		
+		private function onPreinitialize():void 
+		{
+			rL = ResourceLibrary.getInstance();
+			cif = CiFSingleton.getInstance(); 
+		}
+		
+		public function updateSocialExchangeInfoGroup(sgName:String):void
+		{
+			initiatorSocialExchangeInfo.update(sgName);
+			
+			
+			
+			this.socialExchangeSelectionGroup.visible = false;
+			this.socialExchangeInfoGroup.visible = true;
+		}
+
+		
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

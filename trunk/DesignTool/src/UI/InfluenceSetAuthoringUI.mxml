@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:UI="UI.*"
+		 width="700" 
+		 height="600" 
+		 contentBackgroundColor="#FFFFFF" >
+	<s:layout>
+		<s:BasicLayout />
+	</s:layout>
+	
+	<fx:Declarations>
+		<s:RadioButtonGroup id="forRole" 
+			valueCommit="addInfluenceRule.label='Add to '+ forRole.selection.label; updateInfluenceRule.label='Update to '+forRole.selection.label" />
+			
+		<fx:Number id="weight" >0</fx:Number>
+		<fx:Boolean id="isInitiatorRule">true</fx:Boolean>
+		<fx:Boolean id="isResponderRule">false</fx:Boolean>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+
+	<s:HGroup>
+		<UI:RuleAuthoringUI id="ruleUI" />
+		<s:VGroup>
+			<s:RadioButton label="Initiator" color="#ffffff" selected="@{isInitiatorRule}" groupName="forRole" click="openAccordianTab();" />
+			<s:RadioButton label="Responder" color="#ffffff" selected="@{isResponderRule}" groupName="forRole" click="openAccordianTab();" />
+			<s:Label text="Influence Rule Weight" verticalAlign="justify"  color="#ffffff"/>
+			<s:NumericStepper minimum="-100" maximum="100" value="@{weight}" /> 
+			<s:Button id="addInfluenceRule" click="addInfluenceRuleToWorkingSG();" />
+			<s:Button id="updateInfluenceRule" click="updateInfluenceRuleToWorkingSG();" />
+		</s:VGroup>
+	</s:HGroup>
+		
+	<fx:Script>
+		<![CDATA[
+			import CiF.Debug;
+			import CiF.InfluenceRule;
+			import flash.events.Event;
+			import tool.DesignerToolEngine;
+			
+			public var dte:DesignerToolEngine = DesignerToolEngine.getInstance();
+		
+			/**
+			 * Updates the influence rule (initiator or responder determined by
+			 * the selected radio button option) in the influence rule set with
+			 * the local influence rule with a corresponding ID.
+			 */
+			public function updateInfluenceRuleToWorkingSG():void {
+				var ir:InfluenceRule;
+				var irToUpdate:InfluenceRule = new InfluenceRule();
+				var i:uint;
+				irToUpdate.name = this.ruleUI.rule.name;
+				irToUpdate.predicates = this.ruleUI.rule.predicates.concat();
+				irToUpdate.weight = this.weight;
+				irToUpdate.id = this.ruleUI.rule.id;
+				
+				Debug.debug(this, "updateInfluenceRuleToWorkingSG() irToUpdate: " + irToUpdate.toString());
+				
+				if (this.isInitiatorRule) {
+					for (i = 0; i < dte.workingSocialGame.initiatorIRS.influenceRules.length; ++i) {
+						if (dte.workingSocialGame.initiatorIRS.influenceRules[i].id == irToUpdate.id) {
+							Debug.debug(this, "updateInfluenceRuleToWorkingSG() i= "+i+" - " + dte.workingSocialGame.initiatorIRS.influenceRules[i] + " to " + irToUpdate);
+							dte.workingSocialGame.initiatorIRS.influenceRules[i] = irToUpdate;
+							dispatchEvent(new Event("irsListUpdate", true, true));
+							return;
+						}
+					}
+				}else if (this.isResponderRule) {
+					for (i = 0; i < dte.workingSocialGame.responderIRS.influenceRules.length; ++i) {
+						if (dte.workingSocialGame.responderIRS.influenceRules[i].id == irToUpdate.id) {
+							dte.workingSocialGame.responderIRS.influenceRules[i] = irToUpdate;
+							dispatchEvent(new Event("irsListUpdate", true, true));
+							return;
+						}
+					}
+				}
+				//corresponding id not found in the working social game -- add it 
+				addInfluenceRuleToWorkingSG();
+			}
+				
+			public function addInfluenceRuleToWorkingSG():void {
+				var irToAdd:InfluenceRule = new InfluenceRule();
+				var irIterator:InfluenceRule;
+				var maxID:int = 0;
+				//TODO: make this ruleUI.rule.clone() as InfluenceRule
+				irToAdd.predicates = ruleUI.rule.predicates.concat();// = ruleUI.rule as InfluenceRule;
+				//ir.name = ruleUI.rule.name;
+				if (ruleUI.rule.name == "")// don't let things have a blank name
+					irToAdd.name  = "Anonymous Rule";
+				else 
+					irToAdd.name  = ruleUI.rule.name; 
+				irToAdd.weight = this.weight;
+				if (this.isInitiatorRule) {
+					for each(irIterator in dte.workingSocialGame.initiatorIRS.influenceRules)
+						if (maxID <= irIterator.id) maxID = irIterator.id + 1;
+					irToAdd.id = maxID;
+					dte.workingSocialGame.initiatorIRS.influenceRules.push(irToAdd);
+					dte.initiatorIRSDP = dte.generateInitiatorIRSDP();
+					
+				}else {
+					for each(irIterator in dte.workingSocialGame.responderIRS.influenceRules)
+						if (maxID <= irIterator.id) maxID = irIterator.id + 1;
+					irToAdd.id = maxID;
+					dte.workingSocialGame.responderIRS.influenceRules.push(irToAdd);
+					dte.responderIRSDP = dte.generateResponderIRSDP();
+				}
+				
+				this.ruleUI.rule.id = maxID;
+				
+				dispatchEvent(new Event("irsListUpdate", true, true));
+			}
+			
+/*			public function updateInfluenceRuleToWorkingSG():void 
+			{
+				var ir:InfluenceRule = new InfluenceRule();
+				//TODO: make this ruleUI.rule.clone() as InfluenceRule
+				ir.predicates = ruleUI.rule.predicates.concat();// = ruleUI.rule as InfluenceRule;
+				ir.name = ruleUI.rule.name;
+				ir.weight = this.weight;
+				
+				var irForCompare:InfluenceRule
+				if (this.isInitiatorRule) 
+				{
+					for each (irForCompare in dte.workingSocialGame.initiatorIRS.influenceRules)
+					{
+						if (irForCompare.equals(ir))
+						{
+							
+						}
+					}
+				}
+				else 
+				{
+					for each (ir in dte.workingSocialGame.responderIRS.influenceRules)
+					{
+						
+					}
+				}
+				dispatchEvent(new Event("irsListUpdate", true, true));
+			}*/
+			
+			/**
+			 * If the flag for linking the selected tab with the
+			 * corresponding accordian is set to true,
+			 * open up the Initiator IRS accordian tab when 
+			 * Initiator is selected, and open up the responder one
+			 * when Responder is selected!
+			 */
+			public function openAccordianTab():void {
+				if (dte.tabAndAccordianLinkBoxValue) {
+					dispatchEvent(new Event("influenceRuleSetChange", true, true));
+				}
+			}
+		]]>
+	</fx:Script>
+</s:Group>

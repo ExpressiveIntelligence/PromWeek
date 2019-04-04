@@ -1,0 +1,598 @@
+<!-- 0=Doug, 1=Jordan, 2=Buzz, 3=Naomi, 4=Lil, 5=Nicholas, 6=Zack, 7=Cassie, 8=Simon, 9=Monica -->
+<!-- CHARACTERS NOT APPEARING IN THIS SCENARIO: 10=Cassandra, 11=Oswald, 12=Edward, 13=Mave, 14=Gunter, -->
+<CiFState time="0">
+  <Cast>
+	<Character name="Doug" networkID="0" >
+		<Trait type="doug"/>
+      <Trait type="male"/>
+      <Trait type="shy"/>
+      <Trait type="oblivious"/>
+      <Trait type="pacifist"/>
+      <Trait type="defensive"/>
+      <Locution type="greeting">sup</Locution>
+      <Locution type="shocked">woah</Locution>
+	  <Locution type="positiveadj">groovy</Locution>
+      <Locution type="pejorative">poser</Locution>
+ 
+      <Locution type="sweetie">babe</Locution>
+	  <Locution type="buddymale">bro</Locution>
+	  <Locution type="buddyfemale">chica</Locution>
+    </Character>
+    <Character name="Simon" networkID="8" >
+		<Trait type="simon"/>
+	  <Trait type="male"/>
+	  <Trait type="brainy"/>
+	  <Trait type="loyal"/>
+	  <Trait type="irritable"/>
+	  <Trait type="afraid of commitment"/>
+	  
+	  <Locution type="greeting">hi</Locution>
+	  <Locution type="shocked">impossible</Locution>
+	  <Locution type="positiveadj">perfect</Locution>
+	  <Locution type="pejorative">idiot</Locution>
+	  <Locution type="sweetie">lady love</Locution>
+	  <Locution type="buddymale">brosef</Locution>
+	  <Locution type="buddyfemale">girlfriend</Locution>
+	  
+	  <Status type="has a crush on" from="Simon" to="Monica"/>
+	  <Status type="envies" from="Simon" to="Zack"/>
+	  <Status type="lonely" from="Simon" />
+    </Character>	
+    <Character name="Monica" networkID="9" >
+		<Trait type="monica"/>
+	  <Trait type="female"/>
+	  <Trait type="loyal"/>
+	  <Trait type="attention hog"/>
+	  <Trait type="sex magnet"/>
+	  <Trait type="vengeful"/>
+	  
+	  <Locution type="greeting">oh</Locution>
+	  <Locution type="shocked">shut up</Locution>
+	  <Locution type="positiveadj">super-cute</Locution>
+	  <Locution type="pejorative">nobody</Locution>
+	  <Locution type="sweetie">love-monkey</Locution>
+	  <Locution type="buddymale">boy</Locution>
+	  <Locution type="buddyfemale">girl</Locution>
+	  
+	  <!-- <Status type="has a crush on" from="Monica" to="Oswald"/> -->
+	  <Status type="envies" from="Monica" to="Naomi"/>
+	  <Status type="popular" from="Monica" />	  
+    </Character>	
+    <Character name="Oswald" networkID="10" >
+		<Trait type="oswald"/>
+	  <Trait type="male"/>
+    </Character>
+    <Character name="Zack" networkID="6" >	
+		<Trait type="zack"/>
+	  <Trait type="male"/>
+	  <Trait type="arrogant"/>
+	  <Trait type="stubborn"/>
+	  <Trait type="outgoing"/>
+	  <Trait type="honest"/>
+	  
+	  <Locution type="greeting">oh hai</Locution>
+	  <Locution type="shocked">what teh f</Locution>
+	  <Locution type="positiveadj">roxor</Locution>
+	  <Locution type="pejorative">n00b</Locution>
+	  <Locution type="sweetie">gigababe</Locution>
+	  <Locution type="buddymale">guildie</Locution>
+	  <Locution type="buddyfemale">guildie</Locution>
+	  
+    </Character>
+    <Character name="Nicholas" networkID="5" >	
+		<Trait type="nicholas"/>
+	  <Trait type="male"/>
+	  <Trait type="arrogant"/>
+	  <Trait type="swinger"/>
+	  <Trait type="vengeful"/>
+	  <Trait type="witty"/>
+	  
+	  <Locution type="greeting">greetings</Locution>
+	  <Locution type="shocked">my oh my</Locution>
+	  <Locution type="positiveadj">lovely</Locution>
+	  <Locution type="pejorative">simpering moron</Locution>
+	  <Locution type="sweetie">snookie-wookums</Locution>
+	  <Locution type="buddymale">my man</Locution>
+	  <Locution type="buddyfemale">dahhrling</Locution>
+	  
+	  <Status type="cheater" from="Nicholas" to=""/>
+    </Character>	
+    <Character name="Lil" networkID="4" >	
+		<Trait type="lil"/>
+	  <Trait type="female"/>
+	  <Trait type="dishonest"/>
+	  <Trait type="clumsy"/>
+	  <Trait type="takes things slowly"/>
+	  <Trait type="mopey"/>
+	  
+	  <Locution type="greeting">hello</Locution>
+	  <Locution type="shocked">oh</Locution>
+	  <Locution type="positiveadj">neat</Locution>
+	  <Locution type="pejorative">freakshow</Locution>
+	  <Locution type="sweetie">love</Locution>
+	  <Locution type="buddymale">man</Locution>
+	  <Locution type="buddyfemale">man</Locution>
+    </Character>
+    <Character name="Naomi" networkID="3" >	
+		<Trait type="naomi"/>
+	  <Trait type="female"/>
+	  <Trait type="sympathetic"/>
+	  <Trait type="jealous"/>
+	  <Trait type="self destructive"/>
+	  <Trait type="brainy"/>
+	  
+	  <Locution type="greeting">hey hey</Locution>
+	  <Locution type="shocked">my word</Locution>
+	  <Locution type="positiveadj">amazing</Locution>
+	  <Locution type="pejorative">waste of space</Locution>
+	  <Locution type="sweetie">sugar</Locution>
+	  <Locution type="buddymale">my man</Locution>
+	  <Locution type="buddyfemale">sweetness</Locution>
+	  
+    </Character>		
+    <Character name="Buzz" networkID="2" >
+		<Trait type="buzz"/>
+	  <Trait type="male"/>
+	  <Trait type="mean"/>
+	  <Trait type="inarticulate"/>
+	  <Trait type="ripped"/>
+	  <Trait type="emotional"/>
+	  
+	  <Locution type="greeting">uhhhh</Locution>
+	  <Locution type="shocked">the f?</Locution>
+	  <Locution type="positiveadj">tight</Locution>
+	  <Locution type="pejorative">crapface</Locution>
+	  <Locution type="sweetie">babe</Locution>
+	  <Locution type="buddymale">dude</Locution>
+	  <Locution type="buddyfemale">girl dude</Locution>
+
+    </Character>
+    <Character name="Jordan" networkID="1" >	
+		<Trait type="jordan"/>
+	  <Trait type="female"/>
+	  <Trait type="loyal"/>
+	  <Trait type="confident"/>
+	  <Trait type="competitive"/>
+	  <Trait type="impulsive"/>
+	  
+	  <Locution type="greeting">hey</Locution>
+	  <Locution type="shocked">no way</Locution>
+	  <Locution type="positiveadj">nice</Locution>
+	  <Locution type="pejorative">dork</Locution>
+	  <Locution type="sweetie">cutie</Locution>
+	  <Locution type="buddymale">man</Locution>
+	  <Locution type="buddyfemale">man</Locution>
+	  
+	  <!--<Status type="has a crush on" from="Jordan" to="Oswald"/>-->
+    </Character>	
+    <Character name="Cassie" networkID="7" >
+		<Trait type="cassie"/>
+	  <Trait type="female"/>
+	  <Trait type="outgoing"/>
+	  <Trait type="kind"/>
+	  <Trait type="smooth talker"/>
+	  <Trait type="insecure"/>
+	  <Trait type="jealous"/>
+	  
+	  <Locution type="greeting">what's the latest</Locution>
+	  <Locution type="shocked">wait, what?</Locution>
+	  <Locution type="positiveadj">wicked</Locution>
+	  <Locution type="pejorative">zombie</Locution>
+	  <Locution type="buddymale">punk</Locution>
+	  <Locution type="buddyfemale">punk</Locution>
+	  <Locution type="sweetie">hot stuff</Locution>
+	  
+	  <!-- <Status type="has a crush on" from="Cassie" to="CryingHearts"/> -->
+    </Character>	
+    <Character name="Cassandra" networkID="15" >
+		<Trait type="cassandra"/>
+	  <Trait type="female"/>
+	</Character>
+    <Character name="Robert" networkID="11" >
+		<Trait type="robert"/>
+	  <Trait type="male"/>
+	</Character>
+    <Character name="Edward" networkID="12" >
+		<Trait type="edward"/>
+	  <Trait type="male"/>
+	</Character>
+    <Character name="Mave" networkID="13" >
+		<Trait type="mave"/>
+	  <Trait type="female"/>
+	</Character>
+    <Character name="Gunther" networkID="14" >
+		<Trait type="gunther"/>
+	  <Trait type="male"/>
+	</Character>
+    <Character name="Debbie" networkID="16" >
+		<Trait type="debbie"/>
+	  <Trait type="female"/>
+	</Character>
+    <Character name="Karen" networkID="17" >
+		<Trait type="karen"/>
+	  <Trait type="female"/>
+	</Character>
+
+	
+  </Cast>
+  <SFDB>
+	  <BackstoryContext time="-6" initiator="Zack" responder="Cassie" other="" SFDBLabel="lame" PerformanceRealizationString="%i% thought %r% said to no when %pron(i,he/she)% asked %pron(r,him/her)% out because he beat her at life" />
+	  <BackstoryContext time="-3" initiator="Nicholas" responder="Monica" other="" SFDBLabel="mean" PerformanceRealizationString="%i% cheated off of %rp% homework" />
+	  <BackstoryContext time="-2" initiator="Lil" responder="Zack" other="" SFDBLabel="mean" PerformanceRealizationString="%i% gave %r% a high five so hard that it hurt %pron(r,his/her)% hand" />
+	  <BackstoryContext time="-1" initiator="Zack" responder="Lil" other="" SFDBLabel="romantic" PerformanceRealizationString="%i% smooched %r% on the cheak" />
+	  <BackstoryContext time="-4" initiator="Monica" responder="Nicholas" other="" SFDBLabel="nice" PerformanceRealizationString="%i% offered to let %r% cheat off %pron(i,his/her)% homework" />
+	  <BackstoryContext time="-30" initiator="Jordan" responder="Doug" other="" SFDBLabel="nice" PerformanceRealizationString="%i% helped %r% out with %pron(r,his/her)% homework" />
+	  <BackstoryContext time="-20" initiator="Jordan" responder="Doug" other="" SFDBLabel="funny" PerformanceRealizationString="%i% told %r% that awesome joke about koalas" />
+	  <BackstoryContext time="-10" initiator="Jordan" responder="Doug" other="" SFDBLabel="cool" PerformanceRealizationString="%i% showed %r% how to do that awesome skate trick" />
+	  <BackstoryContext time="-15" initiator="Jordan" responder="Doug" other="" SFDBLabel="nice" PerformanceRealizationString="%i% helped %r% out with %pron(r,his/her)% homework" />
+	  <BackstoryContext time="-25" initiator="Doug" responder="Jordan" other="" SFDBLabel="cool" PerformanceRealizationString="%i% fixed %rp% bike" />
+	  <BackstoryContext time="-15" initiator="Doug" responder="Jordan" other="" SFDBLabel="funny" PerformanceRealizationString="%i% did that sweet impression of the assistant principal" />
+	  <BackstoryContext time="-5" initiator="Doug" responder="Jordan" other="" SFDBLabel="nice" PerformanceRealizationString="%i% walked %r% home from school after %pron(r,he/she)% failed that test" />
+	  
+	  <BackstoryContext time="-300" initiator="Naomi" responder="Jordan" other="" SFDBLabel="nice" PerformanceRealizationString="%i% became friends with %r%" />
+	  <BackstoryContext time="-200" initiator="Jordan" responder="Naomi" other="" SFDBLabel="nice" PerformanceRealizationString="%i% and %r% stopped being friends because %r% was getting too popular or something" />
+	  
+	  <BackstoryContext time="-200" initiator="Buzz" responder="Cassandra" other="" SFDBLabel="romantic" PerformanceRealizationString="%i% asked %r% out during halftime of the football game" />
+	  <BackstoryContext time="-199" initiator="Buzz" responder="Cassandra" other="" SFDBLabel="mean" PerformanceRealizationString="%i% dumped %r% right after the football game" />
+	  <BackstoryContext time="-100" initiator="Buzz" responder="Monica" other="" SFDBLabel="bad ass" PerformanceRealizationString="%i% asked %r% out in the middle of the homecoming assembly" />
+	  <BackstoryContext time="-99" initiator="Buzz" responder="Monica" other="" SFDBLabel="cheating" PerformanceRealizationString="%i% cheated on %r% with that sophomore chick" />
+	  
+	  <BackstoryContext time="-80" initiator="Buzz" responder="Doug" other="" SFDBLabel="mean" PerformanceRealizationString="%i% broke %rp% skateboard in half" />
+	  <BackstoryContext time="-66" initiator="Buzz" responder="Lil" other="" SFDBLabel="mean" PerformanceRealizationString="%i% made fun of %rp% hair over the PA system" />
+	  <BackstoryContext time="-40" initiator="Buzz" responder="Zack" other="" SFDBLabel="mean" PerformanceRealizationString="%i% flushed %rp% homework down the toilet" />
+	  <BackstoryContext time="-30" initiator="Buzz" responder="Simon" other="" SFDBLabel="mean" PerformanceRealizationString="%i% gave %r% a wedgie in gym class" />
+	  <BackstoryContext time="-35" initiator="Buzz" responder="Nicholas" other="" SFDBLabel="mean" PerformanceRealizationString="%i% called %r% a momma's boy" />
+	  
+	  <BackstoryContext time="-2" initiator="Naomi" responder="Lil" other="" SFDBLabel="nice" PerformanceRealizationString="%i% decided to make %r% %pron(i,his/her)% project" />	  
+	  
+	  <BackstoryContext time="-12" initiator="Nicholas" responder="Lil" other="" SFDBLabel="rude" PerformanceRealizationString="%i% told %r% %pron(r,he/she)% dressed like a depressed clown" />
+	  <BackstoryContext time="-1500" initiator="Zack" responder="Simon" other="" SFDBLabel="nice" PerformanceRealizationString="%i% and %r% became best friends in like third grade" />	
+	  <BackstoryContext time="-800" initiator="Zack" responder="Simon" other="" SFDBLabel="funny" PerformanceRealizationString="%i% and %r% hacked the school's network together in eighth grade" />
+	  <BackstoryContext time="-30" initiator="Simon" responder="Zack" other="" SFDBLabel="cool" PerformanceRealizationString="%i% lets %r% cheat off %pron(i,his/her)% homework" />
+	  
+	  <BackstoryContext time="-50" initiator="Zack" responder="Lil" other="" SFDBLabel="romantic" PerformanceRealizationString="%i% wrote that perl script to ask %r% out" />
+	  
+	  <BackstoryContext time="-75" initiator="Zack" responder="Buzz" other="" SFDBLabel="rude" PerformanceRealizationString="%i% posted that embarassing picture of %r% to SkimddIt" />
+	  <BackstoryContext time="-60" initiator="Zack" responder="Nicholas" other="" SFDBLabel="rude" PerformanceRealizationString="%i% totally stomped on %rp% paper in English class" />
+	  <BackstoryContext time="-50" initiator="Zack" responder="Doug" other="" SFDBLabel="rude" PerformanceRealizationString="%i% told %r% that %pron(r,his/her)% clothes were so 2000s" />
+	  <BackstoryContext time="-30" initiator="Zack" responder="Jordan" other="" SFDBLabel="rude" PerformanceRealizationString="%i% unfriended %r% with extreme prejudice" />
+	  <BackstoryContext time="-30" initiator="Zack" responder="Naomi" other="" SFDBLabel="embarrassing" PerformanceRealizationString="%i% thought %r% said to no when %pron(i,he/she)% asked %pron(r,him/her)% out because he beat her at chess" />
+	  
+
+	  
+	  <BackstoryContext time="-80" initiator="Nicholas" responder="Zack" other="" SFDBLabel="mean" PerformanceRealizationString="%i% broke %rp% glasses in gym class" />
+	  
+	  <BackstoryContext time="-300" initiator="Simon" responder="Naomi" other="" SFDBLabel="lame" PerformanceRealizationString="%i% invited %r% to chess club by filling %pron(r,his/her)% backpack with pawns" /> 
+	  
+	  <BackstoryContext time="-100" initiator="Monica" responder="Jordan" other="" SFDBLabel="rude" PerformanceRealizationString="%i% pretended not to notice %r% at the mall" />
+	  <BackstoryContext time="-80" initiator="Monica" responder="Simon" other="" SFDBLabel="rude" PerformanceRealizationString="%i% texted that mortifying video from %rp% blog to everyone" />
+	  <BackstoryContext time="-60" initiator="Monica" responder="Lil" other="" SFDBLabel="rude" PerformanceRealizationString="%i% spilled soda all over %r% and pretended it was %pron(r,his/her)% fault" />
+	  <BackstoryContext time="-40" initiator="Monica" responder="Naomi" other="" SFDBLabel="rude" PerformanceRealizationString="%i% told everyone %r% was the one who farted" />
+	  <BackstoryContext time="-100" initiator="Monica" responder="Lil" other="" SFDBLabel="mean" PerformanceRealizationString="%i% made that fake dating profile for %r% and posted the link all over" />
+	
+	<SocialGameContext gameName="Share Interest" initiator="Zack" responder="Monica" other="Doug" initiatorScore="24" responderScore="-8" time="11" effectIndex="1" chosenItemCKB="null" socialGameContextReference="-1" performanceRealizationString="null"/>
+<SocialGameContext gameName="Make Plans" initiator="Cassie" responder="Zack" other="" initiatorScore="8" responderScore="11" time="10" effectIndex="15" chosenItemCKB="null" socialGameContextReference="-1" performanceRealizationString="null"/>
+<SocialGameContext gameName="Open Up" initiator="Zack" responder="Cassie" other="Doug" initiatorScore="13" responderScore="8" time="9" effectIndex="0" chosenItemCKB="null" socialGameContextReference="-1" label="nice" labelFrom="Cassie" labelDirectedAt="Zack" performanceRealizationString="null"/>
+<SocialGameContext gameName="Make Plans" initiator="Zack" responder="Buzz" other="" initiatorScore="12" responderScore="-2" time="8" effectIndex="0" chosenItemCKB="null" socialGameContextReference="-1" performanceRealizationString="null"/>
+<SocialGameContext gameName="Physical Flirt" initiator="Cassie" responder="Simon" other="" initiatorScore="9" responderScore="-4" time="7" effectIndex="7" chosenItemCKB="null" socialGameContextReference="-1" label="embarrassing" labelFrom="Cassie" labelDirectedAt="Simon" performanceRealizationString="null"/>
+<SocialGameContext gameName="Pick-up Line" initiator="Zack" responder="Monica" other="Doug" initiatorScore="18" responderScore="-10" time="6" effectIndex="2" chosenItemCKB="null" socialGameContextReference="-1" label="lame" labelFrom="Zack" labelDirectedAt="Monica" performanceRealizationString="null"/>
+<SocialGameContext gameName="Bicker" initiator="Buzz" responder="Zack" other="Cassie" initiatorScore="6" responderScore="10" time="5" effectIndex="10" chosenItemCKB="null" socialGameContextReference="-1" performanceRealizationString="null"/>
+<SocialGameContext gameName="Ask on a Date" initiator="Cassie" responder="Monica" other="Doug" initiatorScore="13" responderScore="-11" time="4" effectIndex="6" chosenItemCKB="null" socialGameContextReference="-1" label="lame" labelFrom="Monica" labelDirectedAt="Cassie" performanceRealizationString="null"/>
+<SocialGameContext gameName="Debonair" initiator="Monica" responder="Cassie" other="Doug" initiatorScore="12" responderScore="14" time="3" effectIndex="6" chosenItemCKB="null" socialGameContextReference="-1" label="romantic" labelFrom="Monica" labelDirectedAt="Cassie" performanceRealizationString="null"/>
+<SocialGameContext gameName="Weird Out" initiator="Simon" responder="Buzz" other="" initiatorScore="6" responderScore="1" time="2" effectIndex="6" chosenItemCKB="null" socialGameContextReference="-1" performanceRealizationString="null"/>
+<SocialGameContext gameName="Make Plans" initiator="Cassie" responder="Buzz" other="" initiatorScore="7" responderScore="-4" time="1" effectIndex="10" chosenItemCKB="null" socialGameContextReference="-1" label="embarrassing" labelFrom="Cassie" labelDirectedAt="Buzz" performanceRealizationString="null"/>
+<SocialGameContext gameName="Show Off" initiator="Zack" responder="Cassie" other="" initiatorScore="18" responderScore="6" time="0" effectIndex="9" chosenItemCKB="banana slug" socialGameContextReference="-1" label="cool" labelFrom="Zack" labelDirectedAt="Cassie" performanceRealizationString="null"/>
+  </SFDB>	  
+  <Triggers>
+	<Trigger id="0">
+      <PerformanceRealization />
+      <ConditionRule>
+        <Rule name="Anonymous Rule" id="-1">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="false" intent="false" isSFDB="false" window="0"/>
+          <Predicate type="relationship" first="initiator" second="other" relationship="dating" negated="false" intent="false" isSFDB="false" window="0"/>
+		  <Predicate type="SFDB label" first="initiator" second="responder" label="" negated="false" intent="false" isSFDB="true" window="1" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+		  <Predicate type="status" status="cheating on" first="initiator" second="other" negated="true" intent="false" isSFDB="false" window="0"/>
+        </Rule>
+      </ConditionRule>
+      <ChangeRule>
+        <Rule name="Anonymous Rule" id="-1">
+          <Predicate type="status" status="cheater" first="initiator" second="" negated="false" intent="false" isSFDB="false" window="0"/>
+		  <Predicate type="status" status="cheating on" first="initiator" second="other" negated="false" intent="false" isSFDB="false" window="0"/>
+        </Rule>
+      </ChangeRule>
+    </Trigger>
+    <Trigger id="0">
+      <PerformanceRealization/>
+      <ConditionRule>
+        <Rule name="Anonymous Rule" id="-1">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="false" intent="false" isSFDB="false" window="0"/>
+          <Predicate type="relationship" first="initiator" second="other" relationship="dating" negated="false" intent="false" isSFDB="false" window="0"/>
+		  <Predicate type="SFDB label" first="initiator" second="responder" label="" negated="false" intent="false" isSFDB="true" window="1" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot="bad ass"/>
+		  <Predicate type="status" status="cheating on" first="initiator" second="other" negated="true" intent="false" isSFDB="false" window="0"/>
+        </Rule>
+      </ConditionRule>
+      <ChangeRule>
+        <Rule name="Anonymous Rule" id="-1">
+          <Predicate type="status" status="cheater" first="initiator" second="" negated="false" intent="false" isSFDB="false" window="0"/>
+		  <Predicate type="status" status="cheating on" first="initiator" second="other" negated="false" intent="false" isSFDB="false" window="0"/>
+		  <Predicate type="status" status="cheated on by" first="other" second="initiator" negated="false" intent="false" isSFDB="false" window="0"/>
+        </Rule>
+      </ChangeRule>
+    </Trigger>
+	<!--
+		<Trigger id="1">
+		  <PerformanceRealization/>
+		  <ConditionRule>
+			<Predicate type="trait" trait="afraid of commitment" first="initiator" negated="false" intent="false" isSFDB="false" window="0"/>
+			<Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="false" intent="false" isSFDB="false" window="0"/>
+		  </ConditionRule>
+		  <ChangeRule>
+			<Predicate type="status" status="anxious" first="initiator" second="responder" negated="false" intent="false" isSFDB="false" window="0"/>
+		  </ChangeRule>
+		</Trigger>
+		<Trigger id="2">
+			<PerformanceRealization>This is the default performance realization string</PerformanceRealization>
+			<ConditionRule>
+				<Predicate type="trait" trait="swinger" first="initiator" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot="first"/>
+				<Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+				<Predicate type="status" status="cheating on" first="responder" second="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+			</ConditionRule>
+			<ChangeRule>
+				<Predicate type="status" status="angry at" first="initiator" second="responder" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+				<Predicate type="status" status="heartbroken" first="initiator" second="responder" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+			</ChangeRule>
+		</Trigger>
+        <Trigger id="3">
+          <PerformanceRealization>This is the default performance realization string</PerformanceRealization>
+          <ConditionRule>
+            <Predicate type="status" status="cheating on" first="initiator" second="responder" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+            <Predicate type="trait" trait="loyal" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          </ConditionRule>
+          <ChangeRule>
+            <Predicate type="status" status="guilty" first="initiator" second="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          </ChangeRule>
+        </Trigger>
+			<Trigger id="4">
+			  <PerformanceRealization>This is the default performance realization string</PerformanceRealization>
+			  <ConditionRule>
+				<Predicate type="status" status="cheating on" first="initiator" second="responder" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+				<Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+			  </ConditionRule>
+			  <ChangeRule>
+				<Predicate type="status" status="cheating on" first="initiator" second="responder" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+			  </ChangeRule>
+		  </Trigger>
+		 -->
+    <Trigger id="1">
+      <PerformanceRealization/>
+      <ConditionRule>
+        <Rule name="Anonymous Rule" id="-1">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="false" intent="false" isSFDB="false" window="0"/>
+          <Predicate type="relationship" first="initiator" second="other" relationship="dating" negated="false" intent="false" isSFDB="false" window="0"/>
+		  <Predicate type="SFDB label" first="responder" second="initiator" label="" negated="false" intent="false" isSFDB="true" window="1" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot="bad ass"/>
+		  <Predicate type="status" status="cheating on" first="initiator" second="other" negated="true" intent="false" isSFDB="false" window="0"/>
+        </Rule>
+      </ConditionRule>
+      <ChangeRule>
+        <Rule name="Anonymous Rule" id="-1">
+          <Predicate type="status" status="cheater" first="initiator" second="" negated="false" intent="false" isSFDB="false" window="0"/>
+		  <Predicate type="status" status="cheating on" first="initiator" second="other" negated="false" intent="false" isSFDB="false" window="0"/>
+		  <Predicate type="status" status="cheated on by" first="other" second="initiator" negated="false" intent="false" isSFDB="false" window="0"/>
+        </Rule>
+      </ChangeRule>
+    </Trigger>
+	</Triggers>
+  
+  
+  <Network type="buddy" numChars="18">
+	<!--
+monica 9
+simon 8
+buzz 2
+cassie 7
+zack 6
+	-->
+	<edge from="9" to="8" value="10"/>
+	<edge from="9" to="2" value="20"/>
+	<edge from="9" to="7" value="10"/>
+	<edge from="9" to="6" value="10"/>
+	
+	<edge from="8" to="9" value="50"/>
+	<edge from="8" to="2" value="10"/>
+	<edge from="8" to="7" value="65"/>
+	<edge from="8" to="6" value="40"/>
+	
+	<edge from="8" to="9" value="100"/>
+	<edge from="8" to="2" value="100"/>
+	<edge from="8" to="7" value="10"/>
+	<edge from="8" to="6" value="100"/>
+	
+	<edge from="2" to="9" value="60"/>
+	<edge from="2" to="8" value="5"/>
+	<edge from="2" to="7" value="30"/>
+	<edge from="2" to="6" value="70"/>
+	
+	<edge from="7" to="9" value="25"/>
+	<edge from="7" to="8" value="15"/>
+	<edge from="7" to="2" value="25"/>
+	<edge from="7" to="6" value="75"/>
+	
+	<edge from="6" to="9" value="25"/>
+	<edge from="6" to="8" value="60"/>
+	<edge from="6" to="2" value="30"/>
+	<edge from="6" to="7" value="80"/>
+
+  </Network>
+  
+  <Network type="romance" numChars="18">
+	<!--
+monica 9
+simon 8
+buzz 2
+cassie 7
+zack 6
+	-->
+	<edge from="9" to="8" value="70"/>
+	<edge from="9" to="2" value="25"/>
+	<edge from="9" to="7" value="0"/>
+	<edge from="9" to="6" value="25"/>
+	<!--<edge from="9" to="6" value="100"/>-->
+	
+	<edge from="8" to="9" value="88"/>
+	<edge from="8" to="2" value="0"/>
+	<edge from="8" to="7" value="15"/>
+	<edge from="8" to="6" value="0"/>
+	
+	<edge from="2" to="9" value="60"/>
+	<edge from="2" to="8" value="5"/>
+	<edge from="2" to="7" value="80"/>
+	<edge from="2" to="6" value="5"/>
+	
+	<edge from="7" to="9" value="5"/>
+	<edge from="7" to="8" value="35"/>
+	<edge from="7" to="2" value="10"/>
+	<edge from="7" to="6" value="50"/>
+	
+	<edge from="6" to="9" value="90"/>
+	<edge from="6" to="8" value="5"/>
+	<edge from="6" to="2" value="5"/>
+	<edge from="6" to="7" value="74"/>
+  </Network>
+  
+  <Network type="cool" numChars="18">
+	<!--
+monica 9
+simon 8
+buzz 2
+cassie 7
+zack 6
+	-->
+	<edge from="9" to="8" value="10"/>
+	<edge from="9" to="2" value="75"/>
+	<edge from="9" to="7" value="20"/>
+	<edge from="9" to="6" value="10"/>
+	
+	<edge from="8" to="9" value="80"/>
+	<edge from="8" to="2" value="25"/>
+	<edge from="8" to="7" value="60"/>
+	<edge from="8" to="6" value="90"/>
+	
+	<edge from="2" to="9" value="50"/>
+	<edge from="2" to="8" value="5"/>
+	<edge from="2" to="7" value="40"/>
+	<edge from="2" to="6" value="10"/>
+	
+	<edge from="7" to="9" value="10"/>
+	<edge from="7" to="8" value="20"/>
+	<edge from="7" to="2" value="60"/>
+	<edge from="7" to="6" value="60"/>
+	
+	<edge from="6" to="9" value="90"/>
+	<edge from="6" to="8" value="50"/>
+	<edge from="6" to="2" value="10"/>
+	<edge from="6" to="7" value="20"/>
+
+
+	
+  </Network>
+
+  <Relationships>	 
+	<Relationship type="dating" from="Zack" to="Cassie"/>
+	<Relationship type="friends" from="Zack" to="Simon"/>
+	<Relationship type="dating" from="Buzz" to="Monica"/>
+	<Relationship type="enemies" from="Buzz" to="Simon"/>
+	<Relationship type="enemies" from="Zack" to="Simon"/>
+	<Relationship type="enemies" from="Cassie" to="Simon"/>
+	
+  </Relationships>
+  <CulturalKB>
+	  <!-- CKB SHOULD BE SINGULAR, NOT IRREGULARLY PLURAL, AND NOT START WITH A VOWEL. You must be able to have a X, want a X, hold a X behind your back, be into X's before they were cool, ask someone to give you their X, show someone your awesome X collection. -->
+
+    <Proposition type="truth" head="skateboard" connection="are" tail="cool"/>
+    <Proposition type="truth" head="differential calculus book" connection="are" tail="lame"/>
+	<Proposition type="truth" head="retro phone" connection="are" tail="lame"/>
+    <Proposition type="truth" head="diamond" connection="are" tail="romantic"/>
+    <Proposition type="truth" head="banana slug" connection="are" tail="gross"/>
+    <Proposition type="truth" head="bobblehead" connection="are" tail="funny"/>
+    <Proposition type="truth" head="Japanese sword" connection="are" tail="bad ass"/>
+    <Proposition type="truth" head="fart machine" connection="are" tail="mean"/>
+    <Proposition type="truth" head="dead bug" connection="are" tail="taboo"/>
+	
+	<!-- And now, the definitions: has, wants, likes, dislikes -->		
+    <Proposition type="subjective" head="Doug" connection="likes" tail="skateboard"/>
+	<Proposition type="subjective" head="Doug" connection="has" tail="skateboard"/>
+	<Proposition type="subjective" head="Doug" connection="likes" tail="skateboard"/>
+	<Proposition type="subjective" head="Doug" connection="likes" tail="retro phone"/>
+	<Proposition type="subjective" head="Doug" connection="wants" tail="retro phone"/>
+	<Proposition type="subjective" head="Doug" connection="wants" tail="bobblehead"/>
+	<Proposition type="subjective" head="Doug" connection="dislikes" tail="fart machine"/>
+	<Proposition type="subjective" head="Doug" connection="dislikes" tail="banana slug"/>
+	
+	<Proposition type="subjective" head="Jordan" connection="likes" tail="skateboard"/>
+	<Proposition type="subjective" head="Jordan" connection="wants" tail="skateboard"/>
+	<Proposition type="subjective" head="Jordan" connection="dislikes" tail="Japanese sword"/>
+	<Proposition type="subjective" head="Jordan" connection="has" tail="bobblehead"/>
+	<Proposition type="subjective" head="Jordan" connection="has" tail="differential calculus book"/>
+	<Proposition type="subjective" head="Jordan" connection="dislikes" tail="differential calculus book"/>
+	
+	<Proposition type="subjective" head="Buzz" connection="likes" tail="Japanese sword"/>
+	<Proposition type="subjective" head="Buzz" connection="has" tail="Japanese sword"/>
+	<Proposition type="subjective" head="Buzz" connection="likes" tail="fart machine"/>
+	<Proposition type="subjective" head="Buzz" connection="wants" tail="fart machine"/>
+	<Proposition type="subjective" head="Buzz" connection="has" tail="banana slug"/>
+	<Proposition type="subjective" head="Buzz" connection="dislikes" tail="skateboard"/>
+	<Proposition type="subjective" head="Buzz" connection="dislikes" tail="differential calculus book"/>
+	<Proposition type="subjective" head="Buzz" connection="wants" tail="dead bug"/>
+	
+	<Proposition type="subjective" head="Naomi" connection="likes" tail="diamond"/>
+	<Proposition type="subjective" head="Naomi" connection="wants" tail="diamond"/>
+	<Proposition type="subjective" head="Naomi" connection="dislikes" tail="Japanese sword"/>
+	<Proposition type="subjective" head="Naomi" connection="dislikes" tail="dead bug"/>
+	<Proposition type="subjective" head="Naomi" connection="dislikes" tail="banana slug"/>
+	<Proposition type="subjective" head="Naomi" connection="has" tail="differential calculus book"/>
+	
+	<Proposition type="subjective" head="Lil" connection="likes" tail="retro phone"/>
+	<Proposition type="subjective" head="Lil" connection="has" tail="retro phone"/>
+	<Proposition type="subjective" head="Lil" connection="dislikes" tail="skateboard"/>
+	<Proposition type="subjective" head="Lil" connection="dislikes" tail="diamond"/>
+	<Proposition type="subjective" head="Lil" connection="dislikes" tail="differential calculus book"/>
+	<Proposition type="subjective" head="Lil" connection="dislikes" tail="bobblehead"/>
+	<Proposition type="subjective" head="Lil" connection="dislikes" tail="fart machine"/>
+	<Proposition type="subjective" head="Lil" connection="dislikes" tail="Japanese sword"/>
+	<Proposition type="subjective" head="Lil" connection="dislikes" tail="banana slug"/>
+	<Proposition type="subjective" head="Lil" connection="has" tail="dead bug"/>
+	
+	<Proposition type="subjective" head="Nicholas" connection="has" tail="diamond"/>
+	<Proposition type="subjective" head="Nicholas" connection="has" tail="skateboard"/>	
+	<Proposition type="subjective" head="Nicholas" connection="has" tail="bobblehead"/>
+	<Proposition type="subjective" head="Nicholas" connection="has" tail="fart machine"/>
+	<Proposition type="subjective" head="Nicholas" connection="has" tail="Japanese sword"/>
+	<Proposition type="subjective" head="Nicholas" connection="dislikes" tail="diamond"/>	
+	<Proposition type="subjective" head="Nicholas" connection="dislikes" tail="skateboard"/>
+	<Proposition type="subjective" head="Nicholas" connection="dislikes" tail="bobblehead"/>	
+	<Proposition type="subjective" head="Nicholas" connection="dislikes" tail="fart machine"/>
+	<Proposition type="subjective" head="Nicholas" connection="dislikes" tail="Japanese sword"/>
+
+	<Proposition type="subjective" head="Zack" connection="likes" tail="retro phone"/>
+	<Proposition type="subjective" head="Zack" connection="has" tail="retro phone"/>
+	<Proposition type="subjective" head="Zack" connection="likes" tail="banana slug"/>
+	<Proposition type="subjective" head="Zack" connection="wants" tail="banana slug"/>
+	<Proposition type="subjective" head="Zack" connection="has" tail="differential calculus book"/>
+	<Proposition type="subjective" head="Zack" connection="has" tail="bobblehead"/>
+	<Proposition type="subjective" head="Zack" connection="dislikes" tail="skateboard"/>
+	
+	<Proposition type="subjective" head="Cassie" connection="likes" tail="skateboard"/>
+	<Proposition type="subjective" head="Cassie" connection="has" tail="retro phone"/>
+	<Proposition type="subjective" head="Cassie" connection="likes" tail="banana slug"/>
+	<Proposition type="subjective" head="Cassie" connection="dislikes" tail="diamond"/>
+	<Proposition type="subjective" head="Cassie" connection="wants" tail="differential calculus book"/>
+	
+	<Proposition type="subjective" head="Simon" connection="likes" tail="differential calculus book"/>
+	<Proposition type="subjective" head="Simon" connection="has" tail="differential calculus book"/>
+	<Proposition type="subjective" head="Simon" connection="has" tail="retro phone"/>
+	<Proposition type="subjective" head="Simon" connection="likes" tail="retro phone"/>
+	<Proposition type="subjective" head="Simon" connection="dislikes" tail="skateboard"/>
+	<Proposition type="subjective" head="Simon" connection="dislikes" tail="Japanese sword"/>
+	<Proposition type="subjective" head="Simon" connection="dislikes" tail="dead bug"/>
+  </CulturalKB>
+</CiFState>

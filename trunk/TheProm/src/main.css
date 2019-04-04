@@ -1,0 +1,929 @@
+﻿@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+@namespace prom "PromWeek.*";
+
+
+global { focusThickness: 0; }
+
+mx|ToolTip {
+	borderSkin: ClassReference("PromWeek.skins.PromWeekToolTipBorder");
+}
+
+/*
+@font-face {
+	src: url("fonts/font.swf");
+	fontFamily: "PromWeekFontEmbedded";
+	font-weight:"bold";
+	font-style:"regular";
+}
+*/
+/** Colors
+
+==background==
+pale yellow:
+#fffff3
+yellow:
+#fffbd1
+
+==normal buttons==
+violet-red:
+#900076
+light violet-red:
+#ed6edf
+
+
+
+==Juice==
+orange juice:
+#ffc900
+pale orange:
+#ffc900
+
+*/
+
+/*prom|SocialGameButton {
+	color: #FFE600;
+	
+	font-family: "PromWeekFontEmbedded";
+	
+	font-size: 15px;
+	font-weight: bold;
+	alpha:0.7;
+	
+	skinClass: ClassReference("PromWeek.skins.SocialGameButtonSkin");
+}*/
+
+/*prom|JuicePointButton {
+	color: #4B0082;
+	
+	font-family: "PromWeekFontEmbedded";
+	
+	font-size: 15px;
+	font-weight: bold;
+	alpha:0.7;
+	
+	skinClass: ClassReference("PromWeek.skins.JuicePointButtonSkin");
+	
+	over: ClassReference("PromWeek.skins.JuicePointButtonSkin");
+	up: ClassReference("PromWeek.skins.JuicePointButtonSkin");
+	down: ClassReference("PromWeek.skins.JuicePointButtonSkin");
+	locked: ClassReference("PromWeek.skins.JuicePointButtonSkin");
+	disabled: ClassReference("PromWeek.skins.JuicePointButtonSkin");	
+}*/
+
+/*prom|ToggleableButton{
+	color: #4B0082;
+	font-family: "PromWeekFontEmbedded";
+	
+	font-size: 15px;
+	font-weight: bold;
+	alpha:0.7;
+	
+	skinClass: ClassReference("PromWeek.skins.ToggleableButtonSkin");
+	over: ClassReference("PromWeek.skins.ToggleableButtonSkin");
+	up: ClassReference("PromWeek.skins.ToggleableButtonSkin");
+	down: ClassReference("PromWeek.skins.ToggleableButtonSkin");
+	disabled: ClassReference("PromWeek.skins.ToggleableButtonSkin");
+}
+*/
+/*
+prom|ImageButton {
+	color: #FFE600;
+	
+	font-family: "PromWeekFontEmbedded";
+	
+	font-size: 15px;
+	font-weight: bold;
+	alpha:0.7;
+	
+	skinClass: ClassReference("PromWeek.skins.ImageButtonSkin");
+	
+	over: ClassReference("PromWeek.skins.ImageButtonSkin");
+	up: ClassReference("PromWeek.skins.ImageButtonSkin");
+	down: ClassReference("PromWeek.skins.ImageButtonSkin");
+}
+*/
+
+/*prom|PromWeekButton {
+	color: #FFE600;
+	background-color: #1F497D;
+	font-family: "PromWeekFontEmbedded";
+	
+	font-size: 15px;
+	font-weight: bold;
+	alpha:0.7;
+	
+	skinClass: ClassReference("PromWeek.skins.PromWeekButtonSkin");
+	
+	over: ClassReference("PromWeek.skins.PromWeekButtonSkin");
+	up: ClassReference("PromWeek.skins.PromWeekButtonSkin");
+	down: ClassReference("PromWeek.skins.PromWeekButtonSkin");
+}*/
+
+
+
+/*
+prom|StatusIcon {
+	color: #FFE600;
+	
+	font-family: "PromWeekFontEmbedded";
+	
+	font-size: 15px;
+	font-weight: bold;
+	alpha:1.0;
+	
+	skinClass: ClassReference("PromWeek.skins.SocialNetworkButtonSkin");
+	
+	over: ClassReference("PromWeek.skins.SocialNetworkButtonSkin");
+	up: ClassReference("PromWeek.skins.SocialNetworkButtonSkin");
+	down: ClassReference("PromWeek.skins.SocialNetworkButtonSkin");
+}
+*/
+
+/*.primaryColorThemeBackground {
+	background-color: #1488C3;
+	border-color: #004669;
+}*/
+
+.primaryColor {
+	backgroundColor: #42a4ed;
+	backgroundStroke: #004669;
+	backgroundColorAlpha: 1.0;
+	
+	contentAreaColor: #0E386C;
+	contentAreaStroke: #0E386C;
+	contentAreaDropShadows: "false";
+	contentAreaTextColor: #00adff;
+	
+	buttonColor: #900076;
+	buttonColorDown: #900076;
+	buttonColorSelected: #f400ca;
+	buttonColorOver: #f400ca;
+	buttonColorDisabled: #ffd9f8;
+	buttonColorOverSelected: #ff5ae3;
+	buttonColorDownSelected: #f400ca;
+	buttonStroke: #ed6edf;
+	buttonStrokeSelected: #ed6edf;
+	buttonStrokeDown: #ed6edf;
+	buttonStrokeOver: #ed6edf;
+	buttonStrokeDisabled: #f6b9f0;
+	buttonStrokeOverSelected: #ed6edf;
+	buttonStrokeDownSelected: #ed6edf;
+	buttonRadiusX: 15;
+	buttonRadiusY: 15;
+	buttonStrokeWeight: 2.0;
+	toggleButtonBoxPadding: 5;
+	
+	
+	juiceColor: #ffc900;
+	juiceColorDown: #ffc900;
+	juiceColorOver: #ffc900;
+	juiceColorUnlocked: #ffc900;
+	juiceStroke: #ffc900;
+	juiceStrokeDown: #ffc900;
+	juiceStrokeOver: #ffc900;
+	juiceStrokeUnlocked: #ffc900;
+	
+	buddyColor: #119000;
+	buddyColorDown: #119000;
+	buddyColorOver: #119000;
+	buddyStroke: #15c100;
+	buddyStrokeDown: #15c100;
+	buddyStrokeOver: #15c100;
+	
+	romanceColor: #c22100;
+	romanceColorDown: #c22100;
+	romanceColorOver: #c22100;
+	romanceStroke: #ff0f0f;
+	romanceStrokeDown: #ff0f0f;
+	romanceStrokeOver: #ff0f0f;
+	
+	coolColor: #510090;
+	coolColorDown: #510090;
+	coolColorOver: #510090;
+	coolStroke: #6d00c1;
+	coolStrokeDown: #6d00c1;
+	coolStrokeOver: #6d00c1;
+	
+	networkStrokeWeight: 3.0;
+	
+	navSGArrowColor: #FFFFFF;
+	
+	textColor: #FFFD70;
+	font-family: "PromWeekFontEmbedded";
+	font-size: 15px;
+	font-weight: bold;
+	alpha:0.7;
+}
+
+
+
+/*@font-face
+{
+    src:                    url("fonts/font.swf");
+    font-family:            PromWeekFontEmbedded;
+    font-style:             normal;
+    font-weight:            normal;
+    embed-as-cff:           true;
+    embedAsCFF:           true;
+    cff:           true;
+    advanced-anti-aliasing: true;
+}
+
+@font-face
+{
+    src:                    url("fonts/font.swf");
+    font-family:            PromWeekFontEmbedded;
+    font-style:             normal;
+    font-weight:            bold;
+    embedAsCFF:           true;
+    cff:           true;
+    advanced-anti-aliasing: true;
+}*/
+/*
+@font-face
+{
+    src:                    url("fonts/TAHOMA.TTF");
+    font-family:            PromWeekFontEmbedded;
+    font-style:             normal;
+    font-weight:            normal;
+    embed-as-cff:           false;
+    embedAsCFF:           false;
+    cff:           false;
+    advanced-anti-aliasing: true;
+}
+
+@font-face
+{
+    src:                    url("fonts/TAHOMABD.TTF");
+    font-family:            PromWeekFontEmbedded;
+    font-style:             normal;
+    font-weight:            bold;
+    embed-as-cff:           false;
+    embedAsCFF:           false;
+    cff:           false;
+    advanced-anti-aliasing: true;
+}
+
+
+*/
+
+
+/* the warm grey and orange theme */
+.classicPromWeekX {
+	backgroundColor: #42a4ed;
+	backgroundStroke: #2a2724;
+	backgroundStrokeWeight: 5;
+	backgroundColorAlpha: 0.7;
+	
+	contentAreaColor: #cca777;
+	contentAreaStroke: #2a2724;
+	contentAreaDropShadows: "true";
+	contentAreaTextColor: #FFFFFF;
+	contentAreaAltColor: #cc9854;
+	
+	megaUIStrokeWeight: 3;
+	megaUIStroke: #2a2724;
+	
+	/*buttonColor: #ef8116;*/
+	buttonColor: #ff9631;
+	buttonColorDown: #cd6f12;
+	buttonColorSelected: #c76b12;
+	buttonColorOver: #ef9640;
+	buttonColorDisabled: #897562;
+	buttonColorOverSelected: #cd6f12;
+	buttonColorDownSelected: #cd6f12;
+	buttonStroke: #a85a0f;
+	buttonStrokeSelected: #a85a0f;
+	buttonStrokeDown: #a85a0f;
+	buttonStrokeOver: #a85a0f;
+	buttonStrokeDisabled: #a85a0f;
+	buttonStrokeOverSelected: #cd6f12;
+	buttonStrokeDownSelected: #a85a0f;
+	buttonRadiusX: 0;
+	buttonRadiusY: 0;
+	buttonStrokeWeight: 2.0;
+	endingButtonColor: #ef8116;
+	
+	/* true if the main menu buttons should have the gradient effects in their different states*/
+	mainMenuButtonUseGradient: true;
+	/* true if the gradients should have a solid color fill. might not work with the gradients */
+	mainMenuButtonUseSolidFill: true;
+	mainMenuButtonStrokeWeight: 3;
+	mainMenuButtonRoundness: 5;
+
+	/*mainMenuLightBackgroundColor: #48aefd;
+	mainMenuDarkBackgroundColor: #014bbb;*/
+	mainMenuLightBackgroundColor: #ffffff;
+	mainMenuDarkBackgroundColor: #000000;
+
+	
+	toggleButtonColor: #ff9631;
+	toggleButtonColorDown: #cd6f12;
+	toggleButtonColorSelected: #ffb062;
+	toggleButtonColorOver: #ffab5a;
+	toggleButtonColorDisabled: #897562;
+	toggleButtonColorOverSelected: #ffb062;
+	toggleButtonColorDownSelected: #cd6f12;
+	toggleButtonStroke: #a85a0f;
+	toggleButtonStrokeSelected: #ffffff;
+	toggleButtonStrokeDown: #a85a0f;
+	toggleButtonStrokeOver: #a85a0f;
+	toggleButtonStrokeDisabled: #a85a0f;
+	toggleButtonStrokeOverSelected: #ffffff;
+	toggleButtonStrokeDownSelected: #ffffff;
+	toggleButtonRadiusX: 0;
+	toggleButtonRadiusY: 0;
+	toggleButtonStrokeWeight: 2.0;
+	toggleButtonBoxPadding: 5;
+	
+	
+	/* true if the prom week buttons should have the gradient effects in their different states*/
+	pwButtonUseGradient: true;
+	/* true if the gradients should have a solid color fill. might not work with the gradients */
+	pwButtonUseSolidFill: true;
+	
+	juiceColor: #ffc900;
+	juiceColorDown: #ffc900;
+	juiceColorOver: #ffc900;
+	juiceColorUnlocked: #ffc900;
+	juiceColorNeg: #EE2222;
+	juiceColorPos: #AA9999;
+	juiceStroke: #ffc900;
+	juiceStrokeDown: #ffc900;
+	juiceStrokeOver: #ffc900;
+	juiceStrokeUnlocked: #ffc900;
+	
+	juiceButtonColor: #4B0082;
+	juiceButtonBorder: #000000;	
+	juiceButtonUnlockedColor: #26466D;
+	
+	juiceButtonLockedColor: #2E0854;
+	juiceButtonSelectedColor: #5F9F9F;
+	juiceButtonDisabledFill: #D6D6D6;
+		
+	juiceButtonUnlockedBorder: #1D7CF2;
+	juiceButtonLockedBorder: #551A8B;
+	juiceButtonSelectedBorder: #00CDCD;
+		
+	juiceButtonUnlockedOverBorder: #FFFFFF;/*#FF0000;*/
+	juiceButtonLockedOverBorder: #FFFFFF;/*#FF0000;*/
+	juiceButtonSelectedOverBorder: #00CDCD;
+	
+	buddyColor: #00FF00;
+	buddyColorDown: #00FF00;
+	buddyColorOver: #00FF00;
+	buddyStroke: #00FF00;
+	buddyStrokeDown: #00FF00;
+	buddyStrokeOver: #00FF00;
+	
+	romanceColor: #FF99CE;
+	romanceColorDown: #FF99CE;
+	romanceColorOver: #FF99CE;
+	romanceStroke: #FF99CE;
+	romanceStrokeDown: #FF99CE;
+	romanceStrokeOver: #FF99CE;
+	
+	coolColor: #0000FF;
+	coolColorDown: #0000FF;
+	coolColorOver: #0000FF;
+	coolStroke: #0000FF;
+	coolStrokeDown: #0000FF;
+	coolStrokeOver: #0000FF;
+	
+	networkStrokeWeight: 3.0;
+	statusTimeRemainingColor: #990000;
+	
+	navSGArrowColor: #1F497D;
+	
+	initBackgroundColor: #00FF00;
+	respBackgroundColor: #FCFF00;
+	portraitNamePlate: #FFFFFF;
+	portraitDefault: #A9A9A9;
+	
+	storyGoalWindowColor: #0000FF;
+	goalProgressBarColor: #00FF00;
+	
+	windowStrokeWeight: 3.0;
+	windowNamePlate: #0E386C;
+	textColor: #FFFFFF;
+	blackText: #2a2724;
+	
+	toDoBarBGColor: #2a2724;
+	toDoBarFGColor: #00DA00;
+	toDoListHeaderColor: #ff9631;
+	toDoListHeaderStroke: #ed6edf;
+	
+	miniMaphudColor: #ffc018;
+	miniMapworldColor: #c6dd47;
+	
+	borderThicknessLeft: 0;
+	borderThicknessTop: 0;
+	borderThicknessBottom: 0;
+	borderThicknessRight: 0;
+	headerHeight: 0;
+	dropShadowEnabled: false;
+	headerColors: #ebdcca, #2a2724;
+	borderAlpha: 1;
+	backgroundAlpha: 1;
+	paddingTop: 0;
+	paddingLeft: 4;
+	paddingRight: 4;
+	verticalGap: 0;
+	
+	updateWidth: 210;
+	updateHeight: 75;
+	updateBGColor: #cc9854;
+	popupBGColor: #ef9640;
+	
+	
+	/*font-family: "Rockwell";*/
+	/*font-family: "PromWeekFontEmbedded";*/
+	/*font-size: 15px;
+	font-weight: bold;*/
+	alpha:0.7;
+}
+
+/* the blue theme */
+.classicPromWeek {
+	backgroundColor: #42a4ed;
+	/*backgroundStroke: #000000;*/
+	backgroundStroke: #1a69ac;
+	backgroundStrokeWeight: 5;
+	backgroundColorAlpha: 0.7;
+	
+	almostBackgroundColor: #0086f9;
+	
+	megaUIStrokeWeight: 3;
+	megaUIStroke: #000000;
+	
+	contentAreaColor: #0E386C;
+	contentAreaStroke: #0E386C;
+	contentAreaDropShadows: "true";
+	contentAreaTextColor: #FFFFFF;
+	contentAreaAltColor: #C0D9D9;
+	
+	buttonColor: #0097FF;
+	buttonColorDown: #0062A6;
+	buttonColorSelected: #5086AB;
+	buttonColorOver: #21A4FF;
+	buttonColorDisabled: #0097FF;
+	buttonColorOverSelected: #21A4FF;
+	buttonColorDownSelected: #21A4FF;
+	buttonStroke: #000000;
+	buttonStrokeSelected: #000000;
+	buttonStrokeDown: #000000;
+	buttonStrokeOver: #000000;
+	buttonStrokeDisabled: #000000;
+	buttonStrokeOverSelected: #000000;
+	buttonStrokeDownSelected: #000000;
+	buttonRadiusX: 0;
+	buttonRadiusY: 0;
+	buttonStrokeWeight: 2.0;
+	endingButtonColor: #0E386C;
+	
+	/* true if the main menu buttons should have the gradient effects in their different states*/
+	mainMenuButtonUseGradient: true;
+	/* true if the gradients should have a solid color fill. might not work with the gradients */
+	mainMenuButtonUseSolidFill: false;
+	mainMenuButtonStrokeWeight: 3.0;
+	mainMenuButtonRoundness: 5.0;
+	
+	mainMenuLightBackgroundColor: #48aefd;
+	mainMenuDarkBackgroundColor: #014bbb;
+	
+	toggleButtonColor: #0097FF;
+	toggleButtonColorDown: #0062A6;
+	toggleButtonColorSelected: #41b2ff;
+	toggleButtonColorOver: #21A4FF;
+	toggleButtonColorDisabled: #0097FF;
+	toggleButtonColorOverSelected: #21A4FF;
+	toggleButtonColorDownSelected: #21A4FF;
+	toggleButtonStroke: #000000;
+	toggleButtonStrokeSelected: #ffffff;
+	toggleButtonStrokeDown: #000000;
+	toggleButtonStrokeOver: #000000;
+	toggleButtonStrokeDisabled: #000000;
+	toggleButtonStrokeOverSelected: #ffffff;
+	toggleButtonStrokeDownSelected: #ffffff;
+	toggleButtonRadiusX: 0;
+	toggleButtonRadiusY: 0;
+	toggleButtonStrokeWeight: 2.0;
+	toggleButtonBoxPadding: 5;
+	
+	/* true if the prom week buttons should have the gradient effects in their different states*/
+	pwButtonUseGradient: true;
+	/* true if the gradients should have a solid color fill. might not work with the gradients */
+	pwButtonUseSolidFill: true;
+	
+	juiceColor: #ffc900;
+	juiceColorDown: #ffc900;
+	juiceColorOver: #ffc900;
+	juiceColorUnlocked: #ffc900;
+	juiceColorNeg: #EE2222;
+	juiceColorPos: #AA9999;
+	juiceStroke: #ffc900;
+	juiceStrokeDown: #ffc900;
+	juiceStrokeOver: #ffc900;
+	juiceStrokeUnlocked: #ffc900;
+	
+	juiceButtonColor: #4B0082;
+	juiceButtonBorder: #000000;	
+	juiceButtonUnlockedColor: #26466D;
+	
+	juiceButtonLockedColor: #2E0854;
+	juiceButtonSelectedColor: #5F9F9F;
+	juiceButtonDisabledFill: #D6D6D6;
+		
+	juiceButtonUnlockedBorder: #1D7CF2;
+	juiceButtonLockedBorder: #551A8B;
+	juiceButtonSelectedBorder: #00CDCD;
+		
+	juiceButtonUnlockedOverBorder: #FFFFFF;/*#FF0000;*/
+	juiceButtonLockedOverBorder: #FFFFFF;/*#FF0000;*/
+	juiceButtonSelectedOverBorder: #00CDCD;
+	
+	buddyColor: #00FF00;
+	buddyColorDown: #00FF00;
+	buddyColorOver: #00FF00;
+	buddyStroke: #00FF00;
+	buddyStrokeDown: #00FF00;
+	buddyStrokeOver: #00FF00;
+	
+	romanceColor: #FF99CE;
+	romanceColorDown: #FF99CE;
+	romanceColorOver: #FF99CE;
+	romanceStroke: #FF99CE;
+	romanceStrokeDown: #FF99CE;
+	romanceStrokeOver: #FF99CE;
+	
+	coolColor: #0000FF;
+	coolColorDown: #0000FF;
+	coolColorOver: #0000FF;
+	coolStroke: #0000FF;
+	coolStrokeDown: #0000FF;
+	coolStrokeOver: #0000FF;
+	
+	networkStrokeWeight: 3.0;
+	statusTimeRemainingColor: #990000;
+	
+	navSGArrowColor: #0E386C;
+	
+	initBackgroundColor: #00FF00;
+	respBackgroundColor: #FCFF00;
+	portraitNamePlate: #FFFFFF;
+	portraitDefault: #A9A9A9;
+	
+	storyGoalWindowColor: #0000FF;
+	goalProgressBarColor: #00FF00;
+	
+	windowStrokeWeight: 3.0;
+	windowNamePlate: #0E386C;
+	textColor: #FFFFFF;
+	blackText: #000000;
+	
+	toDoBarBGColor: #FFFFFF;
+	toDoBarFGColor: #00DA00;
+	toDoListHeaderColor: #0E386C;
+	toDoListHeaderStroke: #000000;
+	
+	miniMaphudColor: #ffc018;
+	miniMapworldColor: #c6dd47;
+	
+	borderThicknessLeft: 0;
+	borderThicknessTop: 0;
+	borderThicknessBottom: 0;
+	borderThicknessRight: 0;
+	headerHeight: 0;
+	dropShadowEnabled: false;
+	headerColors: #d9d9d9, #ffffff;
+	borderAlpha: 1;
+	backgroundAlpha: 1;
+	paddingTop: 0;
+	paddingLeft: 4;
+	paddingRight: 4;
+	verticalGap: 0;
+	
+	updateWidth: 210;
+	updateHeight: 75;
+	updateBGColor: #3B7BCB;
+	popupBGColor: #3B7BCB;
+	
+	/*font-family: "Rockwell";*/
+	/*font-family: "PromWeekFontEmbedded";*/
+	/*font-size: 15px;
+	font-weight: bold;*/
+	alpha:0.7;
+}
+
+
+
+
+.greenColor {
+	backgroundColor: #57B23F;
+	backgroundStroke: #000000;
+	backgroundStrokeWeight: 5;
+	backgroundColorAlpha: 0.7;
+	
+	contentAreaColor: #57D42F;
+	contentAreaStroke: #0E386C;
+	contentAreaDropShadows: "true";
+	contentAreaTextColor: #FFFD70;
+	
+	megaUIStrokeWeight: 3;
+	megaUIStroke: #000000;
+	
+	buttonColor: #0097FF;
+	buttonColorDown: #0062A6;
+	buttonColorSelected: #5086AB;
+	buttonColorOver: #21A4FF;
+	buttonColorDisabled: #0097FF;
+	buttonColorOverSelected: #21A4FF;
+	buttonColorDownSelected: #21A4FF;
+	buttonStroke: #000000;
+	buttonStrokeSelected: #000000;
+	buttonStrokeDown: #000000;
+	buttonStrokeOver: #000000;
+	buttonStrokeDisabled: #000000;
+	buttonStrokeOverSelected: #000000;
+	buttonStrokeDownSelected: #000000;
+	buttonRadiusX: 0;
+	buttonRadiusY: 0;
+	buttonStrokeWeight: 2.0;
+	toggleButtonBoxPadding: 5;
+	endingButtonColor: #0E386C;
+	
+	juiceColor: #ffc900;
+	juiceColorDown: #ffc900;
+	juiceColorOver: #ffc900;
+	juiceColorUnlocked: #ffc900;
+	juiceColorNeg: #EE2222;
+	juiceColorPos: #AA9999;
+	juiceStroke: #ffc900;
+	juiceStrokeDown: #ffc900;
+	juiceStrokeOver: #ffc900;
+	juiceStrokeUnlocked: #ffc900;
+	
+	juiceButtonColor: #4B0082;
+	juiceButtonBorder: #000000;	
+	juiceButtonUnlockedColor: #26466D;
+	
+	juiceButtonLockedColor: #2E0854;
+	juiceButtonSelectedColor: #5F9F9F;
+	juiceButtonDisabledFill: #D6D6D6;
+		
+	juiceButtonUnlockedBorder: #1D7CF2;
+	juiceButtonLockedBorder: #551A8B;
+	juiceButtonSelectedBorder: #00CDCD;
+		
+	juiceButtonUnlockedOverBorder: #FF0000;
+	juiceButtonLockedOverBorder: #FF0000;
+	juiceButtonSelectedOverBorder: #00CDCD;
+	
+	buddyColor: #00FF00;
+	buddyColorDown: #00FF00;
+	buddyColorOver: #00FF00;
+	buddyStroke: #00FF00;
+	buddyStrokeDown: #00FF00;
+	buddyStrokeOver: #00FF00;
+	
+	romanceColor: #FF99CE;
+	romanceColorDown: #FF99CE;
+	romanceColorOver: #FF99CE;
+	romanceStroke: #FF99CE;
+	romanceStrokeDown: #FF99CE;
+	romanceStrokeOver: #FF99CE;
+	
+	coolColor: #0000FF;
+	coolColorDown: #0000FF;
+	coolColorOver: #0000FF;
+	coolStroke: #0000FF;
+	coolStrokeDown: #0000FF;
+	coolStrokeOver: #0000FF;
+	
+	networkStrokeWeight: 3.0;
+	statusTimeRemainingColor: #990000;
+	
+	navSGArrowColor: #1F497D;
+	
+	initBackgroundColor: #00FF00;
+	respBackgroundColor: #FCFF00;
+	portraitNamePlate: #FFFFFF;
+	portraitDefault: #A9A9A9;
+	
+	storyGoalWindowColor: #0000FF;
+	goalProgressBarColor: #00FF00;
+	
+	windowStrokeWeight: 3.0;
+	windowNamePlate: #0E386C;
+	textColor: #FFFD70;
+	blackText: #000000;
+	
+	toDoBarBGColor: #FFFFFF;
+	toDoBarFGColor: #00FF00;
+	
+	miniMaphudColor: #ffc018;
+	miniMapworldColor: #c6dd47;
+	
+	borderThicknessLeft: 0;
+	borderThicknessTop: 0;
+	borderThicknessBottom: 0;
+	borderThicknessRight: 0;
+	headerHeight: 0;
+	dropShadowEnabled: false;
+	headerColors: #d9d9d9, #ffffff;
+	borderAlpha: 1;
+	backgroundAlpha: 1;
+	paddingTop: 0;
+	paddingLeft: 4;
+	paddingRight: 4;
+	verticalGap: 0;
+	
+	updateWidth: 210;
+	updateHeight: 75;
+	updateBGColor: #57B23F;
+	
+	font-family: "PromWeekFontEmbedded";
+	font-size: 15px;
+	font-weight: bold;
+	alpha:0.7;
+}
+
+.redColor {
+	backgroundColor: #AA0000;
+	backgroundStroke: #000000;
+	backgroundStrokeWeight: 5;
+	backgroundColorAlpha: 0.7;
+	
+	contentAreaColor: #FF0000;
+	contentAreaStroke: #0E386C;
+	contentAreaDropShadows: "true";
+	contentAreaTextColor: #FFFD70;
+	
+	buttonColor: #0097FF;
+	buttonColorDown: #0062A6;
+	buttonColorSelected: #5086AB;
+	buttonColorOver: #21A4FF;
+	buttonColorDisabled: #0097FF;
+	buttonColorOverSelected: #21A4FF;
+	buttonColorDownSelected: #21A4FF;
+	buttonStroke: #000000;
+	buttonStrokeSelected: #000000;
+	buttonStrokeDown: #000000;
+	buttonStrokeOver: #000000;
+	buttonStrokeDisabled: #000000;
+	buttonStrokeOverSelected: #000000;
+	buttonStrokeDownSelected: #000000;
+	buttonRadiusX: 0;
+	buttonRadiusY: 0;
+	buttonStrokeWeight: 2.0;
+	toggleButtonBoxPadding: 5;
+	endingButtonColor: #0E386C;
+	
+	juiceColor: #FA0085;/*ffc900; */
+	juiceColorDown: #ffc900;
+	juiceColorOver: #ffc900;
+	juiceColorUnlocked: #ffc900;
+	juiceColorNeg: #A34878;/*EE2222;*/
+	juiceColorPos: #A34878;/*AA9999;*/
+	juiceStroke: #ffc900;
+	juiceStrokeDown: #ffc900;
+	juiceStrokeOver: #ffc900;
+	juiceStrokeUnlocked: #ffc900;
+	
+	juiceButtonColor: #4B0082;
+	juiceButtonBorder: #000000;	
+	juiceButtonUnlockedColor: #26466D;
+	
+	juiceButtonLockedColor: #2E0854;
+	juiceButtonSelectedColor: #5F9F9F;
+	juiceButtonDisabledFill: #D6D6D6;
+		
+	juiceButtonUnlockedBorder: #1D7CF2;
+	juiceButtonLockedBorder: #551A8B;
+	juiceButtonSelectedBorder: #00CDCD;
+		
+	juiceButtonUnlockedOverBorder: #FFFFFF; /* FF0000 */
+	juiceButtonLockedOverBorder: #FFFFFF; /* FF0000 */
+	juiceButtonSelectedOverBorder: #00CDCD;
+	
+	buddyColor: #00FF00;
+	buddyColorDown: #00FF00;
+	buddyColorOver: #00FF00;
+	buddyStroke: #00FF00;
+	buddyStrokeDown: #00FF00;
+	buddyStrokeOver: #00FF00;
+	
+	romanceColor: #FF99CE;
+	romanceColorDown: #FF99CE;
+	romanceColorOver: #FF99CE;
+	romanceStroke: #FF99CE;
+	romanceStrokeDown: #FF99CE;
+	romanceStrokeOver: #FF99CE;
+	
+	coolColor: #0000FF;
+	coolColorDown: #0000FF;
+	coolColorOver: #0000FF;
+	coolStroke: #0000FF;
+	coolStrokeDown: #0000FF;
+	coolStrokeOver: #0000FF;
+	
+	networkStrokeWeight: 3.0;
+	statusTimeRemainingColor: #990000;
+	
+	navSGArrowColor: #1F497D;
+	
+	initBackgroundColor: #00FF00;
+	respBackgroundColor: #FCFF00;
+	portraitNamePlate: #FFFFFF;
+	portraitDefault: #A9A9A9;
+	
+	storyGoalWindowColor: #0000FF;
+	goalProgressBarColor: #00FF00;
+	
+	windowStrokeWeight: 3.0;
+	windowNamePlate: #0E386C;
+	textColor: #FFFD70;
+	blackText: #000000;
+	
+	toDoBarBGColor: #FFFFFF;
+	toDoBarFGColor: #00FF00;
+	
+	miniMaphudColor: #ffc018;
+	miniMapworldColor: #c6dd47;
+	
+	borderThicknessLeft: 0;
+	borderThicknessTop: 0;
+	borderThicknessBottom: 0;
+	borderThicknessRight: 0;
+	headerHeight: 0;
+	dropShadowEnabled: false;
+	headerColors: #d9d9d9, #ffffff;
+	borderAlpha: 1;
+	backgroundAlpha: 1;
+	paddingTop: 0;
+	paddingLeft: 4;
+	paddingRight: 4;
+	verticalGap: 0;
+	
+	updateWidth: 210;
+	updateHeight: 75;
+	
+	font-family: "PromWeekFontEmbedded";
+	font-size: 15px;
+	font-weight: bold;
+	alpha:0.7;
+}
+
+
+
+.primaryColorThemeButton {
+	background-color: #0098C4;
+	border-color: #006785;
+	backgroundColorAlpha: 1.0;
+	font-family: "PromWeekFontEmbedded";
+	font-size: 15px;
+	font-weight: bold;
+	alpha:0.7;
+}
+
+
+.primaryColorThemeJuice {
+	background-color: #ffc900;
+	border-color: #ffc900;
+	
+	font-family: "PromWeekFontEmbedded";
+	font-size: 18px;
+	font-weight: bold;
+}
+
+.topBar {
+	background-color:#0074AE;
+	border-color: #004F77;
+	font-family: "PromWeekFontEmbedded";
+	font-size: 18px;
+	font-weight: bold;
+
+}
+
+.GoalLabel {
+	color: #fffff3;
+	font-family: "PromWeekFontEmbedded";
+	font-size: 18px;
+	font-weight: bold;
+}
+
+.statusesAndTraits {
+	color: #FFE600;
+	font-family: "PromWeekFontEmbedded";
+	font-size: 16px;
+	font-weight: bold;
+}
+
+.StatusIcons {
+	color: #FFE600;
+	text-align: "center";
+	font-family: "PromWeekFontEmbedded";
+	font-size: 12px;
+	font-weight: bold;
+}

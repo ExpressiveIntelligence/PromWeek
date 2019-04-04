@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 preinitialize="onPreinitialize()"
+		 creationComplete="onCreationComplete()"
+		 width="100%"
+		 height="100%"
+		 styleName="classicPromWeek">
+		 
+		<fx:Metadata>
+		</fx:Metadata>
+		 
+		
+		<fx:Declarations>
+			<mx:Fade id="fadeIn" alphaFrom="0.0" alphaTo="1.0" effectStart="tutorialFilterFadeInStarted(event)"/>
+			<prom:AuthoringLibrary id="aL"/>
+		</fx:Declarations>
+		
+		<s:Rect id="background" width="100%" height="100%">
+			<s:fill>
+				<s:SolidColor id="backgroundFill" color="{getStyle('backgroundColor')}" />
+			</s:fill>
+		</s:Rect>
+		
+		<util:SmoothImage id="curtainsImage" width="760" height="600" x="0" y="0" />
+		
+		<util:SmoothImage id="logoImage" x="160" y="70" width="430" height="250" />
+		
+		<prom:ToggleableContainerButton id="startButton" label="Enter" width="150" height="50" x="{this.width/2 - 75}" y="425" click="enterClicked(event)" roundness="20" toggleable="false" />
+		
+		 <fx:Script>
+			 <![CDATA[
+		
+		import CiF.Character;
+		import CiF.Debug;
+		import CiF.Effect;
+		import CiF.Predicate;
+		import CiF.SocialGame;
+		import flash.events.Event;
+		import flash.events.MouseEvent;
+		import flash.utils.Dictionary;
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import CiF.CiFSingleton;
+		import mx.controls.RichTextEditor;
+		import PromWeek.Story;
+		import PromWeek.StoryButton;
+		import PromWeek.MainMenuButton;
+		import PromWeek.assets.ResourceLibrary;
+		import spark.components.Group;
+		import spark.components.RichText;
+		
+		private var rL:PromWeek.assets.ResourceLibrary;
+		private var cif:CiFSingleton;
+		private var gameEngine:GameEngine;
+
+		
+		private function onPreinitialize():void {
+			cif = CiFSingleton.getInstance();
+			this.gameEngine = GameEngine.getInstance();
+			rL = PromWeek.assets.ResourceLibrary.getInstance();
+		}
+		
+		public function onCreationComplete():void
+		{
+			this.curtainsImage.source = rL.uiIcons["facadeCurtains"];
+			
+			var rt:RichText = new RichText();
+			rt.width = startButton.width;
+			rt.height = startButton.height;
+			rt.text = "Enter";
+			rt.setStyle("fontSize", "20");
+			rt.setStyle("verticalAlign", "middle");
+			rt.setStyle("textAlign", "center");
+			this.startButton.mainContainer.addElement(rt);
+			
+			this.logoImage.source = rL.uiIcons["facade"];
+		}
+	
+		
+		
+		public function tutorialFilterFadeInStarted(e:Event):void
+		{
+			this.visible = true;
+		}
+		public function tutorialFilterFadeInStopped(e:Event):void
+		{
+			this.visible = false;
+		}
+		
+		
+		public function enterClicked(event:Event):void
+		{	
+			goToFacadeState();
+			
+			this.visible = false;
+		}
+		
+		public function goToFacadeState():void
+		{	
+			var cif:CiFSingleton = CiFSingleton.getInstance();
+			aL.loadCifStates();
+			cif.clearProspectiveMemory();
+			this.cif.parseCiFState(aL.cifStartStates["facadeState"],false);
+			
+			
+			aL.loadXMLStories();
+			var storyToPlay:Story = new Story();
+			
+			for each (var storyXML:XML in aL.stories["Facade"]..Story) {
+				storyToPlay.loadFromXML(storyXML);
+			}
+			
+			
+			gameEngine.hudGroup.storySelectionScreen.selectedStory = storyToPlay;
+			gameEngine.hudGroup.storySelectionScreen.startStory();
+			
+			
+			
+			gameEngine.facadeState = true;
+			gameEngine.hudGroup.megaUI.stateVisualizer.stateFilter.characterFilterGroup.hiderBtn.enabled = false;
+			gameEngine.hudGroup.megaUI.stateVisualizer.switchPortraitDrawer.hiderBtn.enabled = false;
+		}
+		
+		public function leaveFacadeState():void
+		{
+			var cif:CiFSingleton = CiFSingleton.getInstance();
+			cif.clearProspectiveMemory();
+			gameEngine.resetGameState();
+			//this.cif.parseCiFState(gameEngine.intitialState,false);
+			
+			gameEngine.facadeState = false;
+			gameEngine.hudGroup.megaUI.stateVisualizer.stateFilter.characterFilterGroup.hiderBtn.enabled = true;
+			gameEngine.hudGroup.megaUI.stateVisualizer.switchPortraitDrawer.hiderBtn.enabled = true;
+		}
+			 
+			 ]]>
+		 </fx:Script>
+</s:Group>

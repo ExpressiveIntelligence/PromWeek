@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 width="100%"
+		 height="100%">
+	
+		
+	<fx:Metadata>
+	</fx:Metadata>
+		
+	<fx:Declarations>
+	</fx:Declarations>
+
+	
+	<s:Group id="removeIconGroup" x="{this.width/2}" y="{-this.height/6}" visible="false" width="{width/4}" height="{height/4}" click="removePortraitClicked(event)" toolTip="Remove">
+		<s:Rect width="{width/2}" height="{height/2}">
+			<s:stroke>
+				<s:SolidColorStroke color="black" alpha="1.0" />
+			</s:stroke>
+			<s:fill>
+				<s:SolidColor color="white" alpha="0.5" />
+			</s:fill>
+		</s:Rect>
+		<s:Line id="line1" xFrom="0" yFrom="0" xTo="{width/2}" yTo="{height/2}" >
+			<s:stroke>
+				<s:SolidColorStroke color="red" alpha="1.0" weight="2" />
+			</s:stroke>
+		</s:Line>
+		<s:Line id="line2" xFrom="0" yFrom="{height/2}" xTo="{width/2}" yTo="0" >
+			<s:stroke>
+				<s:SolidColorStroke color="red" weight="2"/>
+			</s:stroke>
+		</s:Line>		
+	</s:Group>
+	
+	<s:Group id="switchCharIconGroup" x="0" y="{-this.height/6}" visible="false" width="{width/4}" height="{height/4}" click="switchCharacterInCharacterSheet(event)" toolTip="Character Info">
+		<s:Ellipse width="{width/2}" height="{height/2}">
+			<s:stroke>
+				<s:SolidColorStroke color="black" alpha="1.0" />
+			</s:stroke>
+			<s:fill>
+				<s:SolidColor color="white" alpha="0.5" />
+			</s:fill>
+		</s:Ellipse>
+	</s:Group>
+
+	
+	
+	
+	<fx:Script>
+		<![CDATA[		
+		import CiF.*;
+		import flash.events.Event;
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import flash.events.MouseEvent;
+		import PromWeek.assets.ResourceLibrary;
+		
+		private var resourceLibrary:PromWeek.assets.ResourceLibrary = PromWeek.assets.ResourceLibrary.getInstance();
+		private var cif:CiFSingleton = CiFSingleton.getInstance();
+		
+		public var characterName:String;
+		
+		public var selected:Boolean = false;
+		
+		public var portraitImage:SmoothImage = new SmoothImage();
+		public var greyedPortraitImage:SmoothImage = new SmoothImage();
+		
+		public var canRemove:Boolean = false;
+		public var canAdd:Boolean = false;
+		public var displayXOnTop:Boolean = false;
+		private var _charName:String;
+		private var _w:Number;
+		private var _h:Number;
+		
+		public function onCreationComplete():void
+		{
+			//this.addEventListener(MouseEvent.MOUSE_DOWN, mouseDownHandler);
+			//this.addEventListener(MouseEvent.MOUSE_OVER, mouseOverHandler);
+			//this.addEventListener(MouseEvent.MOUSE_OUT, mouseOutHandler);
+			
+			
+			//this.setElementIndex(this.removeIconGroup, this.numElements - 1);
+		}
+
+		public function switchCharacterInCharacterSheet(e:Event = null):void
+		{
+			PromWeek.GameEngine.getInstance().hudGroup.characterSheet.stateVisualizer.selectedCharacter = cif.cast.getCharByName(this.characterName);
+			PromWeek.GameEngine.getInstance().hudGroup.characterSheet.updateCharacterSheet(this.characterName);
+		}
+		
+		private function mouseOverHandler(e:MouseEvent):void 
+		{
+			//only allow dragging if we are not in the visualizer
+			if (canRemove)
+			{
+				//removeIconGroup.x = this.width / 2 - removeIconGroup.width / 2;
+				//if (displayXOnTop)
+				//{
+					//removeIconGroup.y = -this.removeIconGroup.height/2;
+				//}
+				//else
+				//{
+					//removeIconGroup.y = this.height - removeIconGroup.height/2;
+				//}
+				//Debug.debug(this,"MAKE VIZ");
+				removeIconGroup.visible = true;
+				
+				switchCharIconGroup.visible = true;
+			}
+        }
+		
+		private function mouseOutHandler(e:MouseEvent):void 
+		{
+			this.removeIconGroup.visible = false;
+			
+			switchCharIconGroup.visible = false;
+			
+			//Debug.debug(this,"MAKE UN VIZ");
+		}
+		
+		
+		private function removePortraitClicked(e:MouseEvent = null ):void 
+		{
+
+        }
+		
+		public function toggleSelected():void
+		{
+			//this.selected = !this.selected;
+			//Debug.debug(this,"IS IT TOGGLED: " + this.selected);
+			if (this.selected)
+			{
+				this.setSelected(false)
+				//Debug.debug(this,"BECAME FALSE");
+			}
+			else
+			{
+				this.setSelected(true)
+				//Debug.debug(this,"BECAME TRUE");
+			}
+			if (!this.selected)
+			{
+				this.portraitImage.visible = false;
+				this.greyedPortraitImage.visible = true;
+			}
+			else
+			{
+				this.portraitImage.visible = true;
+				this.greyedPortraitImage.visible = false;
+			}
+		}
+		
+		public function setSelected(shouldSelect:Boolean):void
+		{
+			this.selected = shouldSelect;
+			if (this.selected)
+			{
+				this.portraitImage.visible = true;
+				this.greyedPortraitImage.visible = false;
+			}
+			else
+			{
+				this.portraitImage.visible = false;
+				this.greyedPortraitImage.visible = true;
+			}		
+		}
+		
+		override protected function commitProperties():void {
+			super.commitProperties();
+			//Debug.debug(this, "commitProperties()")
+			if(this._charName) {
+				if (_w == 0)
+				{
+					_w = PromWeek.StateVisualizer.MINI_PORTRAIT_WIDTH;
+				}
+				if (_h == 0)
+				{
+					_h = PromWeek.StateVisualizer.MINI_PORTRAIT_HEIGHT;
+				}
+				//this.characterName = _charName;
+				
+				//this.toolTip = this.characterName;
+				
+				this.portraitImage = new SmoothImage();
+				this.portraitImage.width = _w;
+				this.portraitImage.height = _h;
+				this.portraitImage.source = resourceLibrary.charHeads[this._charName.toLowerCase() ]
+				
+				this.portraitImage.toolTip = this._charName;
+				
+				this.addElement(this.portraitImage);
+				
+				this.greyedPortraitImage = new SmoothImage();
+				this.greyedPortraitImage.width = _w;
+				this.greyedPortraitImage.height = _h;
+				this.greyedPortraitImage.source = resourceLibrary.charHeads[_charName]
+				this.greyedPortraitImage.alpha = 0.5;
+				
+				this.greyedPortraitImage.toolTip = this._charName;
+				
+				this.addElement(this.greyedPortraitImage);
+				
+				this.width = _w;
+				this.height = _h;
+				
+				this.setElementIndex(this.switchCharIconGroup, this.numElements - 1);
+				this.setElementIndex(this.removeIconGroup, this.numElements - 1);
+				
+				if (this.canRemove)
+				{
+					//this means that we can definitely want to be not greyed out
+					//this means that this is in the visualizer
+					this.setSelected(true);
+				}
+			}
+		}
+		
+		public function loadPortraitImageToIcon(charName:String, canAdd1:Boolean, canRemove1:Boolean,w:Number=0,h:Number=0):void
+		{	
+			_charName = charName;
+			this.characterName = charName;
+			_w = w;
+			_h = h;
+			//Debug.debug(this,"loadPortraitImageToIcon - "+charName);
+			
+			this.canAdd = canAdd1;
+			this.canRemove = canRemove1;
+			this.invalidateProperties();
+			this.invalidateSize();
+			this.invalidateDisplayList();
+		}
+		
+		]]>
+	</fx:Script>
+		
+	
+</s:Group>

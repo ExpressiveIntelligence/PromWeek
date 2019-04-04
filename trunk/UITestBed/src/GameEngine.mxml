@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+               xmlns:s="library://ns.adobe.com/flex/spark"
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:prom="PromWeek.*"
+			   applicationComplete="onApplicationComplete()"
+			   preinitialize="onPreinitialize()"
+			   width="100%" height="100%">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<fx:XML id="cifStateXML" source="./PromWeekCharacters.xml" />
+		<fx:Number id="defaultResponderSubjectThoughtBubbleTop">150</fx:Number>
+	</fx:Declarations>
+	<fx:Style source="main.css"/>
+	<fx:Style>
+		@namespace s "library://ns.adobe.com/flex/spark";
+		@namespace mx "library://ns.adobe.com/flex/halo";
+ 
+		@font-face {
+			src: url("PromWeek/fonts/CREABBRG.TTF");
+			fontFamily: "CreativeBlock";
+			embedAsCFF: true;
+		}
+		.myTmpTextStyle {
+			fontFamily: CreativeBlock;
+			fontLookup: embeddedCFF;
+			fontSize: 34;
+		}
+		
+		@font-face {
+			src: url("PromWeek/fonts/Bubblegum.ttf");
+			fontFamily: "Bubblegum";
+			embedAsCFF: true;
+		}
+		.namePlateStyle {
+			fontFamily: Bubblegum;
+			fontLookup: embeddedCFF;
+			fontSize: 24;
+		}
+		
+		@font-face {
+			src: url("PromWeek/fonts/AlteHaasGroteskRegular.ttf");
+			fontFamily: "AlteHaasGroteskRegular";
+			embedAsCFF: true;
+		}
+		.subjectiveOpinionWords {
+			fontFamily: AlteHaasGroteskRegular;
+			fontLookup: embeddedCFF;
+			fontSize: 15;
+		}
+		
+		@font-face {
+			src: url("PromWeek/fonts/AlteHaasGroteskRegular.ttf");
+			fontFamily: "AlteHaasGroteskRegular";
+			embedAsCFF: true;
+		}
+		.socialExchangeButton {
+			fontFamily: AlteHaasGroteskRegular;
+			fontLookup: embeddedCFF;
+			fontSize: 34;
+		}
+		
+		@font-face {
+			src: url("PromWeek/fonts/CREABBRG.TTF");
+			fontFamily: "CreativeBlock";
+			embedAsCFF: true;
+		}
+		.bigThoughtBubbleTitleStyle {
+			fontFamily: CreativeBlock;
+			fontLookup: embeddedCFF;
+			fontSize: 20;
+		}
+		
+	</fx:Style>
+	
+	
+	<prom:HudGroup id="hudGroup" width="100%" height="100%"/>
+	
+	<prom:CircleGoogleImage id="googleImage" width="200" height="200%"/>
+	
+	<fx:Script>
+		<![CDATA[
+		import com.be.boulevart.google.ajaxapi.search.GoogleSearchResult;
+		import com.be.boulevart.google.ajaxapi.search.images.data.GoogleImage;
+		import com.be.boulevart.google.ajaxapi.search.images.GoogleImageSearch;
+		import com.be.boulevart.google.ajaxapi.search.web.data.GoogleWebItem;
+		import com.be.boulevart.google.ajaxapi.search.web.GoogleWebSearch;
+		import com.be.boulevart.google.events.GoogleApiEvent;
+		import CiF.Character;
+		import CiF.CiFSingleton;
+		import CiF.Debug;
+		import CiF.Predicate;
+		import CiF.RelationshipNetwork;
+		import CiF.SocialNetwork;
+		import flash.display.Loader;
+		import flash.display.Sprite;
+		import flash.events.Event;
+		import flash.events.ProgressEvent;
+		import flash.net.URLRequest;
+		import mx.controls.RichTextEditor;
+		import mx.core.UIComponent;
+		import mx.events.ResizeEvent;
+		import mx.graphics.SolidColor;
+		import PromWeek.NetworkIconTwoChar;
+		import PromWeek.RelationshipIconTwoChar;
+		import PromWeek.skins.NEW_socialExchangeButtonSkin;
+		import spark.components.Group;
+		import spark.components.RichText;
+		import spark.primitives.Rect;
+		
+		public var cif:CiFSingleton;
+		
+		
+		public var myLoader:Loader = new Loader();
+		private static var _instance:GameEngine;
+		public static function getInstance():GameEngine
+		{
+			return _instance;
+		}
+		
+		
+		private function onPreinitialize():void 
+		{
+			
+			
+			cif = CiFSingleton.getInstance();
+			cif.parseCiFState(cifStateXML);
+		}
+		
+		
+		public function createQuickPlayGoalText():Group
+		{
+			var group:Group = new Group();
+			group.height = 75;
+			group.width = this.width;
+			
+			var rt:RichText = new RichText();
+			rt.width = group.width;
+			rt.height = group.height;
+			rt.text = "Make Gunter and Naomi date!!!"
+			rt.setStyle("fontSize", 22);
+			rt.setStyle("color", 0xffffff);
+			rt.setStyle("textAlign","center");
+			
+			group.addElement(rt);
+			
+			return group;
+		}
+		
+		
+		public function onApplicationComplete():void
+		{
+			if (!_instance)
+				_instance = this;
+			
+			
+			//-------------
+			//var googleWebSearch:GoogleImageSearch=new GoogleImageSearch();
+			//googleWebSearch.search("Mike Treanor");
+			//googleWebSearch.addEventListener(GoogleApiEvent.IMAGE_SEARCH_RESULT,onImageResults) ;
+			//-------------		
+			this.addEventListener(Event.RESIZE,resized);
+		}
+		
+		
+		
+		private function onImageResults(e:GoogleApiEvent):void{
+				var resultObject:GoogleSearchResult=e.data as GoogleSearchResult
+				trace("Estimated Number of Results: "+resultObject.estimatedNumResults)
+				trace("Current page index: "+resultObject.currentPageIndex)
+				trace("Number of pages: "+resultObject.numPages)
+				
+				trace(resultObject.results[0].url);
+				googleImage.loadImageFromLink(resultObject.results[0].url);
+				
+				//var numReturned:int = 0;
+				//var imageLink:String;
+				//for each (var result:GoogleImage in resultObject.results)
+				//{
+						//trace(result.url)
+						//imageLink =  resultObject.results[0].url;
+						//numReturned++;
+						//if (numReturned > 0)
+							//return;
+				//}
+				
+				
+				//myLoader.contentLoaderInfo.addEventListener(ProgressEvent.PROGRESS, onProgressStatus);
+				//myLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoaderReady);
+//
+				//var fileRequest:URLRequest = new URLRequest(imageLink);
+				//myLoader.load(fileRequest);
+			}
+			//public function onProgressStatus(e:ProgressEvent):void {   
+				  // this is where progress will be monitored     
+				  //trace(e.bytesLoaded, e.bytesTotal); 
+			//}
+//
+			//public function onLoaderReady(e:Event):void {     
+				//var ui:UIComponent = new UIComponent();
+				// the image is now loaded, so let's add it to the display tree!     
+				//var sprite:Sprite = new Sprite();
+				//sprite.addChild(myLoader);
+				//ui.addChild(sprite);
+				//this.addElement(ui);
+			//}
+		
+		
+		private function resized(e:ResizeEvent):void 
+		{
+			this.hudGroup.topBar.pathData = "M -5 -5 l " + (this.width + 10) + " 0 l 0 40 l " + ( -1 * ((this.width + 10) - 150)) + " 0 C 107 77 36 72 -4 52 l 0 -55";
+			this.hudGroup.topBar.width = this.width;
+			this.hudGroup.width = this.width;
+			this.hudGroup.height = this.height;
+		}
+		
+		]]>
+			
+	</fx:Script>
+		
+</s:Application>

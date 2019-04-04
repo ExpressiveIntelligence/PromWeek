@@ -1,0 +1,126 @@
+
+
+<!--
+<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" >
+		<![CDATA[]]>
+	</TutorialStep>
+-->
+
+<TutorialScript>
+	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" >
+		<![CDATA[Prom Week characters have their own ideas about what they want to do, based on their personalities, situations, and histories. But to help them achieve their dreams, you'll need to push them outside their comfort zones.]]>
+	</TutorialStep>
+	<TutorialStep object="goalButton" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" >
+		<![CDATA[Each campaign stars a different character, and each character has at least one <span color='0x0000FF'>goal</span> they want to meet by the end of Prom Week. Click the 'Goals' button in the lower-left of the screen. Try it now!]]>
+	</TutorialStep>
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="2">
+		<![CDATA[You can see that Zack has an unmet goal of 'Zack is single.' (Maybe he wants a clean slate for all those college girls.) The empty horizontal bar means this goal has not yet been met.]]>
+	</TutorialStep>
+	<TutorialStep object="goalButton" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="2">
+		<![CDATA[Click the 'Goals' button again to close the pop-up.]]>
+	</TutorialStep>
+	<TutorialStep object="avatar" name="zack" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" >
+		<![CDATA[If the goal 'Zack is single' is unmet, Zack must still be dating someone. How can we tell who it is? Click on Zack to select him. (To find Zack, you may need to click and drag to move, or scroll to zoom out.)]]>
+	</TutorialStep>
+	<TutorialStep object="character1Button" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" >
+		<![CDATA[See the box with Zack's name in the lower left of the screen? When you have a character selected, click this to learn more about his or her social state.]]>
+	</TutorialStep>
+	<TutorialStep object="stars" name="" eventType="" preText="" postText="" disableExceptions="" nextVisible="true" >
+		<![CDATA[Along with some information about Zack's personality and status, the 'Stars' area shows important people in Zack's life. Under 'Girlfriend' we can see someone's picture. It's Chloe!]]>
+	</TutorialStep>
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" >
+		<![CDATA[So we know Zack is dating <span color='0xFFFF00' >DATING</span> Chloe now. Let's see if Chloe wants to break up with him.]]>
+	</TutorialStep>
+	<TutorialStep object="avatar" name="zack" eventType="deselect" preText="" postText="" disableExceptions="" nextVisible="false" >
+		<![CDATA[Click on the background to de-select Zack.]]>
+	</TutorialStep>
+	<TutorialStep object="avatar" name="chloe" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" >
+		<![CDATA[Now click on Chloe to select her as the new primary character.]]>
+	</TutorialStep>
+	<TutorialStep object="avatar" name="zack" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" >
+		<![CDATA[Now click on Zack to make him the secondary character and see what social exchanges Chloe wants to try with him.]]>
+	</TutorialStep>
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="2">
+		<![CDATA[You may need to click and drag the window to see all five possible social exchanges above Zack's head. They're all positive, so Chloe must feel pretty good about Zack. But how does he feel?]]>
+	</TutorialStep>
+	<TutorialStep object="avatar" name="zack" eventType="deselect" preText="" postText="" disableExceptions="" nextVisible="false"  quadrant="2">
+		<![CDATA[Click on the background to de-select Zack.]]>
+	</TutorialStep>
+	<TutorialStep object="avatar" name="chloe" eventType="deselect" preText="" postText="" disableExceptions="" nextVisible="false"  quadrant="2">
+		<![CDATA[Now de-select Chloe.]]>
+	</TutorialStep>
+	<TutorialStep object="avatar" name="zack" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false"  quadrant="2">
+		<![CDATA[Now, click Zack to set him as the primary character again.]]>
+	</TutorialStep>
+	<TutorialStep object="avatar" name="chloe" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="2">
+		<![CDATA[Though becoming single is one of Zack's goals, he might not have the desire to actually make it happen on his own. Click on Chloe to see what social exchanges he wants to try with her.]]>
+	</TutorialStep>
+	<TutorialStep object="socialGameButton4" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="2">
+		<![CDATA[It looks like Zack is too comfortable in his relationship to want to end it on his own. But he does want to try the social exchange 'Insult.' Click on 'Insult.']]>
+	</TutorialStep>
+	<TutorialStep object="selectedGameButton" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" >
+		<![CDATA[Between the two selected character names at the bottom of the screen (under the Play button) is the name of the selected exchange. Click this to bring up more information about 'Insult.']]>
+	</TutorialStep>
+	<TutorialStep object="detailWindow" name="" eventType="click" preText=""  postText="" disableExceptions="" nextVisible="true">
+		<![CDATA[The detail window shows that this is a <span color='0x00FF00'>buddy down</span> exchange. Zack *intends* for this change to happen, but Chloe can either <span color='0x0000FF'>accept</span> or <span color='0x0000FF'>reject</span> this intent.]]>
+	</TutorialStep>
+	<TutorialStep object="detailWindow" name="" eventType="click" preText=""  postText="" disableExceptions="" nextVisible="true">	
+		<![CDATA[A successful 'Insult' would lower Chloe's buddy feelings towards Zack, which might make them more likely to break up.]]>
+	</TutorialStep>
+	<TutorialStep object="goButton" name="" eventType="click" preText=""  postText="" disableExceptions="" disableExceptionsButStillProgress="socialGameButton4" nextVisible="false">	
+		<![CDATA[Let's try it. Click the 'Play' button <span color='0xFFFF00' >PLAYBUTTON</span> above the name of the exchange, or 'Insult' again in the list of exchanges above Chloe's head, to start the scene.]]>
+	</TutorialStep>
+	<TutorialStep object="detailsButton" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="3">
+		<![CDATA[It didn't work! Chloe rejected Zack's buddy down exchange. Click on the 'details' button at the bottom center of the window above to see more information on what happend.]]>
+	</TutorialStep>
+	<TutorialStep object="responderMotivesButton" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="3">
+		<![CDATA[This view shows lots of details about why both Zack and Chloe acted the way they did. Click the 'Factors' button to see why Chloe chose to reject the insult.]]>
+	</TutorialStep>
+	<TutorialStep object="continueButton" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="3">
+		<![CDATA[One reason Chloe rejected the buddy down exchange is that she likes Zack: her <span color='0x00FF00'>buddy feelings</span> for him are high, so she didn't take his insult seriously. Click the continue button to exit the results display.]]>
+	</TutorialStep>
+	<TutorialStep object="juiceBar" name="" eventType="over" preText="" postText="" disableExceptions="" nextVisible="false" >
+		<![CDATA[Fortunately, we have a way to influence characters to make them do things they might not ordinarily want to. These are 'social influence points.' The bar on the lower left of the screen shows how many social influence points you have. Mouse over it now.]]>
+	</TutorialStep>
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" >
+		<![CDATA[As you perform actions characters want to do, you gain more social influence points. You can spend them to find out more about what characters are thinking, make them take actions they wouldn't do on their own, or even change how they'll react to exchanges.]]>
+	</TutorialStep>
+	<TutorialStep object="avatar" name="zack" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" >
+		<![CDATA[Let's try spending some social influence points to make Chloe accept the 'Insult.' Click on Zack.]]>
+	</TutorialStep>
+	<TutorialStep object="avatar" name="chloe" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" >
+		<![CDATA[Now click on Chloe.]]>
+	</TutorialStep>
+	<TutorialStep object="socialGameButton4" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false">
+		<![CDATA[Now click 'Insult.']]>
+	</TutorialStep>
+	<TutorialStep object="megaUIResultsButton" name="" eventType="over" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="1">
+		<![CDATA[The purple 'locked' icons <span color='0xFFFF00' >LOCK</span> in the bottom window show ways you can spend social influence points to gain more insight into the character's minds, and even sway their future. Hover your mouse over the 'Results' button.]]>
+	</TutorialStep>
+	<TutorialStep object="megaUIResultsButton" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="1">
+		<![CDATA[In the social influence points bar, you can see a highlighted area previewing how much predicting the results of an exchange will cost. Not too much! Go ahead and click 'Results.']]>
+	</TutorialStep>
+	<TutorialStep object="megaUISwitchOutcomeButton" name="" eventType="over" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="1">
+		<![CDATA[Now we learn that Chloe will reject this exchange if it's played again. Hover your mouse over the 'Change Response' button to see how much it would cost to change her behavior.]]>
+	</TutorialStep>
+	<TutorialStep object="megaUISwitchOutcomeButton" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" quadrant="1">
+		<![CDATA[Pricey, but we can afford it. Click 'Change Response.']]>
+	</TutorialStep>
+	<TutorialStep object="goButton" name="" eventType="click" preText="" postText="" disableExceptions="" disableExceptionsButStillProgress="socialGameButton4" nextVisible="false" quadrant="1">
+		<![CDATA[Now Chloe will accept the insult. Click the 'Play' button <span color='0xFFFF00' >PLAYBUTTON</span> (or 'Insult' in the list of exchanges around the responder's head) to start the scene.]]>
+	</TutorialStep>
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" quadrant="3">
+		<![CDATA[In the 'changes' bar, you can see that Chloe's <span color='0x00FF00'>buddy feelings</span> for Zack have gone down. Now Zack might have an easier time breaking things off.]]>
+	</TutorialStep>
+	<TutorialStep object="juiceBar" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" >
+		<![CDATA[Whenever you do things the characters want to do, you'll regain social influence points. Spend points to learn characters' motives and push them outside their comfort zones.]]>
+	</TutorialStep>	
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="true" >
+		<![CDATA[By helping characters meet their goals, you'll unlock new Prom endings and help them remember their special night forever.]]>
+	</TutorialStep>
+	<TutorialStep object="" name="" eventType="click" preText="" postText="" disableExceptions="" nextVisible="false" isOver="true">
+		<![CDATA[This concludes the Basic Gameplay tutorials! You can get started playing now, or continue on to the next set of tutorials to learn more about how to win exchanges and influence classmates!]]>
+	</TutorialStep>
+
+</TutorialScript>

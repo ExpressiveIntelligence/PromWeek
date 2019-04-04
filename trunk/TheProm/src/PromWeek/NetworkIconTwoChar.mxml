@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()">
+	
+		 
+	<fx:Metadata>
+	</fx:Metadata>
+		
+	<fx:Declarations>
+		<fx:Number id="netIconWidth">50</fx:Number>
+		<fx:Number id="netIconHeight">50</fx:Number>
+		<fx:Number id="charIconWidth">35</fx:Number>
+		<fx:Number id="charIconHeight">35</fx:Number>
+		<fx:Number id="crossWidth">85</fx:Number>
+		<fx:Number id="crossHeight">50</fx:Number>
+		<fx:Number id="networkValue">-999</fx:Number>
+		<fx:String id="networkOperator">""</fx:String>
+	</fx:Declarations>
+			
+	  <s:Group id="iconGroup">
+			<util:SmoothImage id="netIcon" x="15" width="{netIconWidth}" height="{netIconHeight}" />
+			<util:SmoothImage id="netIconLeft" width="{charIconWidth}" height="{charIconHeight}" />
+			<util:SmoothImage id="netIconRight" width="{charIconWidth}" height="{charIconHeight}" />
+			<mx:Text id="networkValueText" width="{charIconWidth}" height="{charIconHeight}" fontSize="18" visible="false" />
+			<s:Group id="negatedGroup" visible="false">
+				<s:Line id="line1" xFrom="0" yFrom="0" xTo="{crossWidth}" yTo="{crossHeight}">
+					<s:stroke>
+						<s:SolidColorStroke color="red" alpha="1.0" weight="7" />
+					</s:stroke>
+				</s:Line>
+				<s:Line id="line2" xFrom="0" yFrom="{crossHeight}" xTo="{crossWidth}" yTo="0">
+					<s:stroke>
+						<s:SolidColorStroke color="red" alpha=".8" weight="10"/>
+					</s:stroke>
+				</s:Line>
+			</s:Group> 
+	  </s:Group>
+
+	  
+	  
+	<fx:Script>
+		<![CDATA[		
+		import CiF.*;
+		import PromWeek.assets.ResourceLibrary;
+		
+		private var resourceLibrary:PromWeek.assets.ResourceLibrary = PromWeek.assets.ResourceLibrary.getInstance();
+		
+		public var readyToPopulateComponents:Boolean = false;
+		
+		public var netID:Number;
+		public var char1:String;
+		public var char2:String;
+		public var negated:Boolean;
+		public var whyText:String;
+		public var isIntent:Boolean;
+		
+		public var firstPersonName:String;
+		
+		
+		public function onCreationComplete():void
+		{
+			//resourceLibrary = PromWeek.assets.ResourceLibrary.getInstance();
+		}
+		
+		
+		
+		override protected function commitProperties():void
+		{
+			if (readyToPopulateComponents)
+			{
+				netIconLeft.source = resourceLibrary.portraits[char1.toLowerCase()];
+				netIconRight.source = resourceLibrary.portraits[char2.toLowerCase()];	
+
+				var changeName:String;
+				switch (netID)
+				{
+					case SocialNetwork.BUDDY:
+						//textColor = GameEngine.BUDDY_COLOR;
+						if (this.networkOperator == "+")
+						{
+							changeName = "buddyUp"
+						}
+						else
+						{
+							changeName = "buddyDown"
+						}
+						break;
+					case SocialNetwork.ROMANCE:
+						//textColor = GameEngine.ROMANCE_COLOR;
+						if (this.networkOperator == "+")
+						{
+							changeName = "romanceUp"
+						}
+						else
+						{
+							changeName = "romanceDown"
+						}
+						break;
+					case SocialNetwork.COOL:
+						//textColor = GameEngine.COOL_COLOR;
+						if (this.networkOperator == "+")
+						{
+							changeName = "coolUp"
+						}
+						else
+						{
+							changeName = "coolDown"
+						}
+						break;
+				}
+				
+				this.netIcon.source = resourceLibrary.networkArrowIcons[changeName];	
+				
+				var increaseOrDecrease:String;
+				var cif:CiFSingleton = CiFSingleton.getInstance();
+				var cChar2:Character = cif.cast.getCharByName(char2);
+				var char2isMale:Boolean = cChar2.hasTrait(Trait.MALE);
+				var char2HimHer:String = (char2isMale ? "him" : "her");
+				var char2HeShe:String = (char2isMale ? "he" : "she");
+				var introTxt:String = "...for ";
+				if (this.isIntent) // future tense
+				{
+					if (firstPersonName == "")
+					{
+						switch(changeName)
+						{
+							case "buddyUp": this.toolTip = introTxt + char1 + " to like " + char2HimHer + " more"; break;
+							case "buddyDown": this.toolTip = introTxt + char1 + " to like " + char2HimHer + " less"; break;
+							case "romanceUp": this.toolTip = introTxt + char1 + " to be more attracted to " + char2HimHer; break;
+							case "romanceDown": this.toolTip = introTxt + char1 + " to be less attracted to " + char2HimHer; break;
+							case "coolUp": this.toolTip = introTxt + char1 + " to think " + char2HeShe + " is cooler"; break;
+							case "coolDown": this.toolTip = introTxt + char1 + " to think " + char2HeShe + " is less cool"; break;
+						}
+						//old version:
+						//increaseOrDecrease = (this.networkOperator == "+")?"to increase":"to decrease"
+						//increaseOrDecrease + " " + char1 + "'s " + SocialNetwork.getNameFromType(netID) + " feelings toward " + char2;
+					}
+					else
+					{
+						switch(changeName)
+						{
+							case "buddyUp": this.toolTip = introTxt + char1 + " to like " + char2 + " more"; break;
+							case "buddyDown": this.toolTip = introTxt + char1 + " to like " + char2 + " less"; break;
+							case "romanceUp": this.toolTip = introTxt + char1 + " to be more attracted to " + char2; break;
+							case "romanceDown": this.toolTip = introTxt + char1 + " to be less attracted to " + char2; break;
+							case "coolUp": this.toolTip = introTxt + char1 + " to think " + char2 + " is cooler"; break;
+							case "coolDown": this.toolTip = introTxt + char1 + " to think " + char2 + " is less cool"; break;
+						}
+					}
+				}
+				else // present tense (this is now true)
+				{
+					switch(changeName)
+					{
+						case "buddyUp": this.toolTip = char1 + " likes " + char2 + " more"; break;
+						case "buddyDown": this.toolTip = char1 + " likes " + char2 + " less"; break;
+						case "romanceUp": this.toolTip = char1 + " is more attracted to " + char2; break;
+						case "romanceDown": this.toolTip = char1 + " is less attracted to " + char2; break;
+						case "coolUp": this.toolTip = char1 + " thinks " + char2 + " is cooler"; break;
+						case "coolDown": this.toolTip = char1 + " thinks " + char2 + " is less cool"; break;
+					}
+					//old version
+					//increaseOrDecrease = (this.networkOperator == "+")?"increased":"decreased"
+					//this.toolTip = char1 + "'s " + SocialNetwork.getNameFromType(netID) + " feelings toward " + char2 + " " + increaseOrDecrease;
+				}
+				if (whyText)
+				{
+					this.toolTip += "\n\n" + whyText;
+				}
+				
+				if (this.firstPersonName != "")
+				{
+					var otherChar1:String;
+					if (this.firstPersonName.toLowerCase() == char1.toLowerCase())
+					{
+						otherChar1 = char2;
+					}
+					else
+					{
+						otherChar1 = char1;
+					}
+					this.toolTip = Utility.makeStringFirstPerson(this.toolTip, this.firstPersonName,otherChar1,"");
+				}
+				
+				this.toolTip = LineOfDialogue.preprocessLine(this.toolTip);
+				
+				
+				netIcon.left = 3/4 * charIconWidth;
+				netIconLeft.left = 0;
+				netIconRight.left = (netIconWidth);
+				netIconLeft.top = (netIconHeight - charIconHeight)/2;
+				netIconRight.top = (netIconHeight - charIconHeight)/2;
+				netIconRight.scaleX = -1;
+				networkValueText.top = netIconHeight / 1.5;
+				networkValueText.left = (netIconWidth) / 2;
+				this.netIcon.visible = true;
+				this.netIconLeft.visible = true;
+				this.netIconRight.visible = true;
+				this.visible = true;
+				
+				if (negated)
+				{
+					this.negatedGroup.visible = true;
+				}else {
+					this.negatedGroup.visible = false;
+				}
+			}
+			
+			super.commitProperties();
+		}
+		
+		
+		
+		
+		
+		
+		/**
+		 * Given a variety of parameters, creates a small picture that contains 
+		 * the two characters involved in the network change, as well as an arrow
+		 * painted in the appropriate color to denote which network was affected.
+		 * (one if undirected status, two if directed).
+		 * @param	netID The id number of the network
+		 * @param	char1 the NAME (in string form) of the first character (the "from" character)
+		 * @param	char2 the NAME (in string form) of the second character (the "to" character)
+		 * @param	negated A boolean -- if true, then some crosses should appear over the status (i.e. the status was removed).
+		 */
+		public function loadImagesToIcon(netID1:Number, char1a:String = "", char2a:String = "", negated1:Boolean = false, whyText1:String = "",networkOp:String="",isIntent1:Boolean=false,nameToBeFirstPerson:String = ""):void
+		{	
+			if (networkOp != "")
+			{
+				this.networkOperator = networkOp;
+			}
+			this.netID = netID1;
+			this.char1 = char1a;
+			this.char2 = char2a;
+			this.negated = negated1;
+			this.whyText = whyText1;
+			this.isIntent = isIntent1;
+			
+			this.firstPersonName = nameToBeFirstPerson;
+			
+			this.readyToPopulateComponents = true;
+			
+			this.commitProperties();
+			
+			this.invalidateProperties();
+			this.invalidateSize();
+			this.invalidateDisplayList();
+		}
+		
+		]]>
+	</fx:Script>
+		
+	
+</s:Group>

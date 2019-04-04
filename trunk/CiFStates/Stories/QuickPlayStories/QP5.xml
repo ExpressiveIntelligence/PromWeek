@@ -1,0 +1,46 @@
+<PromWeek>
+		<Story title="QP5" storyLeadCharacter="Monica" locked="false" toUnlock="0" isTutorial="false" isQuickPlay="true" numberOfQuickPlaySGAvailable="3" startState="quickPlayStartState5" nextChallengeName="QP6">
+			<Description>Strategy.</Description>
+			<QuickPlayDescription>
+				<![CDATA[Make ###MONICA### and ###EDWARD### enemies ###ENEMIES### in 2 moves]]>
+			</QuickPlayDescription>
+			<QuickPlayEndingDescription>
+				<![CDATA[People are complicated.]]>
+			</QuickPlayEndingDescription>
+			<ForcedSGs> <!-- Force a pair of characters to WANT to play a specific instantiation of a specific social game. -->
+				<ForcedSG initiator="Edward" responder="Monica" gameName="annoy" turnsIn="0" instantiationID="-1" />
+				<ForcedSG initiator="Edward" responder="Monica" gameName="brag" turnsIn="0" instantiationID="-1" />
+				<ForcedSG initiator="Edward" responder="Monica" gameName="insult" turnsIn="0" instantiationID="-1" />
+				
+				<ForcedSG initiator="Monica" responder="Edward" gameName="insult" turnsIn="0" instantiationID="-1" />
+				<ForcedSG initiator="Monica" responder="Edward" gameName="bicker" turnsIn="0" instantiationID="-1" />
+				<ForcedSG initiator="Monica" responder="Edward" gameName="brag" turnsIn="0" instantiationID="-1" />
+
+			</ForcedSGs>
+			<ToDoList>
+				<ToDoItem name="Make Monica and Edward enemies">
+					<Condition>
+						<Rule>
+							<Predicate type="relationship" first="Monica" second="Edward" relationship="enemies" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+						<taskNaturalLanguage words="Make ###MONICA### and ###EDWARD### enemies!"/>
+					</Condition>
+				</ToDoItem>
+			</ToDoList>
+			<Levels>
+				<Level title="LEVEL 5" timeLimit="2" cameraZoom="1" useDefinedCameraPosition="false" cameraX="800" cameraY="1400" endable="false" isTutorial="false" tutorialScript="">
+					<Description>Make Monica and Edward enemies.</Description>
+					<Setting>neighborhood</Setting>
+					<Cast>
+						<CharacterName>Monica</CharacterName>
+						<CharacterName>Edward</CharacterName>
+						<!-- <CharacterName>Lil</CharacterName> -->
+					</Cast>
+					<GoalRules>
+					</GoalRules>
+				</Level>
+			</Levels>
+			<Endings>
+			</Endings>
+		</Story>
+</PromWeek>

@@ -1,0 +1,39 @@
+<PromWeek>
+		<Story title="QP7" storyLeadCharacter="Gunter" locked="false" toUnlock="0" isTutorial="false" isQuickPlay="true" numberOfQuickPlaySGAvailable="2" startState="quickPlayStartState7" nextChallengeName="NONE">
+			<Description>Social physics.</Description>
+			<QuickPlayDescription>
+				<![CDATA[Force ###PHOEBE### and ###GUNTER### to start dating ###DATING###]]> <!--in two moves. Hint: sometimes the enemy of an enemy is a friend. -->
+			</QuickPlayDescription>
+			<QuickPlayEndingDescription>
+				<![CDATA[Sometimes it takes three to tango.]]>
+			</QuickPlayEndingDescription>
+			<ForcedSGs>
+				<ForcedSG initiator="Gunter" responder="Phoebe" gameName="Humble Self" turnsIn="0" instantiationID="-1" />
+				<ForcedSG initiator="Gunter" responder="Phoebe" gameName="Ask Out" turnsIn="0" instantiationID="-1" />
+			</ForcedSGs>
+			<ToDoList>
+				<ToDoItem name="Using Social Influence Points">
+					<Condition>
+						<Rule>
+							<Predicate type="relationship" first="Gunter" second="Phoebe" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+						<taskNaturalLanguage words="Make ###GUNTER### and ###PHOEBE### to start dating ###DATING###"/>
+					</Condition>
+				</ToDoItem>
+			</ToDoList>
+			<Levels>
+				<Level title="LEVEL 7" timeLimit="1" cameraZoom="1" useDefinedCameraPosition="false" cameraX="800" cameraY="1400" endable="false" isTutorial="false" tutorialScript="">
+					<Description>Make Gunter and Phoebe Date.</Description>
+					<Setting>park</Setting>
+					<Cast>
+						<CharacterName>Gunter</CharacterName>
+						<CharacterName>Phoebe</CharacterName>
+					</Cast>
+					<GoalRules>
+					</GoalRules>
+				</Level>
+			</Levels>
+			<Endings>
+			</Endings>
+		</Story>
+</PromWeek>

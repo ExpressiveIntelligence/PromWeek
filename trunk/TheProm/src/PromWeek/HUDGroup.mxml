@@ -1,0 +1,1826 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 preinitialize="onPreinitialize()"
+		 initialize="initializeHUDGroup()"
+		 creationComplete="onCreationComplete()"
+		 width="100%"
+		 height="100%">
+	
+		 
+	<fx:Metadata>
+		[Event(name="primaryPortraitClicked", type="flash.events.Event")]
+		[Event(name="secondaryPortraitClicked", type="flash.events.Event")]
+		[Event(name="firstSocialChangeClicked", type="flash.events.Event")]
+		[Event(name="secondSocialChangeClicked", type="flash.events.Event")]
+		[Event(name="thirdSocialChangeClicked", type="flash.events.Event")]
+		[Event(name="fourthSocialChangeClicked", type="flash.events.Event")]
+	</fx:Metadata>
+		
+	<fx:Declarations>
+		<mx:Fade id="fadeIn" alphaFrom="0.0" alphaTo="1.0" />
+		<mx:Fade id="fadeOut" alphaFrom="1.0" alphaTo="0.0" />
+		
+		<mx:Fade id="initSelectedFadeIn" alphaFrom="0.0" alphaTo="1.0" /><!--effectStart="initSelectedFadingHappening(event)" effectEnd="initSelectedFadingDone(event)"/>-->
+		<mx:Fade id="initSelectedFadeOut" alphaFrom="1.0" alphaTo="0.0" effectStart="initSelectedFadingHappening(event)" effectEnd="initSelectedFadingDone(event)"/>
+		
+		<mx:WipeDown id="wipeDownOptions" duration="400" />
+		<mx:WipeUp id="wipeUpOptions" duration="150" />
+		
+		<fx:Number id="optionsFadedAlpha">0.4</fx:Number>
+		
+		<fx:Number id="appWidth">758</fx:Number>
+		<fx:Number id="appHeight">600</fx:Number>
+		
+		<fx:Number id="defaultResponderSubjectThoughtBubbleTop">150</fx:Number>
+	</fx:Declarations>
+	
+
+	
+	<!--<prom:LevelClock id="levelClock" click="onClickLevelClock(event)" right="10" top="10" y="10" visible="false" />-->
+	
+
+	
+	<!--<s:Group width="100%" height="100%">
+		<s:layout>
+            <s:HorizontalLayout horizontalAlign="right" />
+        </s:layout>-->
+		
+		
+		
+		
+		<s:Group id="rightScrollArea" width="10%" height="90%" click="onClickScrollAreaHandler(event)" mouseOver="scrollWorldGroupRight(event)" mouseOut="stopScrollRight(event)" visible="false" includeInLayout="false">
+			<!--<s:Rect width="100%" height="100%" >
+				<s:stroke>
+					<s:SolidColorStroke weight="10" color="#000000" />
+				</s:stroke>
+			</s:Rect>-->
+		</s:Group>
+				
+	
+
+<!--	<s:Group width="100%" height="100%">
+		<s:layout>
+            <s:HorizontalLayout horizontalAlign="left" />
+        </s:layout>
+-->		<s:Group id="leftScrollArea" width="10%" height="100%"  click="onClickScrollAreaHandler(event)" mouseOver="scrollWorldGroupLeft(event)" mouseOut="stopScrollLeft(event)" visible="false" includeInLayout="false">
+			<!--<s:Rect width="100%" height="100%" >
+				<s:stroke>
+					<s:SolidColorStroke weight="10" color="#000000" />
+				</s:stroke>
+			</s:Rect>-->
+		</s:Group>
+		
+		<s:Group id="downScrollArea" width="92%" height="10%" click="onClickScrollAreaHandler(event)" mouseOver="scrollWorldGroupDown(event)" mouseOut="stopScrollDown(event)"  visible="false" includeInLayout="false">
+			<!--<s:Rect width="100%" height="100%" >
+				<s:stroke>
+					<s:SolidColorStroke weight="10" color="#000000" />
+				</s:stroke>
+			</s:Rect>-->
+		</s:Group>
+		<s:Group id="upScrollArea" width="100%" height="10%" click="onClickScrollAreaHandler(event)" mouseOver="scrollWorldGroupUp(event)" mouseOut="stopScrollUp(event)"  visible="false" includeInLayout="false"/>	
+	<!--</s:Group>-->
+	<!--</s:Group> click="onClickScrollAreaHandler(event)"-->
+	
+	<!--<prom:CharacterInfoUI id="charInfoUI" visible="false" top="-20" left="30" width="100" height="100" />-->
+	
+	<!--<prom:SGInfoWindowComponent id="sgInfoWindow" visible="false" />-->
+	
+	<!--<prom:DebugWindow id="debugWindow" top="5" left="20" visible="true" />-->
+	<!--<mx:Button id="MakeANewOne" y="0" x="0" width="75" label="AddGoal" buttonDown="addEntry()" visible="true" />-->
+	<!--<s:Button id="todoListButton" label="To Do!" height="20" top="580" left="100" click="toDoButtonClicked(event)" visible="true" />
+	<s:Button id="SSUButton" label="SSU!" height="20" top="580" left="220" click="ssuButtonClicked(event)" visible="true" />-->
+	
+	<!--THESE ARE VERY USEFUL FOR TESTING, BUT WE DON'T WANT THEM IN THE ACTUAL GAME, RIGHT? SETTING VISIBLE TO FALSE -->
+	<s:Button id="debugInfoButton" label="Debug Info" height="20" top="50" left="0" click="reportDebugInfo(event)" visible="false" />
+	<s:Button id="consoleButton" label="Console" height="20" top="70" left="0" click="consoleButtonClicked(event)" visible="false" />
+	
+	
+	<s:Group id="autonomousActionGroup" width="100%" height="100%"/>
+		
+	
+	
+	<s:Group id="stuffToGoOnTopGroup" x="0" y="0" visible="false" mouseEnabledWhereTransparent="true" >
+		<s:Group id="socialGameButtonRingCloakOfInvisibility">
+			<prom:SocialGameButtonRing id="socialGameButtonRing"/>
+		</s:Group>
+		<prom:UpdatesArea id="updatesGroup" height="600" x="760" y="{this.appHeight - achievementGroup.height}" visible="true" mouseEnabledWhereTransparent="false"/>
+		<prom:MegaUI id="megaUI" x="25" y="450" visible="false" hideEffect="{fadeOut}" showEffect="{fadeIn}" mouseEnabledWhereTransparent="false"/>
+		<s:VGroup id="selectInitiatorGroup" left="10" bottom="5"  mouseEnabled="false" mouseEnabledWhereTransparent="false" >
+			<s:RichText id="selectACharacterText" color="0xFFFFFF" text="Select a character" styleName="selectACharacterText" />
+			<prom:NEW_initatorCharHeadSelectionGroup id="initSelectGroup" />
+		</s:VGroup>
+		<prom:NEW_responderPreResponseThoughtBubble id="responderPreResponseThoughtBubble" visible="false" mouseEnabled="false" mouseEnabledWhereTransparent="false" hideEffect="{fadeOut}" showEffect="{fadeIn}"/>
+		<prom:NEW_responderThoughtBubble id="responderThoughtBubble" visible="false" mouseEnabled="false" mouseEnabledWhereTransparent="false" hideEffect="{fadeOut}" showEffect="{fadeIn}"/>
+		<prom:NEW_subjectiveThoughtBubble id="responderSubjectiveThoughtBubble" top="{this.defaultResponderSubjectThoughtBubbleTop}" visible="false"  mouseEnabled="false" mouseEnabledWhereTransparent="false"/>
+		<prom:NEW_initatorSelectedComponent id="initiatorSelectedComponent" visible="false" left="10" bottom="5" width="100%" height="100%" hideEffect="{initSelectedFadeOut}" showEffect="{initSelectedFadeIn}" mouseEnabled="false" mouseEnabledWhereTransparent="false"/>
+		<prom:JuiceBar id="juiceBar" x="0" y="600" rotation="-90" height="25" width="150" visible="false" hideEffect="{fadeOut}" showEffect="{fadeIn}"/>
+		<prom:SSUVisualizer id="ssuVisualizer" x="{this.appWidth - ssuVisualizer.width}" y="{this.appHeight - ssuVisualizer.height}" visible="false" />
+		<!--<prom:TopBar id="topBar" x="0" y="0" visible="false" hideEffect="{fadeOut}" showEffect="{fadeIn}" />-->
+		<prom:HelpTips id="helpTips" x="{this.appWidth/2 - helpTips.width/2}" y="{this.appHeight/2 - helpTips.height/2}" visible="false" />
+		<prom:CustomAlert id="customAlert" x="{this.appWidth/2 - customAlert.width/2}" y="{this.appHeight/2 - customAlert.height/2}"  visible="false" />
+		<prom:BugReporterComponent id="bugReporterComponent" x="{this.appWidth/2 - bugReporterComponent.width/2}" y="{this.appHeight/2 - bugReporterComponent.height/2}" visible="false" />
+		
+		<prom:InGameOptionsComponent id="skipLevelOptionMenu" width="250" height="120" x="{this.appWidth/2 - skipLevelOptionMenu.width/2}" y="{this.appHeight/2 - skipLevelOptionMenu.height/2}" visible="false" isSkipLevelPopUp="true" />
+		<prom:InGameOptionsComponent id="skipToEndOfPromNight" width="250" height="120" x="{this.appWidth/2 - skipToEndOfPromNight.width/2}" y="{this.appHeight/2 - skipToEndOfPromNight.height/2}" visible="false" isEndingLevel="true" />
+
+		
+		
+		<prom:NEW_quickPlayInstructionsText id="quickPlayInstructionsText" width="100%" height="100%" />
+		<prom:NEW_endingTitleScreen id="endingTitleScreen" width="100%" height="100%" visible="false" />
+		<prom:NEW_topBar id="topBar" width="100%" hideEffect="{fadeOut}" showEffect="{fadeIn}" mouseEnabledWhereTransparent="false"/>
+		<prom:NEW_hintComponent id="quickPlayHintGroup" width="100%" height="100%" showEffect="{fadeIn}" visible="false" />
+		<mx:Panel id="optionsDropDownPanel" width="120" height="128" visible="false" hideEffect="{wipeUpOptions}" showEffect="{wipeDownOptions}" headerHeight="0" rollOut="rollOutOptionsDropDown(event)" rollOver="rollOverOptionsDropDown(event)" creationPolicy="all">
+			<s:Group width="100%" height="100%">
+				<!--<s:Rect width="100%" height="100%">
+					<s:fill>
+						<s:SolidColor color="{getStyle('backgroundColor')}" alpha="1.0" />
+					</s:fill>
+				</s:Rect>-->
+				<s:Scroller width="100%" height="100%" horizontalScrollPolicy="off" verticalScrollPolicy="off">
+					<s:VGroup width="100%" height="100%" gap="0">
+						<prom:PromWeekButton id="musicToggleButton" width="100%" height="25" label="Turn Music Off" click="musicToggleButtonClicked(event)" cornerRoundness="0" />
+						<prom:PromWeekButton id="soundEffectsToggleButton" width="100%" height="25" label="Turn Sound Off" click="soundEffectsToggleButtonClicked(event)" cornerRoundness="0"/>
+						<prom:PromWeekButton id="changeDifficultyButton" label="Adjust Difficulty" width="100%" height="25" click="changeDifficultyButtonClicked(event)" visible="true" cornerRoundness="0" />
+						<prom:PromWeekButton id="bugReporterButton" label="Send Feedback" width="100%" height="25" click="reportBugButtonClicked(event)" visible="true" cornerRoundness="0"/>
+						<prom:PromWeekButton id="exitStoryButton" width="100%" height="25" label="Exit Story" click="exitStoryButtonClicked(event)" cornerRoundness="0" />
+					</s:VGroup>
+				</s:Scroller>
+			</s:Group>
+		</mx:Panel>
+		
+		<!--<prom:SFDBVisualizer id="sfdbVisualizer" x="{this.appWidth/2 - sfdbVisualizer.width/2}" y="{this.appHeight/2 - sfdbVisualizer.height/2}" visible="false" />-->
+		<prom:AchievementGroup id="achievementGroup" height="600" x="0" y="{this.appHeight - achievementGroup.height}" visible="true" />
+		<prom:PossibleEndingWindow id="endingWindow" x="{this.appWidth - endingWindow.width}" y="35" visible="false" />
+		<!--<prom:PromWeekButton id="goToEndingButton" label="Go to End of Night" x="{this.appWidth - goToEndingButton.width}" y="10" width="150" visible="false" click="megaUI.onClickLevelClock(event)" />-->
+		<prom:EndingInfoWindow id="endingInfoWindow" visible="false" x="{this.appWidth - endingInfoWindow.width - 10}" y="{this.appHeight - endingInfoWindow.height - 10}" />
+		<!--<prom:SFDBEntry id="postSGSFDBEntry" x="{this.appWidth/2 - postSGSFDBEntry.width/2}" y="{this.appHeight/2 - postSGSFDBEntry.height/2 - 35}" visible="false" />-->
+		<prom:SFDBEntry id="postSGSFDBEntry" width="100%" height="100%" visible="false" />
+		<prom:NEW_GoalProgressGroup id="goalProgressGroup" width="100%" height="100%" visible="false" mouseEnabledWhereTransparent="false" />
+		<prom:StoryGoalWindow id="storyGoalWindow" x="{this.appWidth/2-storyGoalWindow.width/2}" y="{this.appHeight/2 - storyGoalWindow.height/2}" visible="false" alpha="0" />
+		<prom:NEW_storyGoalWindow id="newStoryGoalWindow" width="580" height="440" x="{this.appWidth/2-newStoryGoalWindow.width/2}" y="{this.appHeight/2 - newStoryGoalWindow.height/2}" visible="false" /><!--hideEffect="{fadeOut}" showEffect="{fadeIn}"/>-->
+		<s:Group visible="false"><prom:PromWeekButton id="resetStateButton" label="Start Over" x="{this.appWidth - 118}" y="{this.appHeight - 65}" width="75" height="40" scaleX="1.5" scaleY="1.5" visible="false" click="resetStateButtonClicked(event)" /></s:Group>
+		<s:Button id="nextQuickPlayButton" label="Next Challenge!" left="{this.appWidth-100}" top="{this.appHeight-50}" height="50" width="100" visible="false" click="nextQuickPlayButtonClicked(event)" />
+		<s:RichText id="quickPlayLevelInstructionsLabel" text="" left="200" textAlign="center" top="{topBar.height}" visible="false" styleName="QuickPlayInstructionStyle" hideEffect="{fadeOut}" showEffect="{fadeIn}" />
+		<!--s:RichText id="quickPlayLevelHintText" text="" left="400" textAlign="center" top="{topBar.height}" visible="false" styleName="QuickPlayHintStyle"  /-->
+
+		<prom:LevelObjectiveScreen id="levelObjectiveScreen" visible="false" height="100%" width="100%" />
+	</s:Group>
+	
+	<s:Group id="fireworksGroup" width="100%" height="100%" mouseEnabledWhereTransparent="true" mouseEnabled="false" mouseChildren="false" />
+	
+	
+	
+	
+	
+	<!-- a 'layer' for the character nameplate group -->
+	<s:Group id="characterNameplateGroup" height="100%" width="100%" />
+	
+	<prom:DialogueBubble id="initiatorDiablogueBubble" visible="false" width="250" height="250" />
+	<prom:DialogueBubble id="responderDiablogueBubble" visible="false" width="250" height="250" />
+	<prom:DialogueBubble id="otherDialogueBubble" visible="false" width="250" height="250" />
+	
+	
+	<prom:ConsolePopUp id="consolePopUp" height="105" left="200" width="340" x="100" y="{this.appHeight - 320}" visible="false" />
+	
+	<s:RichText id="otherIsApproachingText" text="Character Approaching" height="40" x="10" y="{this.appHeight-80}" visible="false" color="#DCDCDC" fontSize="20" />
+	<s:RichText id="clickToContinueText" text="Click To Continue" height="40" x="10" y="{this.appHeight-40}" visible="false" color="#DCDCDC" fontSize="20" />
+	<s:RichText id="betweenTurnHint" text="" height="40" x="10" width="600"  y="{this.appHeight-40}" visible="false" color="#FF7722" fontSize="14" />
+	
+	<!--	
+	<s:Rect id="totalJuicePointRect" width="100" left="60" height="20" x="0" y="{this.appHeight - 120}" visible="false" />
+	<s:Rect id="currentJuicePointRect" width="50" left="60" height="20" x="0" y="{this.appHeight - 120}" visible="false" />
+	-->
+	
+	<s:Button id="addJuicePointButton" label="Add Juice Points" height="20" top="520" left="0" click="addJuicePointButtonClicked(event)" visible="false" />
+	<s:Button id="subtactJuicePointButton" label="Subtract Juice Points" height="20" top="540" left="0" click="subtractJuicePointButtonClicked(event)" visible="false" />
+	
+	
+	<!--<prom:PromWeekButton id="optionsButton" label="Options" height="20" top="0" left="0" click="optionsMenuButtonClicked(event)" visible="true" />-->
+	<prom:ToggleableContainerButton id="optionsButton" width="30" height="30" top="5" left="5" click="optionsMenuButtonClicked(event)" visible="true" toggleable="false" rollOut="rollOutOptionsButton(event)" rollOver="rollOverOptionsButton(event)" alpha="{optionsFadedAlpha}" boxPadding="0" roundness="3" />
+
+	<prom:ToggleableContainerButton id="zoomInButton" width="30" height="30" top="5" left="75" click="zoomInMenuButtonClicked(event)" visible="true" toggleable="false" rollOut="rollOutZoomInButton(event)" rollOver="rollOverZoomInButton(event)" alpha="{optionsFadedAlpha}" boxPadding="0" roundness="3" />
+	<prom:ToggleableContainerButton id="zoomOutButton" width="30" height="30" top="5" left="110" click="zoomOutMenuButtonClicked(event)" visible="true" toggleable="false" rollOut="rollOutZoomOutButton(event)" rollOver="rollOverZoomOutButton(event)" alpha="{optionsFadedAlpha}" boxPadding="0" roundness="3" />
+	
+	
+	
+	
+	<prom:StorySelectionScreen id="storySelectionScreen" visible="false" height="100%" width="100%" />
+	<prom:MainMenuScreen id="mainMenuScreen" visible="false" height="100%" width="100%" />
+	<prom:EndOfStoryScreen id="endOfStoryScreen" visible="false" height="100%" width="100%" />
+	<prom:TutorialScreen id="tutorialSelectionScreen" visible="false" height="100%" width="100%" />
+	<prom:SandboxMenuScreen id="sandboxMenuScreen" visible="false" width="100%" height="100%" />
+	<prom:OptionsScreen id="optionsScreen" visible="false" height="100%" width="100%" />
+	<prom:CreditsScreen id="creditsScreen" visible="false" height="100%" width="100%" />
+	<prom:AchievementsScreen id="achievementsScreen" visible="false" height="100%" width="100%" />
+	<!--<prom:LevelObjectiveScreen id="levelObjectiveScreen" visible="false" height="100%" width="100%" />-->
+	<prom:LevelResultsScreen id="levelResultsScreen" visible="false" height="100%" width="100%" />
+	<prom:FacadeScreen id="facadeScreen" visible="false" height="100%" width="100%" />
+
+	<prom:ToggleableContainerButton id="fullScreenButton" width="30" height="30" y="5" x="40" click="fullScreenClicked(event)" visible="true" toggleable="false" rollOut="rollOutFullScreenButton(event)" rollOver="rollOverFullScreenButton(event)" alpha="{optionsFadedAlpha}" boxPadding="0" roundness="3" />
+	<prom:ToggleableContainerButton id="soundButton" width="30" height="30" y="5" x="75" click="soundMenuButtonClicked(event)" visible="true" toggleable="true" rollOut="rollOutSoundButton(event)" rollOver="rollOverSoundButton(event)" alpha="{optionsFadedAlpha}" boxPadding="0" roundness="3" />
+	
+	<s:HGroup id="charactersAreThinkingGroup" width="200" height="100%" paddingTop="50">
+		<mx:ProgressBar bottom="0%" id="intentProgressBar" labelPlacement="bottom" chromeColor="0xff6633"
+					minimum="0" visible="false" maximum="100" label="Characters are thinking..." 
+					direction="right" mode="manual" width="100%" />
+	</s:HGroup>
+	<!-- we want this to always appear close to the top, so lets define it down here at the bottom -->
+	<prom:InGameOptionsComponent id="inGameOptionMenu" width="280" height="150" x="{this.appWidth/2 - inGameOptionMenu.width/2}" y="{this.appHeight/2 - inGameOptionMenu.height/2}" visible="false" />
+	<prom:DifficultySelectorComponent id="difficultySelectionMenu" width="350" height="220" x="{this.appWidth/2 - difficultySelectionMenu.width/2}" y="{this.appHeight/2 - difficultySelectionMenu.height/2}" visible="false" />
+				
+	<fx:Script>
+		<![CDATA[
+		
+		import com.greensock.motionPaths.Direction;
+		import flash.display.MovieClip;
+		import flash.events.MouseEvent;
+		import flash.events.TimerEvent;
+		import flash.geom.Point;
+		import flash.geom.Vector3D;
+		import flash.ui.Mouse;
+		import flash.utils.Dictionary;
+		import flash.utils.Timer;
+		import flashx.textLayout.utils.CharacterUtil;
+		import mx.flash.UIMovieClip;
+		import PromWeek.assets.ResourceLibrary;
+		import spark.components.Group;
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import mx.core.FlexGlobals;
+		import CiF.*;
+		import mx.containers.TitleWindow;
+		import mx.events.CloseEvent;
+		import spark.components.Button;
+		import spark.components.RichText;
+		import flash.events.Event;
+		import flash.events.EventDispatcher;
+		import mx.managers.PopUpManager;
+		import mx.core.IFlexDisplayObject;;
+		import mx.controls.Alert;
+		import mx.controls.TextArea;
+		import mx.graphics.SolidColor;
+		import mx.graphics.SolidColorStroke;
+		
+		private var gameEngine:GameEngine;
+		private var rL:ResourceLibrary;
+		private var statisticsManager:StatisticsManager;
+		private var dm:DifficultyManager;
+		
+		//public var socialGameButtonRing:SocialGameButtonRing;
+		
+		//public var postSGSFDBEntry:SFDBEntry;
+		
+		/**
+		 * The dimension of the portion of the UI that should always be on the
+		 * visible screem area.
+		 */
+		public var visibleHUDWidth:Number;
+		public var visibleHUDHeight:Number;
+
+		
+		public var socialGameResultsUI:SocialGameResultsUI;
+		public var characterSheet:CharacterSheet;
+		
+		
+		public var endingButtons:Vector.<PromWeekButton>;
+		
+		public var relationshipIcons:Vector.<RelationshipIcon>;
+		
+		
+		public var initiatorToResponderOpinionLines:OpinionLines;
+		public var responderToInitiatorOpinionLines:OpinionLines;
+		
+		public var networkChangeIcons:Vector.<NetworkChangeIcon>;
+		public var statusChangeIcons:Vector.<StatusChangeIcon>;
+		public var relationshipChangeIcons:Vector.<RelationshipChangeIcon>;
+		// Autonomous icons
+		public var autonomousIcons:Dictionary;
+		
+		
+		public var optionsMenuTimer:Timer;
+		
+		protected var debugPopUp:TitleWindow;
+		public var debugGroup:Group;
+		public var debugInfo:String;
+		
+		public var lastContext:SocialGameContext;	
+		
+		
+		/**
+		 * The trigger social change predicates that need to be displayed to the character
+		 */
+		public var toDisplayChangePreds:Vector.<Predicate>;
+		public var toDisplaySubjectiveChangeAnimations:Vector.<Predicate>;
+		/**
+		 * The rate at which change preds will be displayed
+		 */
+		public var displayChangePredsRate:Number = 3000;
+		public var lastChangePredDisplay:Number = 0;
+		
+		public var displaySubjectiveOpinionChangeRate:Number = 1000;
+		public var lastSubjectiveChangeAnimationDisplay:Number = 0;
+		
+		//public var promTimeClock:UIMovieClip = new TimeClockComponent() as UIMovieClip
+		
+		public static const MAX_ZOOM:Number = 1.3;
+		public static const MIN_ZOOM:Number = 0.7;
+		
+		public var initSelectedCurrentlyFading:Boolean = false;
+		
+		public var jpm:JuicePointManager;
+		
+		public var NUMBER_OF_AANS:Number = 0
+		
+		public function onPreinitialize():void {
+			Debug.debug(this, "onPreinitialize()");
+			this.gameEngine = GameEngine.getInstance();
+			this.statisticsManager = StatisticsManager.getInstance();
+			this.dm = DifficultyManager.getInstance();
+			this.rL = ResourceLibrary.getInstance();
+			this.jpm = JuicePointManager.getInstance();
+			
+			toDisplayChangePreds = new Vector.<Predicate>();
+			toDisplaySubjectiveChangeAnimations = new Vector.<Predicate>();
+			
+			// init the autonomousIcons vector
+			autonomousIcons = new Dictionary()
+		}
+		
+		override protected function createChildren():void {
+			Debug.debug(this, "createChildren()");
+			
+			//postSGSFDBEntry = new PromWeek.SFDBEntry();
+
+			//this.addElement(promTimeClock)
+			
+			debugPopUp = new PromWeek.DebugPopUp();
+			
+			//socialGameButtonRing = new SocialGameButtonRing();
+			//addElement(socialGameButtonRing);
+
+			endingButtons = new Vector.<PromWeekButton>();
+			
+			relationshipIcons = new Vector.<RelationshipIcon>();
+			networkChangeIcons = new Vector.<NetworkChangeIcon>();
+			relationshipChangeIcons = new Vector.<RelationshipChangeIcon>();
+			statusChangeIcons = new Vector.<StatusChangeIcon>();
+			
+
+			
+			this.leftScrollArea.top = 0;
+			this.leftScrollArea.left = 0;
+			this.leftScrollArea.width = 0.1 * this.visibleHUDWidth;
+			
+			this.rightScrollArea.top = 0;
+			this.rightScrollArea.width  = 0.1 * this.visibleHUDWidth;
+			this.rightScrollArea.left = this.visibleHUDWidth - this.rightScrollArea.width;
+
+			this.downScrollArea.height  = 0.1 * this.visibleHUDHeight;
+			this.downScrollArea.left = 0
+			this.downScrollArea.top = this.visibleHUDHeight - this.downScrollArea.height;
+
+			this.upScrollArea.top = 0;
+			this.upScrollArea.height  = 0.1 * this.visibleHUDHeight;
+			this.upScrollArea.left = 0
+			
+			socialGameResultsUI = new SocialGameResultsUI();
+			this.addElement(socialGameResultsUI);
+			socialGameResultsUI.visible = false;
+			
+			socialGameResultsUI.left = 50;// (this.visibleHUDWidth / 2.0) - (socialGameResultsUI.width / 2.0);//this.appWidth / 2 - socialGameResultsUI.width / 2;
+			socialGameResultsUI.top = 50;//this.appHeight / 2 - socialGameResultsUI.height / 2;
+			
+			this.endingWindow.visible = gameEngine.useEndingButtons;
+			
+			initiatorToResponderOpinionLines = new OpinionLines();
+			responderToInitiatorOpinionLines = new OpinionLines();
+			initiatorToResponderOpinionLines.width = 40;
+			initiatorToResponderOpinionLines.height = 100;
+			responderToInitiatorOpinionLines.width = 40;
+			responderToInitiatorOpinionLines.height = 100;
+			this.addElement(initiatorToResponderOpinionLines);
+			this.addElement(responderToInitiatorOpinionLines);
+			initiatorToResponderOpinionLines.visible = false;
+			responderToInitiatorOpinionLines.visible = false;
+			
+			
+			characterSheet = new PromWeek.CharacterSheet();
+			this.addElement(characterSheet);
+			characterSheet.visible = false; // originally not visible.
+			
+			/*
+			 * NOTE TO SELF FOR LATER!
+			 * 
+			 * CREATE THE "STATE EXPLORER" THAT LETS THE PLAYER ORGANIZE HOW THEY WANT TO SEE STATE
+			 * THIS WILL REPLACE THE CHARACTER SHEET. IT WILL CONTAIN THE CHARACTER SHEETS
+			 */
+			
+			 
+			 if (gameEngine.useConsoleButton) {
+				 this.consoleButton.visible = true;
+			 }
+			 else {
+				 this.consoleButton.visible = false;
+			 }
+			
+			
+			if (gameEngine.useJuicePoints) {
+				//
+				//var totalJuiceSolidColor:SolidColor = new SolidColor();
+				//totalJuiceSolidColor.color = "#000000" as uint;
+				//totalJuiceSolidColor.alpha = .7;
+				//var totalJuiceSolidColorStroke:SolidColorStroke = new SolidColorStroke();
+				//totalJuiceSolidColorStroke.color = "#000000" as uint;
+				//totalJuiceSolidColorStroke.weight = 3;
+				
+				//this.totalJuicePointRect.fill = totalJuiceSolidColor;
+				//this.totalJuicePointRect.stroke = totalJuiceSolidColorStroke;
+				//
+				//
+				//this.totalJuicePointRect.visible = true;
+				//
+				//var currentJuiceSolidColor:SolidColor = new SolidColor();
+				//currentJuiceSolidColor.color = "#00FF00" as uint;
+				//currentJuiceSolidColor.alpha = .7;
+				//var currentJuiceSolidColorStroke:SolidColorStroke = new SolidColorStroke();
+				//currentJuiceSolidColorStroke.color = "#000000" as uint;
+				//currentJuiceSolidColorStroke.weight = 3;
+				//
+				//this.currentJuicePointRect.fill = currentJuiceSolidColor;
+				//this.currentJuicePointRect.stroke = currentJuiceSolidColorStroke;
+				//
+				//this.currentJuicePointRect.width = jpm.getRectangleWidthBasedOnJuicePoints();
+				//
+				//this.currentJuicePointRect.visible = true;
+				//this.juiceBar.visible = true
+				//this.juiceBar.visible = true
+			}
+			else {
+				this.juiceBar.visible = false
+				//this.currentJuicePointRect.visible = false;
+				//this.totalJuicePointRect.visible = false;
+			}
+			
+			
+			var img:SmoothImage = new SmoothImage();
+			img.width = 30//this.optionsButton.mainContainer.width;
+			img.height = 30//this.optionsButton.mainContainer.height;
+			img.source = ResourceLibrary.getInstance().uiIcons["wrench"];
+			this.optionsButton.mainContainer.addElement(img);
+			
+			img = new SmoothImage();
+			img.width = 30//this.optionsButton.mainContainer.width;
+			img.height = 30//this.optionsButton.mainContainer.height;
+			img.source = ResourceLibrary.getInstance().uiIcons["sound"];
+			this.soundButton.mainContainer.addElement(img);
+			
+			img = new SmoothImage();
+			img.width = 30//this.optionsButton.mainContainer.width;
+			img.height = 30//this.optionsButton.mainContainer.height;
+			img.source = ResourceLibrary.getInstance().uiIcons["fullScreen"];
+			this.fullScreenButton.mainContainer.addElement(img);
+			
+			img = new SmoothImage();
+			img.width = 25//this.optionsButton.mainContainer.width;
+			img.height = 25//this.optionsButton.mainContainer.height;
+			img.source = ResourceLibrary.getInstance().uiIcons["zoomIn"];
+			this.zoomInButton.mainContainer.x -= 5;
+			this.zoomInButton.mainContainer.y -= 3;
+			this.zoomInButton.mainContainer.addElement(img);
+			
+			img = new SmoothImage();
+			img.width = 25//this.optionsButton.mainContainer.width;
+			img.height = 25//this.optionsButton.mainContainer.height;
+			img.source = ResourceLibrary.getInstance().uiIcons["zoomOut"];
+			this.zoomOutButton.mainContainer.x -= 5;
+			this.zoomOutButton.mainContainer.y -= 3;
+			this.zoomOutButton.mainContainer.addElement(img);
+			
+			this.debugPopUp = new PromWeek.DebugPopUp();
+			debugPopUp.title = "Debug Info";
+			debugPopUp.showCloseButton = true;
+			debugPopUp.addEventListener(CloseEvent.CLOSE, debugPopUp_close);
+			
+			
+			
+			//promTimeClock.x = 655
+			//promTimeClock.y = 545
+			//promTimeClock.visible = false
+			
+			this.setElementIndex(stuffToGoOnTopGroup, this.numElements - 1); // we always want this to be at the very top of everything!
+			
+			super.createChildren()
+		}
+		
+		public function initSelectedFadingHappening(e:Event):void
+		{
+			this.initSelectedCurrentlyFading = true;
+		}
+		public function initSelectedFadingDone(e:Event):void
+		{
+			this.initSelectedCurrentlyFading = false;
+			if (gameEngine.currentState == "Interaction" && gameEngine.endingToPerform == null )
+			{
+				this.selectInitiatorGroup.visible = true;
+			}
+		}
+		/*
+		public function tutorialFilterClicked(e:MouseEvent):void
+		{
+			var hitAnAvatar:Boolean = false;
+			for each (var avatar:Avatar in gameEngine.worldGroup.avatars)
+			{
+				var pt:Point = new Point(e.stageX,e.stageY);
+				var pt2:Point = avatar.globalToLocal(pt);
+				if (avatar.clip.hitTestPoint(pt2.x,pt2.y,true))
+				{
+					hitAnAvatar = true;
+					avatar.dispatchEvent(new MouseEvent(MouseEvent.CLICK, true, false));
+				}
+			}
+			if (!hitAnAvatar)
+			{
+				gameEngine.hudGroup.dispatchEvent(new MouseEvent(MouseEvent.CLICK, true, false));
+				//gameEngine.worldGroup.background.dispatchEvent(new MouseEvent(MouseEvent.CLICK, true, false));
+			}
+		}
+		*/
+		
+
+		
+		override protected function commitProperties():void {
+			super.commitProperties();
+			Debug.debug(this, "commitProperties() width: " + this.width + " height: " + this.height + " scale: " + this.scaleX);
+			Utility.log(this, "commitProperties() width: " + this.width + " height: " + this.height + " scale: " + this.scaleX + " app: <" + this.appWidth + ", " + this.appHeight + ", " + this.scaleX + ">");
+		}
+		
+		
+		
+		
+		public function initializeHUDGroup():void
+		{
+			Debug.debug(this, "initializeHUDGroup()");
+
+			
+
+
+			//promTimeClock.addEventListener("ssuUpdatePressed",ssuButtonClicked)
+			//promTimeClock.addEventListener("toDoPressed", toDoButtonClicked)
+			//promTimeClock.addEventListener("zoomInPressed", zoomIn)
+			//promTimeClock.addEventListener("zoomOutPressed", zoomOut)
+
+			
+
+			
+
+		}		
+		
+		
+		/**
+		 * Event that automatically closes the cpanel if it is open and rolled out of.
+		 */
+		
+		public function rollOutOptionsDropDown(event:MouseEvent=null):void 
+		{
+			this.optionsButton.alpha = this.optionsFadedAlpha;
+			this.optionsDropDownPanel.visible = false;
+			//this.goToLevelButton._selected = !this.goToLevelButton._selected;
+		}
+		
+		public function rollOverOptionsDropDown(event:MouseEvent=null):void 
+		{
+			this.optionsButton.alpha = 1;
+			if (this.optionsMenuTimer != null)
+			{
+				this.optionsMenuTimer.stop();
+				this.optionsMenuTimer = null;
+			}
+		}
+		
+		public function closeOptionsDropDown(event:TimerEvent=null):void 
+		{
+			this.optionsDropDownPanel.visible = false;
+			this.optionsMenuTimer = null;
+			//goalLists.setToClosed();
+		}
+		
+		
+		
+		public function optionsMenuButtonClicked(e:Event = null):void
+		{
+			this.removeElement(this.inGameOptionMenu);
+			this.addElement(this.inGameOptionMenu);
+			//clear out the timer
+			if (this.optionsMenuTimer != null)
+			{
+				this.optionsMenuTimer.stop();
+				this.optionsMenuTimer = null;
+			}
+
+			if (!this.optionsDropDownPanel.visible)
+			{
+				//this means we are making it visible and should start some timers
+				optionsMenuTimer = new Timer(1500, 1);
+				optionsMenuTimer.addEventListener(TimerEvent.TIMER, closeOptionsDropDown);
+				optionsMenuTimer.start();
+			}
+
+			this.optionsDropDownPanel.visible = !this.optionsDropDownPanel.visible;
+			
+			//if (this.inGameOptionMenu.visible)
+			//{
+				//this.optionsMenuButton.selected = false;
+			//}
+			//else
+			//{
+				//this.optionsMenuButton.selected = true;
+			//}
+		}
+		
+		public function exitStoryButtonClicked(e:MouseEvent = null):void
+		{
+			if (gameEngine.facadeState)
+			{
+				this.facadeScreen.leaveFacadeState();
+			}
+			
+			this.skipLevelOptionMenu.visible = false;
+			this.skipToEndOfPromNight.visible = false;
+			this.storyGoalWindow.visible = false;
+			this.newStoryGoalWindow.visible = false;
+			this.inGameOptionMenu.populateForExitStory();
+			this.inGameOptionMenu.visible = true;
+		}
+		
+		
+		public function fullScreenClicked(e:MouseEvent = null):void
+		{
+			this.topBar.toggleFullScreen();
+		}
+		public function rollOutOptionsButton(e:MouseEvent = null):void
+		{ 
+			this.optionsButton.alpha = this.optionsFadedAlpha;
+		}
+		public function rollOverOptionsButton(e:MouseEvent = null):void
+		{ 
+			this.optionsButton.alpha = 1.0;
+		}
+		
+		public function rollOutSoundButton(e:MouseEvent = null):void
+		{ 
+			this.soundButton.alpha = this.optionsFadedAlpha;
+		}
+		public function rollOverSoundButton(e:MouseEvent = null):void
+		{ 
+			this.soundButton.alpha = 1.0;
+		}
+		
+		public function rollOutFullScreenButton(e:MouseEvent = null):void
+		{ 
+			this.fullScreenButton.alpha = this.optionsFadedAlpha;
+		}
+		public function rollOverFullScreenButton(e:MouseEvent = null):void
+		{ 
+			this.fullScreenButton.alpha = 1.0;
+		}
+		public function soundMenuButtonClicked(e:MouseEvent = null):void
+		{
+			if (e.currentTarget == this.soundButton)
+			{
+				this.topBar.soundButton.selected = this.soundButton.selected;
+			}
+			if (e.currentTarget == this.topBar.soundButton)
+			{
+				this.soundButton.selected = this.topBar.soundButton.selected;
+			}
+			
+			var img:SmoothImage;
+			if (this.soundButton.selected || this.topBar.soundButton.selected)
+			{
+				//mute it!
+				MusicPlayer.isMuted = true;
+				if (gameEngine.soundChannel) gameEngine.soundChannel.stop();
+				gameEngine.isSoundOn = false;
+				
+				img = new SmoothImage();
+				img.width = 30//this.optionsButton.mainContainer.width;
+				img.height = 30//this.optionsButton.mainContainer.height;
+				img.source = ResourceLibrary.getInstance().uiIcons["noSound"];
+				this.soundButton.mainContainer.removeAllElements();
+				this.soundButton.mainContainer.addElement(img);
+			}
+			else
+			{
+				MusicPlayer.isMuted = false;
+				
+				gameEngine.isSoundOn = true;
+				if (gameEngine.soundChannel) gameEngine.soundChannel.stop();
+				
+				img = new SmoothImage();
+				img.width = 30//this.optionsButton.mainContainer.width;
+				img.height = 30//this.optionsButton.mainContainer.height;
+				img.source = ResourceLibrary.getInstance().uiIcons["sound"];
+				this.soundButton.mainContainer.removeAllElements();
+				this.soundButton.mainContainer.addElement(img);
+				
+				
+			}
+		}
+		
+		public function rollOutZoomInButton(e:MouseEvent = null):void
+		{ 
+			this.zoomInButton.alpha = this.optionsFadedAlpha;
+		}
+		public function rollOverZoomInButton(e:MouseEvent = null):void
+		{ 
+			this.zoomInButton.alpha = 1.0;
+		}
+		public function zoomInMenuButtonClicked(e:MouseEvent = null):void
+		{
+			var MAX_ZOOM:Number = 1.5;
+			var MIN_ZOOM:Number = 0.25;
+			var MOUSE_WHEEL_ZOOM_FACTOR:Number = .01;
+			
+			if(this.gameEngine.camera) {
+				this.gameEngine.camera.zoom += MOUSE_WHEEL_ZOOM_FACTOR * 20;
+				if (this.gameEngine.camera.zoom >= MAX_ZOOM) {
+					//Debug.debug(this, "onMouseWheel(): Maximum Zoom Reached.");
+					this.gameEngine.camera.zoom = MAX_ZOOM;
+				}
+				else if (this.gameEngine.camera.zoom <= MIN_ZOOM) {
+					//Debug.debug(this, "onMouseWheel(): Minimum Zoom Reached.");
+					this.gameEngine.camera.zoom = MIN_ZOOM;
+				}
+				//Debug.debug(this, "onMouseWheel() destination zoom level: " + gameEngine.camera.zoom);
+				//this.gameEngine.camera.update();
+			}
+		}
+		
+		
+		public function rollOutZoomOutButton(e:MouseEvent = null):void
+		{ 
+			this.zoomOutButton.alpha = this.optionsFadedAlpha;
+		}
+		public function rollOverZoomOutButton(e:MouseEvent = null):void
+		{ 
+			this.zoomOutButton.alpha = 1.0;
+		}
+		public function zoomOutMenuButtonClicked(e:MouseEvent = null):void
+		{
+			var MAX_ZOOM:Number = 1.5;
+			var MIN_ZOOM:Number = 0.25;
+			var MOUSE_WHEEL_ZOOM_FACTOR:Number = .01;
+			
+			if(this.gameEngine.camera) {
+				this.gameEngine.camera.zoom -= MOUSE_WHEEL_ZOOM_FACTOR * 20;
+				if (this.gameEngine.camera.zoom >= MAX_ZOOM) {
+					//Debug.debug(this, "onMouseWheel(): Maximum Zoom Reached.");
+					this.gameEngine.camera.zoom = MAX_ZOOM;
+				}
+				else if (this.gameEngine.camera.zoom <= MIN_ZOOM) {
+					//Debug.debug(this, "onMouseWheel(): Minimum Zoom Reached.");
+					this.gameEngine.camera.zoom = MIN_ZOOM;
+				}
+				//Debug.debug(this, "onMouseWheel() destination zoom level: " + gameEngine.camera.zoom);
+				//this.gameEngine.camera.update();
+			}
+		}
+		
+		
+		
+		/**
+		 * promTimeClock zoomIn button catcher
+		 * @param	e
+		 */
+		public function zoomIn(e:Event = null):void {
+			this.gameEngine.camera.zoom += 0.10;
+			if (this.gameEngine.camera.zoom >= MAX_ZOOM) {
+				Debug.debug(this, "Maximum Zoom Reached.");
+				this.gameEngine.camera.zoom = MAX_ZOOM;
+			}
+			Debug.debug(this, "destination zoom level: " + gameEngine.camera.zoom);
+			this.gameEngine.camera.update();
+		}
+		
+		/** 
+		 * promTimeClock zoomOut button catcher for zooming out
+		 * @param	e
+		 */
+		public function zoomOut(e:Event = null):void {
+			this.gameEngine.camera.zoom -= 0.10;
+			if (this.gameEngine.camera.zoom <= MIN_ZOOM) {
+				Debug.debug(this, "Minimum Zoom Reached.");
+				this.gameEngine.camera.zoom = MIN_ZOOM;
+			}
+			this.gameEngine.camera.update()
+			
+		}
+		
+		/**
+		 * promTimeClock toDoButton event catcher for todolist visibility toggle
+		 * @param	e
+		 */
+		public function toDoButtonClicked(e:Event = null):void
+		{
+			this.storyGoalWindow.visible = !this.storyGoalWindow.visible
+		}
+		
+		/**
+		 * promTimeClock ssuButton event catcher for the ssu visibility toggle
+		 * @param	e
+		 */
+		public function ssuButtonClicked(e:Event = null):void
+		{
+			this.ssuVisualizer.visible = !this.ssuVisualizer.visible;
+			//this.megaUI.updateNumUnreadSSU(0);
+		}
+		
+		
+		public function skipToEndOfNight(event:MouseEvent = null):void
+		{
+			gameEngine.endingIndex = 0;
+			
+			
+			gameEngine.currentStory.evaluateEndingPreconditions(CiFSingleton.getInstance().cast.characters);
+			
+			var endingManager:EndingManager = new EndingManager(gameEngine.currentStory);
+			gameEngine.possibleEndings = endingManager.determineEndings(false);
+			
+			
+			//sort the vector based on dramaScore
+			function compEndings(x:Ending, y:Ending):Number 
+			{
+				return x.dramaScore - y.dramaScore
+				
+				/*if (x.dramaScore < y.dramaScore)
+				{
+					return 1.0;
+				}
+				else if (x.dramaScore > y.dramaScore)
+				{
+					return -1.0;
+				}
+				else
+				{
+					return 0;
+				}*/
+			}
+			gameEngine.possibleEndings.sort(compEndings);
+			
+			gameEngine.endingPickedPairs = endingManager.getCharactersForEnding();
+			gameEngine.endingPickedPairs.reverse();
+			
+			this.gameEngine.possibleEndings[gameEngine.endingIndex].actualSecondThirdPair = gameEngine.endingPickedPairs[gameEngine.endingIndex];
+			
+			
+			var timer:Timer = new Timer(2000, 1);
+			timer.addEventListener(TimerEvent.TIMER_COMPLETE, afterEndingTitleLaunchEnding);
+			timer.start();
+			
+			this.topBar.visible = false;
+			
+			this.endingTitleScreen.visible = true;
+			this.endingTitleScreen.populateEndingTitle("Here Comes " + LineOfDialogue.toInitialCap(gameEngine.currentStory.storyLeadCharacter) + "'s ###" + gameEngine.currentStory.storyLeadCharacter.toUpperCase() + "### Ending");
+			this.endingTitleScreen.endingTitleGroup.visible = true;
+			//center on the story lead!
+			var avatar:Avatar = gameEngine.worldGroup.avatars[gameEngine.currentStory.storyLeadCharacter.toLowerCase()];
+			gameEngine.camera.absolutePositionCenter(avatar.locX,avatar.locY, 1.5);
+		}
+		
+				
+		public function afterEndingTitleLaunchEnding(e:TimerEvent=null):void
+		{
+			//this.endingTitleScreen.visible = false;
+			
+			
+			this.launchEndingSequence(this.gameEngine.possibleEndings[gameEngine.endingIndex], gameEngine.endingPickedPairs[gameEngine.endingIndex]);
+			this.endingInfoWindow.updateEndingText(gameEngine.possibleEndings[gameEngine.endingIndex]);
+			this.endingInfoWindow.visible = true;
+			this.endingInfoWindow.alpha = 1;
+		}
+		
+		public function createOpinionLines():void
+		{
+			//this should never happen, but I need to make sure I never try to dray lines if 
+			//we don't have two characters selected.
+			if (!gameEngine.primaryAvatarSelection || !gameEngine.secondaryAvatarSelection) return;
+			
+			this.initiatorToResponderOpinionLines.updateOpinionLinesData(gameEngine.primaryAvatarSelection, gameEngine.secondaryAvatarSelection);
+			this.responderToInitiatorOpinionLines.updateOpinionLinesData(gameEngine.secondaryAvatarSelection, gameEngine.primaryAvatarSelection);
+			this.initiatorToResponderOpinionLines.visible = true;
+			this.responderToInitiatorOpinionLines.visible = true;
+		}
+		
+		
+		public function clearOpinionLines():void
+		{
+			//for each (var opinionLine:OpinionLines in this.opinionLines)
+			//{
+			
+			this.initiatorToResponderOpinionLines.visible = false;
+			this.responderToInitiatorOpinionLines.visible = false;
+			//}
+			
+			//this.opinionLines = null;
+		}
+		
+		
+		public function onClickScrollAreaHandler(event:MouseEvent):void {
+			//Debug.debug(this, "onClickScrollAreaHandler() " + event );
+			
+			if (!gameEngine) return;
+			if (!gameEngine.worldGroup) return;
+			if (!gameEngine.worldGroup.avatars) return;
+			for each (var avatar:Avatar in gameEngine.worldGroup.avatars) {
+				if (avatar.clip.hitTestPoint(event.stageX, event.stageY, true)) {
+				//if (avatar.clip.hit(event.localX, event.localY, true)) {
+					avatar.onClick(event);
+					Debug.debug(this, "onClickScrollAreaHandler() hit avatar: " + avatar.characterName);
+
+					return;
+				}
+			}
+		}
+		
+		public var intentLoadingProgress:uint = 0;
+		public var numIntentBarChunks:int = 0;
+		public var numCharsProcessed:int = 0;
+		public function initIntentProgressBar(numChars:int):void
+		{
+			numIntentBarChunks = numChars;
+			intentLoadingProgress = 0;
+			intentProgressBar.setProgress(intentLoadingProgress, 100);
+			intentProgressBar.visible = true;
+			numCharsProcessed = 0;
+		}
+		
+		// Event handler function to set the value of the 
+		// Halo ProgressBar control.
+		public function intentProgressBarUpdate():void
+		{
+			if (intentLoadingProgress < 100) {
+				//trace("Updating the progress bar...");
+				intentLoadingProgress = numCharsProcessed * 100/numIntentBarChunks;
+			} else if (intentLoadingProgress >= 100) {
+				intentLoadingProgress = 0;
+				intentProgressBar.visible = false;
+			}
+			intentProgressBar.setProgress(intentLoadingProgress, 100);
+			//this.updateDisplayList(this.unscaledWidth, this.unscaledHeight);
+			//intentProgressBar.label = "Current Progress: " + intentLoadingProgress + "%";
+		}
+		
+		
+		
+		public function onCreationComplete():void
+		{
+			addEventListener("primaryPortraitClicked", this.primaryPortraitClicked);
+			addEventListener("secondaryPortraitClicked", this.secondaryPortraitClicked);
+			
+			this.addEventListener("INIT_FACE_CLICKED", initFaceClickedEvent);
+			//addEventListener("firstSocialChangeClicked", this.firstSocialChangeClicked);
+			//addEventListener("secondSocialChangeClicked", this.secondSocialChangeClicked);
+			//addEventListener("thirdSocialChangeClicked", this.thirdSocialChangeClicked);
+			//addEventListener("fourthSocialChangeClicked", this.fourthSocialChangeClicked);
+			
+			if (!VisibilityManager.getInstance().useOldInterface)
+			{
+				//this.optionsDropDownPanel.right = 0;
+			}
+			
+		}
+		
+		private function initFaceClickedEvent(e:Event):void 
+		{	
+			for each (var avatar:Avatar in gameEngine.worldGroup.avatars)
+			{
+				if (avatar.characterName.toLowerCase() == e.target.charName.toLowerCase())
+				{
+					avatar.onClick(null,true);
+				}
+			}
+			gameEngine.camera.centerOnAllCharacters();
+		}
+		
+		
+		
+		
+		public function setDebugInfo(context:SocialGameContext):void 
+		{
+			this.lastContext = context;
+			
+			var initiatorName:String = context.initiator;
+			var responderName:String = context.responder;
+			var otherName:String = context.other;
+			
+			var cif:CiFSingleton = CiFSingleton.getInstance();
+			
+			var sg:SocialGame = cif.socialGamesLib.getByName(context.gameName);
+			var effect:Effect = sg.getEffectByID(context.effectID);
+			
+			this.debugInfo = "";
+			
+			
+			this.debugInfo += initiatorName + " played " + sg.name + " with " + responderName + "\n";
+			var otherChar:Character;
+			if (otherName)
+			{
+				this.debugInfo += " (other involved: " + otherName + ")\n"
+				otherChar = cif.cast.getCharByName(otherName);
+			}
+			else
+			{
+				this.debugInfo += "\n";
+			}
+			this.debugInfo += "PRS: " + sg.getEffectByID(context.effectID).renderTextNotForDialogue(cif.cast.getCharByName(initiatorName), cif.cast.getCharByName(responderName), otherChar) + "\n";
+			this.debugInfo += "Effect ID: " + context.effectID + "\n";
+			this.debugInfo += "Instantiation ID: " + sg.getEffectByID(context.effectID).instantiationID  + "\n";
+			
+			this.debugInfo += "Initiator Score: " + context.initiatorScore + "\n";
+			this.debugInfo += "Responder Score: " + context.responderScore + "\n";
+			
+			this.debugInfo += "\nEffect Condition:\n"
+			var pred:Predicate;
+			if (context.responderScore >= 0)
+			{
+				this.debugInfo += "* Accept\n";
+			}
+			else
+			{
+				this.debugInfo += "* Reject\n";
+			}
+			for each (pred in effect.condition.predicates)
+			{
+				this.debugInfo += "* " + pred.toString() + "\n";
+			}
+			
+			this.debugInfo += "\nEffect Change:\n"
+			for each (pred in effect.change.predicates)
+			{
+				this.debugInfo += "* " + pred.toString() + "\n";
+			}
+			
+			this.debugInfo += "\nNOTES:\n\n\n\n"
+			
+			this.debugInfo += "-------------------------------\n\n"
+			
+			this.debugInfo += "Initiator Rules:\n"
+			var str:String;
+			var ruleRecord:RuleRecord;
+			var ruleRecordIntent:Number;
+			var ruleRecordIntentIndex:Number;
+			/*
+			for each (str in gameEngine.latestInitiatorInfluenceRules)
+			{
+				this.debugInfo += str + "\n";
+			}
+			*/
+			
+			for each (ruleRecord in cif.cast.getCharByName(initiatorName).prospectiveMemory.ruleRecords)
+			{
+				if (ruleRecord.initiator == initiatorName && ruleRecord.responder == responderName)
+				{
+					if (ruleRecord.type == RuleRecord.SOCIAL_GAME_TYPE)
+					{
+						if (ruleRecord.name == sg.name)
+						{
+							this.debugInfo += "SG: ";
+							this.debugInfo += ruleRecord.name + " ";
+							this.debugInfo += ruleRecord.influenceRule.weight + " ";
+							this.debugInfo += ruleRecord.influenceRule.generateRuleName() + " ";
+							this.debugInfo += "i: " + ruleRecord.initiator + " "
+							this.debugInfo += "r: " + ruleRecord.responder + " "
+							this.debugInfo += "o: " + ruleRecord.other
+							this.debugInfo += "\n"
+						}
+					}
+					else if (ruleRecord.type == RuleRecord.MICROTHEORY_TYPE)
+					{
+						ruleRecordIntentIndex = ruleRecord.influenceRule.findIntentIndex();
+						
+						if (ruleRecordIntentIndex < 0)
+						{
+							Debug.debug(this, "setDebugInfo() Microtheory " + ruleRecord.name + " has a rule without an intent: " + ruleRecord.influenceRule.toString());
+						}
+						else
+						{
+							ruleRecordIntent = ruleRecord.influenceRule.predicates[ruleRecordIntentIndex].getIntentType();
+							if (sg.intents[0].predicates[0].getIntentType() == ruleRecordIntent)
+							{
+								this.debugInfo += "MT: ";
+								this.debugInfo += ruleRecord.name + " ";
+								this.debugInfo += ruleRecord.influenceRule.weight + " ";
+								this.debugInfo += ruleRecord.influenceRule.generateRuleName() + " ";
+								this.debugInfo += "i: " + ruleRecord.initiator + " "
+								this.debugInfo += "r: " + ruleRecord.responder + " "
+								this.debugInfo += "o: " + ruleRecord.other
+								this.debugInfo += "\n"
+							}
+						}
+					}
+				}
+			}
+			
+			this.debugInfo += "\n"
+			this.debugInfo += "Responder Rules:\n"
+			
+			for each (ruleRecord in cif.cast.getCharByName(responderName).prospectiveMemory.ruleRecords)
+			{
+				if (ruleRecord.initiator == responderName && ruleRecord.responder == initiatorName)
+				{
+					if (ruleRecord.type == RuleRecord.MICROTHEORY_TYPE)
+					{
+						ruleRecordIntentIndex = ruleRecord.influenceRule.findIntentIndex();
+						
+						if (ruleRecordIntentIndex < 0)
+						{
+							Debug.debug(this, "setDebugInfo() Microtheory " + ruleRecord.name + " has a rule without an intent: " + ruleRecord.influenceRule.toString());
+						}
+						else
+						{
+							ruleRecordIntent = ruleRecord.influenceRule.predicates[ruleRecordIntentIndex].getIntentType();
+							if (sg.intents[0].predicates[0].getIntentType() == ruleRecordIntent)
+							{
+								this.debugInfo += "MT: ";
+								this.debugInfo += ruleRecord.name + " ";
+								this.debugInfo += ruleRecord.influenceRule.weight + " ";
+								this.debugInfo += ruleRecord.influenceRule.generateRuleName() + " ";
+								this.debugInfo += "i: " + ruleRecord.initiator + " " 
+								this.debugInfo += "r: " + ruleRecord.responder + " " 
+								this.debugInfo += "o: " + ruleRecord.other
+								this.debugInfo += "\n"
+							}
+						}
+					}
+				}
+			}
+			for each (ruleRecord in cif.cast.getCharByName(responderName).prospectiveMemory.responseSGRuleRecords)
+			{
+				if (ruleRecord.initiator == initiatorName && ruleRecord.responder == responderName)
+				{
+					if (ruleRecord.type == RuleRecord.SOCIAL_GAME_TYPE)
+					{
+						if (ruleRecord.name == sg.name)
+						{
+							this.debugInfo += "SG: ";
+							this.debugInfo += ruleRecord.name + " ";
+							this.debugInfo += ruleRecord.influenceRule.weight + " ";
+							this.debugInfo += ruleRecord.influenceRule.generateRuleName() + " ";
+							this.debugInfo += "i: " + ruleRecord.initiator + " "
+							this.debugInfo += "r: " + ruleRecord.responder + " "
+							this.debugInfo += "o: " + ruleRecord.other
+							this.debugInfo += "\n"
+						}
+					}
+				}
+			}
+			
+			this.debugInfo += "\n";
+			//non-backstory social game contexts in the sfdb
+            for each (var c:SFDBContext in cif.sfdb.contexts) {
+                if (c.isSocialGame()) {
+                    if (!(c as SocialGameContext).isBackstory)
+                        this.debugInfo += c.toXMLString() + "\n";
+				} else {
+					if (c.isTrigger()) 
+						this.debugInfo += c.toXMLString() + "\n";
+					else
+					{
+						this.debugInfo += c.toXMLString() + "\n";
+					}
+				}
+			}
+            this.debugInfo += "\n";
+			
+		}
+		
+		
+		public function reportDebugInfo(e:MouseEvent):void
+		{
+			this.lastContext = gameEngine.socialGameContext;
+			if (!this.lastContext) return;
+			cif = CiFSingleton.getInstance();
+			var sg:SocialGame = cif.socialGamesLib.getByName(lastContext.gameName.toLowerCase());
+			
+			var cif:CiFSingleton = CiFSingleton.getInstance();
+			
+			//debugPopUp = new PromWeek.DebugPopUp();
+			
+			var initChar:Character = cif.cast.getCharByName(lastContext.initiator.toLowerCase());
+			var respChar:Character = cif.cast.getCharByName(lastContext.responder.toLowerCase());
+			var otherChar:Character;
+			if (this.lastContext.other)
+			{
+				otherChar = cif.cast.getCharByName(lastContext.other.toLowerCase());
+			}
+			
+			//Debug.debug(this,"SG: " + sg.name);
+			
+			//this.debugPopUp.updateData(sg, initChar, respChar, otherChar);
+			debugPopUp = new TitleWindow();
+ 			debugGroup = new Group();				
+			var textArea:TextArea = new TextArea();
+			textArea.width = 400;
+			textArea.height = 300;
+			textArea.text = this.debugInfo;
+			debugGroup.addElement(textArea);
+			debugPopUp.addElement(debugGroup);
+			debugPopUp.showCloseButton = true;
+			debugPopUp.addEventListener(CloseEvent.CLOSE, debugPopUp_close);
+			//debugPopUp.debugInfoText.text = this.debugInfo;
+			
+			PopUpManager.addPopUp(debugPopUp, this, true);
+			PopUpManager.centerPopUp(debugPopUp);
+		}
+		
+		protected function debugPopUp_close(evt:CloseEvent):void 
+		{
+			debugPopUp.removeElement(debugGroup);
+			PopUpManager.removePopUp(evt.currentTarget as IFlexDisplayObject);
+		}
+		
+		
+		public function endingButtonClicked(e:MouseEvent):void
+		{
+			for each (var ending:Ending in gameEngine.currentStory.endings)
+			{
+				if (ending.name == e.target.label)
+				{
+					// this was removed. If it hasn't been added already, we must make an "EndingButton" component!
+					gameEngine.endingToPerform = ending;
+				}
+			}
+
+			gameEngine.initiatorName = gameEngine.endingToPerform.firstName.toLowerCase();
+			gameEngine.responderName = gameEngine.endingToPerform.actualSecondThirdPair["responder"].toLowerCase();
+			gameEngine.otherName = (gameEngine.endingToPerform.actualSecondThirdPair["other"])?gameEngine.endingToPerform.actualSecondThirdPair["other"].toLowerCase():"";
+			
+			gameEngine.currentDialogueInstantiation = gameEngine.endingToPerform.instantiations[0];
+			
+			gameEngine.worldGroup.avatars[gameEngine.initiatorName].lookingAtTarget = gameEngine.responderName;
+			gameEngine.worldGroup.avatars[gameEngine.responderName].lookingAtTarget = gameEngine.initiatorName;
+			
+			
+			
+			gameEngine.hudGroup.socialGameButtonRing.visible = false;
+			gameEngine.hudGroup.megaUI.visible = false;
+			this.optionsButton.visible = false;
+			//gameEngine.hudGroup.levelClock.visible = false;
+			gameEngine.hudGroup.updatesGroup.visible = false;
+			//gameEngine.hudGroup.goToEndingButton.visible = false;
+			
+			
+			
+			//avatarsToFollow = new ArrayCollection;//Vector.<Avatar> = new Vector.<Avatar>();
+			//avatarsToFollow.addItem(gameEngine.worldGroup.avatars[gameEngine.initiatorName]);
+			//avatarsToFollow.addItem(gameEngine.worldGroup.avatars[gameEngine.responderName]);
+			//gameEngine.camera.frameAvatars(avatarsToFollow);
+			
+			gameEngine.currentState = "Performance";
+		}
+		
+		public function launchEndingSequence(ending:Ending,endingPickedPair:Dictionary):void
+		{
+			gameEngine.endingToPerform = ending;
+			
+			gameEngine.initiatorName = gameEngine.endingToPerform.firstName.toLowerCase();
+			gameEngine.responderName = endingPickedPair["responder"].toLowerCase();//gameEngine.endingToPerform.secondName.toLowerCase();
+			gameEngine.otherName = (endingPickedPair["other"])?endingPickedPair["other"].toLowerCase():"";
+			
+			gameEngine.currentDialogueInstantiation = gameEngine.endingToPerform.instantiations[0];
+			
+			var cif:CiFSingleton = CiFSingleton.getInstance();
+			var init:Character = cif.cast.getCharByName(gameEngine.initiatorName);
+			var resp:Character = cif.cast.getCharByName(gameEngine.responderName);
+			var other:Character;
+			if (gameEngine.otherName != "")
+			{
+				other = cif.cast.getCharByName(gameEngine.otherName);
+			}
+			
+			gameEngine.currentDialogueInstantiation = gameEngine.currentDialogueInstantiation.realizeDialogue(init, resp, other);
+			
+			//this.gameEngine.possibleEndings[gameEngine.endingIndex].instantiations[0].realizeDialogue();
+			
+			VisibilityManager.getInstance().startOfPerformance();
+			
+			//IF THE CHATACTER ISN'T IN THE LEVEL!
+			if (!gameEngine.charInLevel(gameEngine.initiatorName))
+			{
+				gameEngine.addCharToLevelOffScreen(gameEngine.initiatorName);
+			}
+			if (!gameEngine.charInLevel(gameEngine.responderName))
+			{
+				gameEngine.addCharToLevelOffScreen(gameEngine.responderName);
+			}
+			if (gameEngine.otherName != "")
+			{
+				if (!gameEngine.charInLevel(gameEngine.otherName))
+				{
+					gameEngine.addCharToLevelOffScreen(gameEngine.otherName);
+				}
+			}
+
+			gameEngine.worldGroup.avatars[gameEngine.initiatorName].lookingAtTarget = gameEngine.responderName;
+			gameEngine.worldGroup.avatars[gameEngine.responderName].lookingAtTarget = gameEngine.initiatorName;
+
+			gameEngine.hudGroup.socialGameButtonRing.visible = false;
+			gameEngine.hudGroup.megaUI.visible = false;
+			this.optionsButton.visible = false;
+			//gameEngine.hudGroup.levelClock.visible = false;
+			gameEngine.hudGroup.updatesGroup.visible = false;
+			//gameEngine.hudGroup.goToEndingButton.visible = false;
+			
+			this.endingInfoWindow.updateEndingText(ending);
+			this.endingInfoWindow.visible = true;
+			this.endingInfoWindow.alpha = 1;
+			
+			gameEngine.currentState = "Performance";
+		}
+		
+		
+		
+		public function addEndingButton(endingName:String):void
+		{
+			var endButton:PromWeekButton = new PromWeekButton();
+			var endingString:String;
+			endButton.addEventListener(MouseEvent.CLICK,endingButtonClicked);
+			
+			endButton.label = endingName;
+			
+			endButton.width = 170;
+			endButton.height = 25;
+			
+			endButton.top = 500 - (endButton.height + 20) * this.endingButtons.length;
+			endButton.left = 755 - endButton.width;
+			
+			//endButton.isEndingButton = true;
+			
+			//endButton.addEventListener(MouseEvent.CLICK, endButtonClicked);
+			
+			endingString = gameEngine.currentStory.storyLeadCharacter + "-" + endingName;
+			this.endingButtons.push(endButton);
+			if (gameEngine.useEndingButtons)
+			{
+				endingWindow.allTheEndings.addElement(endButton);
+			
+				if (statisticsManager.endingsSeen[endingString]) {
+						var image:SmoothImage = new SmoothImage();
+						image.source = rL.uiIcons["check"];
+						image.y = 5 + ((endButton.height + 6)* endingWindow.allTheEndings.getElementIndex(endButton));
+						endingWindow.checkMarksGroup.addElement(image);
+				}
+				endingWindow.endingsCount++;
+				endingWindow.atleastOneEnding = true;
+				endingWindow.setDynamicHeight();
+			}
+		}
+		
+		
+		public function addAutonomousActionNotifier(aa:AutonomousAction):AutonomousActionNotifier {
+			if (autonomousIcons[aa.initiator.toLowerCase()]) {
+				Debug.debug(this,"Attempted to add a new AutonomousAction [" + aa.gameName + " to " + aa.initiator + " but " + aa.initiator + " already had one!")
+				return null
+			}
+			
+			var aan:AutonomousActionNotifier = new AutonomousActionNotifier()
+			aan.setAutonomousAction(aa)
+			
+			autonomousIcons[aan.initiator.toLowerCase()] = aan
+			aan.notify()
+			this.autonomousActionGroup.addElement(aan);
+			Debug.debug(this, "HUDGroup::addAutonomousActionNotifier - I just made an Autonomous Action Notifier!")
+			NUMBER_OF_AANS++
+			
+			return aan;
+		}
+		
+		public function update(elapsedTime:Number):void
+		{
+			//Debug.debug(this, "update()");
+
+			socialGameButtonRing.update();
+			achievementGroup.update(elapsedTime);
+			updatesGroup.update(elapsedTime);
+			//this.charInfoUI.update();
+			
+			
+			// if the opinionLines are visible, they ought to be updated
+			if (this.initiatorToResponderOpinionLines.visible && this.responderToInitiatorOpinionLines.visible)
+			{
+				this.initiatorToResponderOpinionLines.updatePosition();
+				this.responderToInitiatorOpinionLines.updatePosition();
+			}
+			
+
+			for each (var icon:RelationshipIcon in relationshipIcons)
+			{
+				icon.update();
+			}
+			 
+			
+			for each (var networkChangeIcon:NetworkChangeIcon in this.networkChangeIcons)
+			{
+				networkChangeIcon.update(elapsedTime);
+			}
+			for each (var statusChangeIcon:StatusChangeIcon in this.statusChangeIcons)
+			{
+				statusChangeIcon.update(elapsedTime);
+			}
+			for each (var relationshipChangeIcon:RelationshipChangeIcon in this.relationshipChangeIcons)
+			{
+				relationshipChangeIcon.update(elapsedTime);
+			}
+			
+			NUMBER_OF_AANS = 0
+			for each (var aan:AutonomousActionNotifier in this.autonomousIcons) {
+				NUMBER_OF_AANS += aan.update();
+				//NUMBER_OF_AANS++
+			}
+			
+			
+			
+			if (!VisibilityManager.getInstance().useOldInterface)
+			{
+				//if (this.initiatorSelectedComponent.visible)
+				//{
+					//this.initiatorSelectedComponent.y = gameEngine.APPLICATION_HEIGHT - this.initiatorSelectedComponent.height;
+				//}
+				
+				if (this.responderSubjectiveThoughtBubble.visible)
+				{
+					this.responderSubjectiveThoughtBubble.updatePosition(elapsedTime);
+				}
+				
+				if (this.responderThoughtBubble.visible)
+				{
+					this.responderThoughtBubble.updatePosition(elapsedTime);
+				}
+				if (this.responderPreResponseThoughtBubble.visible)
+				{
+					this.responderPreResponseThoughtBubble.updatePosition(elapsedTime);
+				}
+			}
+			
+			
+			//updateDialougeBubbles
+			if (initiatorDiablogueBubble.visible)
+			{
+				initiatorDiablogueBubble.update(gameEngine.initiatorName);
+			}
+			if (responderDiablogueBubble.visible)
+			{
+				responderDiablogueBubble.update(gameEngine.responderName);
+			}
+			if (otherDialogueBubble.visible) 
+			{
+				otherDialogueBubble.update(gameEngine.otherName.toLowerCase());
+				//otherDialogueBubble.top += 25; // Because the other stands above everyone.else.
+			}
+			
+			var now:Number = new Date().time;
+			var changePred:Predicate;
+			if ((now - lastChangePredDisplay > displayChangePredsRate) && this.toDisplayChangePreds.length > 0)
+			{
+				//pop a bad boy off and display it
+				changePred = toDisplayChangePreds.pop();
+				gameEngine.visualizeSocialChange(changePred, changePred.first.toLowerCase(), changePred.second);
+				lastChangePredDisplay = now;
+			}
+			
+			if ((now - lastSubjectiveChangeAnimationDisplay > displaySubjectiveOpinionChangeRate) && this.toDisplaySubjectiveChangeAnimations.length > 0)
+			{
+				var rand:int = Util.randRange(0, this.toDisplaySubjectiveChangeAnimations.length - 1);
+				//pop a bad boy off and display it
+				changePred = toDisplaySubjectiveChangeAnimations[rand];
+				this.toDisplaySubjectiveChangeAnimations.splice(rand, 1);
+				gameEngine.visualizeSocialChange(changePred, changePred.first, changePred.second, null, true);
+				lastSubjectiveChangeAnimationDisplay = now;
+			}
+			
+		}
+		
+		
+		public function scrollWorldGroupRight(event:MouseEvent):void
+		{
+			gameEngine.scrollWorldGroupRight = true;
+		}
+		public function scrollWorldGroupLeft(event:MouseEvent):void
+		{
+			gameEngine.scrollWorldGroupLeft = true;
+		}
+
+		public function scrollWorldGroupUp(event:MouseEvent):void
+		{
+			//Debug.debug(this,"scrollWorldGroupUp()");
+			gameEngine.scrollWorldGroupUp = true;
+		}
+		public function scrollWorldGroupDown(event:MouseEvent):void
+		{
+			//Debug.debug(this,"scrollWorldGroupDown()");
+			gameEngine.scrollWorldGroupDown = true;
+		}
+		
+		public function stopScrollRight(event:MouseEvent):void
+		{
+			gameEngine.scrollWorldGroupRight = false;
+		}
+		public function stopScrollLeft(event:MouseEvent):void
+		{
+			gameEngine.scrollWorldGroupLeft = false;
+		}		
+		
+		public function stopScrollDown(event:MouseEvent):void
+		{
+			gameEngine.scrollWorldGroupDown = false;
+		}
+		public function stopScrollUp(event:MouseEvent):void
+		{
+			gameEngine.scrollWorldGroupUp = false;
+		}	
+		
+		
+		public function primaryPortraitClicked(event:Event):void 
+		{
+			//trace("Primary Portrait Clicked Handler, inside of HUDGroup.mxml");
+			//characterSheet.resultsRichText.text = charInfoUI.currentPrimaryCharacter.characterName + "'s character sheet!";
+			//characterSheet.getCharacterBio(charInfoUI.currentPrimaryCharacter.characterName, charInfoUI.currentPrimaryCharacter.statuses, charInfoUI.currentPrimaryCharacter.traits);
+			//characterSheet.updateCharacterSheet(charInfoUI.currentPrimaryCharacter.characterName);
+			//characterSheet.visible = true;
+		}
+		public function secondaryPortraitClicked(event:Event):void 
+		{
+			//trace("Secondary Portrait Clicked Handler, inside of HUDGroup.mxml");
+			//characterSheet.getCharacterBio(charInfoUI.currentSecondaryCharacter.characterName, charInfoUI.currentSecondaryCharacter.statuses, charInfoUI.currentSecondaryCharacter.traits);
+			//characterSheet.updateCharacterSheet(charInfoUI.currentSecondaryCharacter.characterName);
+			//characterSheet.visible = true;
+		}
+		
+		
+		
+		public function addEntry():void {
+			//updatesGroup.createGoalProgressPopUp();
+		}
+		
+		/**
+		 * Brings up the console window when the console button
+		 * has been clicked.
+		 */
+		public function consoleButtonClicked(event:MouseEvent):void {
+			consolePopUp.visible = true;
+			gameEngine.shouldAcceptNormalKeyboardInput = false;
+			//consolePopUp.consoleTextInput.setFocus();
+		}
+		
+		/**
+		 * Keeps track of when the 'change difficulty' button was clicked, and brings
+		 * up a little window that allows the player to adjust the difficulty.
+		 * @param	event
+		 */
+		public function changeDifficultyButtonClicked(event:MouseEvent):void {
+			Debug.debug(this, "changeDifficultyButtonClicked!");
+			gameEngine.worldGroup.characterDeselection(); // useful for making the screen not look totally ugly. Also for repainting purposes of locks.
+			difficultySelectionMenu.updateAdjustDifficultyText();
+			this.difficultySelectionMenu.visible = true;
+		}
+		
+		/**
+		 * Brings up the 'report bug' window when the 'report bug'
+		 * button has been clicked
+		 */
+		public function reportBugButtonClicked(event:MouseEvent):void {
+			bugReporterComponent.visible = true;
+			gameEngine.shouldAcceptNormalKeyboardInput = false;
+		}
+		
+		/**
+		 * addJuicePointButtonClicked is a debug utility that allows us
+		 * to arbitrary grant the player more and more juice points! Yum!
+		 * @param	event
+		 */
+		public function addJuicePointButtonClicked(event:MouseEvent):void {
+			jpm.addJuicePoints();
+		}
+		
+		/**
+		 * subtractJuicePointButtonClicked is another debug utility.
+		 * Maybe we will never want to give the player the ability to rob themselves of points,
+		 * but hey, whatever!
+		 * @param	event
+		 */
+		public function subtractJuicePointButtonClicked(event:MouseEvent):void {
+			jpm.subtractJuicePoints();
+		}
+		
+		public function makeSGInfoBoxAppear(gameName:String):void {
+			Debug.debug(this, "makeSGInfoBoxAppear()");
+			//sgInfoWindow.visible = true;
+			//this.setElementIndex(sgInfoWindow, this.numElements - 1); // make this appear on top of everything else.
+			//sgInfoWindow.loadSGInfo(gameName);
+		}
+		
+		/**
+		 * Click handler for the sound effects toggle button in the options menu. 
+		 * @param	e
+		 */
+		public function soundEffectsToggleButtonClicked(e:MouseEvent):void {
+			gameEngine.isSoundOn = !gameEngine.isSoundOn;
+			if (gameEngine.soundChannel) gameEngine.soundChannel.stop();
+			if (gameEngine.isSoundOn) {
+				this.soundEffectsToggleButton.label = "Turn off sound."
+			}else {
+				this.soundEffectsToggleButton.label = "Turn on sound."
+			}
+		}
+		
+		/**
+		 * Click handler for the music toggle button in the options menu. Toggles on/off the 
+		 * background music and updates the label of the button to reflect the state.
+		 * 
+		 * @param	e
+		 */
+		public function musicToggleButtonClicked(e:MouseEvent):void {
+			MusicPlayer.isPlaying = !MusicPlayer.isPlaying;
+			if (MusicPlayer.isPlaying) {
+				this.musicToggleButton.label = "Turn off music."
+			}else {
+				this.musicToggleButton.label = "Turn on music."
+			}
+		}
+		
+		public function getScale():Number {
+			return this.scaleX;
+		}
+		
+		public function setScale(s:Number):void {
+			this.scaleX = this.scaleY = s;
+			
+		}
+		
+		public function setDimensions(x:Number, y:Number):void {
+			this.appWidth = x;
+			this.appHeight = y;
+			this.invalidateProperties();
+			this.invalidateSize();
+			this.invalidateDisplayList();	
+		}
+		
+		public function resetStateButtonClicked(e:Event):void {
+			Debug.debug(this, "Reset State button clicked!");
+			this.inGameOptionMenu.visible = false;
+			this.inGameOptionMenu.isResetState = true;
+			this.inGameOptionMenu.populateForResetGameState();
+			this.inGameOptionMenu.visible = true;
+		}
+		
+		public function handleQuickPlayFailedMenuScreen():void {
+			if (!this.inGameOptionMenu.isQuickPlayFailed) {
+				Debug.debug(this, "handleQuickPlayFailedMenuScreen() You lose! Sorry!");
+				this.inGameOptionMenu.disableGameplayClicks();
+				this.inGameOptionMenu.visible = false;
+				this.inGameOptionMenu.isQuickPlayFailed = true;
+				this.inGameOptionMenu.populateForQuickPlayChallengeFailed();
+				this.inGameOptionMenu.visible = true;
+			}
+			else {
+				//we are already all set up, I think, so don't bother doing anything.
+			}
+
+			
+		}
+		
+		public function nextQuickPlayButtonClicked(e:flash.events.Event = null):void {
+			Debug.debug(this, "Next Quick Play Button Clicked!");
+			//we want to look inside the story and grab the nextChallengeName attribute. 
+			//And then we want to use that to load up the next story!
+			var nextStoryName:String = gameEngine.currentStory.nextChallengeName;
+			if (nextStoryName == "NONE") {
+				//we want to do something special here.
+				Debug.debug(this, "nextQuickPlayButtonClicked() all done with quickplay!");
+				
+				gameEngine.dealWithEndingLevelStuff("finalQuickPlayLevelCompleted");
+				
+				gameEngine.intitialState = gameEngine.defaultState;
+				
+				gameEngine.sawEnding(e);
+				
+				gameEngine.hudGroup.storySelectionScreen.selectedStory = null;
+				
+				inGameOptionMenu.enableGameplayClicks(); // I think we need to do this here,too, just in case we exit via the wrench.
+				
+				//make a 
+				this.customAlert.title.text = "Awesome!";
+				this.customAlert.message.text = "Now you play through the stories of the each character's Prom Week. Click 'Story Mode' to get started!";
+				this.customAlert.visible = true;
+				
+			}
+			else {
+				gameEngine.dealWithEndingLevelStuff("quickPlayLevelCompleted");
+				for each (var s:Story in gameEngine.stories) {
+					if (s.title.toLowerCase() == nextStoryName.toLowerCase()) {
+						gameEngine.hudGroup.storySelectionScreen.selectedStory = s;
+						break;
+					}
+				}
+			}
+			gameEngine.hudGroup.storySelectionScreen.startStory();
+			gameEngine.hudGroup.inGameOptionMenu.enableGameplayClicks(); // make sure we turn these guys back on!
+		}
+		
+		public function updateSocialExchangeResponseThoughtBubble(sgName:String):void
+		{
+			//this.initiatorSelectedComponent.initiatorThoughtBubble.visible = false;
+			/*
+			if (!jpm.isHintUnlocked(gameEngine.primaryAvatarSelection.toLowerCase(), gameEngine.secondaryAvatarSelection.toLowerCase(), sgName.toLowerCase(), jpm.HINT_SG_OUTCOME))
+			{
+				this.responderThoughtBubble.responseToggleButton.locked = true;
+				this.responderThoughtBubble.responseToggleButton.selected = false;
+				this.responderThoughtBubble.factorsToggleButton.selected = true;
+				this.responderThoughtBubble.responseGroup.visible = false;
+				this.responderThoughtBubble.factorsGroup.visible = true;
+			}
+			else
+			{
+				this.responderThoughtBubble.responseToggleButton.locked = false;
+				//this.responderThoughtBubble.responseToggleButton.selected = false;
+				//this.responderThoughtBubble.factorsToggleButton.selected = true;
+				//this.responderThoughtBubble.responseGroup.visible = false;
+				//this.responderThoughtBubble.factorsGroup.visible = true;				
+			}
+			*/
+			if (jpm.isHintUnlocked(gameEngine.primaryAvatarSelection.toLowerCase(), gameEngine.secondaryAvatarSelection.toLowerCase(), sgName.toLowerCase(), jpm.HINT_NEW_RESPONDER_REACTION))
+			{
+				this.responderThoughtBubble.changeResponseButton.locked = false;
+			}
+			else
+			{
+				this.responderThoughtBubble.changeResponseButton.locked = true;	
+			}
+			this.responderThoughtBubble.changeResponseButton.invalidateSkinState();
+			
+			this.responderThoughtBubble.update(sgName);
+			
+			this.responderSubjectiveThoughtBubble.thoughtBubbleImageStem.visible = false;
+			
+			this.responderThoughtBubble.visible = true;
+			
+			//this.responderThoughtBubble.factorsToggleButton.invalidateSkinState();
+			//this.responderThoughtBubble.responseToggleButton.invalidateSkinState();
+			
+		}
+		
+		public static function getIntentString(intentPred:Predicate, init:Character, resp:Character,nameToBeFirstPerson:String=""):String 
+		{
+			var intentID:int = intentPred.getIntentType();
+			//var returnGroup:Group = new Group();
+			if (intentPred.type == Predicate.RELATIONSHIP)
+			{
+				var relType:String;
+				if (intentPred.relationship == RelationshipNetwork.FRIENDS)
+				{
+					relType = "friends";
+				}
+				else if (intentPred.relationship == RelationshipNetwork.DATING)
+				{
+					relType = "dating";
+				}
+				else if (intentPred.relationship == RelationshipNetwork.ENEMIES)
+				{
+					relType = "enemies";
+				}
+				var relTwoChar:RelationshipIconTwoChar = new RelationshipIconTwoChar();
+				relTwoChar.loadImagesToIcon(intentPred.relationship, init.characterName.toLowerCase(), resp.characterName.toLowerCase(), intentPred.negated, "", true, nameToBeFirstPerson);
+				return relTwoChar.toolTip;
+				//returnGroup.addElement(relTwoChar);
+			}
+			else if (intentPred.type == Predicate.NETWORK)
+			{
+				var netName:String;
+				if (intentPred.networkType == SocialNetwork.BUDDY)
+				{
+					netName = "buddy";
+				}
+				else if (intentPred.networkType == SocialNetwork.ROMANCE)
+				{
+					netName = "romance";
+				}
+				else if (intentPred.networkType == SocialNetwork.COOL)
+				{
+					netName = "cool";
+				}
+				var netTwoChar:NetworkIconTwoChar = new NetworkIconTwoChar();// init.characterName.toLowerCase(), resp.characterName.toLowerCase(), netName, intentPred.networkValue, intentPred.operator, true);
+				netTwoChar.loadImagesToIcon(intentPred.networkType, resp.characterName.toLowerCase(), init.characterName.toLowerCase(), intentPred.negated, "", intentPred.operator, true, nameToBeFirstPerson);
+				return netTwoChar.toolTip;
+				//returnGroup.addElement(netTwoChar);
+			}
+			return "";
+		}
+		
+		
+		
+		]]>
+	</fx:Script>
+	
+</s:Group>

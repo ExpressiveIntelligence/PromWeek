@@ -1,0 +1,407 @@
+<CiFState>
+  <Cast>
+    <Character name="Robert" networkID="0">
+      <Trait type="clumsy"/>
+      <Trait type="sex magnet"/>
+      <Trait type="confidence"/>
+    </Character>
+    <Character name="Karen" networkID="1">
+      <Trait type="forgiving"/>
+      <Trait type="confidence"/>
+      <Trait type="monogamous"/>
+    </Character>
+    <Character name="Lily" networkID="2">
+      <Trait type="domineering"/>
+      <Trait type="afraid of commitment"/>
+    </Character>
+	<Character name="Alec" networkID="3">
+		<Trait type="Pacifist"/>
+		<Trait type="Hubmle"/>
+	</Character>
+  </Cast>
+  <SFDB>
+    <StatusContext time="0">
+      <Predicate type="status" status="has crush" first="karen" second="robert" negated="false" isSFDB="true"/>
+    </StatusContext>
+	<SocialGameContext gameName="Simple Date" initiator="Karen" responder="Robert"
+	 		other="" initiatorScore="80" responderScore="40" time="0" effect="0" chosenCKBItem=""
+	 		socialGameContextReference="">
+	</SocialGameContext>
+	<SocialGameContext gameName="Brag" initiator="Alec" responder="Robert"
+	 		other="" initiatorScore="80" responderScore="40" time="1" effect="0" chosenCKBItem=""
+	 		socialGameContextReference="">
+	</SocialGameContext>
+	<SocialGameContext gameName="Verbally Abuse" initiator="Robert" responder="Lily"
+	 		other="" initiatorScore="80" responderScore="40" time="2" effect="0" chosenCKBItem=""
+	 		socialGameContextReference="">
+	</SocialGameContext>
+	<TriggerContext time="2">
+	  <Rule name="Anonymous Rule">
+		<Predicate type="status" status="enmity" first="Robert" second="Lily" negated="false" isSFDB="false"/>
+	  </Rule>
+	</TriggerContext>
+	<SocialGameContext gameName="Simple Date" initiator="Lily" responder="Alec"
+	 		other="" initiatorScore="80" responderScore="40" time="3" effect="0" chosenCKBItem=""
+	 		socialGameContextReference="">
+	</SocialGameContext>
+  </SFDB>
+  <Network type="buddy" numChars="4">
+    <edge from="0" to="1" value="10"/>
+    <edge from="0" to="2" value="20"/>
+    <edge from="0" to="3" value="20"/>
+    <edge from="1" to="0" value="30"/>
+    <edge from="1" to="2" value="40"/>
+    <edge from="1" to="3" value="40"/>
+    <edge from="2" to="0" value="50"/>
+    <edge from="2" to="1" value="60"/>
+    <edge from="2" to="3" value="60"/>
+    <edge from="3" to="0" value="60"/>
+    <edge from="3" to="1" value="60"/>
+    <edge from="3" to="2" value="60"/>
+  </Network>
+  <Network type="cool" numChars="4">
+    <edge from="0" to="1" value="10"/>
+    <edge from="0" to="2" value="20"/>
+    <edge from="0" to="3" value="20"/>
+    <edge from="1" to="0" value="30"/>
+    <edge from="1" to="2" value="40"/>
+    <edge from="1" to="3" value="40"/>
+    <edge from="2" to="0" value="50"/>
+    <edge from="2" to="1" value="60"/>
+    <edge from="2" to="3" value="60"/>
+    <edge from="3" to="0" value="60"/>
+    <edge from="3" to="1" value="60"/>
+    <edge from="3" to="2" value="60"/>
+  </Network>
+  <Network type="romance" numChars="4">
+    <edge from="0" to="1" value="10"/>
+    <edge from="0" to="2" value="20"/>
+    <edge from="0" to="3" value="75"/>
+    <edge from="1" to="0" value="10"/>
+    <edge from="1" to="2" value="40"/>
+    <edge from="1" to="3" value="75"/>
+    <edge from="2" to="0" value="20"/>
+    <edge from="2" to="1" value="40"/>
+    <edge from="2" to="3" value="80"/>
+    <edge from="3" to="0" value="75"/>
+    <edge from="3" to="1" value="75"/>
+    <edge from="3" to="2" value="75"/>
+  </Network>
+  <Statuses>
+    <Status type="has crush" from="Lily" to="Alec"/>
+    <Status type="has crush" from="Robert" to="Alec"/>
+    <Status type="jealous" from="Lily" to="Robert"/>
+    <Status type="enmity" from="Karen" to="Robert"/>
+  </Statuses>
+  <Relationships>
+    <Relationship type="friends" from="Robert" to="Alec"/>
+    <Relationship type="friends" from="Karen" to="Lily"/>
+    <Relationship type="dating" from="Alec" to="Karen"/>
+    <Relationship type="dating" from="Alec" to="Lily"/>
+  </Relationships>
+  <SocialGameLibrary>
+    <SocialGame name="Brag">
+      <Preconditions>
+        <Rule name="">
+          <Predicate type="trait" trait="confidence" first="initiator" negated="false" isSFDB="false"/>
+        </Rule>
+        <Rule name="">
+          <Predicate type="trait" trait="attention hog" first="initiator" negated="false" isSFDB="false"/>
+        </Rule>
+        <Rule name="">
+          <Predicate type="network" networkType="buddy" first="initiator" second="responder" comparator="greaterthan" value="39" negated="false" isSFDB="false"/>
+        </Rule>
+        <Rule name="">
+          <Predicate type="network" networkType="buddy" first="initiator" second="responder" comparator="lessthan" value="40" negated="true" isSFDB="false"/>
+        </Rule>
+        <Rule name="">
+          <Predicate type="trait" trait="confidence" first="initiator" negated="false" isSFDB="false"/>
+        </Rule>
+      </Preconditions>
+      <InitiatorInfluenceRuleSet>
+        <InfluenceRule weight="20" name="">
+          <Predicate type="trait" trait="witty" first="initiator" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+      </InitiatorInfluenceRuleSet>
+      <ResponderInfluenceRuleSet>
+        <InfluenceRule weight="10" name="Anonymous Rule">
+          <Predicate type="network" networkType="buddy" first="responder" second="initiator" comparator="greaterthan" value="39" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+        <InfluenceRule weight="-30" name="Anonymous Rule">
+          <Predicate type="trait" trait="humble" first="responder" negated="true" isSFDB="false"/>
+        </InfluenceRule>
+        <InfluenceRule weight="-20" name="Anonymous Rule">
+          <Predicate type="status" status="jealous" first="responder" second="initiator" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+      </ResponderInfluenceRuleSet>
+      <Effects>
+        <Effect id="1" accept="true">
+          <PerformanceRealization/>
+          <ConditionRule/>
+          <ChangeRule>
+            <Predicate type="network" networkType="cool" first="responder" second="initiator" comparator="+" value="20" negated="false" isSFDB="false"/>
+          </ChangeRule>
+        </Effect>
+        <Effect id="3" accept="false">
+          <PerformanceRealization/>
+          <ConditionRule/>
+          <ChangeRule>
+            <Predicate type="network" networkType="cool" first="responder" second="initiator" comparator="-" value="20" negated="false" isSFDB="false"/>
+          </ChangeRule>
+        </Effect>
+        <Effect id="4" accept="false">
+          <PerformanceRealization/>
+          <ConditionRule>
+            <Predicate type="status" status="jealous" first="responder" second="initiator" negated="false" isSFDB="false"/>
+          </ConditionRule>
+          <ChangeRule>
+            <Predicate type="network" networkType="cool" first="responder" second="initiator" comparator="-" value="20" negated="false" isSFDB="false"/>
+            <Predicate type="status" status="enmity" first="responder" second="initiator" negated="false" isSFDB="false"/>
+          </ChangeRule>
+        </Effect>
+        <Effect id="5" accept="false">
+          <PerformanceRealization/>
+          <ConditionRule>
+            <Predicate type="trait" trait="humble" first="responder" negated="false" isSFDB="false"/>
+          </ConditionRule>
+          <ChangeRule>
+            <Predicate type="network" networkType="cool" first="responder" second="initiator" comparator="-" value="20" negated="false" isSFDB="false"/>
+            <Predicate type="network" networkType="buddy" first="responder" second="initiator" comparator="-" value="20" negated="false" isSFDB="false"/>
+          </ChangeRule>
+        </Effect>
+      </Effects>
+      <Instantiations>
+        <Instantiation id="1">
+          <LineOfDialogue lineNumber="1" initiatorLine="initiator's line" responderLine="responder's line" otherLine="other's line" primarySpeaker="initiator" initiatorBodyAnimation="accuse" initiatorFaceAnimation="happy" responderBodyAnimation="accuse" responderFaceAnimation="happy" otherBodyAnimation="accuse" otherFaceAnimation="happy" time="5"/>
+        </Instantiation>
+      </Instantiations>
+    </SocialGame>
+    <SocialGame name="Rough Up">
+      <Preconditions>
+        <Rule name="">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="fighting" negated="true" isSFDB="false"/>
+          <Predicate type="status" status="enmity" first="initiator" second="responder" negated="false" isSFDB="false"/>
+        </Rule>
+      </Preconditions>
+      <InitiatorInfluenceRuleSet>
+        <InfluenceRule weight="10" name="">
+          <Predicate type="trait" trait="aggressive" first="responder" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+        <InfluenceRule weight="10" name="">
+          <Predicate type="status" status="enmity" first="initiator" second="responder" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+        <InfluenceRule weight="-20" name="">
+          <Predicate type="trait" trait="pacifist" first="initiator" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+        <InfluenceRule weight="-10" name="">
+          <Predicate type="network" networkType="buddy" first="initiator" second="responder" comparator="greaterthan" value="40" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+      </InitiatorInfluenceRuleSet>
+      <ResponderInfluenceRuleSet>
+        <InfluenceRule weight="10" name="Anonymous Rule">
+          <Predicate type="trait" trait="aggressive" first="initiator" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+        <InfluenceRule weight="10" name="Anonymous Rule">
+          <Predicate type="status" status="enmity" first="responder" second="initiator" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+        <InfluenceRule weight="-20" name="Anonymous Rule">
+          <Predicate type="trait" trait="pacifist" first="responder" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+        <InfluenceRule weight="-10" name="Anonymous Rule">
+          <Predicate type="network" networkType="buddy" first="responder" second="initiator" comparator="greaterthan" value="40" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+      </ResponderInfluenceRuleSet>
+      <Effects>
+        <Effect id="0" accept="true">
+          <PerformanceRealization/>
+          <ConditionRule/>
+          <ChangeRule>
+            <Predicate type="relationship" first="initiator" second="responder" relationship="fighting" negated="false" isSFDB="false"/>
+          </ChangeRule>
+        </Effect>
+        <Effect id="1" accept="false">
+          <PerformanceRealization/>
+          <ConditionRule/>
+          <ChangeRule>
+            <Predicate type="network" networkType="buddy" first="responder" second="initiator" comparator="-" value="20" negated="false" isSFDB="false"/>
+          </ChangeRule>
+        </Effect>
+        <Effect id="2" accept="false">
+          <PerformanceRealization/>
+          <ConditionRule>
+            <Predicate type="trait" trait="pacifist" first="responder" negated="false" isSFDB="false"/>
+          </ConditionRule>
+          <ChangeRule>
+            <Predicate type="network" networkType="cool" first="initiator" second="responder" comparator="+" value="20" negated="false" isSFDB="false"/>
+          </ChangeRule>
+        </Effect>
+      </Effects>
+      <Instantiations/>
+    </SocialGame>
+    <SocialGame name="Verbally Abuse">
+      <Preconditions>
+        <Rule name="not fighting">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="fighting" negated="true" isSFDB="false"/>
+        </Rule>
+      </Preconditions>
+      <InitiatorInfluenceRuleSet>
+        <InfluenceRule weight="10" name="">
+          <Predicate type="status" status="enmity" first="responder" second="initiator" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+        <InfluenceRule weight="10" name="">
+          <Predicate type="trait" trait="aggressive" first="initiator" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+        <InfluenceRule weight="-10" name="">
+          <Predicate type="trait" trait="humble" first="initiator" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+        <InfluenceRule weight="-10" name="">
+          <Predicate type="trait" trait="pacifist" first="initiator" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+        <InfluenceRule weight="-10" name="">
+          <Predicate type="network" networkType="buddy" first="initiator" second="responder" comparator="greaterthan" value="70" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+        <InfluenceRule weight="-10" name="">
+          <Predicate type="network" networkType="cool" first="initiator" second="responder" comparator="greaterthan" value="70" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+      </InitiatorInfluenceRuleSet>
+      <ResponderInfluenceRuleSet>
+        <InfluenceRule weight="-10" name="Anonymous Rule">
+          <Predicate type="trait" trait="aggressive" first="initiator" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+        <InfluenceRule weight="-10" name="Anonymous Rule">
+          <Predicate type="trait" trait="defensive" first="responder" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+        <InfluenceRule weight="10" name="Anonymous Rule">
+          <Predicate type="trait" trait="humble" first="responder" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+        <InfluenceRule weight="20" name="Anonymous Rule">
+          <Predicate type="trait" trait="pacifist" first="responder" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+        <InfluenceRule weight="-10" name="Anonymous Rule">
+          <Predicate type="network" networkType="buddy" first="responder" second="initiator" comparator="greaterthan" value="70" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+        <InfluenceRule weight="-10" name="Anonymous Rule">
+          <Predicate type="network" networkType="cool" first="responder" second="initiator" comparator="greaterthan" value="70" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+      </ResponderInfluenceRuleSet>
+      <Effects>
+        <Effect id="0" accept="true">
+          <PerformanceRealization>when %i% slammed %r%</PerformanceRealization>
+          <ConditionRule/>
+          <ChangeRule>
+            <Predicate type="relationship" first="initiator" second="responder" relationship="fighting" negated="false" isSFDB="false"/>
+          </ChangeRule>
+        </Effect>
+        <Effect id="1" accept="true">
+          <PerformanceRealization>when %i% slammed %r%  and %r% was like Ghandi</PerformanceRealization>
+          <ConditionRule>
+            <Predicate type="trait" trait="pacifist" first="responder" negated="false" isSFDB="false"/>
+          </ConditionRule>
+          <ChangeRule>
+            <Predicate type="relationship" first="initiator" second="responder" relationship="fighting" negated="false" isSFDB="false"/>
+            <Predicate type="status" status="enmity" first="responder" second="initiator" negated="false" isSFDB="false"/>
+          </ChangeRule>
+        </Effect>
+        <Effect id="2" accept="false">
+          <PerformanceRealization>when %i% tried to make fun of %r% and completely failed</PerformanceRealization>
+          <ConditionRule/>
+          <ChangeRule>
+            <Predicate type="network" networkType="cool" first="initiator" second="responder" comparator="-" value="20" negated="false" isSFDB="false"/>
+          </ChangeRule>
+        </Effect>
+        <Effect id="3" accept="true">
+          <PerformanceRealization>when %i% incompetently raged at %r%</PerformanceRealization>
+          <ConditionRule>
+            <Predicate type="trait" trait="pacifist" first="responder" negated="false" isSFDB="false"/>
+          </ConditionRule>
+          <ChangeRule>
+            <Predicate type="relationship" first="initiator" second="responder" relationship="fighting" negated="false" isSFDB="false"/>
+            <Predicate type="status" status="enmity" first="responder" second="initiator" negated="false" isSFDB="false"/>
+          </ChangeRule>
+        </Effect>
+      </Effects>
+      <Instantiations/>
+    </SocialGame>
+    <SocialGame name="Simple Date">
+      <Preconditions>
+        <Rule name="not dating">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="true" isSFDB="false"/>
+        </Rule>
+      </Preconditions>
+      <InitiatorInfluenceRuleSet>
+        <InfluenceRule weight="10" name="Romantic interest">
+          <Predicate type="network" networkType="romance" first="initiator" second="responder" comparator="greaterthan" value="40" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+        <InfluenceRule weight="10" name="more romantic interest">
+          <Predicate type="network" networkType="romance" first="initiator" second="responder" comparator="greaterthan" value="70" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+        <InfluenceRule weight="10" name="sexy responder">
+          <Predicate type="trait" trait="sex magnet" first="responder" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+        <InfluenceRule weight="-10" name="inarticulate">
+          <Predicate type="trait" trait="inarticulate" first="initiator" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+        <InfluenceRule weight="-10" name="not cool responder">
+          <Predicate type="network" networkType="cool" first="responder" second="initiator" comparator="lessthan" value="40" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+        <InfluenceRule weight="20" name="initiator's crush">
+          <Predicate type="status" status="has crush" first="initiator" second="responder" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+      </InitiatorInfluenceRuleSet>
+      <ResponderInfluenceRuleSet>
+        <InfluenceRule weight="10" name="Anonymous Rule">
+          <Predicate type="network" networkType="romance" first="initiator" second="responder" comparator="greaterthan" value="40" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+        <InfluenceRule weight="10" name="Anonymous Rule">
+          <Predicate type="network" networkType="romance" first="initiator" second="responder" comparator="greaterthan" value="70" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+        <InfluenceRule weight="10" name="Anonymous Rule">
+          <Predicate type="trait" trait="sex magnet" first="initiator" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+        <InfluenceRule weight="-10" name="Anonymous Rule">
+          <Predicate type="network" networkType="cool" first="responder" second="initiator" comparator="lessthan" value="40" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+        <InfluenceRule weight="-20" name="Anonymous Rule">
+          <Predicate type="trait" trait="monogamous" first="responder" negated="false" isSFDB="false"/>
+          <Predicate type="relationship" first="responder" second="other" relationship="dating" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+        <InfluenceRule weight="20" name="Anonymous Rule">
+          <Predicate type="status" status="has crush" first="responder" second="initiator" negated="false" isSFDB="false"/>
+        </InfluenceRule>
+      </ResponderInfluenceRuleSet>
+      <Effects>
+        <Effect id="0" accept="true">
+          <PerformanceRealization>when %i% asked %r% out on a date</PerformanceRealization>
+          <ConditionRule/>
+          <ChangeRule>
+            <Predicate type="relationship" first="initiator" second="responder" relationship="friends" negated="false" isSFDB="false"/>
+          </ChangeRule>
+        </Effect>
+        <Effect id="1" accept="false">
+          <PerformanceRealization>when %r% said not to going out with %i%</PerformanceRealization>
+          <ConditionRule/>
+          <ChangeRule>
+            <Predicate type="status" status="shaken" first="responder" second="initiator" negated="false" isSFDB="false"/>
+          </ChangeRule>
+        </Effect>
+        <Effect id="2" accept="false">
+          <PerformanceRealization>when %rp% serial monogamy got in the way when %i% asked %r% to date</PerformanceRealization>
+          <ConditionRule>
+            <Predicate type="trait" trait="monogamous" first="responder" negated="false" isSFDB="false"/>
+          </ConditionRule>
+          <ChangeRule>
+            <Predicate type="network" networkType="cool" first="initiator" second="responder" comparator="-" value="20" negated="false" isSFDB="false"/>
+          </ChangeRule>
+        </Effect>
+      </Effects>
+      <Instantiations/>
+    </SocialGame>
+  </SocialGameLibrary>
+  <CulturalKB>
+    <Proposition type="subjective" head="robert" connection="likes" tail="pirates"/>
+    <Proposition type="subjective" head="karen" connection="dislikes" tail="flowers"/>
+    <Proposition type="subjective" head="robert" connection="likes" tail="flowers"/>
+    <Proposition type="truth" head="pirates" connection="are" tail="mean"/>
+    <Proposition type="truth" head="flowers" connection="are" tail="lame"/>
+  </CulturalKB>
+</CiFState>

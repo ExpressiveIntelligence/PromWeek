@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 creationComplete="onCreationComplete()"
+		 initialize="buttonInitialize()"
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 rollOver="onMouseOver(event)"
+		 rollOut="onMouseOut(event)"
+		 width="100%"
+		 height="100%"
+		 styleName="classicPromWeek"
+		 currentStateChange="onCurrentStateChange(event)">
+
+		 
+	<fx:Metadata>
+
+	</fx:Metadata>
+	
+	<fx:Declarations>
+		<fx:String id="label"></fx:String>
+		<fx:String id="status">up</fx:String>
+		<fx:Number id="boxPadding">5</fx:Number>
+		<fx:Number id="paddingLeft">0</fx:Number>
+		<fx:Number id="paddingRight">0</fx:Number>
+		<fx:Number id="paddingTop">0</fx:Number>
+		<fx:Number id="paddingBottom">0</fx:Number>
+		<fx:Number id="roundness">0</fx:Number>
+		<fx:Number id="strokeWeight">2</fx:Number>
+		<!-- Can we toggle this button? yay or nay! -->
+		<fx:Boolean id="toggleable">true</fx:Boolean>
+		
+		<mx:SolidColor id="backgroundColor" color="{getStyle('backgroundColor')}"/>
+		<mx:SolidColorStroke id="backgroundStroke" color="{getStyle('backgroundStroke')}"/>
+		
+		<!-- This is my rather hacky method to doing stylings -->
+		<!-- I'm using the colour scheme from here: http://www.color-hex.com/color/5590d9 :D  -->
+		<!-- These colors are now in the classicPromWeek theme class in main.css. Josh -->
+		<!--selected state is FALSE-->
+		<!--up state-->
+		<mx:SolidColor id="bgColorUp">0x0097FF</mx:SolidColor>
+		<mx:SolidColorStroke id="bgColorStrokeUp" color="#000000"/>
+		<!--over state-->
+		<mx:SolidColor id="bgColorOver">0x21A4FF</mx:SolidColor>
+		<mx:SolidColorStroke id="bgColorStrokeOver" color="#000000"/>
+		<!--down state-->
+		<mx:SolidColor id="bgColorDown">0x0062A6</mx:SolidColor>
+		<mx:SolidColorStroke id="bgColorStrokeDown" color="#00000"/>
+		
+		<!--selected state is TRUE-->
+		<!--up state-->
+		<mx:SolidColor id="bgColorUpTog">0x5086AB</mx:SolidColor>
+		<mx:SolidColorStroke id="bgColorStrokeUpTog" color="#000000"/>
+		<!--over state-->
+		<mx:SolidColor id="bgColorOverTog">0x21A4FF</mx:SolidColor>
+		<mx:SolidColorStroke id="bgColorStrokeOverTog" color="#000000"/>
+		<!--down state-->
+		<mx:SolidColor id="bgColorDownTog">0x0062A6</mx:SolidColor>
+		<mx:SolidColorStroke id="bgColorStrokeDownTog" color="#000000"/>
+		
+		
+		
+	</fx:Declarations>
+	
+	<s:Group id="everything" mouseDown="onMouseDown()" click="onMouseClick()" mouseUp="onMouseUp()" width="100%" height="100%">
+		<!--<s:Rect id="bgRect" width="100%" height="100%" radiusX="{getStyle('buttonRadiusX')}" radiusY="{getStyle('buttonRadiusY')}">-->
+		<s:Rect id="bgRect" width="100%" height="100%" radiusX="{this.roundness}" radiusY="{this.roundness}">
+			<s:fill>
+				<mx:SolidColor color="{this.backgroundColor.color}"/>
+			</s:fill>
+			<s:stroke>
+				<mx:SolidColorStroke color="{this.backgroundStroke.color}" weight="{strokeWeight}" />
+			</s:stroke>
+		</s:Rect>
+		<s:HGroup width="100%" height="100%" paddingTop="{this.boxPadding + this.paddingTop}" paddingLeft="{this.boxPadding + this.paddingLeft}" paddingRight="{this.boxPadding + this.paddingRight}" paddingBottom="{this.boxPadding + this.paddingBottom}">
+			<mx:Box id="mainContainer" x="0" y="0" height="100%" width="100%" mouseEnabled="false" mouseChildren="true"
+				 horizontalAlign="center" verticalAlign="middle" >
+			<!--<s:Label text="{label}"/>-->
+			</mx:Box>
+		</s:HGroup>
+		<!--<s:Rect id="fgRect" width="100%" height="100%" visible="{this._selected}" radiusX="{getStyle('buttonRadiusX')}" radiusY="{getStyle('buttonRadiusY')}">-->
+		<s:Rect id="fgRect" width="100%" height="100%" visible="{this._selected}" radiusX="{this.roundness}" radiusY="{this.roundness}">
+			<s:fill>
+				<mx:SolidColor color="{this.backgroundColor.color}" alpha="0.3" />
+			</s:fill>
+		</s:Rect>
+		
+		<!--<s:Rect id="fgBorgerRect" width="100%" height="100%" radiusX="{getStyle('buttonRadiusX')}" radiusY="{getStyle('buttonRadiusY')}">-->
+		<s:Rect id="fgBorgerRect" width="100%" height="100%" radiusX="{this.roundness}" radiusY="{this.roundness}">
+			<s:stroke>
+				<mx:SolidColorStroke color="{this.backgroundStroke.color}" weight="{getStyle('toggleButtonStrokeWeight')}" />
+			</s:stroke>
+		</s:Rect>
+		
+	</s:Group>
+	
+	<fx:Script>
+		<![CDATA[
+		 
+			import flash.events.Event;
+			import CiF.Debug;
+			import flash.events.MouseEvent;
+			import mx.events.StateChangeEvent;
+			
+			[Bindable]public var _selected:Boolean = false
+				
+			public function onCreationComplete():void {
+				backgroundColor.color = getStyle("toggleButtonColor")
+				backgroundStroke.color = getStyle("toggleButtonStroke")
+				
+				//this.selected = selected;
+				//this.selected = false;
+			}
+			
+			public function buttonInitialize():void 
+			{
+
+			}
+			
+			/**
+			 * this is my version of invalidateStyle
+			 */
+			private function styleButton():void {
+				//if (!this.enabled) {
+					//backgroundColor.color = getStyle("buttonColorDisabled")
+					//backgroundStroke.color = getStyle("buttonStrokeDisabled")
+					//return;
+				//}
+				
+				switch(this.status) {
+					case "up":
+						if (this._selected) {
+							backgroundColor.color = getStyle("toggleButtonColorSelected");
+							backgroundStroke.color = getStyle("toggleButtonStrokeSelected");
+						} else {
+							backgroundColor.color = getStyle("toggleButtonColor");
+							backgroundStroke.color = getStyle("toggleButtonStroke");
+						}
+						break;
+					case "down":
+						if (this._selected) {
+							backgroundColor.color = getStyle("toggleButtonColorDownSelected");
+							backgroundStroke.color = getStyle("toggleButtonStrokeDownSelected");
+						} else {
+							backgroundColor.color = getStyle("toggleButtonColorDown");
+							backgroundStroke.color = getStyle("toggleButtonStrokeDown");	
+						}
+						break;
+					case "over":
+						if (this._selected) {
+							backgroundColor.color = getStyle("toggleButtonColorOverSelected");
+							backgroundStroke.color = getStyle("toggleButtonStrokeOverSelected");
+						} else {
+							backgroundColor.color = getStyle("toggleButtonColorOver");
+							backgroundStroke.color = getStyle("toggleButtonStrokeOver");
+						}
+						break;
+					default:
+						Debug.debug(this,"This shouldn't happen - default case in styleButton()")
+				}
+				this.invalidateProperties();
+				//Debug.debug(this, "styleButton() - status: " + this.status + " \tthen these guys: " + this.backgroundColor.color + ":" + this.backgroundStroke.color + "\tselected:" + _selected)
+			}
+			
+			public function set selected(value:Boolean):void 
+			{
+				this._selected = value;
+				this.styleButton();
+			}
+			
+			
+			public function get selected():Boolean
+			{
+				return this._selected;
+			}
+			
+			
+			/**
+			 * all sorts of mouse handlers! Hooray!
+			 */
+			private function onCurrentStateChange(e:StateChangeEvent):void {
+				//if (e.newState == "normal") {
+					this.styleButton();
+				//}else if (e.newState == "disabled") {
+					//this.styleButton();
+				//}
+			}
+			 
+			private function onMouseClick():void {
+				dispatchEvent(new Event("buttonPressed", true, true))
+				if (toggleable) { 
+					this.selected = !this._selected 
+				}
+				this.styleButton()
+			}
+			
+			private function onMouseDown():void {
+				this.status = "down"
+				this.styleButton()
+			}
+			
+			private function onMouseOver(e:MouseEvent):void {
+				this.status = "over"
+				this.styleButton()
+			}
+			
+			private function onMouseOut(e:MouseEvent):void {
+				this.status = "up"
+				this.styleButton()
+			}
+			
+			private function onMouseUp():void {
+				if(this.status != "up") this.status = "over"
+				this.styleButton()
+			}
+			
+			public function setStyleName():void {
+				//this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+				this.styleButton();
+				this.invalidateProperties();
+			}
+			
+		]]>
+
+	</fx:Script>
+	
+</s:Group>

@@ -1,0 +1,681 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:UI="UI.*"
+		 xmlns:CiF="CiF.*"	
+		 width="800" 
+		 height="600" 
+		 creationComplete="onCreationComplete()"
+		 >
+		 
+	 <fx:Metadata>
+		
+		[Event(name="conditionChanged", type="flash.events.Event")]
+		[Event(name="changeChanged", type="flash.events.Event")]
+		
+	</fx:Metadata>
+			
+	<fx:Binding source="dte.predTypes" destination="this.predTypes" />
+	
+	
+	
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+
+	<fx:Declarations>
+		<CiF:Effect id="effect" />
+		<s:RadioButtonGroup id="conditionType"/>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<s:VGroup width="780">
+		<s:VGroup width="100%">
+			<s:HGroup width="100%">
+				<s:Label text="Performance Realization String" color="#ffffff" paddingTop="4" />
+				<s:TextInput width="100%" id="performanceRealizationString" text="This is the default performance realization string" focusIn="onPerformanceRealizationStringFocus()" />
+				<s:Button id="addEffectsRule" label="Add to Effects" click="addEffectRuleToWorkingSG();" />
+				<s:Button id="updateEffectsRule" label="Update" click="updateEffectRuleToWorkingSG();" />
+			</s:HGroup>
+			<s:HGroup width="100%">
+				<s:HGroup width="100%">
+					<s:VGroup width="12%">
+						<s:Label text="Condition type:" color="#ffffff"/>
+						<s:List id="conditionPredicateTypeList" width="100%" dataProvider="{this.predTypes}" 
+						doubleClickEnabled="true"
+						doubleClick="addSelectedConditionTypeToList()" />
+						<s:HGroup>
+							<s:Button id="removeConditionButton" label="-" click="removeSelectedConditionFromList()" />
+							<s:Button id="addConditionButton" label="→" click="addSelectedConditionTypeToList()"/>
+						</s:HGroup>
+						<s:RadioButton label="Accept" color="#ffffff" groupName="conditionType" selected="true" />
+						<s:RadioButton label="Reject" color="#ffffff" groupName="conditionType"/>
+					</s:VGroup>
+					<s:VGroup width="38%" height="100%">
+						<s:Label text="Effect Condition:" color="#ffffff"/>
+						<s:List id="conditionPredicateList" width="100%" height="100%" dataProvider="{this.conditionStringDP}" click="clickOnConditionList();"/>
+					</s:VGroup>
+					<s:VGroup width="38%" height="100%">
+						<s:Label text="Social Change:" color="#ffffff"/>
+						<s:List id="changePredicateList" width="100%" height="100%" dataProvider="{this.changeStringDP}" click="clickOnChangeList();"/>
+					</s:VGroup>
+					<s:VGroup width="12%">
+						<s:Label text="Change type:" color="#ffffff"/>
+						<s:List id="changePredicateTypeList" width="100%" height="100%" dataProvider="{this.predTypes}"
+						doubleClick="addSelectedChangeTypeToList()"
+						doubleClickEnabled="true"/>
+						<s:HGroup>
+							<s:Button id="addChangeButton" label="←" click="addSelectedChangeTypeToList()" />
+							<s:Button id="removeChangeButton" label="-" click="removeSelectedChangeFromList()" />
+						</s:HGroup>
+						<s:HGroup>
+							<s:Label text="Instantiation ID" color="#ffffff" paddingTop="4" />
+							<!--<s:DropDownList id="instantiationAssociationList" width="100%" />-->
+							<mx:ComboBox id="instantiationAssociationList" width="100%" />
+						</s:HGroup>
+					</s:VGroup>
+				</s:HGroup>
+				
+			</s:HGroup>
+		</s:VGroup>
+		<mx:HRule width="100%"/>
+		<s:HGroup>
+			<UI:PredicateEditor id="conditionEditor" />
+			<s:Button id="conditionEditorSaveUpButton" label="Save Up" click="effectConditionSaveUpFn();" />
+			<mx:VRule height="400" />
+			<UI:PredicateEditor id="changeEditor" isEvaluation="false" />
+			<s:Button id="changeEditorSaveUpButton" label="Save Up" click="socialChangeSaveUpFn();" />
+		</s:HGroup>
+	</s:VGroup>
+	<fx:Script>
+		<![CDATA[
+		
+		//TODO: save up button
+		//TODO: add to right button
+		
+		import CiF.*;
+		import flash.events.MouseEvent;
+		import flash.media.Microphone;
+		import tool.DesignerToolEngine;
+		import flash.events.Event;
+		import flash.events.EventDispatcher;
+		import mx.collections.ArrayCollection;
+		import mx.controls.Alert;
+
+		public var dte:DesignerToolEngine = DesignerToolEngine.getInstance();
+	
+		public var predTypes:ArrayCollection;
+		public var conditionStringDP:ArrayCollection;
+		public var changeStringDP:ArrayCollection;
+		public var instantiationsDP:ArrayCollection;
+		
+		private var newConditionAdded:Boolean = false;
+		private var newChangeAdded:Boolean = false;
+		
+		public function onCreationComplete():void {
+			//set up event handlers for dataprovider regeneration
+			addEventListener("ruleChanged", this.ruleChanged);
+			addEventListener("conditionChanged", this.onConditionChanged);
+			addEventListener("changeChanged", this.onChangeChanged);
+			
+			
+			//initiate local data providers
+			this.conditionStringDP = new ArrayCollection;
+			this.changeStringDP = new ArrayCollection;
+			this.instantiationsDP = new ArrayCollection;
+			
+			this.conditionPredicateTypeList.dataProvider = dte.generatePredListProvider();
+			this.changePredicateTypeList.dataProvider = dte.generatePredListProvider();
+			
+			//this.conditionPredicateTypeList.executeBindings();
+			//this.changePredicateTypeList.executeBindings();
+			
+			this.addEventListener(MouseEvent.CLICK, reloadDataProviders);
+		}
+		
+			public function reloadDataProviders(e:Event):void
+			{
+				this.conditionPredicateTypeList.dataProvider = dte.generatePredListProvider();
+				this.changePredicateTypeList.dataProvider = dte.generatePredListProvider();
+				
+				this.removeEventListener(MouseEvent.CLICK, reloadDataProviders);
+			}
+		
+		
+		/**
+		 * This function is to be called when the instantiations are updated
+		 * and the instantiations dataprovider for the instantiation<>effect
+		 * binding drop down list is updated.
+		 */
+		public function makeInstantiationsDP():void {
+			//make the new dataprovider for the instantiation drop down list
+			var selectedIndex:uint = 0;
+			var currentIndex:uint = 0;
+			this.instantiationsDP = new ArrayCollection;
+			
+			for each (var instantiation:Instantiation in dte.workingSocialGame.instantiations) {
+				//this.instantiationsDP.addItem(instantiation.id + " " + instantiation.name);
+				this.instantiationsDP.addItem(instantiation.id);
+				if (instantiation.id == this.effect.instantiationID as Number) {
+					//the current instantation is the one associated with the effecgt
+					selectedIndex = currentIndex;
+				}
+				++currentIndex;
+			}
+			//set the data provider to the drop down list's .dp
+			this.instantiationAssociationList.dataProvider = this.instantiationsDP;
+			//set the selected index
+			this.instantiationAssociationList.selectedIndex = selectedIndex;
+			
+			Debug.debug(this,"makeInstantiationsDP() "+this.instantiationAssociationList.selectedIndex);
+		}
+		
+		public function ruleChanged(e:Event):void {
+			dispatchEvent(new Event("conditionChanged", true, true));
+			dispatchEvent(new Event("changeChanged", true, true));
+			if (this.effect.isAccept) {
+				conditionType.selectedValue = "Accept";
+			} else {
+				conditionType.selectedValue = "Reject";
+			}
+					
+			performanceRealizationString.text = effect.referenceAsNaturalLanguage;
+		}
+		
+		public function effectConditionSaveUpFn():void {
+			//Make sure there aren't any num-times uniquely true problems happening!
+			if (conditionEditor.predicate.numTimesUniquelyTrueFlag && conditionEditor.predicate.numTimesRoleSlot == ""){
+				trace("num times role slot: " + conditionEditor.predicate.numTimesRoleSlot);
+				Alert.show("Oops!  You checked the 'num times uniquely true' box but didn't specify a role.  Either specify a role or uncheck the box, and try again!", "Num Times Uniquely True Error");
+			}
+			trace("num times role slot: " + conditionEditor.predicate.numTimesRoleSlot);
+			if (conditionPredicateList.selectedIndex >= 0) {
+				var previousIndex:int = conditionPredicateList.selectedIndex;
+				handleLocutionTranslation();
+				effect.condition.predicates[conditionPredicateList.selectedIndex] = conditionEditor.predicate.clone();
+				dispatchEvent(new Event("conditionChanged", true, true));
+				conditionPredicateList.selectedIndex = previousIndex;
+			}
+			
+		}
+		
+		public function socialChangeSaveUpFn():void {
+			//Make sure there aren't any num-times uniquely true problems happening!
+			if (changeEditor.predicate.numTimesUniquelyTrueFlag && changeEditor.predicate.numTimesRoleSlot == ""){
+				trace("num times role slot: " + changeEditor.predicate.numTimesRoleSlot);
+				Alert.show("Oops!  You checked the 'num times uniquely true' box but didn't specify a role.  Either specify a role or uncheck the box, and try again!", "Num Times Uniquely True Error");
+			}
+			if (changePredicateList.selectedIndex >= 0) {
+				var previousIndex:int = changePredicateList.selectedIndex;
+				effect.change.predicates[changePredicateList.selectedIndex] = changeEditor.predicate.clone();
+				dispatchEvent(new Event("changeChanged", true, true));
+				changePredicateList.selectedIndex = previousIndex;
+			}
+		}
+		
+		public function addEffectRuleToWorkingSG():void {
+			var tempEffect:Effect = new Effect();
+			
+			tempEffect.condition = this.effect.condition.clone();
+			tempEffect.change = this.effect.change.clone();
+			if (performanceRealizationString.text == "")
+				tempEffect.referenceAsNaturalLanguage = "This is the default performance realization string";
+			else
+				tempEffect.referenceAsNaturalLanguage = performanceRealizationString.text;
+			tempEffect.isAccept = conditionType.selectedValue == "Accept";
+			tempEffect.instantiationID = this.instantiationAssociationList.selectedItem as Number;
+			//give a and id number to this new effect
+			for each (var e:Effect in dte.workingSocialGame.effects)
+				if (e.id >= tempEffect.id) tempEffect.id = e.id + 1;
+			if (tempEffect.id == -1) tempEffect.id = 0;
+			//Debug.debug(this, "addEffectRuleToWorkingSG() effect to add: " + tempEffect.toXMLString());
+			dte.workingSocialGame.effects.push(tempEffect);
+			
+			dispatchEvent(new Event("effectListUpdate", true, true));
+		}
+		
+		public function updateEffectRuleToWorkingSG():void
+		{
+			var e:Effect;
+			for (var i:int = 0; i < dte.workingSocialGame.effects.length; i++ )
+			{
+				
+				e = dte.workingSocialGame.effects[i];
+				//trace(e.id + " " + this.effect.id);
+				if (e != null)
+				{	
+					if (e.id == this.effect.id)
+					{
+						if (performanceRealizationString.text == "")
+							 this.effect.referenceAsNaturalLanguage = "This is the default performance realization string";
+						else
+							 this.effect.referenceAsNaturalLanguage = performanceRealizationString.text;
+								
+						if (conditionType.selectedValue == "Accept")
+						{
+							this.effect.isAccept = true;
+						}
+						else
+						{
+							this.effect.isAccept = false;
+						}
+						
+						dte.workingSocialGame.effects[i] = this.effect.clone();
+						dte.workingSocialGame.effects[i].instantiationID = this.instantiationAssociationList.selectedItem as Number;
+						dispatchEvent(new Event("effectListUpdate", true, true));
+						return;
+					}
+				}
+			}
+		}
+		
+		
+		/**
+		 * The click event handler for the addConditionButton. It adds a new
+		 * predicate of default values of type selected in the condition
+		 * predicate type list to the working Effect.condition Rule. Then the
+		 * "conditionChanged" event is dispatched.
+		 */
+		public function addSelectedConditionTypeToList():void {
+			if (conditionPredicateTypeList.selectedItem) {
+				var pred:Predicate = new Predicate();
+				var val:Object = conditionPredicateTypeList.selectedItem
+				pred.setByTypeDefault(Predicate.getTypeByName(val as String));
+				this.effect.condition.predicates.push(pred);
+				this.newConditionAdded = true;
+				this.conditionEditor.currentState = Predicate.getNameByType(pred.type).toLowerCase();
+				this.conditionEditor.predicate = pred.clone();
+				dispatchEvent(new Event("conditionChanged", true, true));
+			}
+		}
+		
+		/**
+		 * The click event handler for the removeConditionButton. It removes
+		 * the predicate from the local model's effect.condition rule that 
+		 * corresponds to the conditionPredicateList's selected index. Then the
+		 * "conditionChanged" event is dispatched.
+		 */
+		public function removeSelectedConditionFromList():void {
+			if(conditionPredicateList.selectedItem){
+				var i:int = conditionPredicateList.selectedIndex;
+				this.effect.condition.predicates.splice(i, 1);
+				dispatchEvent(new Event("conditionChanged", true, true));
+			}
+		}
+		
+		/**
+		 * The click event handler for the addChangeButton. It adds a new
+		 * predicate of default values of type selected in the change
+		 * predicate type list to the working Effect.change Rule. Then the
+		 * "changeChanged" event is dispatched.
+		 */
+		public function addSelectedChangeTypeToList():void {
+			if (changePredicateTypeList.selectedItem) {
+				var pred:Predicate = new Predicate();
+				var val:Object = changePredicateTypeList.selectedItem;
+				pred.setByTypeDefault(Predicate.getTypeByName(val as String));
+				this.effect.change.predicates.push(pred);
+				this.newChangeAdded = true;
+				this.changeEditor.currentState = Predicate.getNameByType(pred.type).toLowerCase();
+				this.changeEditor.predicate = pred.clone();
+				dispatchEvent(new Event("changeChanged", true, true));
+			}
+		}
+		
+		/**
+		 * The click event handler for the removeChangeButton. It removes
+		 * the predicate from the local model's effect.change rule that 
+		 * corresponds to the changePredicateList's selected index. Then the
+		 * "changeChanged" event is dispatched.
+		 * 
+		 */
+		public function removeSelectedChangeFromList():void {
+			if(changePredicateList.selectedItem){
+				var i:int = changePredicateList.selectedIndex;
+				this.effect.change.predicates.splice(i, 1);
+				dispatchEvent(new Event("changeChanged", true, true));
+			}
+		}
+		
+		/**
+		 * The click event handler for the conditionPredicateList. It updates
+		 * the condition predicate editor with the currently-selected condition
+		 * predicate.
+		 */
+		public function clickOnConditionList():void {
+			if (this.conditionPredicateList.selectedItem) {
+				this.conditionEditor.setCurrentState(Predicate.getNameByType(effect.condition.predicates[conditionPredicateList.selectedIndex].type).toLowerCase());
+				this.conditionEditor.predicate = effect.condition.predicates[conditionPredicateList.selectedIndex].clone();
+				
+				Debug.debug(this, "clickOnConditionList() flag is set to "+conditionEditor.predicate.numTimesUniquelyTrueFlag);
+				
+				if (conditionEditor.predicate.numTimesRoleSlot == "first")
+				{
+					conditionEditor.numTimesUniquelyTrueFirstRole.selected = true;
+					conditionEditor.predicate.numTimesRoleSlot = conditionEditor.predicate.numTimesRoleSlot;
+				}
+				else if (conditionEditor.predicate.numTimesRoleSlot == "second")
+				{
+					conditionEditor.numTimesUniquelyTrueSecondRole.selected = true;
+					conditionEditor.predicate.numTimesRoleSlot = conditionEditor.predicate.numTimesRoleSlot;
+				}
+				else if (conditionEditor.predicate.numTimesRoleSlot == "third")
+				{
+					conditionEditor.numTimesUniquelyTrueThirdRole.selected = true;
+					conditionEditor.predicate.numTimesRoleSlot = conditionEditor.predicate.numTimesRoleSlot;
+				}
+				else if (conditionEditor.predicate.numTimesRoleSlot == "both")
+				{
+					conditionEditor.numTimesUniquelyTrueBothRole.selected = true;
+					conditionEditor.predicate.numTimesRoleSlot = conditionEditor.predicate.numTimesRoleSlot;
+				}
+				else
+				{
+					//default to first
+					conditionEditor.numTimesUniquelyTrueFirstRole.selected = true;
+					conditionEditor.predicate.numTimesRoleSlot = conditionEditor.predicate.numTimesRoleSlot;						
+				}
+				
+			}
+		}
+		
+		/**
+		 * The click event handler for the changePredicateList. It updates
+		 * the change predicate editor with the currently-selected condition
+		 * predicate.
+		 */
+		public function clickOnChangeList():void {
+			if (this.changePredicateList.selectedItem) {
+				this.changeEditor.setCurrentState(Predicate.getNameByType(effect.change.predicates[changePredicateList.selectedIndex].type).toLowerCase());
+				this.changeEditor.predicate = effect.change.predicates[changePredicateList.selectedIndex].clone();
+				
+				
+				//predicateEd.isNumTimesUniquelyTrueCheckBox.selected = predicateEd.predicate.numTimesUniquelyTrueFlag;				
+				
+				Debug.debug(this, "clickOnChangeList() flag is set to "+changeEditor.predicate.numTimesUniquelyTrueFlag);
+				
+				if (changeEditor.predicate.numTimesRoleSlot == "first")
+				{
+					changeEditor.numTimesUniquelyTrueFirstRole.selected = true;
+					changeEditor.predicate.numTimesRoleSlot = changeEditor.predicate.numTimesRoleSlot;
+				}
+				else if (changeEditor.predicate.numTimesRoleSlot == "second")
+				{
+					changeEditor.numTimesUniquelyTrueSecondRole.selected = true;
+					changeEditor.predicate.numTimesRoleSlot = changeEditor.predicate.numTimesRoleSlot;
+				}
+				else if (changeEditor.predicate.numTimesRoleSlot == "third")
+				{
+					changeEditor.numTimesUniquelyTrueThirdRole.selected = true;
+					changeEditor.predicate.numTimesRoleSlot = changeEditor.predicate.numTimesRoleSlot;
+				}
+				else if (changeEditor.predicate.numTimesRoleSlot == "both")
+				{
+					changeEditor.numTimesUniquelyTrueBothRole.selected = true;
+					changeEditor.predicate.numTimesRoleSlot = changeEditor.predicate.numTimesRoleSlot;
+				}
+				else
+				{
+					//default to first
+					changeEditor.numTimesUniquelyTrueFirstRole.selected = true;
+					changeEditor.predicate.numTimesRoleSlot = changeEditor.predicate.numTimesRoleSlot;						
+				}
+
+			}
+		}
+		
+		/**
+		 * The event handler for the conditionChanged event. It regenerates
+		 * the data provider for the string representation of the effect.condition
+		 * rule.
+		 * @param	e The event.
+		 */
+		public function onConditionChanged(e:Event):void {
+			var lastSelectedIndex:Number = this.conditionPredicateList.selectedIndex;
+			//Debug.debug(this, "onConditionChanged(): generating rule string data provider.");
+			this.conditionStringDP.removeAll();
+			
+			//this.effect.condition.sortPredicates();
+			
+			for each (var pred:Predicate in this.effect.condition.predicates) {
+				this.conditionStringDP.addItem(pred.toString());
+			}
+			this.conditionPredicateList.dataProvider = this.conditionStringDP;
+			if (this.newConditionAdded) {
+				this.conditionPredicateList.selectedIndex = this.conditionStringDP.length - 1;
+				this.newConditionAdded = false;
+			}else {
+					this.conditionPredicateList.selectedIndex = lastSelectedIndex;
+			}
+			
+			
+		}
+		
+		/**
+		 * The event handler for the changeChanged event. It regenerates
+		 * the data provider for the string representation of the effect.change
+		 * rule.
+		 * @param	e The event.
+		 */
+		public function onChangeChanged(e:Event):void {
+			var lastSelectedIndex:Number = this.changePredicateList.selectedIndex;
+			//Debug.debug(this, "onChangeChanged(): generating rule string data provider.");
+			this.changeStringDP.removeAll();
+			
+			//this.effect.change.sortPredicates();
+			
+			for each (var pred:Predicate in this.effect.change.predicates) {
+				this.changeStringDP.addItem(pred.toString());
+			}
+			this.changePredicateList.dataProvider = this.changeStringDP;
+			if(this.newChangeAdded) {
+				this.changePredicateList.selectedIndex = this.changeStringDP.length - 1;
+				this.newChangeAdded = false;
+			}else{
+				this.changePredicateList.selectedIndex = lastSelectedIndex;
+			}
+			
+		}
+		
+		/**
+		 * Callback function for the Performance Realization String's focusIn() event.
+		 * Makes it so that the default text goes away when you one clicks on
+		 * the textbox.
+		 */
+		public function onPerformanceRealizationStringFocus():void {
+			if (this.performanceRealizationString.text == "This is the default performance realization string") {
+				this.performanceRealizationString.text = "";
+				//dispatchEvent(new Event("effectListUpdate", true, true));
+			}
+		}
+		
+		/**
+		 * handleLocutionTranslation will examine what the current predicate that
+		 is being edited is.  If it is something that can be translated, it finds
+		 out what that translation is, and then stuffs it into the locution translation
+		 text box, so that it can be copied and pasted to be used in other places.
+		 */
+		public function handleLocutionTranslation():void {
+			conditionEditor.locutionTranslation.text = "If you see me, then the type of predicate has no reason to be referenced in a line of dialogue. I bet you were working with a Network or Relationship";
+			switch(conditionEditor.predicateEditorTitle.text) {
+				case "TRAIT PREDICATE EDIT":
+					handleTraitCategoryLocutionTranslation();
+				break
+				case "CKB PREDICATE EDIT":
+					handleCKBLocutionTranslation();
+				break
+				case "SFDBLABEL PREDICATE EDIT":
+					handleSFDLabelLocutionTranslation();
+				break
+				case "STATUS PREDICATE EDIT":
+					handleStatusCategoryLocutionTranslation();
+				break
+				default: Debug.debug(this, "No need to handle anything!  No translation is going to be going on!");
+			}
+		}
+		
+		/**
+		 * handleTraitCategoryLocutionTranslation is only called when we know for sure we are
+		 dealing with a trait predicate -- it checks to see if the specific trait used was a 
+		 category (e.g. "sexy") as opposed to a specific trait (e.g. "sex magnet"), and 
+		 if so, generates the corresponding locution that could be used in a line of dialogue
+		 and stores it in the predicate editors locution translation text area.
+		 */
+		public function handleTraitCategoryLocutionTranslation():void {
+			var traitName:String = "";
+			var firstRole:String = "";			
+			traitName = conditionEditor.traitValue.selectedItem;
+			if (Trait.getNumberByName(conditionEditor.traitValue.selectedItem) <= Trait.LAST_CATEGORY_COUNT) {
+				if (conditionEditor.firstRole.selectedItem == "initiator") firstRole = "i";
+				else if (conditionEditor.firstRole.selectedItem == "responder") firstRole = "r";
+				else if (conditionEditor.firstRole.selectedItem == "other") firstRole = "o";
+				traitName = traitName.slice(5);
+				conditionEditor.locutionTranslation.text = "%cat(" + firstRole + "," + traitName + ")%";		
+			}
+		}
+		
+		/**
+		 * handleCKBLocutionTranslation is only called when we know for sure we are
+		 dealing with a CKB predicate -- it checks to see what the specific CKB predicate was used
+		  (e.g. Initiator likes, Responder has, and object that is objectively cool) and 
+		 generates the corresponding locution that could be used in a line of dialogue
+		 and stores it in the predicate editors locution translation text area.
+		 */
+		public function handleCKBLocutionTranslation():void {
+			var firstRole:String = "";
+			var firstSubjective:String = "";
+			var secondRole:String = "";
+			var secondSubjective:String = "";
+			var objectiveTruth:String = "";
+			var ckbLocutionTranslation:String = "";
+			conditionEditor.locutionTranslation.text = "Dealing with CKB...";
+			
+			firstRole = conditionEditor.firstRole.selectedItem;
+			firstSubjective = conditionEditor.firstRoleSubjective.selectedItem;
+			secondRole = conditionEditor.secondRole.selectedItem;
+			secondSubjective = conditionEditor.secondRoleSubjective.selectedItem;
+			objectiveTruth = conditionEditor.ckbValue.selectedItem;
+			
+			if (firstRole == "initiator") firstRole = "i";
+			else if (firstRole == "responder") firstRole = "r";
+			else if (firstRole == "other") firstRole = "o";
+			
+			if (secondRole == "initiator") secondRole = "i";
+			else if (secondRole == "responder") secondRole = "r";
+			else if (secondRole == "other") secondRole = "o";
+			
+			ckbLocutionTranslation = "%CKB_((";
+			ckbLocutionTranslation += firstRole;
+			
+			ckbLocutionTranslation += ",";
+			if (!conditionEditor.useFirstRoleSubjective.selected) {
+				ckbLocutionTranslation += firstSubjective;
+			}
+			ckbLocutionTranslation += "),(";
+			if (!conditionEditor.useSecondRole.selected) {
+				ckbLocutionTranslation += secondRole;
+			}
+			ckbLocutionTranslation += ",";
+			if (!conditionEditor.useSecondRoleSubjective.selected) {
+				ckbLocutionTranslation += secondSubjective;
+			}
+			ckbLocutionTranslation += "),(";
+			if (!conditionEditor.useCKBTruthValue.selected) {
+				ckbLocutionTranslation += objectiveTruth;
+			}
+			ckbLocutionTranslation += "))%";
+			conditionEditor.locutionTranslation.text = ckbLocutionTranslation;
+		}
+		
+		/**
+		 * handleSFDLabelLocutionTranslation is only called when we know for sure we are
+		 dealing with a SFDBLabel predicate -- it checks to see what the SFDB Label is
+		 and generates the corresponding locution that could be used in a line of dialogue
+		 and stores it in the predicate editors locution translation text area.
+		 */
+		public function handleSFDLabelLocutionTranslation():void {
+			conditionEditor.locutionTranslation.text = "Dealing with SFDB...";
+				
+			var firstRole:String = "";
+			var secondRole:String = "";
+			var SFDBLabel:String = "";
+			var window:int = -1;
+			var SFDBTranslatedLocution:String = "";
+				
+			firstRole = conditionEditor.firstRole.selectedItem;
+			secondRole = conditionEditor.secondRole.selectedItem;
+			SFDBLabel = conditionEditor.sfdbValue.selectedItem;
+			window = conditionEditor.sfdbWindowStepper.value;
+			
+			var labelID:int = SocialFactsDB.getLabelByName(conditionEditor.sfdbValue.selectedItem);
+			if(labelID <= SocialFactsDB.LAST_CATEGORY_COUNT && labelID >= 0){
+				SFDBLabel = SFDBLabel.slice(5);
+			}	
+			else
+			{
+				SFDBLabel += ""; // it was perfect the way it was!
+			}
+			
+			if (firstRole == "initiator") firstRole = "i";
+			else if (firstRole == "responder") firstRole = "r";
+			else if (firstRole == "other") firstRole = "o";
+			
+			if (secondRole == "initiator") secondRole = "i";
+			else if (secondRole == "responder") secondRole = "r";
+			else if (secondRole == "other") secondRole = "o";
+			
+			SFDBTranslatedLocution = "%SFDB_(";
+			
+			if (!conditionEditor.useSFDBLabel.selected) {
+				SFDBTranslatedLocution += SFDBLabel;
+			}
+			
+			SFDBTranslatedLocution += "," + firstRole + ",";
+			
+			if (!conditionEditor.useSecondRole.selected) {
+				SFDBTranslatedLocution += secondRole
+			}
+			
+			SFDBTranslatedLocution += "," + window + ")%";
+			
+			conditionEditor.locutionTranslation.text = SFDBTranslatedLocution;
+		}
+		
+		/**
+		 * handleTraitCategoryLocutionTranslation is only called when we know for sure we are
+		 dealing with a Status predicate -- it checks to see if the specific Status used was a 
+		 category (e.g. "sexy") as opposed to a specific trait (e.g. "sex magnet"), and 
+		 if so, generates the corresponding locution that could be used in a line of dialogue
+		 and stores it in the predicate editors locution translation text area.
+		 */
+		public function handleStatusCategoryLocutionTranslation():void {
+			conditionEditor.locutionTranslation.text = "Dealing with Statuses... -- only Categories have locution translations!";
+			var statusName:String = "";
+			var firstRole:String = "";	
+			var secondRole:String = "";
+			statusName = conditionEditor.statusValue.selectedItem;
+			if (Status.getStatusNumberByName(statusName) <= Status.LAST_CATEGORY_COUNT) {
+				if (conditionEditor.firstRole.selectedItem == "initiator") firstRole = "i";
+				else if (conditionEditor.firstRole.selectedItem == "responder") firstRole = "r";
+				else if (conditionEditor.firstRole.selectedItem == "other") firstRole = "o";
+				
+				//Need to check if it is a directed Catagory!
+				if(statusName == "cat: feeling bad about someone" || statusName == "cat: feeling good about someone"){
+					if (conditionEditor.secondRole.selectedItem == "initiator") secondRole = "i";
+					else if (conditionEditor.secondRole.selectedItem == "responder") secondRole = "r";
+					else if (conditionEditor.secondRole.selectedItem == "other") secondRole = "o";
+				}
+				
+				statusName = statusName.slice(5);
+				if(secondRole == "") { // It was an undirected Catagory -- so we don't need a responder
+					conditionEditor.locutionTranslation.text = "%cat(" + firstRole + "," + statusName + ")%";		
+				}
+				else {
+					conditionEditor.locutionTranslation.text = "%cat(" + firstRole + "," + statusName + "," + secondRole + ")%";	
+				}
+			}	
+		}
+			
+		]]>
+	</fx:Script>
+</s:Group>

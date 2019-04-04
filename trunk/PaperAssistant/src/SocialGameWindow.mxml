@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<s:Group
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark"
+	xmlns:mx="library://ns.adobe.com/flex/halo"
+	frameRate="30"
+	width="640"
+	height="200"
+	creationComplete="onCreationComplete(event)"
+	enterFrame="onEnterFrame(event)"
+	>
+	
+
+	
+	<s:Graphic width="100%" height="100%">
+		
+		<s:Rect width="100%" height="100%">
+			<s:stroke>
+				<s:Stroke color="0xaaaaaa"/>
+			</s:stroke>
+			<s:fill>
+				<s:SolidColor color="0xeeffee" />
+			</s:fill>
+		</s:Rect>
+	</s:Graphic>
+		
+	<s:Button id="titleLabel" label="txt" top="100" />
+
+	<fx:Script>
+		<![CDATA[
+		
+		import edu.ucsc.eis.socialgame.*;
+		import edu.ucsc.eis.*;
+		
+		[Bindable]
+		public var socials:Vector.<SocialEntity>;
+		[Bindable]
+		public var socialGame:SocialGame;
+			
+		private function onCreationComplete(event:Event):void {
+			
+		}
+		
+		private function onEnterFrame(event:Event):void {
+			if(socialGame != null) {
+				this.titleLabel.label = socialGame.getName();
+			}
+			//trace(socialGame);
+		}
+		]]>
+	</fx:Script>
+		
+</s:Group>

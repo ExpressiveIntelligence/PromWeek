@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 xmlns:arcadiocarballares="com.arcadiocarballares.*"
+		 creationComplete="onCreationComplete()"
+		 initialize="initializeSFDBVisualizer()"
+		 width="480"
+		 height="450"
+		 styleName="classicPromWeek">
+
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+		 </fx:Declarations>
+		 
+		<s:Rect id="filterBGRect" left="0" width="{this.width}" height="{this.height}">
+			<!--<s:stroke>
+				<s:SolidColorStroke weight="{getStyle('backgroundStrokeWeight')}" color="{getStyle('backgroundStroke')}" caps="none" />
+			</s:stroke>-->
+			<s:fill>
+				<s:SolidColor color="{getStyle('backgroundColor')}" alpha="0.3" />
+			</s:fill>
+		</s:Rect>
+		 <s:VGroup id="notBackgroundGroup" x="0" y="0" width="100%" height="100%">
+			<s:VGroup id="filterGroup" width="100%" height="20%" depth="10" paddingLeft="7" paddingRight="5" paddingTop="10">
+				<s:VGroup width="100%" height="60%">
+					<s:RichText text="Social History" width="100%" color="{getStyle('textColor')}" fontSize="25" fontWeight="bold" textAlign="center"/>
+					<!--<prom:PromWeekButton id="addLevelCastButton" label="Present" click="addLevelCastClicked()"/>
+					<prom:PromWeekButton id="addAllCastButton" label="All" click="addAllCastClicked()"/>-->
+				</s:VGroup>
+				<s:HGroup id="filterSubGroup" width="100%" height="40%">
+					<s:VGroup id="leftCol" width="32%">
+						<mx:Text text="Filter by initiator" fontSize="10" selectable="false" color="{getStyle('textColor')}" />
+						<s:HGroup paddingLeft="15"><prom:CharPortraitDrawer id="leftDrawer" depth="10" buttonLabel="Select" downward="true" maintainList="true" height="20" /></s:HGroup>
+						<!--<arcadiocarballares:ComboCheck id="leftComboCheck" />-->
+					</s:VGroup>
+					<s:VGroup id="rightCol" paddingLeft="180">
+						<mx:Text text="Filter by responder" fontSize="10" selectable="false" color="{getStyle('textColor')}" />
+						<s:HGroup paddingLeft="15"><prom:CharPortraitDrawer id="rightDrawer" depth="10" buttonLabel="Select" downward="true" maintainList="true" height="20" /></s:HGroup>
+						<!--<arcadiocarballares:ComboCheck id="rightComboCheck" styleName="Prom" />-->
+					</s:VGroup>
+				</s:HGroup>
+			</s:VGroup>
+			 <!--<s:Scroller width="100%" height="80%" verticalScrollBar>-->
+			 <s:HGroup id="entriesGroup" height="100%">
+			    <s:VGroup id="contextEntriesGroup" width="95%" height="80%" paddingLeft="5" paddingTop="2" scaleX="0.85" scaleY="0.85" />
+				<s:VGroup id="scrollbargroup" height="100%">
+					<prom:ToggleableContainerButton id="stepBackward" label="Up" click="moveSlider(-1)" width="25" height="25" />
+					<mx:VSlider id="scrollerSlider" width="5%" height="100%" minimum="0" maximum="{maxIndex-1}" value="{this.currentIndex}" 
+					 change="sliderUpdate(event)" liveDragging="false" snapInterval="{1}" rotation="180" showDataTip="false"/>
+					<prom:ToggleableContainerButton id="stepForward" label="Down" click="moveSlider(1)" width="25" height="25"/>
+				</s:VGroup>
+			 </s:HGroup>
+			 <!--</s:Scroller>-->
+		 </s:VGroup>
+		 
+		<s:Group id="removeIconGroup" x="{this.width - 20}" y="5" width="15" height="15" click="exitSFDBVisualizer(event)" toolTip="Close Window">
+			<s:Rect width="{removeIconGroup.width}" height="{removeIconGroup.height}">
+				<s:stroke>
+					<s:SolidColorStroke color="black" alpha="1.0" />
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor color="white" alpha="0.8" />
+				</s:fill>
+			</s:Rect>
+			<s:Line id="line1" xFrom="0" yFrom="0" xTo="{removeIconGroup.width}" yTo="{removeIconGroup.height}" >
+				<s:stroke>
+					<s:SolidColorStroke color="black" alpha="1.0" weight="2" />
+				</s:stroke>
+			</s:Line>
+			<s:Line id="line2" xFrom="0" yFrom="{removeIconGroup.height}" xTo="{removeIconGroup.width}" yTo="0" >
+				<s:stroke>
+					<s:SolidColorStroke color="black" weight="2"/>
+				</s:stroke>
+			</s:Line>		
+		</s:Group>
+
+	<fx:Script>
+		<![CDATA[
+		
+		import CiF.CiFSingleton;
+		import flash.text.TextFormat;
+		import flash.utils.Dictionary;
+		import flashx.textLayout.utils.CharacterUtil;
+		import mx.collections.ArrayCollection;
+		import mx.events.DragEvent;
+		import mx.events.SliderEvent;
+		import PromWeek.assets.ResourceLibrary;
+		import spark.components.Group;
+		import spark.components.Button;
+		import spark.components.ToggleButton;
+		import mx.graphics.SolidColor;
+		import mx.graphics.SolidColorStroke;
+		import spark.components.HGroup;
+		import spark.components.RichText;
+		import spark.components.VGroup;
+		import spark.primitives.*;
+		import spark.components.Label;
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import flash.events.*;
+		import CiF.*;
+		import flashx.textLayout.formats.TextAlign;
+		
+		public static const PORTRAIT_HEIGHT:Number = 40;
+		public static const PORTRAIT_WIDTH:Number = 40;
+		
+		public static const TYPE_BACKSTORY:int = 0;
+		public static const TYPE_SOCIAL_GAME:int = 1;
+		public static const TYPE_TRIGGER:int = 2;
+		
+		private var gameEngine:GameEngine;// = GameEngine.getInstance();;
+		private var resourceLibrary:ResourceLibrary;// = PromWeek.assets.ResourceLibrary.getInstance();
+		private var cif:CiFSingleton;// = CiFSingleton.getInstance();
+		
+		public var mainBodyFill:SolidColor;
+		public var mainBodyStroke:SolidColorStroke;
+		private var mainBody:Rect;
+		
+		public var allSFDBEntries:Vector.<SFDBEntry>;
+		
+		public var sfdbEntries:Vector.<PromWeek.SFDBEntry>;
+		//public var contexts:Vector.<SFDBContext>;
+		
+		public var verticalList:VGroup;
+		
+		private var initiatorsForUpdate:Vector.<Character>;
+		private var respondersForUpdate:Vector.<Character>;
+		
+		//variables used for keeping track of visible SFDB entries
+		[Bindable]private var currentIndex:Number = 0;
+		[Bindable]private var maxIndex:Number
+		private var numToShow:Number = 2
+		private var prevIndex:Number = 0;
+		
+		public function onCreationComplete():void {
+			gameEngine = PromWeek.GameEngine.getInstance();
+			cif = CiFSingleton.getInstance();
+			resourceLibrary = ResourceLibrary.getInstance();
+		}
+		
+		public function initializeSFDBVisualizer():void 
+		{	
+			allSFDBEntries = new Vector.<SFDBEntry>();
+
+			//this.addEventListener("CHARACTER_CLICKED", characterClickedInStateFilter);
+			this.addEventListener("ALL_CAST_CLICKED", addAllCastClicked);
+			this.addEventListener("LEVEL_CAST_CLICKED", addLevelCastClicked);
+			
+			// ADD ALL THESE FLIPPIN EVENT LISTENERS!
+			leftDrawer.addEventListener("charPortDrawerClosed",updateCharsList)
+			leftDrawer.addEventListener("allFilterPressed",allFilterButtonPressed)
+			leftDrawer.addEventListener("presentFilterPressed",presentFilterButtonPressed)
+			leftDrawer.addEventListener("noneFilterPressed",noneFilterButtonPressed)
+			rightDrawer.addEventListener("charPortDrawerClosed", updateCharsList)
+			rightDrawer.addEventListener("allFilterPressed",allFilterButtonPressed)
+			rightDrawer.addEventListener("presentFilterPressed",presentFilterButtonPressed)
+			rightDrawer.addEventListener("noneFilterPressed",noneFilterButtonPressed)
+
+			
+			var ac:ArrayCollection = new ArrayCollection();
+			var obj:Object;
+			for (var i:int = SocialFactsDB.LAST_CATEGORY_COUNT + 1; i < SocialFactsDB.FIRST_STORY_SEQUENCE; i++ )
+			{
+				obj = new Object();
+				obj["label"] = SocialFactsDB.getLabelByNumber(i);
+				obj["assigned"] = true;
+				obj["value"] = i;
+				ac.addItem(obj);
+			}
+			//leftComboCheck.dataProvider = ac;
+			//rightComboCheck.dataProvider = ac;
+			
+			// Fill 'er up!
+			leftDrawer.fill()
+			rightDrawer.fill()
+		}
+		
+		/**
+		 * Creating children for the birth phase of the component lifecycle.
+		 * Note that this does not handle the case of updating the viewer after
+		 * it has been born.
+		 */
+		override protected function createChildren():void {
+
+			this.mainBody = new Rect();
+			
+			//default values
+			mainBodyFill= new SolidColor(0x1F497D, 1.0); //The Inner Fill (Color, Alpha (1.0 = completely solid))
+			mainBodyStroke = new SolidColorStroke(0x000033, 1.0); //THE BORDER
+			mainBodyStroke.weight = 10;
+			this.mainBody.x = 0;
+			this.mainBody.y = 0;
+			this.mainBody.height = this.height;
+			this.mainBody.width = this.width;//1080;
+			this.mainBody.stroke = mainBodyStroke;
+			this.mainBody.fill = mainBodyFill;
+			this.addElement(mainBody);
+			
+
+			
+			//this.stateFilter.relationshipFilterButtons.visible = false;
+			
+			//button.addEventListener(MouseEvent.CLICK, characterClickedInStateFilter);
+			
+			//For Z Ordering
+			this.setElementIndex(filterBGRect, this.numElements - 1);
+			this.setElementIndex(notBackgroundGroup, this.numElements - 1);
+			this.setElementIndex(removeIconGroup, this.numElements - 1);
+			
+			super.createChildren();
+			//scrollerSlider.addEventListener("change"
+		}
+		
+		/**
+		 * Fills the CharPortraitDrawer that was pressed
+		 * @param	e
+		 */
+		public function allFilterButtonPressed(e:Event):void {
+			e.target.fill()
+		}
+		
+		/**
+		 * Sets the CPD to current level's cast
+		 * @param	e
+		 */
+		public function presentFilterButtonPressed(e:Event):void {
+			e.target.setCastActive(gameEngine.currentLevel.cast)
+		}
+		
+		/**
+		 * Empties the CPD's selection
+		 * @param	e
+		 */
+		public function noneFilterButtonPressed(e:Event):void {
+			e.target.empty()
+		}
+		
+		public function exitSFDBVisualizer(e:Event):void
+		{
+			this.visible = false;
+			gameEngine.hudGroup.megaUI.socialHistoryButton.selected = !this.visible;
+		}
+	
+		/**
+		 * This function creates a list of all characters that are selected and updates the visualizer
+		 * to have only entries pertaining to those in there.
+		 * 
+		 * @param	e
+		 */
+/*		public function characterClickedInStateFilter(e:Event = null):void
+		{
+			var charsToHaveInContextViewer:Vector.<Character> = new Vector.<Character>();
+			for each (var charPort:PromWeek.PortraitIcon in this.stateFilter.characterRepresentations)
+			{
+				if (charPort.selected)
+				{
+					charsToHaveInContextViewer.push(cif.cast.getCharByName(charPort.characterName));
+				}
+			}
+			this.updateSFDBVisualizer(charsToHaveInContextViewer);
+		}*/
+		
+		
+		public function addAllCastClicked(e:Event=null):void
+		{
+			//this.charactersToDisplay = cif.cast.characters;
+			//this.stateFilter.characterFilterGroup.updateIndividualCharacterFilterGroup(cif.cast.characters);
+			this.updateSFDBVisualizer(cif.cast.characters,cif.cast.characters);
+			leftDrawer.fill()
+			rightDrawer.fill()
+		}
+		
+		public function addLevelCastClicked(e:Event=null):void
+		{
+			//this.charactersToDisplay = gameEngine.currentLevel.cast;
+			//this.stateFilter.characterFilterGroup.updateIndividualCharacterFilterGroup(gameEngine.currentLevel.cast);
+			leftDrawer.setCastActive(gameEngine.currentLevel.cast)
+			rightDrawer.setCastActive(gameEngine.currentLevel.cast)
+			this.updateSFDBVisualizer(gameEngine.currentLevel.cast,gameEngine.currentLevel.cast);
+		}
+		
+		/**
+		 * this updates the characters list, but it's got to take care of the whole "Initiator Responder" deal.
+		 * @param	e
+		 */
+		public function updateCharsList(e:Event):void {
+			var iChars:Vector.<Character> = new Vector.<Character>()
+			var rChars:Vector.<Character> = new Vector.<Character>()
+			for (var key:Object in leftDrawer.selectedChars) {
+				if (leftDrawer.selectedChars[key as String]) {
+					iChars.push(cif.cast.getCharByName(key as String))
+				}
+			}
+			for (key in rightDrawer.selectedChars) {
+				if (rightDrawer.selectedChars[key as String]) {
+					rChars.push(cif.cast.getCharByName(key as String))
+				}
+			}
+			updateSFDBVisualizer(iChars,rChars)
+		}
+		
+		public function updateSFDBVisualizer(iChars:Vector.<Character>, rChars:Vector.<Character>):void
+		{
+			initiatorsForUpdate = iChars
+			respondersForUpdate = rChars
+			this.invalidateProperties();
+			this.invalidateSize();
+			this.invalidateDisplayList();
+		}
+		
+		override protected function commitProperties():void {
+			super.commitProperties();
+			var context:SFDBContext;
+			var triggerContext:TriggerContext;
+			var sgContext:SocialGameContext;
+			var char:Character;
+			
+			var sfdbEntry:PromWeek.SFDBEntry;
+			
+			this.sfdbEntries = new Vector.<SFDBEntry>();			
+			//given this new list of chars, fine the sfdbEntries that are appropriate
+			for each (sfdbEntry in this.allSFDBEntries)
+			{
+				context = sfdbEntry.sgContext;
+				//Debug.debug(this, "ALL SFDB: " + context.toXMLString());
+				if (context.isSocialGame())
+				{
+					sgContext = context as SocialGameContext;
+					// GO THROUGH EACH OF THESE MOFOS TO UPDATE! Both the initiators and responders
+					for each (char in this.initiatorsForUpdate)
+					{
+						if (sgContext.initiator == char.characterName)
+						{
+							// and another for loop :/
+							for each (char in this.respondersForUpdate) {
+								if (sgContext.responder == char.characterName){									
+									// if we found a match, add that to the sfdbEntries to visualize
+									if (this.sfdbEntries.indexOf(sfdbEntry) == -1) {
+										this.sfdbEntries.push(sfdbEntry);
+									} else {
+										break;
+									}
+								}
+							}
+						}
+					}
+					
+				}
+			}
+			maxIndex = this.sfdbEntries.length - 1
+			this.moveSlider(0)
+		}
+		
+		public function sliderUpdate(event:SliderEvent):void {
+			moveSlider(scrollerSlider.value - prevIndex)
+			prevIndex = scrollerSlider.value
+		}
+		
+		/**
+		 * Used to maintain the currentIndex so it's super easy for other things to call this (such as a button!)
+		 * use 1 or -1 to move it up and down!
+		 */
+		public function moveSlider(moveBy:Number):void {
+			currentIndex += moveBy
+			if (currentIndex <= 0) {
+				currentIndex = 0
+			} else if (currentIndex >= this.sfdbEntries.length - numToShow) {
+				currentIndex = this.sfdbEntries.length - (numToShow)
+			}
+			this.maxIndex = this.sfdbEntries.length -1
+			// make sure the previous index gets updated, as the slider's value
+			prevIndex = currentIndex
+			scrollerSlider.value = currentIndex
+			sortChildren()
+		}
+		
+		/**
+		 * Go through the children and make sure we're only displaying the ones we want to show! 
+		 * Change "(numToShow - 1)" to change how many there are to show. 
+		 * 
+		 */
+		private function sortChildren():void {
+			this.contextEntriesGroup.removeAllElements()
+			if (this.sfdbEntries.length == 0) {
+				return
+			}
+			var tSFDB:SFDBEntry = this.sfdbEntries[currentIndex]
+			tSFDB.visible = true
+			this.contextEntriesGroup.addElement(tSFDB)
+			if (currentIndex + 1 >= this.sfdbEntries.length) {
+				return
+			}
+			tSFDB = this.sfdbEntries[currentIndex + 1]
+			tSFDB.visible = true
+			this.contextEntriesGroup.addElement(tSFDB)
+		}
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

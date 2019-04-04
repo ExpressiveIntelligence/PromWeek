@@ -1,0 +1,38 @@
+<PromWeek>
+		<Story title="QP1" storyLeadCharacter="Zack" locked="false" toUnlock="0" isTutorial="false" isQuickPlay="true" numberOfQuickPlaySGAvailable="1" startState="quickPlayStartState1" nextChallengeName="QP2">
+			<Description>Make Zack ask out Chloe</Description>
+			<QuickPlayDescription>
+				<![CDATA[Have Zack ###ZACK### ask out ###DATING### Chloe ###CHLOE###]]>
+			</QuickPlayDescription>
+			<QuickPlayEndingDescription>
+				<![CDATA[Every action has social consequences.]]>
+			</QuickPlayEndingDescription>
+			<ForcedSGs> <!-- Force a pair of characters to WANT to play a specific instantiation of a specific social game. -->
+				<ForcedSG initiator="Zack" responder="Chloe" gameName="ask out" turnsIn="0" instantiationID="5" />
+			</ForcedSGs>
+			<ToDoList>
+				<ToDoItem name="Make Zack ask out Chloe.">
+					<Condition>
+						<Rule>
+							<Predicate type="relationship" first="Zack" second="Chloe" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+						<taskNaturalLanguage words="Get ###ZACK### and ###CHLOE### to date!"/>
+					</Condition>
+				</ToDoItem>
+			</ToDoList>
+			<Levels>
+				<Level title="LEVEL 1" timeLimit="1" cameraZoom="1" useDefinedCameraPosition="false" cameraX="800" cameraY="1400" endable="false" isTutorial="false" tutorialScript="">
+					<Description>Make Zack ask out Chloe.</Description>
+					<Setting>lockers</Setting>
+					<Cast>
+						<CharacterName>Zack</CharacterName>
+						<CharacterName>Chloe</CharacterName>
+					</Cast>
+					<GoalRules>
+					</GoalRules>
+				</Level>
+			</Levels>
+			<Endings>
+			</Endings>
+		</Story>
+</PromWeek>

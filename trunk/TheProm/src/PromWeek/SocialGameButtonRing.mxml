@@ -1,0 +1,693 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 creationComplete="onCreationComplete()"
+		 initialize="socialGameButtonRingInitialize()"
+		 visible="false"
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*">
+
+		 
+		 
+		 
+		 <fx:Declarations>
+		 </fx:Declarations>
+		 
+		 
+		
+		 
+		<!-- <prom:SGDropDownComponent id="sgddc" />-->
+
+		 <!--s:DropDownList id="sgDropdown" dataProvider="{this.sgArray}" change="dropdownSGChosen()" width="250"   />
+		 
+		 <s:Button id="unlockSGOutcome0Button" label="Unlock Outcome for" height="20" top="40" left="400" click="unlockOutcomeButton(event,0)" visible="false" />
+		 <s:Button id="unlockSGOutcome1Button" label="Unlock Outcome for" height="20" top="60" left="400" click="unlockOutcomeButton(event,1)" visible="false" />
+		 <s:Button id="unlockSGOutcome2Button" label="Unlock Outcome for" height="20" top="80" left="400" click="unlockOutcomeButton(event,2)" visible="false" />
+		 <s:Button id="unlockSGOutcome3Button" label="Unlock Outcome for" height="20" top="100" left="400" click="unlockOutcomeButton(event,3)" visible="false" />
+		 <s:Button id="unlockSGOutcome4Button" label="Unlock Outcome for" height="20" top="120" left="400" click="unlockOutcomeButton(event,4)" visible="false" />
+		 
+		 <s:Button id="unlockResponderMotive0Button" label="Unlock Hint for" height="20" top="160" left="400" click="unlockResponderMotiveButton(event,0)" visible="false" />
+		 <s:Button id="unlockResponderMotive1Button" label="Unlock Hint for" height="20" top="180" left="400" click="unlockResponderMotiveButton(event,1)" visible="false" />
+		 <s:Button id="unlockResponderMotive2Button" label="Unlock Hint for" height="20" top="200" left="400" click="unlockResponderMotiveButton(event,2)" visible="false" />
+		 <s:Button id="unlockResponderMotive3Button" label="Unlock Hint for" height="20" top="220" left="400" click="unlockResponderMotiveButton(event,3)" visible="false" />
+		 <s:Button id="unlockResponderMotive4Button" label="Unlock Hint for" height="20" top="240" left="400" click="unlockResponderMotiveButton(event,4)" visible="false" /-->
+		 
+		 
+
+
+	<fx:Script>
+		<![CDATA[
+		import CiF.SocialGamesLib;
+		import flash.events.MouseEvent;
+		import mx.events.FlexEvent;
+		
+		
+		import CiF.CiFSingleton;
+		import CiF.Debug;
+		import CiF.SocialGame;
+		import CiF.GameScore;
+		import CiF.Predicate;
+		import CiF.Status;
+		import flash.geom.Point;
+		import mx.collections.ArrayCollection;
+		import flash.display.InteractiveObject;
+		
+		private var gameEngine:GameEngine;
+		private var cif:CiFSingleton;
+		private var dm:DifficultyManager;
+		
+		[Bindable] private var sgArray:ArrayCollection
+		
+		
+		public var isFlipped:Boolean = false;
+		public var flipHeight:Number = 0;
+		
+		public var maxNumButtons:int = 5;
+		public var minNumButtons:int = 1;
+		
+		public var currentNumButtons:int = 1;
+		
+		public var offsetFromAvatarX:Number = -100;
+		public var offsetFromAvatarY:Number = -175;
+		
+		public var sgDropDown:SGDropDownComponent;
+		
+		/**
+		 * The number that a social game's score has to be greater than to get displayed
+		 */
+		public var volitionThreshold:int = 0;
+		
+		public const exceptionallyImportantGameThreshold:int = 1;
+		
+		public var radx:Number = 110;
+		public var rady:Number = 100;
+		
+		
+		
+		public var socialGameButtons:Vector.<SocialGameButton> = new Vector.<SocialGameButton>();
+		
+		public var relationshipSummaryButton:PromWeek.RelationshipSummaryButton;
+		
+		private var jpm:JuicePointManager;
+		
+		override protected function createChildren():void {
+			
+			super.createChildren();
+			gameEngine = GameEngine.getInstance();
+			cif = CiFSingleton.getInstance();
+			jpm = JuicePointManager.getInstance();
+			dm = DifficultyManager.getInstance();
+			
+			for (var i:int = 0; i < maxNumButtons; i++)
+			{
+				socialGameButtons.push(new SocialGameButton());
+				socialGameButtons[i].shouldGlow = false;
+				socialGameButtons[i].label = i + " button";
+				addElement(socialGameButtons[i]);
+			}
+			
+			sgDropDown = new SGDropDownComponent();
+			this.addElement(sgDropDown);
+			
+			relationshipSummaryButton = new PromWeek.RelationshipSummaryButton();
+			relationshipSummaryButton.width = 80;
+			relationshipSummaryButton.height = 30;
+			this.addElement(this.relationshipSummaryButton);
+			//sgDropDown.ddl.addEventListener(MouseEvent.MOUSE_OVER, dropDownListOver);
+			//sgDropDown.ddl.addEventListener("itemRollOver", itemRollOver);
+			
+			currentNumButtons = maxNumButtons;
+			semiCircularLayout();
+			
+			this.visible = false;
+			
+			sgArray = new ArrayCollection();
+			
+			
+			/*
+			unlockResponderMotive0Button.label = "Unlock Hint for";
+			unlockResponderMotive1Button.label = "Unlock Hint for";
+			unlockResponderMotive2Button.label = "Unlock Hint for";
+			unlockResponderMotive3Button.label = "Unlock Hint for";
+			unlockResponderMotive4Button.label = "Unlock Hint for";
+			*/
+			/*
+			if (gameEngine.dropDownListShouldDisplay) {
+				sgDropdown.visible = true;
+				if (cif) {
+					if(cif.socialGamesLib){
+						for each(var sg:SocialGame in cif.socialGamesLib.games) {
+							sgArray.addItem(sg.name);
+							//sgArray.push(sg.name);
+							Debug.debug(this, "pushing the library into the special array?");
+						}
+					}
+				}
+			}
+			else {
+				sgDropdown.visible = false;
+			}
+			*/
+			
+		}
+		
+		public function socialGameButtonRingInitialize():void
+		{
+
+		}
+		
+		
+		
+		public function onCreationComplete():void
+		{
+		}
+		
+		
+		public function update():void
+		{	
+			if (gameEngine) 
+			{
+				if (gameEngine.primaryAvatarSelection != null && gameEngine.secondaryAvatarSelection != null)
+				{
+					if (gameEngine.secondaryAvatarSelection != null)
+					{
+						var charX:Number = gameEngine.worldGroup.avatars[gameEngine.secondaryAvatarSelection].locX ;
+						var charY:Number = gameEngine.worldGroup.avatars[gameEngine.secondaryAvatarSelection].locY ;
+						
+						var newRingLocBeforeTranslation:Point = new Point();
+						//NOTE: the -30 has to do with positioning given the placement of the dropDownList
+						var avatar:Avatar = gameEngine.worldGroup.avatars[gameEngine.secondaryAvatarSelection];
+						
+						//pre Utility.translatePoint() version
+						//var newRingLoc:Point = gameEngine.worldGroup.avatars[gameEngine.secondaryAvatarSelection].localToGlobal(newRingLocBeforeTranslation);
+						//newRingLoc.x = newRingLoc.x / gameEngine.APPLICATION_SCALE;
+						//newRingLoc.y = newRingLoc.y / gameEngine.APPLICATION_SCALE;
+						//newRingLocBeforeTranslation.x = charX - gameEngine.worldGroup.avatars[gameEngine.secondaryAvatarSelection].clip.width / 2.0 + (offsetFromAvatarX - 30)/ gameEngine.camera.zoom
+						//newRingLocBeforeTranslation.y = charY + offsetFromAvatarY / gameEngine.camera.zoom;
+						
+						
+						
+						//var newRingLoc:Point = gameEngine.worldGroup.localToGlobal(new Point(charX, charY));
+						
+						//var newRingLoc:Point = gameEngine.worldGroup.avatars[gameEngine.secondaryAvatarSelection].localToGlobal(new Point(charX - gameEngine.worldGroup.avatars[gameEngine.secondaryAvatarSelection].clip.width/2 + offsetFromAvatarX, charY + offsetFromAvatarY));
+						
+						//post Utility.translatePoint() version
+						//newRingLocBeforeTranslation.x = charX// - this.width / 2.0; // gameEngine.worldGroup.avatars[gameEngine.secondaryAvatarSelection].clip.width / 2.0 + (offsetFromAvatarX - 30)
+						//newRingLocBeforeTranslation.y = charY// + this.height / 2.0; // offsetFromAvatarY 
+						//newRingLocBeforeTranslation.x = avatar.clip.width / 2.0;
+						//newRingLocBeforeTranslation.y = avatar.clip.height / 2.0;
+						newRingLocBeforeTranslation.x = charX
+						newRingLocBeforeTranslation.y = charY - 70;
+						var newRingLoc:Point = Utility.translatePoint(newRingLocBeforeTranslation, gameEngine.worldGroup, gameEngine.hudGroup);
+						
+						
+						if (newRingLoc.y < this.flipHeight && !this.isFlipped)
+						{
+							// if the button ring is not flipped but is high enough to be flipped, do it!
+							this.isFlipped = true;
+							semiCircularLayout();
+						}
+						
+						if (newRingLoc.y >= this.flipHeight && this.isFlipped)
+						{
+							//unflip if we have room to unflip
+							this.isFlipped = false;
+							semiCircularLayout();
+						}
+						
+						//this.horizontalCenter = newRingLoc.x;
+						this.left = newRingLoc.x - this.width / 2.0;
+						this.top = newRingLoc.y - this.height / 2.0;
+						//Debug.debug(this, "update() before trans: " + newRingLocBeforeTranslation + " after trans: " + newRingLoc + " top,left: " + this.top + ", " + this.left + " width,height: " + this.width + ", " + this.height);
+						//update all the social game text
+
+						//this.visible = true;
+					}
+				}
+				//else
+				//{
+					//this.visible = false;
+					//this.sgDropDown.close();
+				//}
+			}
+		}
+		
+		/**
+		 * This function is meant to check if we have two game scores that have the same
+		 * intent in a vector of game scores.  If we do,return true, if not, false.
+		 * @param	intentVector a vector of gamescores -- the underlying assumption is that we
+		 * do not want duplicate intents.
+		 * @return true if duplicate intents exist, false if otherwise.
+		 */
+		public function existsDuplicateIntentsInVector(intentVector:Vector.<GameScore>):Boolean {
+			for (var i:int = 0; i < intentVector.length; i++) {
+				for (var j:int = 0; j < intentVector.length; j++) {
+					if (i != j) {
+						if (cif.socialGamesLib.getByName(intentVector[i].name).intents[0].predicates[0].getIntentType() == cif.socialGamesLib.getByName(intentVector[j].name).intents[0].predicates[0].getIntentType()) { // they have the same intent!
+							return true;
+						}
+					}
+				}
+			}
+			return false;
+		}
+		
+		public function updateSocialGameButtonText():void
+		{
+			//var gameScores:Vector.<GameScore> = cif.cast.getCharByName(gameEngine.primaryAvatarSelection).prospectiveMemory.getHighestGameScoresTo(gameEngine.secondaryAvatarSelection, maxNumButtons);
+			this.relationshipSummaryButton.updateRelationshipButtons();
+			
+			
+			volitionThreshold = dm.getVolitionThreshold("initiator"); // adjust volition threshold based on current difficulty setting.
+			//This returns all social games from initiator to responder that are greater than or equal to the volition threshold.
+			//The volition threshold changes based on the difficulty.
+			var topGameScores:Vector.<GameScore> =  cif.cast.getCharByName(gameEngine.primaryAvatarSelection).prospectiveMemory.getHighestGameScoresTo(gameEngine.secondaryAvatarSelection, maxNumButtons, volitionThreshold);
+			
+			
+			/* 
+			 * Took this code right out of the if(gameEngine.dropDownListShouldDisplay) section.
+			 * Adding this to the SGDropDownComponent's infos!
+			 */
+			 /*
+			var allGameScores:Vector.<GameScore> =  cif.cast.getCharByName(gameEngine.primaryAvatarSelection).prospectiveMemory.getHighestGameScoresTo(gameEngine.secondaryAvatarSelection, cif.socialGamesLib.games.length, -1000); // someone will have to REALLY not want to play a game in order for it to not show up in the drop down list.
+			sgArray = new ArrayCollection() // zero it out
+			var nameString:String = ""; // will be the game name, followed by its volition.
+			for each(var gsFromAllGameScores:GameScore in allGameScores) {
+				nameString = gsFromAllGameScores.name + " (" + gsFromAllGameScores.score + ")";
+				sgArray.addItem(nameString);
+			}
+			*/
+			//sgddc.ddlDP = sgArray
+			
+			
+			/*
+			if(gameEngine.dropDownListShouldDisplay){
+				var allGameScores:Vector.<GameScore> =  cif.cast.getCharByName(gameEngine.primaryAvatarSelection).prospectiveMemory.getHighestGameScoresTo(gameEngine.secondaryAvatarSelection, cif.socialGamesLib.games.length, -1000); // someone will have to REALLY not want to play a game in order for it to not show up in the drop down list.
+				sgArray = new ArrayCollection() // zero it out
+				var nameString:String = ""; // will be the game name, followed by its volition.
+				for each(var gsFromAllGameScores:GameScore in allGameScores) {
+					nameString = gsFromAllGameScores.name + " (" + gsFromAllGameScores.score + ")";
+					sgArray.addItem(nameString);
+				}
+			}else {
+				if (this.sgDropdown.visible)
+					this.sgDropdown.visible = false;
+			}
+			*/
+			
+			var numButtonsToDisplay:int = topGameScores.length;
+			
+			
+			//This is us trying to limit the amount of duplicate intents characters want to play with each other.
+			var exceptionalGameScores:Vector.<GameScore> = new Vector.<GameScore>(); // this will be ALL games that initiator wants to play with responder! ALL of them greater than 0.
+			for each(var gs:GameScore in cif.cast.getCharByName(gameEngine.primaryAvatarSelection).prospectiveMemory.scores) {
+				if (gs.responder.toLowerCase() == gameEngine.secondaryAvatarSelection.toLowerCase()) {
+					if (gs.score > exceptionallyImportantGameThreshold) {
+						var shouldAdd:Boolean = true; // assume that we SHOULD add a new game (i.e. assume that it is not already in top scores).
+						for each (var gs2:GameScore in topGameScores) { //when building our exceptionalGameScores, want to make sure it isn't in the top scores.
+							if ((GameScore.equals(gs, gs2)) || (cif.socialGamesLib.getByName(gs.name).intents[0].predicates[0].getIntentType() == cif.socialGamesLib.getByName(gs2.name).intents[0].predicates[0].getIntentType()) ) { 
+								shouldAdd = false;  // oops! This game already is in top scores OR we already have the intent of this game in our top game scores! Don't add it to exceptionalGameScores!
+							}			
+						}
+						if (shouldAdd) { 
+							exceptionalGameScores.push(gs); // we never encountered gs inside of topGameScores and it has a unique intent -- lets add it to exceptionalGameScores!
+						}
+					}
+				}
+			}
+			
+			
+			
+			
+			
+			var vectorLength:int = exceptionalGameScores.length;
+			//We need to go through our exceptionalGameScores and make sure that we have no duplicate intents inside of it!  If there are, we remove the game that has the lower score.
+			for (i = 0; i < vectorLength; i++) {
+				for (j = 0; j < vectorLength; j++) {
+					if (j >= exceptionalGameScores.length || (i >= exceptionalGameScores.length)) {
+						break; // get out of here!
+					}
+					if (i != j) { // we don't want to be dealing with the same game!
+						//first we should find out if they have the same intent.
+						if (cif.socialGamesLib.getByName(exceptionalGameScores[i].name).intents[0].predicates[0].getIntentType() == cif.socialGamesLib.getByName(exceptionalGameScores[j].name).intents[0].predicates[0].getIntentType()) { // they have the same intent!
+							if (exceptionalGameScores[i].score > exceptionalGameScores[j].score) { 
+								// i is better than j -- kill j
+								exceptionalGameScores.splice(j, 1);
+								vectorLength--;
+								if (i >= j) { // want to make sure that the length is correct!
+									//i = i - 1;
+								}
+							}
+							else {
+								// j is better than i -- kill i (we also do this if i and j have the same score)
+								exceptionalGameScores.splice(i, 1);
+								vectorLength--;
+								if (j >= i) { // want to make sure that the length is correct!
+									//j = j - 1;
+								}
+							}
+						}
+					}
+				}
+			}
+			
+			function comp(x:GameScore, y:GameScore):Number 
+			{
+				if (x.score < y.score)
+				{
+					return 1.0;
+				}
+				else if (x.score > y.score)
+				{
+					return -1.0;
+				}
+				else
+				{
+					return 0;
+				}
+			}
+			exceptionalGameScores.sort(comp); // so now the game with the highest number is first!
+			topGameScores.sort(comp);
+			
+			
+			// I think HERE is where we would want to sort the games to give
+			//a bonus to volition on the initiator's end.
+			//Well, this is a POSSIBILITY, for for now, I am going to do this in gameEngine.mxml instead
+			//once intent has finished being formed (that also makes sense, I suppose...).
+			//Yeahhh.... I think that makes more sense, actually, because then we don't have to worry about
+			//moving things back and forth between the rings.
+			
+			/*for each(gs in exceptionalGameScores) {
+				Debug.debug(this, "game name: " + gs.name + " score: " + gs.score);
+			}*/
+			
+			//As long as we have 'spare' social games inside of exceptional social games, AND as long as we have duplicate intents
+			//inside of our topGameScores vector, replace the lowest scoring duplicate with the highest scoring exceptionalGameScore.
+			while (exceptionalGameScores.length > 0 && existsDuplicateIntentsInVector(topGameScores)) {
+				var currentLeastGoodIndex:int = -999;
+				for (i = 0; i < topGameScores.length; i++) {
+					for (j = 0; j < topGameScores.length; j++) {
+						if ( i != j) {
+							if (cif.socialGamesLib.getByName(topGameScores[i].name).intents[0].predicates[0].getIntentType() == cif.socialGamesLib.getByName(topGameScores[j].name).intents[0].predicates[0].getIntentType()) { // they have the same intent!
+								if (topGameScores[i].score > topGameScores[j].score) { 
+									// i is better than j -- BUT we cant kill i right away...
+									currentLeastGoodIndex = j;
+								}
+								else {
+									// j is better than i -- BUT we cant kill right away...
+									currentLeastGoodIndex = i;
+								}
+							}
+						}
+					}
+				}
+				if (currentLeastGoodIndex != -999) { // we found something to replace!!!!
+					//Debug.debug(this, "REPLACEMENT! Used to have" + topGameScores[currentLeastGoodIndex].toString() + " now have: " + exceptionalGameScores[0].toString());
+					topGameScores[currentLeastGoodIndex] = exceptionalGameScores.splice(0, 1)[0]; // we can say 0 because we know for sure it is sorted. We add the [0] because splice returns a vector.
+				}
+			}
+					
+			
+			var gameScores:Vector.<GameScore> = topGameScores;
+			gameScores.sort(comp);
+			
+			//If there is a tie in game scores, lets make it so that they
+			//are sorted alphabetically.
+			for (var k:int = 0; k < gameScores.length - 1; k++) {
+				var swapIndex:int = -1;
+				for (var outer:int = k; outer < gameScores.length; outer++){
+					if (gameScores[k].score > gameScores[outer].score && swapIndex != -1) {
+						var tempGameScore:GameScore = gameScores[k].clone();
+						gameScores[k] = gameScores[swapIndex];
+						gameScores[swapIndex] = tempGameScore;
+						break;
+					}
+					else if (gameScores[k].score == gameScores[outer].score) {
+						//need to figure out which one comes first alphabetically.
+						if (gameScores[k].name <= gameScores[outer].name) {
+							//nothing!  We are set!
+						}
+						else {
+							swapIndex = outer;
+						}
+					}
+				}
+			}
+			
+			var i:int = 0;
+			currentNumButtons = 0;
+			for each (var gameScore:GameScore in gameScores)
+			{
+				//trace(gameScore.name + ": " + gameScore.score);
+				if (i <= numButtonsToDisplay)
+				{
+					//this.socialGameButtons[i].invalidateSkinState();
+					if (gameScore.score >= volitionThreshold)
+					{
+						this.socialGameButtons[i].updateStateBasedOnGameName(gameScore.name); 
+						this.socialGameButtons[i].invalidateDisplayList();
+						currentNumButtons++;
+					}
+					else
+					{
+						this.socialGameButtons[i].visible = false;
+					}
+					i++;
+					
+				}
+				else
+				{
+					
+					break;
+				}
+			}
+			
+			//make sure all the buttons that we aren't using are turned off
+			//for (var j:int = gameScores.length ; j < numButtonsToDisplay; j++ )
+			var j:int;
+			for (j = 0 ; j < gameScores.length; j++ )
+			{
+				socialGameButtons[j].visible = true;
+			}
+			
+			
+			for (j = gameScores.length ; j < maxNumButtons; j++ )
+			{
+				socialGameButtons[j].visible = false;
+			}
+			
+			//now position all the buttons where they oughta go in the semi circle
+			semiCircularLayout();
+			
+			// now I will attempt to place the sgddc SGDropDownComponent!
+			//sgddc.x = 0
+			//sgddc.y = 0
+			
+		
+			if (gameEngine.useJuicePoints) {
+				//In real life we'll have more beautiful buttons, but fow now, jam all of our ugly buttons into one function
+				dealWithHintButtonVisibility();
+			}
+			
+			
+			//Use the nice function that lives indie of the megaUI to populare the drop down list!
+			var indexString:String = gameEngine.primaryAvatarSelection.toLowerCase() + "-" + gameEngine.secondaryAvatarSelection.toLowerCase();
+			gameEngine.hudGroup.megaUI.handleInitialAvailableGames(indexString);
+			this.sgDropDown.ddlDP = gameEngine.hudGroup.megaUI.updateDropDownList(indexString);
+			
+			// Attempt to fix our issue regarding button colours not being fixed
+			this.clearGlow();
+		}
+		
+		
+		public function clearGlow():void
+		{
+			for each (var sgb:SocialGameButton in this.socialGameButtons) 
+			{
+				sgb.isSelected = false;
+				sgb.shouldGlow = false;
+				sgb.skin.invalidateProperties();
+			
+			}
+		}
+		
+		
+		
+		/**
+		 * Places the social game buttons in a semi-ciruclar layout
+		 */
+		public function semiCircularLayout():void 
+		{
+			//if there's just one button put it right over the avatar's head
+			if (currentNumButtons == 1)
+			{
+				socialGameButtons[0].horizontalCenter = 0;
+				socialGameButtons[0].verticalCenter = -rady;
+			}
+			else
+			{
+				var offsetForFirstLocation:Number = - Math.PI / 2;
+				//var iterativeOffset:Number = Math.PI / (currentNumButtons)
+				var iterativeOffset:Number = Math.PI / (currentNumButtons - 1);
+				
+				for (var j:int = 0; j < currentNumButtons; j++) 
+				{
+					/*
+					 * We are subtracting to get the next location in stead of adding
+					 * as to grow the location list in a clockwise direction. This
+					 * is due to the y-axis being flipped from the standard Cartesian
+					 * representation.
+					 */
+					this.socialGameButtons[j].horizontalCenter = radx * Math.sin(offsetForFirstLocation - j * iterativeOffset);
+					//if (this.isFlipped)
+					//{
+						//this.socialGameButtons[j].verticalCenter = -1 * rady * Math.cos(offsetForFirstLocation - j * iterativeOffset);
+					//}
+					//else
+					//{
+						this.socialGameButtons[j].verticalCenter = rady * Math.cos(offsetForFirstLocation - j * iterativeOffset);
+					//}
+					
+				}
+				j--;
+				this.sgDropDown.horizontalCenter = radx * Math.sin(offsetForFirstLocation - j * iterativeOffset) + this.sgDropDown.width/4 - 15 - 17;
+				//if (this.isFlipped)
+				//{
+					//this.sgDropDown.verticalCenter = -1 * (rady * Math.cos(offsetForFirstLocation - j * iterativeOffset) + this.sgDropDown.height * 1.5);
+				//}
+				//else
+				//{
+					this.sgDropDown.verticalCenter = rady * Math.cos(offsetForFirstLocation - j * iterativeOffset) + 43; //+ this.sgDropDown.height * 1.5;
+				//}
+				
+				this.relationshipSummaryButton.horizontalCenter = radx * Math.sin(offsetForFirstLocation - j * iterativeOffset) + this.sgDropDown.width / 4 - 200 - 45 + 18;
+				this.relationshipSummaryButton.verticalCenter = rady * Math.cos(offsetForFirstLocation - j * iterativeOffset) + 33 //+ 100; //+ this.sgDropDown.height * 1.5;
+			}
+		}
+		
+		//A social game has been selected from the drop down menu.
+		public function dropdownSGChosen():void {
+			/*
+			if(jpm.handleNonTopSocialGameSelection() )
+					return;
+			else if(!gameEngine.useJuicePoints) {
+				
+				gameEngine.socialGameToPerform = sgDropdown.selectedItem;
+			
+				gameEngine.initiatorName = gameEngine.primaryAvatarSelection;
+				gameEngine.responderName = gameEngine.secondaryAvatarSelection;
+				
+				gameEngine.worldGroup.avatars[gameEngine.initiatorName].lookingAtTarget = gameEngine.responderName.toLowerCase();
+				gameEngine.worldGroup.avatars[gameEngine.responderName].lookingAtTarget = gameEngine.initiatorName.toLowerCase();
+				
+				gameEngine.currentState = "Performance";
+			}
+			*/
+		}
+		
+		public function unlockResponderMotiveButton(event:MouseEvent, whichButton:int):void {
+			//jpm.handleResponderMotiveUnlock(whichButton);
+		}
+		
+		public function unlockOutcomeButton(event:MouseEvent, whichButton:int):void {
+			//jpm.handleOutcomeUnlock(whichButton);
+		}
+		
+		public function dealWithHintButtonVisibility():void 
+		{
+			//First the motives buttons
+			/*
+			unlockResponderMotive0Button.visible = true;
+			unlockResponderMotive1Button.visible = true;
+			unlockResponderMotive2Button.visible = true;
+			unlockResponderMotive3Button.visible = true;
+			unlockResponderMotive4Button.visible = true;
+			
+			unlockResponderMotive0Button.label = "Unlock Responder Motive for " + this.socialGameButtons[0].gameName;
+			unlockResponderMotive1Button.label = "Unlock Responder Motive for " + this.socialGameButtons[1].gameName;
+			unlockResponderMotive2Button.label = "Unlock Responder Motive for " + this.socialGameButtons[2].gameName;
+			unlockResponderMotive3Button.label = "Unlock Responder Motive for " + this.socialGameButtons[3].gameName;
+			unlockResponderMotive4Button.label = "Unlock Responder Motive for " + this.socialGameButtons[4].gameName;
+			
+			unlockResponderMotive0Button.enabled = true;
+			unlockResponderMotive1Button.enabled = true;
+			unlockResponderMotive2Button.enabled = true;
+			unlockResponderMotive3Button.enabled = true;
+			unlockResponderMotive4Button.enabled = true;
+			
+			if (jpm.isHintUnlocked(gameEngine.primaryAvatarSelection, gameEngine.secondaryAvatarSelection, socialGameButtons[0].gameName, jpm.HINT_RESPONDER_MOTIVE))
+				unlockResponderMotive0Button.enabled = false;
+			if (jpm.isHintUnlocked(gameEngine.primaryAvatarSelection, gameEngine.secondaryAvatarSelection, socialGameButtons[1].gameName, jpm.HINT_RESPONDER_MOTIVE))
+				unlockResponderMotive1Button.enabled = false;
+			if (jpm.isHintUnlocked(gameEngine.primaryAvatarSelection, gameEngine.secondaryAvatarSelection, socialGameButtons[2].gameName, jpm.HINT_RESPONDER_MOTIVE))
+				unlockResponderMotive2Button.enabled = false;
+			if (jpm.isHintUnlocked(gameEngine.primaryAvatarSelection, gameEngine.secondaryAvatarSelection, socialGameButtons[3].gameName, jpm.HINT_RESPONDER_MOTIVE))
+				unlockResponderMotive3Button.enabled = false;
+			if (jpm.isHintUnlocked(gameEngine.primaryAvatarSelection, gameEngine.secondaryAvatarSelection, socialGameButtons[4].gameName, jpm.HINT_RESPONDER_MOTIVE))
+				unlockResponderMotive4Button.enabled = false;
+				
+			//Now the SG Outcome buttons.
+			unlockSGOutcome0Button.visible = true;
+			unlockSGOutcome1Button.visible = true;
+			unlockSGOutcome2Button.visible = true;
+			unlockSGOutcome3Button.visible = true;
+			unlockSGOutcome4Button.visible = true;
+			
+			unlockSGOutcome0Button.label = "Unlock Outcome for " + this.socialGameButtons[0].gameName;
+			unlockSGOutcome1Button.label = "Unlock Outcome for " + this.socialGameButtons[1].gameName;
+			unlockSGOutcome2Button.label = "Unlock Outcome for " + this.socialGameButtons[2].gameName;
+			unlockSGOutcome3Button.label = "Unlock Outcome for " + this.socialGameButtons[3].gameName;
+			unlockSGOutcome4Button.label = "Unlock Outcome for " + this.socialGameButtons[4].gameName;
+			
+			unlockSGOutcome0Button.enabled = true;
+			unlockSGOutcome1Button.enabled = true;
+			unlockSGOutcome2Button.enabled = true;
+			unlockSGOutcome3Button.enabled = true;
+			unlockSGOutcome4Button.enabled = true;
+			
+			if (jpm.isHintUnlocked(gameEngine.primaryAvatarSelection, gameEngine.secondaryAvatarSelection, socialGameButtons[0].gameName, jpm.HINT_SG_OUTCOME))
+				unlockSGOutcome0Button.enabled = false;
+			if (jpm.isHintUnlocked(gameEngine.primaryAvatarSelection, gameEngine.secondaryAvatarSelection, socialGameButtons[1].gameName, jpm.HINT_SG_OUTCOME))
+				unlockSGOutcome1Button.enabled = false;
+			if (jpm.isHintUnlocked(gameEngine.primaryAvatarSelection, gameEngine.secondaryAvatarSelection, socialGameButtons[2].gameName, jpm.HINT_SG_OUTCOME))
+				unlockSGOutcome2Button.enabled = false;
+			if (jpm.isHintUnlocked(gameEngine.primaryAvatarSelection, gameEngine.secondaryAvatarSelection, socialGameButtons[3].gameName, jpm.HINT_SG_OUTCOME))
+				unlockSGOutcome3Button.enabled = false;
+			if (jpm.isHintUnlocked(gameEngine.primaryAvatarSelection, gameEngine.secondaryAvatarSelection, socialGameButtons[4].gameName, jpm.HINT_SG_OUTCOME))
+				unlockSGOutcome4Button.enabled = false;
+				*/
+		}
+		
+		/*
+		public function dropDownListOver(e:MouseEvent):void {
+			Debug.debug(this, "hello, mouse over!");
+			//Debug.debug(this, sgDropDown.ddl.caretIndex);
+			var myString:String = "";
+			var myObject:Object = new Object();
+			
+			//myListObject.addEventListener(MouseEvent.MOUSE_OVER, itemRollOver);
+			
+			//myObject.addEventListener(MouseEvent.MOUSE_OVER, weirdFunction);
+			
+			//sgDropDown.ddlDP.addItem(myListObject);
+		}
+		
+		private function itemRollOver(e:MouseEvent):void {
+			Debug.debug(this, "item roll over!!!!!");
+		}
+		*/
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			this.relationshipSummaryButton.setStyleName();
+			this.invalidateProperties();
+		}
+		
+		]]>
+	</fx:Script>
+	
+</s:Group>

@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 preinitialize="onPreinitialize()"
+		 width="260" height="260"> 
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>					
+		 </fx:Declarations>
+		 
+		 
+		<util:SmoothImage id="bigThoughtBubbleImage" x="55" y="45" width="260" height="260" />
+		<util:SmoothImage id="bigThoughtBubbleStemImage" width="120" height="80" />
+		
+		<s:VGroup x="60" y="45" width="260" height="260" paddingLeft="20" paddingRight="40" paddingTop="30" paddingBottom="30">
+			 <s:HGroup width="100%" height="50" verticalAlign="middle">
+				 <!--<s:Button id="backButton" width="30" height="30" click="backButtonClickHandler(event)" skinClass="PromWeek.skins.NEW_backButtonSkin" />-->
+				 <s:RichText id="socialExchangeResponseTitleText" styleName="bigThoughtBubbleTitleStyle" width="100%" height="100%" verticalAlign="middle" />
+			 </s:HGroup>
+<!--			<s:HGroup width="100%" height="20%" verticalAlign="middle" horizontalAlign="center">
+				 <prom:NEW_bigThoughtBubToggleButton id="factorsToggleButton" label="Factors" width="40%" height="100%" click="toggleButtonClicked(event)"/>
+				 <prom:NEW_bigThoughtBubToggleButton id="responseToggleButton" label="Response" width="40%" height="100%" click="toggleButtonClicked(event)" locked="true" />
+			 </s:HGroup>-->
+			<s:RichText id="customResponseText" width="100%" height="30" verticalAlign="middle" textAlign="center" styleName="responseTextStyle" />
+			<s:Group width="100%" height="75">
+				<s:HGroup width="100%" height="100%" >
+					<s:RichText id="factorsText" width="100%" height="85%" verticalAlign="middle" styleName="considerationTextStyle"/>
+				</s:HGroup>
+				<s:HGroup width="100%" height="100%" horizontalAlign="right" verticalAlign="bottom" paddingRight="0" paddingBottom="0">
+					<s:Button id="moreFactorsButton" label="More..." width="65" height="25" click="moreFactorsButtonClicked(event)" skinClass="PromWeek.skins.NEW_moreButtonSkin"  />
+				</s:HGroup>
+			</s:Group>
+			<s:HGroup width="100%" height="27" horizontalAlign="center" verticalAlign="middle" paddingLeft="15" paddingRight="15" bottom="5">
+				<prom:NEW_socialExchangeButton id="changeResponseButton" width="175" height="100%" label="Change Response" locked="true" isChangeResponse="true" click="onChangeResponseClick(event)" />
+			 </s:HGroup>
+		</s:VGroup>
+		
+		 
+	<fx:Script>
+		<![CDATA[
+		import CiF.CiFSingleton;
+		import CiF.LineOfDialogue;
+		import CiF.Predicate;
+		import CiF.RelationshipNetwork;
+		import CiF.SocialGame;
+		import CiF.SocialGameContext;
+		import flash.events.MouseEvent;
+		import flash.geom.Point;
+		import flash.utils.Dictionary;
+		import PromWeek.assets.ResourceLibrary;
+
+		private var rL:ResourceLibrary;
+		private var cif:CiFSingleton;
+		private var gameEngine:GameEngine;
+		private var dm:DifficultyManager;
+		private var jpm:JuicePointManager;
+		
+		
+		public var initiator:String;
+		public var responder:String;
+		public var sgc:SocialGameContext;
+		public var factorsIndex:int;
+		public var responderFactorsVector:Vector.<String>;
+		public var intensityString:String;
+		public var intentString:String;
+		public var QP6OverwrittenTruthValue:Boolean;
+		
+		public function onCreationComplete():void 
+		{
+			cif = CiFSingleton.getInstance();
+			gameEngine = GameEngine.getInstance();
+			dm = DifficultyManager.getInstance();
+			jpm = JuicePointManager.getInstance();
+			this.bigThoughtBubbleImage.source = rL.uiIcons["bigThoughtBubble"];
+			this.bigThoughtBubbleStemImage.source = rL.uiIcons["responderBigThoughtBubbleStem"];
+			
+		}
+		
+		private function onPreinitialize():void 
+		{
+			rL = ResourceLibrary.getInstance();
+		}
+		
+		public function update(sgName:String):void
+		{
+			initiator = GameEngine.getInstance().hudGroup.initiatorSelectedComponent.currentInitiator;
+			responder = GameEngine.getInstance().hudGroup.initiatorSelectedComponent.currentResponder;
+			
+			//var somethingSelected:Boolean = false;
+			//if (this.factorsToggleButton.selected || this.responseToggleButton.selected)
+			//{
+				//somethingSelected = true;
+			//}
+			//if (!somethingSelected)
+			//{
+				//this.factorsToggleButton.selected = true;
+				//factorsToggleButton.invalidateSkinState();
+				//this.factorsGroup.visible = true;
+			//}
+			
+			
+			this.socialExchangeResponseTitleText.text = LineOfDialogue.preprocessLine(Utility.getSocialGameConsiderationPhraseForResponder(sgName, initiator));
+			this.socialExchangeResponseTitleText.text += "?";
+
+			this.sgc = cif.playGame(cif.socialGamesLib.getByName(sgName), cif.cast.getCharByName(initiator), cif.cast.getCharByName(responder), null, cif.cast.characters, gameEngine.currentLevel.cast, false, dm.getVolitionThreshold("responder"), dm.getResponderBoostFromDictionary(initiator, responder, sgName));
+			
+			this.QP6OverwrittenTruthValue = false;
+			if (gameEngine.currentStory.title == "QP6")
+			{
+				if (cif.time == 1 
+					&& sgc.gameName == "Confide In" 
+					&& sgc.initiator.toLowerCase() == "zack"
+					&& sgc.responder.toLowerCase() == "naomi"
+					&& sgc.effectID != 29)
+				{
+					if (!cif.relationshipNetwork.getRelationship(RelationshipNetwork.ENEMIES, cif.cast.getCharByName("zack"), cif.cast.getCharByName("monica")))
+					{
+						sgc.effectID = 1;
+						this.QP6OverwrittenTruthValue = true;
+					}
+				}
+			}			
+			
+			this.populateResponderFactors();
+			
+			this.populateResponse();
+			
+			this.factorsText.text = this.responderFactorsVector[0];
+		}
+		public function moreFactorsButtonClicked(e:MouseEvent):void
+		{
+			factorsIndex++;
+			if (factorsIndex > (this.responderFactorsVector.length - 1))
+			{
+				//this means we got to the end of the motives
+				factorsIndex = 0;
+			}
+			
+			this.factorsText.text = this.responderFactorsVector[factorsIndex];
+		}
+		public function populateResponse():void 
+		{
+			var acceptOrReject:String;
+			if (sgc.responderScore < dm.getVolitionThreshold("responder"))
+			{
+				acceptOrReject = "reject";
+			}
+			else
+			{
+				acceptOrReject = "accept";
+			}
+			
+			if (this.QP6OverwrittenTruthValue)
+			{
+				acceptOrReject = "reject";
+			}
+			
+			
+			var dictionaryIndex:String = initiator.toLowerCase() + "-" + responder.toLowerCase() + "-" + sgc.gameName.toLowerCase();
+			if (jpm.isResponderReactionOpposite[dictionaryIndex] != null)
+			{
+				if (jpm.isResponderReactionOpposite[dictionaryIndex])
+				{
+					if (acceptOrReject == "reject") acceptOrReject = "accept";
+					else if (acceptOrReject == "accept") acceptOrReject = "reject";
+				}
+			}
+			
+			
+			var strengthOfResponse:String = gameEngine.getIntensityOfDesireToDoWhatTheCharacterDid("responder", this.sgc);
+			
+			//var intentString:String = Predicate.getIntentNameByNumber(cif.socialGamesLib.gamesByName(sgc.gameName).intents[0].predicates[0].getIntentType());
+			var intentString:String = Predicate.getIntentNameByNumber(cif.socialGamesLib.gamesByName[sgc.gameName].intents[0].predicates[0].getIntentType());
+			//var intentString:String = Predicate.getIntentNameByNumber(6);
+
+			var responseIndex:String = intentString.toLowerCase() + "-" + acceptOrReject.toLowerCase() + "-" + strengthOfResponse.toLowerCase();
+			var possibilities:Vector.<String> = gameEngine.responsePhrases[responseIndex];
+			this.customResponseText.text = possibilities[Utility.randRange(0,possibilities.length - 1)];
+		}
+		
+		
+		public function populateResponderFactors():void
+		{
+			var acceptOrReject:String;
+			if (sgc.responderScore < dm.getVolitionThreshold("responder"))
+			{
+				acceptOrReject = "reject";
+			}
+			else
+			{
+				acceptOrReject = "accept";
+			}
+						
+			var dictionaryIndex:String = initiator.toLowerCase() + "-" + responder.toLowerCase() + "-" + sgc.gameName.toLowerCase();
+			if (jpm.isResponderReactionOpposite[dictionaryIndex] != null)
+			{
+				if (jpm.isResponderReactionOpposite[dictionaryIndex])
+				{
+					if (acceptOrReject == "reject") acceptOrReject = "accept";
+					else if (acceptOrReject == "accept") acceptOrReject = "reject";
+				}
+			}
+			
+			var respMotivesDict:Vector.<Dictionary> = gameEngine.getResponderMotives(
+				sgc, 
+				true, 
+				cif.getPredicateRelevance(sgc, 
+				cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder), 
+				cif.cast.getCharByName(sgc.other), "responder", gameEngine.currentLevel.cast,acceptOrReject),
+				sgc.initiator, 
+				sgc.responder);
+				
+
+			this.responderFactorsVector = new Vector.<String>();
+			
+			var addedSoFar:Vector.<String> = new Vector.<String>();
+			
+			for each (var dictionary:Dictionary in respMotivesDict)
+			{
+				if (this.stringNotInVector(addedSoFar, dictionary["motive"]))
+				{
+					addedSoFar.push(dictionary["motive"]);
+					
+					var firstPersonLine:String = Utility.makeStringFirstPerson(dictionary["motive"],sgc.responder,sgc.initiator,sgc.other);
+					this.responderFactorsVector.push(LineOfDialogue.preprocessLine(firstPersonLine) + "\n");
+				}
+			}
+		}
+		public function stringNotInVector(vect:Vector.<String>, str:String):Boolean
+		{
+			for each (var s:String in vect)
+			{
+				if (s == str)
+				{
+					return false;
+				}
+			}
+			
+			return true;
+		}
+		
+		public function onChangeResponseClick(e:MouseEvent = null):void
+		{
+			//var indexString:String = this.initiator.toLowerCase() + "-" + this.responder.toLowerCase() + "-" + this.sgc.gameName.toLowerCase();
+			
+			if (jpm.isHintUnlocked(this.initiator.toLowerCase(), this.responder.toLowerCase(), this.sgc.gameName.toLowerCase(), jpm.HINT_NEW_RESPONDER_REACTION))
+			{
+				jpm.switchResponderReaction(this.initiator.toLowerCase(), this.responder.toLowerCase(), this.sgc.gameName.toLowerCase(), this.sgc);
+				this.populateResponse();
+				this.populateResponderFactors();
+				this.factorsText.text = this.responderFactorsVector[0];
+			}
+			else if (jpm.activateOppositeResponderReaction(this.initiator, this.responder,sgc.gameName,this.sgc))
+			{
+				this.changeResponseButton.locked = false;
+				gameEngine.hudGroup.topBar.juiceBar.phantomJuiceHide();							
+				this.populateResponse();
+				this.populateResponderFactors();
+				this.factorsText.text = this.responderFactorsVector[0];
+			}
+		}
+		
+		/*
+		public function backButtonClickHandler(e:MouseEvent = null):void
+		{
+			GameEngine.getInstance().hudGroup.responderThoughtBubble.visible = false;
+			//GameEngine.getInstance().hudGroup.responderSubjectiveThoughtBubble.top = GameEngine.getInstance().hudGroup.defaultResponderSubjectThoughtBubbleTop;
+			gameEngine.hudGroup.responderSubjectiveThoughtBubble.thoughtBubbleImageStem.visible = true;
+			
+			GameEngine.getInstance().hudGroup.initiatorSelectedComponent.initiatorThoughtBubble.visible = true;
+		}
+		*/
+		/*
+		public function toggleButtonClicked(e:MouseEvent):void
+		{
+			if (e.target.id == "factorsToggleButton")
+			{
+				if (this.factorsToggleButton.selected)
+				{
+					return;
+				}
+				else
+				{
+					this.factorsToggleButton.selected = true;
+					this.responseToggleButton.selected = false;
+					
+					this.factorsGroup.visible = true;
+					this.responseGroup.visible = false;
+				}
+				
+			}
+			else if (e.target.id == "responseToggleButton")
+			{
+				if (this.responseToggleButton.selected || this.responseToggleButton.locked)
+				{
+					return;
+				}
+				else
+				{
+					this.responseToggleButton.selected = true;
+					this.factorsToggleButton.selected = false;
+					
+					this.responseGroup.visible = true;
+					this.factorsGroup.visible = false;
+				}
+			}
+			
+			factorsToggleButton.invalidateSkinState();
+			responseToggleButton.invalidateSkinState();
+		}
+		*/
+		public function updatePosition(elapsedTime:Number):void 
+		{
+			if (gameEngine.secondaryAvatarSelection == null) return;
+
+			var offsetX:Number = 40;
+			var offsetY:Number = -150;
+			
+			var charX:Number = (gameEngine.worldGroup.avatars[gameEngine.secondaryAvatarSelection.toLowerCase()] as Avatar).locX;
+			var charY:Number = (gameEngine.worldGroup.avatars[gameEngine.secondaryAvatarSelection.toLowerCase()] as Avatar).locY;
+			
+			// fancy local to global trickery
+			//var newPt:Point = gameEngine.worldGroup.avatars[gameEngine.secondaryAvatarSelection.toLowerCase()].localToGlobal(new Point(charX + offsetX, charY + offsetY))
+			var newPt:Point = new Point(charX + offsetX, charY + offsetY);
+			var finalPoint:Point = Utility.translatePoint(newPt, gameEngine.worldGroup, gameEngine.hudGroup);
+			
+
+			//newPt = this.trapPointOnScreen(newPt);
+			
+			this.left = finalPoint.x
+			this.top = finalPoint.y
+		}
+		
+		public function trapPointOnScreen(pt:Point):Point
+		{
+			if (pt.y < 50)
+			{	
+				pt.y = 50;
+			}
+			
+			if (pt.y + this.height > gameEngine.APPLICATION_HEIGHT)
+			{
+				pt.y = gameEngine.APPLICATION_HEIGHT - this.height;
+			}
+			if (pt.x < 0)
+			{
+				pt.x = 0;
+			}
+			if (pt.x + this.width > gameEngine.APPLICATION_WIDTH)
+			{
+				pt.x = gameEngine.APPLICATION_WIDTH - this.width;
+			}
+			
+			return pt;
+		}
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>
+

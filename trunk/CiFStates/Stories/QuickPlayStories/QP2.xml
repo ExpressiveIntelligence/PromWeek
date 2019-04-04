@@ -1,0 +1,39 @@
+<PromWeek>
+		<Story title="QP2" storyLeadCharacter="Chloe" locked="false" toUnlock="0" isTutorial="false" isQuickPlay="true" numberOfQuickPlaySGAvailable="2" startState="quickPlayStartState2" nextChallengeName="QP3">
+			<Description>Teach players about choosing actions, and that any character can take actions.</Description>
+			<QuickPlayDescription>
+				<![CDATA[Have Chloe ###CHLOE### impress ###COOL UP### Kate ###Kate### ! ]]>
+			</QuickPlayDescription>
+			<QuickPlayEndingDescription>
+				<![CDATA[Characters remember what's happened to them.]]>
+			</QuickPlayEndingDescription>
+			<ForcedSGs> <!-- Force a pair of characters to WANT to play a specific instantiation of a specific social game. -->
+				<ForcedSG initiator="Chloe" responder="Kate" gameName="Brag" turnsIn="0" instantiationID="38" />
+				<!--<ForcedSG initiator="Chloe" responder="Kate" gameName="Annoy" turnsIn="0" instantiationID="-1" />-->
+			</ForcedSGs>
+			<ToDoList>
+				<ToDoItem name="Have Chloe impress Kate">
+					<Condition>
+						<Rule>
+							<Predicate type="network" networkType="cool" first="Kate" second="Chloe" comparator="greaterthan" value="70" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+						<taskNaturalLanguage words="Get ###KATE### to think ###CHLOE### is cooler!"/>
+					</Condition>
+				</ToDoItem>
+			</ToDoList>
+			<Levels>
+				<Level title="LEVEL 2" timeLimit="1" cameraZoom="1" useDefinedCameraPosition="false" cameraX="800" cameraY="1400" endable="false" isTutorial="false" tutorialScript="">
+					<Description>Have Chloe impress Kate.</Description>
+					<Setting>park</Setting>
+					<Cast>
+						<CharacterName>Chloe</CharacterName>
+						<CharacterName>Kate</CharacterName>
+					</Cast>
+					<GoalRules>
+					</GoalRules>
+				</Level>
+			</Levels>
+			<Endings>
+			</Endings>
+		</Story>
+</PromWeek>

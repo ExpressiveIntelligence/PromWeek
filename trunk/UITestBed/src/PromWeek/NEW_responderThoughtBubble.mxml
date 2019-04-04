@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 preinitialize="onPreinitialize()"> 
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>					
+		 </fx:Declarations>
+		 
+		 
+		<util:SmoothImage id="bigThoughtBubbleImage" x="60" y="45" width="260" height="260" />
+		<util:SmoothImage id="bigThoughtBubbleStemImage" width="120" height="80" />
+		
+		<s:VGroup x="60" y="45" width="260" height="260" paddingLeft="20" paddingRight="20" paddingTop="30" paddingBottom="30">
+			 <s:HGroup width="100%" height="25%" verticalAlign="middle">
+				 <s:Button id="backButton" width="30" height="30" click="backButtonClickHandler(event)" skinClass="PromWeek.skins.NEW_backButtonSkin" />
+				 <s:RichText id="socialExchangeResponseTitleText" styleName="bigThoughtBubbleTitleStyle" width="100%" height="100%" verticalAlign="middle" />
+			 </s:HGroup>
+			<s:HGroup width="100%" height="20%" verticalAlign="middle" horizontalAlign="center">
+				 <prom:NEW_bigThoughtBubToggleButton id="factorsToggleButton" label="Factors" width="40%" height="100%" click="toggleButtonClicked(event)"/>
+				 <prom:NEW_bigThoughtBubToggleButton id="responseToggleButton" label="Response" width="40%" height="100%" click="toggleButtonClicked(event)" locked="true" />
+			 </s:HGroup>
+			 <s:Group width="100%" height="55%">
+				 <s:Group id="factorsGroup" width="100%" height="100%" visible="false">
+					<!--<s:Rect radiusX="10" radiusY="10" width="100%" height="100%">
+					  <s:stroke>
+						  <s:SolidColorStroke id="iconBackground" color="#dadada"/>
+					  </s:stroke>
+					</s:Rect>-->
+					<s:HGroup width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingTop="10" paddingBottom="10">
+						<!--<s:RichText id="motivesText" width="100%" height="100%"/>-->
+						<s:TextArea id="factorsText" width="100%" height="100%" fontSize="12" editable="false" selectable="false"  />
+					</s:HGroup>
+				 </s:Group>
+				 <s:VGroup id="responseGroup" width="100%" height="100%" visible="false" paddingLeft="0">
+					<s:HGroup width="100%" height="28%" horizontalAlign="center" verticalAlign="middle" gap="15">
+						<s:HGroup width="45%" height="100%" verticalAlign="middle">
+							<s:Label id="responderWillText" fontSize="14" width="100%" textAlign="right" />
+						</s:HGroup>
+						<s:RichText id="responseText" fontSize="20" verticalAlign="middle" width="55%" height="100%"/>
+					</s:HGroup>
+					<s:HGroup width="100%" height="47%" horizontalAlign="center" verticalAlign="middle" gap="15">
+						<s:HGroup width="45%" height="100%" verticalAlign="middle">
+							<s:Label id="initAttemptToText" fontSize="14" width="100%" textAlign="right"/>
+						</s:HGroup>
+						<s:HGroup id="intentImageGroup" width="55%" height="100%" verticalAlign="middle"/> <!--width="50" height="50"-->
+					</s:HGroup>
+					<s:HGroup width="100%" height="25%" horizontalAlign="center" verticalAlign="middle" paddingLeft="15" paddingRight="15">
+						<prom:NEW_socialExchangeButton id="changeResponseButton" width="100%" height="100%" label="Change Response" locked="true" isChangeResponse="true" />
+					</s:HGroup>
+				 </s:VGroup>
+			 </s:Group>
+		</s:VGroup>
+		
+		 
+	<fx:Script>
+		<![CDATA[
+		import CiF.CiFSingleton;
+		import CiF.LineOfDialogue;
+		import CiF.Predicate;
+		import flash.events.MouseEvent;
+		import PromWeek.assets.ResourceLibrary;
+
+		private var rL:ResourceLibrary;
+		private var cif:CiFSingleton;
+		
+		public function onCreationComplete():void 
+		{
+			cif = CiFSingleton.getInstance();
+			
+			this.bigThoughtBubbleImage.source = rL.uiIcons["bigThoughtBubble"];
+			this.bigThoughtBubbleStemImage.source = rL.uiIcons["responderBigThoughtBubbleStem"];
+		}
+		
+		private function onPreinitialize():void 
+		{
+			rL = ResourceLibrary.getInstance();
+		}
+		
+		public function update(sgName:String):void
+		{
+			var initiator:String = GameEngine.getInstance().hudGroup.initiatorSelectedComponent.currentInitiator;
+			var responder:String = GameEngine.getInstance().hudGroup.initiatorSelectedComponent.currentResponder;
+			
+			var somethingSelected:Boolean = false;
+			if (this.factorsToggleButton.selected || this.responseToggleButton.selected)
+			{
+				somethingSelected = true;
+			}
+			if (!somethingSelected)
+			{
+				this.factorsToggleButton.selected = true;
+				factorsToggleButton.invalidateSkinState();
+				this.factorsGroup.visible = true;
+			}
+			
+			
+			
+			
+			this.factorsText.text = "* She is my friend\n* She was nice to me recently\n* I am shy\n* Three negative things happened to me recently\n* She is popular";
+			
+			this.responderWillText.text = LineOfDialogue.toInitialCap(responder) + " will";
+			
+			this.responseText.text = "Accept";
+			
+			this.initAttemptToText.text = LineOfDialogue.toInitialCap(initiator) + "'s attempt to";
+			
+			this.intentImageGroup.removeAllElements();
+			var pred:Predicate = new Predicate();
+			pred.setRelationshipPredicate("initiator","responder",0);
+			this.intentImageGroup.addElement(HudGroup.getIntentImage(pred, cif.cast.getCharByName(initiator.toLowerCase()), cif.cast.getCharByName(responder.toLowerCase())));
+			
+			this.socialExchangeResponseTitleText.text = sgName + " with " + initiator + "?";
+		}
+		
+		public function backButtonClickHandler(e:MouseEvent = null):void
+		{
+			GameEngine.getInstance().hudGroup.responderThoughtBubble.visible = false;
+			GameEngine.getInstance().hudGroup.responderSubjectiveThoughtBubble.top = GameEngine.getInstance().hudGroup.defaultResponderSubjectThoughtBubbleTop;
+			
+			GameEngine.getInstance().hudGroup.initiatorSelectedComponent.initiatorThoughtBubble.visible = true;
+		}
+		
+		public function toggleButtonClicked(e:MouseEvent):void
+		{
+			if (e.target.id == "factorsToggleButton")
+			{
+				if (this.factorsToggleButton.selected)
+				{
+					return;
+				}
+				else
+				{
+					this.factorsToggleButton.selected = true;
+					this.responseToggleButton.selected = false;
+					
+					this.factorsGroup.visible = true;
+					this.responseGroup.visible = false;
+				}
+				
+			}
+			else if (e.target.id == "responseToggleButton")
+			{
+				if (this.responseToggleButton.selected)
+				{
+					return;
+				}
+				else
+				{
+					this.responseToggleButton.selected = true;
+					this.factorsToggleButton.selected = false;
+					
+					this.responseGroup.visible = true;
+					this.factorsGroup.visible = false;
+				}
+			}
+			
+			factorsToggleButton.invalidateSkinState();
+			responseToggleButton.invalidateSkinState();
+		}
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>
+

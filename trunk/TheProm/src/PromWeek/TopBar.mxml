@@ -1,0 +1,508 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 preinitialize="onPreinitialize()"
+		 initialize="onInitialize()"
+		 creationComplete="onCreationComplete()"
+		 styleName="classicPromWeek"
+		 width="760"
+		 height="30">
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+			<fx:Number id="timeRemaining">1000</fx:Number>
+			<mx:Fade id="fadeOut" duration="300" alphaFrom="1.0" alphaTo="0.0" effectEnd="fadeOutDone(event)" />
+			<mx:Fade id="fadeIn" duration="300" alphaFrom="0.0" alphaTo="1.0" effectStart="fadeInStarted(event)" />
+			
+			<mx:WipeDown id="wipeDown" duration="400" />
+			<mx:WipeUp id="wipeUp" duration="150" />
+			<mx:WipeDown id="wipeDownSkipLevel" duration="400" />
+			<mx:WipeUp id="wipeUpSkipLevel" duration="150" />
+		 </fx:Declarations>
+		 
+		 
+		<!--<s:Group id="theBar" width="100%" height="100%">-->
+		<s:Rect id="background" width="100%" height="100%">
+			<s:stroke>
+				<s:SolidColorStroke weight="1" color="{getStyle('backgroundStroke')}" />
+			</s:stroke>
+			<s:fill>
+				<s:SolidColor color="{getStyle('backgroundColor')}" alpha="1.0" />
+			</s:fill>
+		</s:Rect>
+		
+		
+		<s:HGroup width="100%" height="27" x="0" y="0" paddingLeft="10" paddingRight="10" paddingTop="3">
+			<s:HGroup id="tehButtons" width="100" height="100%" x="0" paddingTop="2">
+				<prom:PromWeekButton id="goalButton" label="Goals" click="goalButtonClicked()" />
+			</s:HGroup>
+			<prom:ToggleableContainerButton id="toDoButton" width="385" height="100%" click="toDoButtonClicked(event)" toggleable="false" boxPadding="0" toolTip="Current Goal" enabled="false" />
+			<mx:Spacer width="10"></mx:Spacer>
+			<s:HGroup id="timeGroup" width="160" height="100%">
+				<s:HGroup paddingTop="7"><s:RichText id="timeLeft" text="Time Left in Level:" width="120" fontSize="14" color="#FFFFFF" /></s:HGroup>
+				<s:HGroup paddingTop="3" width="40"><s:RichText id="daTime" width="100%" text="{this.timeRemaining}" top="3" fontSize="24" color="#FFFFFF" fontWeight="bold" /></s:HGroup>
+			</s:HGroup>
+			<prom:ToggleableContainerButton id="goToLevelButton" width="70" height="100%" toggleable="false" boxPadding="0" enabled="true" />
+		</s:HGroup>
+		 
+		<mx:Panel id="taskListContainerGroup" width="{this.toDoButton.width}" height="0" x="{toDoButton.x}" y="{this.height}" visible="false" hideEffect="{wipeUp}" showEffect="{wipeDown}" headerHeight="0" rollOut="rollOutDropDown(event)" rollOver="rollOverDropDown(event)">
+			<s:Group width="100%" height="100%">
+				<s:Rect id="taskListBackground" width="100%" height="100%">
+					<s:stroke>
+						<s:SolidColorStroke weight="1" color="{getStyle('backgroundStroke')}" />
+					</s:stroke>
+					<s:fill>
+						<s:SolidColor color="{getStyle('backgroundColor')}" alpha="1.0" />
+					</s:fill>
+				</s:Rect>
+				<s:Group id="taskListGroup" width="100%" height="100%">
+					<s:List id="todoListList" width="100%" contentBackgroundColor="{getStyle('contentAreaColor')}" itemRenderer="PromWeek.GoalTaskItemRenderer">
+						<s:layout>
+							<s:VerticalLayout gap="0" variableRowHeight="true"/>
+						</s:layout>
+					</s:List>
+				</s:Group>
+			</s:Group>
+		</mx:Panel>
+		
+		
+		<mx:Panel id="skipToDropDownPanel" width="{this.goToLevelButton.width + 30}" height="45" x="{goToLevelButton.x - 30}" y="{this.height}" visible="false" hideEffect="{wipeUpSkipLevel}" showEffect="{wipeDownSkipLevel}" headerHeight="0" rollOut="rollOutSkipDropDown(event)" rollOver="rollOverSkipDropDown(event)">
+			<s:Group width="100%" height="100%">
+				<s:Rect width="100%" height="100%">
+					<s:stroke>
+						<s:SolidColorStroke weight="1" color="{getStyle('backgroundStroke')}" />
+					</s:stroke>
+					<s:fill>
+						<s:SolidColor color="{getStyle('backgroundColor')}" alpha="1.0" />
+					</s:fill>
+				</s:Rect>
+				<s:VGroup width="100%" height="100%" gap="0">
+					<prom:PromWeekButton id="skipLevelButton" width="100%" height="20" label="Next Level" click="skipButtonClicked(event)" />
+					<prom:PromWeekButton id="skipToPromButton" width="100%" height="20" label="Prom Night!" click="skipToPromButtonClicked(event)" />
+				</s:VGroup>
+			</s:Group>
+		</mx:Panel>
+	<fx:Script>
+		<![CDATA[
+		
+		import CiF.Character;
+		import CiF.CiFSingleton;
+		import CiF.Predicate;
+		import CiF.Rule;
+		import CiF.SocialGameContext;
+		import CiF.ToCLocution;
+		import com.greensock.plugins.CirclePath2DPlugin;
+		import flash.display.DisplayObject;
+		import flash.events.Event;
+		import flash.events.MouseEvent;
+		import flash.utils.ByteArray;
+		import flash.utils.Dictionary;
+		import flash.utils.Timer;
+		import mx.collections.ArrayCollection;
+		import mx.containers.Box;
+		import mx.graphics.SolidColor;
+		import PromWeek.GameEngine;
+		import PromWeek.assets.ResourceLibrary;
+		import spark.components.IItemRenderer;
+		import spark.components.List;
+		import spark.components.Group;
+		import spark.components.RichText;
+		import spark.primitives.Rect;
+		import flash.events.TimerEvent;
+		
+		private var gameEngine:GameEngine;
+		private var rL:PromWeek.assets.ResourceLibrary;
+		private var cif:CiFSingleton;
+		
+		public var toDoItemComponent:PromWeek.ToDoItemComponent;
+		public var goalLists:CollapsiblePanel;
+		public var goalInThere:Boolean;
+		public var insideGroup:Box;
+		//public var todoListList:List;
+		
+		public var responder:Character
+		public var other:Character;
+		
+		public var timer:Timer;
+		public var skipLevelTimer:Timer;
+		
+		public var dropDownGroupBackground:Rect;
+		
+		private function onPreinitialize():void {
+			gameEngine = GameEngine.getInstance();
+			cif = CiFSingleton.getInstance();
+		}
+		
+		override protected function createChildren():void {
+			super.createChildren();
+		}
+		
+		public function onInitialize():void {	
+		}
+		
+		
+		
+		
+		public function onCreationComplete():void 
+		{
+			rL = PromWeek.assets.ResourceLibrary.getInstance();
+			toDoItemComponent = new PromWeek.ToDoItemComponent();
+			toDoItemComponent.height = 25;
+			toDoItemComponent.width = 385;
+			toDoItemComponent.y = 2;
+			toDoItemComponent.addEventListener("click", showPanel);
+			this.toDoButton.mainContainer.addElement(toDoItemComponent);
+			
+			
+			var rt:RichText = new RichText();
+			rt.width = goToLevelButton.width;
+			rt.height = goToLevelButton.height;
+			rt.setStyle("color","white");
+			rt.setStyle("textAlign","center");
+			rt.setStyle("verticalAlign","middle");
+			rt.text = "Skip to..."
+			goToLevelButton.addEventListener(MouseEvent.CLICK, showSkipToDropDownPanel);
+			goToLevelButton.mainContainer.addElement(rt);
+		}
+
+		public function skipToPromButtonClicked(e:MouseEvent = null):void
+		{
+			gameEngine.dealWithEndingLevelStuff();
+			gameEngine.currentLevelIndex = gameEngine.currentStory.levels.length - 2;
+			//gameEngine.currentState = "EndOfLevelResult";
+			gameEngine.onClickInEndOfLevelResultState();
+		}
+		
+		public function skipButtonClicked(e:MouseEvent = null):void
+		{
+			//gameEngine.currentState = "EndOfLevelResult";
+			gameEngine.dealWithEndingLevelStuff();
+			gameEngine.onClickInEndOfLevelResultState();
+		}
+		
+		
+		public function showSkipToDropDownPanel(e:MouseEvent = null):void
+		{
+			//clear out the timer
+			if (this.skipLevelTimer != null)
+			{
+				this.skipLevelTimer.stop();
+				this.skipLevelTimer = null;
+			}
+
+			if (!this.skipToDropDownPanel.visible)
+			{
+				//this means we are making it visible and should start some timers
+				skipLevelTimer = new Timer(1500, 1);
+				skipLevelTimer.addEventListener(TimerEvent.TIMER, closeSkipDropDown);
+				skipLevelTimer.start();
+			}
+			
+			this.skipToDropDownPanel.visible = !this.skipToDropDownPanel.visible;
+			this.goToLevelButton._selected = !this.goToLevelButton._selected;
+		}
+		
+		public function toDoButtonClicked(e:MouseEvent = null):void
+		{
+			//clear out the timer
+			if (this.timer != null)
+			{
+				this.timer.stop();
+				this.timer = null;
+			}
+
+			if (!this.taskListContainerGroup.visible)
+			{
+				//this means we are making it visible and should start some timers
+				timer = new Timer(1500, 1);
+				timer.addEventListener(TimerEvent.TIMER, closeDropDown);
+				timer.start();
+			}
+			
+			this.taskListContainerGroup.visible = !this.taskListContainerGroup.visible;
+		}
+		
+		
+		
+		
+		public function fadeInStarted(e:Event):void
+		{
+			gameEngine.hudGroup.storyGoalWindow.visible = true;
+		}
+		public function fadeOutDone(e:Event):void
+		{
+			gameEngine.hudGroup.storyGoalWindow.visible = false;
+			if (gameEngine.hudGroup.storyGoalWindow.hintComponent.filterTopLevel.visible)
+			{
+				gameEngine.hudGroup.storyGoalWindow.hintComponent.fadeOut.play([gameEngine.hudGroup.storyGoalWindow.hintComponent.hintSearchGroup]);
+			}
+		}
+
+		
+		
+		override protected function commitProperties():void {
+			super.commitProperties();
+		}
+		
+		public function ssuButtonClicked(e:MouseEvent):void
+		{
+			this.gameEngine.hudGroup.ssuVisualizer.visible = !this.gameEngine.hudGroup.ssuVisualizer.visible;
+		}
+		
+		public function goalButtonClicked(e:MouseEvent=null,shouldTurnOn:Boolean=false):void 
+		{
+			if (shouldTurnOn)
+			{
+				if (!this.gameEngine.hudGroup.storyGoalWindow.visible)
+				{
+					fadeIn.play([this.gameEngine.hudGroup.storyGoalWindow]);
+				}
+			}
+			else
+			{
+				if (this.gameEngine.hudGroup.storyGoalWindow.visible)
+				{
+					fadeOut.play([this.gameEngine.hudGroup.storyGoalWindow]);
+				}
+				else
+				{
+					fadeIn.play([this.gameEngine.hudGroup.storyGoalWindow]);
+				}
+			}
+		}
+		
+		public function setTimeThingy(time:Number):void {
+			this.timeRemaining = time;
+		}
+		
+		public function render():void {
+			this.daTime.text = this.timeRemaining as String;
+		}
+		
+		private function cloneListObject(source:Object):*
+		{
+			var buffer:ByteArray = new ByteArray();
+			buffer.writeObject(source);
+			buffer.position = 0;
+			return buffer.readObject();
+		}
+		
+		
+		public function clearToDoItem():void
+		{
+			this.toDoItemComponent.todoItemNameLabel.text = "";
+			//this.toDoItemComponent.toDoItem = null;
+			this.toDoItemComponent.responderFace.visible = false;
+			this.toDoItemComponent.otherFace.visible = false;
+			currentGoalTitle = "";
+			//this.toDoItemComponent.progressFGRect.width = 0;
+			
+			this.toDoButton.enabled = false;
+		}
+		
+		public function updateWorkingGoal(thePanel:List, toDoItem:PromWeek.ToDoItemComponent):void
+		{
+			//this.taskListGroup.removeAllElements();
+
+			
+			var newDP:ArrayCollection = new ArrayCollection();
+			for each (var value:Object in thePanel.dataProvider)
+			{
+				var newObj:Object = new Object;
+				
+				if (value.responder != null)
+					newObj.responder = value.responder as Character;
+				var other:Character
+				if (value.other != null)
+					newObj.other = value.other as Character;
+				
+				if (value.pred != null)
+				{
+					newObj.pred = value.pred as Predicate;
+				}
+				
+				if (value.rule != null)
+				{
+					newObj.rule = value.rule as Rule;
+				}
+				
+				if (value.textToUse != null)
+				{
+					newObj.textToUse = value.textToUse as String;
+				}
+				
+				if (value.autoDrawBackground != null)
+					newObj.autoDrawBackground = value.autoDrawBackground as Boolean;
+				
+				if (value.shouldDisplayChecks != null)
+					newObj.shouldDisplayChecks = value.shouldDisplayChecks as Boolean;
+				
+				newObj.autoDrawBackground = false;
+				
+				newDP.addItem(newObj);
+			}
+			this.todoListList.dataProvider = newDP;
+			
+			
+			//var responder:Character = (thePanel.dataProvider[0].responder != null)?thePanel.dataProvider[0].responder:null;
+			//var other:Character = (thePanel.dataProvider[0].other != null)?thePanel.dataProvider[0].other:null;
+			//var shouldDisplayChecks:Boolean = false;
+			//if (responder != null) shouldDisplayChecks = true;
+			//PromWeek.StoryGoalWindow.updateGoalList(this.todoListList, responder, other, shouldDisplayChecks, false);
+			
+			
+			
+			//this one almost works
+			//this.todoListList.dataProvider = thePanel.dataProvider;
+			
+			
+			
+			//PromWeek.StoryGoalWindow.updateGoalList(this.todoListList, null, null, false,false);
+			
+			this.todoListList.height = thePanel.dataProvider.length * 30 + 10;
+			
+			this.taskListContainerGroup.height = this.todoListList.height + 5;
+
+			this.goalInThere = true;
+			
+			this.toDoItemComponent.todoItemNameLabel.text = toDoItem.todoItemNameLabel.text;
+			this.toDoItemComponent.toDoItem = toDoItem.toDoItem;
+			currentGoalTitle = toDoItem.todoItemNameLabel.text;
+			//this.toDoItemComponent.progressFGRect.width = toDoItem.progressFGRect.width;
+		}
+		
+		public var currentGoalTitle:String = "";
+		public function displayProgress(thePanel:List, toDoItem:PromWeek.ToDoItemComponent, predChangeIndex:int=-1):void 
+		{
+			this.updateWorkingGoal(thePanel, toDoItem);
+			
+			goalInThere = true;
+			
+			var mostRecentGameContext:SocialGameContext = cif.sfdb.getLatestSocialGameContext();
+
+			if (mostRecentGameContext.responder != "")
+			{
+				this.responder = cif.cast.getCharByName(mostRecentGameContext.responder);
+			}
+			if (mostRecentGameContext.other != "")
+			{
+				this.other = cif.cast.getCharByName(mostRecentGameContext.other);
+			}
+			
+			PromWeek.StoryGoalWindow.updateGoalList(this.todoListList, responder, other, true,false);
+			
+			if (predChangeIndex != -1)
+			{
+				this.todoListList.selectedIndex = predChangeIndex;
+			}
+			
+			
+			var isPredTrue:Boolean = false;
+			
+			if (this.toDoItemComponent.toDoItem)
+			{
+				this.toDoItemComponent.setProgressWidthPercent(this.toDoItemComponent.toDoItem.condition.getPercentageTrueForInitiator(cif.cast.getCharByName(gameEngine.currentStory.storyLeadCharacter), null, responder, other)["percent"]);
+			}
+
+			//Finally, make the drop down happen
+			if (!this.taskListContainerGroup.visible)
+			{
+				if (this.timer != null)
+				{
+					this.timer.stop();
+				}
+				timer = new Timer(4000, 1);
+				timer.addEventListener(TimerEvent.TIMER, closeDropDown);
+				timer.start();
+				
+				this.taskListContainerGroup.visible = true;
+			}
+		}
+		
+		/**
+		 * Event that automatically closes the cpanel if it is open and rolled out of.
+		 */
+		
+		public function rollOutDropDown(event:MouseEvent=null):void 
+		{
+			this.taskListContainerGroup.visible = false;
+		}
+		
+		public function rollOverDropDown(event:MouseEvent=null):void 
+		{
+			if (this.timer != null)
+			{
+				this.timer.stop();
+				this.timer = null;
+			}
+		}
+		
+		/**
+		 * Event that automatically closes the cpanel if it is open and rolled out of.
+		 */
+		
+		public function rollOutSkipDropDown(event:MouseEvent=null):void 
+		{
+			this.skipToDropDownPanel.visible = false;
+			//this.goToLevelButton._selected = !this.goToLevelButton._selected;
+		}
+		
+		public function rollOverSkipDropDown(event:MouseEvent=null):void 
+		{
+			if (this.skipLevelTimer != null)
+			{
+				this.skipLevelTimer.stop();
+				this.skipLevelTimer = null;
+			}
+		}
+		
+		
+		
+		
+		public function closeDropDown(event:TimerEvent=null):void 
+		{
+			this.taskListContainerGroup.visible = false;
+			this.timer = null;
+			//goalLists.setToClosed();
+		}
+		public function closeSkipDropDown(event:TimerEvent=null):void 
+		{
+			this.skipToDropDownPanel.visible = false;
+			this.skipLevelTimer = null;
+			//goalLists.setToClosed();
+		}
+
+		
+		
+		
+		public function showPanel(e:Event):void 
+		{
+			//if (goalInThere) 
+			//{
+				//if (goalLists.open)
+				//{
+					//goalLists.setToClosed();
+					//timer = null;
+				//}
+				//else
+				//{
+					//goalLists.setToOpen();
+					//timer = new Timer(1500, 1);
+					//timer.addEventListener(TimerEvent.TIMER, closeDropDown);
+					//timer.start();
+				//}
+			//}
+		}
+		
+
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

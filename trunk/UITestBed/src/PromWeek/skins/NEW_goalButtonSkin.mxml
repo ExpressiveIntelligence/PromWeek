@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Skin 
+    xmlns:fx="http://ns.adobe.com/mxml/2009" 
+    xmlns:s="library://ns.adobe.com/flex/spark"  
+	creationComplete="onCreationComplete()"
+	preinitialize="onPreinitialize()"
+	xmlns:util="com.util.*"
+    alpha.disabled="0.5"> 
+ 
+     <fx:Metadata> 
+        [HostComponent("PromWeek.NEW_goalButton")] 
+    </fx:Metadata> 
+ 
+	<fx:Declarations>	
+		 <fx:String id="pathData"></fx:String>
+	</fx:Declarations>
+	
+    <s:states> 
+        <s:State name="up" enterState="onEnterState(event)" /> 
+        <s:State name="over" enterState="onEnterState(event)"/> 
+        <s:State name="down" enterState="onEnterState(event)"/> 
+        <s:State name="disabled" enterState="onEnterState(event)"/> 
+    </s:states>  
+
+    <!--<util:SmoothImage id="upImage" visible="false" width="{hostComponent.width}" height="{hostComponent.height}" maintainAspectRatio="false"/>
+    <util:SmoothImage id="overImage" visible="false" width="{hostComponent.width}" height="{hostComponent.height}" maintainAspectRatio="false"/>
+    <util:SmoothImage id="downImage" visible="false" width="{hostComponent.width}" height="{hostComponent.height}" maintainAspectRatio="false"/>-->
+    
+    <s:Path id="upPath" data="{this.pathData}" >
+        <!--<s:stroke>
+            <s:SolidColorStroke color="#000000" alpha="1" 
+                    weight="3" pixelHinting="true"/>
+        </s:stroke>-->
+        <s:fill>
+            <s:SolidColor color="#45A9FF" alpha="1"/>
+        </s:fill>
+    </s:Path>
+    
+	<s:Path id="overPath" data="{this.pathData}" >
+        <!--<s:stroke>
+            <s:SolidColorStroke color="#000000" alpha="1" 
+                    weight="3" pixelHinting="true"/>
+        </s:stroke>-->
+        <s:fill>
+            <s:SolidColor color="#3c94de" alpha="1"/>
+        </s:fill>
+    </s:Path>
+	
+	<s:Path id="downPath" data="{this.pathData}" >
+        <!--<s:stroke>
+            <s:SolidColorStroke color="#000000" alpha="1" 
+                    weight="3" pixelHinting="true"/>
+        </s:stroke>-->
+        <s:fill>
+            <s:SolidColor color="#337ebd" alpha="1"/>
+        </s:fill>
+    </s:Path>
+	
+	<s:HGroup width="{hostComponent.width}" height="{hostComponent.height}">
+		<util:SmoothImage id="charFaceImage" width="40%" />
+		<s:VGroup height="100%" verticalAlign="middle">
+			<s:Label id="labelDisplay" 
+					 color="#ffffff"
+					 fontSize="20" fontWeight="bold"
+					 verticalAlign="bottom" 
+					 height="50%"
+					 filters="{[new GlowFilter(0x000000,1.0,2.0,2.0,10)]}"/>
+			<s:Label  id="goalLabelText"
+					 color="#ffffff"
+					 text="Goals"
+					 fontSize="20" fontWeight="bold"
+					 verticalAlign="top" 
+					 height="50%"
+					 filters="{[new GlowFilter(0x000000,1.0,2.0,2.0,10)]}"/>
+		</s:VGroup>
+	</s:HGroup>
+    <fx:Script> 
+        <![CDATA[
+			import CiF.LineOfDialogue;
+			import flash.events.Event;
+			import flash.filters.GlowFilter;
+			import PromWeek.assets.ResourceLibrary;
+		
+			public var rL:ResourceLibrary;
+		
+			private var currentCharName:String;
+			
+			private function onPreinitialize():void 
+			{
+				rL = ResourceLibrary.getInstance();
+			}
+			
+			public function onCreationComplete():void 
+			{
+				
+				
+				//this.upPath.source = rL.uiIcons["backUp"];
+				//this.downPath.source = rL.uiIcons["backDown"];
+				//this.overPath.source = rL.uiIcons["backOver"];
+				
+				var buttonWidth:Number = 150;
+				
+				//this.pathData = "M -5 -5 l " + (buttonWidth + 5) + " 0 l 0 40 l " + ( -1 * ((buttonWidth + 5) - 150)) + " 0 C 107 77 36 72 -4 52 l 0 -55"
+				this.pathData = "M -5 -5 l " + (buttonWidth + 5) + " 0 l 0 40 C 107 77 36 72 -4 52 l 0 -55";
+			}
+			
+			override protected function updateDisplayList(w:Number, h:Number):void {
+				super.updateDisplayList(w,h);
+				//update the charFace and name only if necessary
+				if (this.currentCharName != hostComponent.charName)
+				{
+					this.currentCharName = hostComponent.charName;
+					this.charFaceImage.source = rL.charHeads[this.currentCharName.toLowerCase()];
+					hostComponent.label = LineOfDialogue.toInitialCap(this.currentCharName) + "'s";// + "'s Goals";
+					
+					if (this.currentCharName.length > 6)
+					{
+						this.labelDisplay.setStyle("fontSize",14);
+						this.goalLabelText.setStyle("fontSize",14);
+					}
+					else
+					{
+						this.labelDisplay.setStyle("fontSize",18);
+						this.goalLabelText.setStyle("fontSize",18);						
+					}
+				}
+			}
+			
+			public function onEnterState(e:Event):void
+			{
+				//this.updateDisplayList(this.width,this.height);
+				
+				if (e.currentTarget.name == "up")
+				{
+					this.upPath.visible = true;
+					this.downPath.visible = false;
+					this.overPath.visible = false;
+				}
+				else if (e.currentTarget.name == "down")
+				{
+					this.upPath.visible = false;
+					this.downPath.visible = true;
+					this.overPath.visible = false;
+				}
+				else if (e.currentTarget.name == "over")
+				{
+					this.upPath.visible = false;
+					this.downPath.visible = false;
+					this.overPath.visible = true;
+				}
+			}
+           
+        ]]>
+    </fx:Script> 
+	
+	
+</s:Skin >

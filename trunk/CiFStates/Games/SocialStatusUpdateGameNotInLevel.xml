@@ -1,0 +1,457 @@
+<CiFLibraries>
+  <SocialGameLibrary>
+    <SocialGame name="SocialStatusUpdateGameNotInLevel" italic="false">
+      <PatsyRule>
+        <Rule name="Anonymous Rule" id="-1"/>
+      </PatsyRule>
+      <Intents/>
+      <Preconditions/>
+      <InitiatorInfluenceRuleSet>
+        <InfluenceRule weight="0" name="@%r%: Hey buddy, where you at? so bored :/" id="0">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="friends" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot="first"/>
+          <Predicate type="SFDB label" first="responder" second="" label="" negated="false" intent="false" isSFDB="true" window="2" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="@%r%: Hahahahahaha you suck" id="1">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="enemies" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot="first"/>
+          <Predicate type="SFDB label" first="other" second="responder" label="mean" negated="false" intent="false" isSFDB="true" window="1" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="@%o%: just heard what happened with %r%. u rock" id="2">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="enemies" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot="first"/>
+          <Predicate type="SFDB label" first="other" second="responder" label="mean" negated="false" intent="false" isSFDB="true" window="1" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="oh god %r% and %o% are friends now?! lol pathetic" id="3">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="enemies" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot="first"/>
+          <Predicate type="relationship" first="responder" second="other" relationship="friends" negated="false" intent="false" isSFDB="true" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="@%o%: they say the enemy of my enemy is my friend, but u and %r% both suck, sry" id="4">
+          <Predicate type="relationship" first="initiator" second="other" relationship="dating" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="relationship" first="responder" second="other" relationship="enemies" negated="false" intent="false" isSFDB="true" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="relationship" first="initiator" second="responder" relationship="enemies" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot="first"/>
+          <Predicate type="relationship" first="initiator" second="other" relationship="friends" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="@%r%: hey %sweetie%, who's my %sweetie%? *kiss*" id="5">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="SFDB label" first="responder" second="" label="" negated="false" intent="false" isSFDB="true" window="1" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="@%o%: leave my %gender(r,boy,girl)%friend alone, %pejorative%! :(" id="6">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="SFDB label" first="other" second="responder" label="cat: negative" negated="false" intent="false" isSFDB="true" window="1" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="@%r%: poke... txt me back I miss u %sweetie% ;)" id="7">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="SFDB label" first="other" second="responder" label="romantic" negated="false" intent="false" isSFDB="true" window="1" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="@%r%: sweetie its been like 5 mins since u txted me... what r u doin?!?!?" id="8">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="SFDB label" first="responder" second="other" label="romantic" negated="false" intent="false" isSFDB="true" window="1" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="@%r%: awww %sweetie% I just heard what u did for %o%... u r so nice!!!! *heart*" id="9">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="SFDB label" first="responder" second="other" label="nice" negated="false" intent="false" isSFDB="true" window="1" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="awww yeah... my %gender(r,b,g)%f %r% is a badassss" id="10">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="SFDB label" first="responder" second="other" label="bad ass" negated="false" intent="false" isSFDB="true" window="1" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="SFDB label" first="responder" second="other" label="cat: flirt" negated="true" intent="false" isSFDB="true" window="1" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="hey %r% we r @ the diner u r missin hella delish %random(cheese fries,onion straws,hot wings,cheezeytoos)%" id="11">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="friends" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot="first"/>
+          <Predicate type="SFDB label" first="responder" second="" label="" negated="false" intent="false" isSFDB="true" window="2" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="@%r% omg u r friends with %o% now? %positiveadj% %pron(o,he/she)% is a rockstar" id="12">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="friends" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot="first"/>
+          <Predicate type="relationship" first="initiator" second="other" relationship="friends" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="relationship" first="responder" second="other" relationship="friends" negated="false" intent="false" isSFDB="true" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="@%r% hang in there %gender(r,boy,girl)%, u don't need %pron(o,him/her)% anyway" id="13">
+          <Predicate type="relationship" first="responder" second="other" relationship="dating" negated="true" intent="false" isSFDB="true" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="relationship" first="initiator" second="responder" relationship="friends" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot="first"/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="@%r% u made peace with %o%??! WHY?!?!? :/" id="14">
+          <Predicate type="relationship" first="initiator" second="other" relationship="dating" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="relationship" first="responder" second="other" relationship="enemies" negated="true" intent="false" isSFDB="true" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="relationship" first="initiator" second="responder" relationship="friends" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot="first"/>
+          <Predicate type="relationship" first="initiator" second="other" relationship="friends" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="@%r% I heard you and %o% worked out yr probs. %positiveadj%!" id="15">
+          <Predicate type="relationship" first="responder" second="other" relationship="enemies" negated="true" intent="false" isSFDB="true" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="relationship" first="initiator" second="responder" relationship="friends" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot="first"/>
+          <Predicate type="relationship" first="initiator" second="other" relationship="friends" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="@%r%: ooooh, love is in the air. congrats ;)" id="16">
+          <Predicate type="relationship" first="responder" second="other" relationship="dating" negated="false" intent="false" isSFDB="true" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="relationship" first="initiator" second="responder" relationship="friends" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot="first"/>
+          <Predicate type="network" networkType="buddy" first="initiator" second="other" comparator="greaterthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="network" networkType="romance" first="initiator" second="other" comparator="lessthan" value="50" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="apparently my friend %r% is now dating a total %pejorative%. :(" id="17">
+          <Predicate type="relationship" first="initiator" second="other" relationship="dating" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="relationship" first="responder" second="other" relationship="dating" negated="false" intent="false" isSFDB="true" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="relationship" first="initiator" second="responder" relationship="friends" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot="first"/>
+          <Predicate type="relationship" first="initiator" second="other" relationship="friends" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="network" networkType="buddy" first="initiator" second="other" comparator="lessthan" value="34" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="@%r%: that's cool %gender(r,bro,hon)%, it's not like I liked %o% first or anything :( #betrayals" id="18">
+          <Predicate type="relationship" first="responder" second="other" relationship="dating" negated="false" intent="false" isSFDB="true" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="relationship" first="initiator" second="other" relationship="dating" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="relationship" first="initiator" second="responder" relationship="friends" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot="first"/>
+          <Predicate type="network" networkType="romance" first="initiator" second="other" comparator="greaterthan" value="65" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="@%o%: welcome to the %r% Sucks Club. we will need a larger clubhouse soon" id="19">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="enemies" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot="first"/>
+          <Predicate type="relationship" first="responder" second="other" relationship="enemies" negated="false" intent="false" isSFDB="true" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="yeah everyone thinks %r% is soooo funny. what a joke. u are all sheep" id="20">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="enemies" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot="first"/>
+          <Predicate type="SFDB label" first="responder" second="other" label="funny" negated="false" intent="false" isSFDB="true" window="1" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="who would want to date %r% anyway? LOL what a loser" id="21">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="enemies" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot="first"/>
+          <Predicate type="SFDB label" first="responder" second="other" label="failed romance" negated="false" intent="false" isSFDB="true" window="1" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="@%o%: have u noticed %r% is kind of stupid? I have." id="22">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="enemies" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot="first"/>
+          <Predicate type="SFDB label" first="other" second="responder" label="misunderstood" negated="false" intent="false" isSFDB="true" window="1" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="omg the prom is so soon!!! #nervous" id="23">
+          <Predicate type="trait" trait="insecure" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="so bored... nothin is goin on anywhere :(" id="24">
+          <Predicate type="trait" trait="mopey" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="You all are missing out on these awesome chess problems. #winning" id="25">
+          <Predicate type="trait" trait="brainy" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="just %random(dropped my phone in a fish tank,knocked over a jar of strawberry jam,tripped over my own feet,smacked myself in the face with a locker)%. oops :/" id="26">
+          <Predicate type="trait" trait="clumsy" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="where *IS* everybody?! I am not receiving the attention i deserve" id="27">
+          <Predicate type="trait" trait="attention hog" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="just %random(bought a toaster,entered a contest,signed up for kung fu,threw out all my old games,cleaned the rents garage,bought an iguana)%, woohoo!" id="28">
+          <Predicate type="trait" trait="impulsive" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="thinking about my friends :) love you all!" id="29">
+          <Predicate type="trait" trait="kind" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="u know what pisses me off? %random(pickle jars,nuns,politics,Hollywood,Canada,people with beards,babies,thunderstorms,door slamming,orange cars)%. srsly %random(waht,what)% the hell?!" id="30">
+          <Predicate type="trait" trait="irritable" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="just slammed the door in the face of some %random(girl scouts,aid workers,lost tourists,neighbor or something,old lady with a missing dog)%. srsly people get a life!" id="31">
+          <Predicate type="trait" trait="mean" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="checkin in from da gym" id="32">
+          <Predicate type="trait" trait="ripped" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="ok friends be honest. should I get a new hat? :/" id="33">
+          <Predicate type="trait" trait="wears a hat" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="OMG shopping" id="34">
+          <Predicate type="trait" trait="cares about fashion" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="@%r%: u may have every1 else fooled but i still kno ur a phony" id="35">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="enemies" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot="first"/>
+          <Predicate type="status" status="popular" first="responder" second="" negated="false" intent="false" isSFDB="true" window="1" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="@%r%: u feeling okay %buddy%?" id="36">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="friends" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot="first"/>
+          <Predicate type="status" status="sad" first="responder" second="" negated="false" intent="false" isSFDB="true" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="@%r%: i cant believe you!" id="37">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot="first"/>
+          <Predicate type="relationship" first="responder" second="other" relationship="dating" negated="false" intent="false" isSFDB="true" window="1" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="status" status="cheating on" first="responder" second="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="@%o%: get away from my %gender(r,bf,gf)%!" id="38">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot="first"/>
+          <Predicate type="relationship" first="initiator" second="other" relationship="enemies" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="SFDB label" first="other" second="responder" label="cat: flirt" negated="false" intent="false" isSFDB="true" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="stop hanging out with my %gender(r,bf,gf)% %o%" id="39">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot="first"/>
+          <Predicate type="relationship" first="initiator" second="other" relationship="enemies" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="relationship" first="responder" second="other" relationship="friends" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="SFDB label" first="other" second="responder" label="cat: positive" negated="false" intent="false" isSFDB="true" window="1" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="OMG fashion crisis! %r%   %o% need help!" id="40">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="friends" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="relationship" first="initiator" second="other" relationship="friends" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="trait" trait="cares about fashion" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="@%r%: BFFs forever!" id="41">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="friends" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="network" networkType="buddy" first="initiator" second="responder" comparator="greaterthan" value="66" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="www.megacities.com/%i% - link it to your friends!" id="43">
+          <Predicate type="trait" trait="cat: sharp" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="totally just forgot how to spell '%random(room,choose,quit,lawn,banana,bread,pejorative)%' lol" id="44">
+          <Predicate type="trait" trait="cat: slow" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="@%o%: stop messing with my %gender(r,bf,gf)%" id="45">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="SFDB label" first="other" second="responder" label="cat: negative" negated="false" intent="false" isSFDB="true" window="1" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="does any1 want to see '%random(Battlefield Switzerland,Buzz IV,Lord of the Necklace,21 Months After,Fire Ants on a Plane)%' tonight?" id="46">
+          <Predicate type="trait" trait="cat: extroverted" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="@%r%: i cant believe you would do that to %o%" id="47">
+          <Predicate type="status" status="cheating on" first="responder" second="other" negated="false" intent="false" isSFDB="true" window="1" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="i hope those rumors i have been hearing aren't tru. %r% would never do that to me..." id="48">
+          <Predicate type="status" status="cheated on by" first="initiator" second="responder" negated="false" intent="false" isSFDB="true" window="1" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="status" status="trusts" first="initiator" second="responder" negated="false" intent="false" isSFDB="false" window="1" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="u better stop picking on my %gender(r,bf,gf)% %o%" id="49">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="SFDB label" first="other" second="responder" label="mean" negated="false" intent="false" isSFDB="true" window="1" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="I %random(heart,love,luv)% %CKB_((i,likes),(,),())%s%random( so much, soooo much, , , )%%random(..., )%" id="51">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="likes" secondSubjective="" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="It seems like %random(everyone,everybody,every1)% is %random(into,in2)% %CKB_((i,likes),(,),())%s these days... *eyeroll*" id="52">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="likes" secondSubjective="" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="%random(FYI: ,,,)%I was into %CKB_((i,likes),(,),())%s before they were cool. %random(just sayin, , )%" id="53">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="likes" secondSubjective="" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="Cant stop %random(thinkin,thinking)% about %CKB_((i,likes),(,),())%s..." id="54">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="likes" secondSubjective="" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="Checkin in from da %CKB_((i,likes),(,),())% shop.... aww yeah" id="55">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="likes" secondSubjective="" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="%CKB_((i,likes),(,),())%s are %positiveadj%..." id="56">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="likes" secondSubjective="" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="ok, I admit %CKB_((i,likes),(,),(lame))%s aren't the coolest but I can't help it. I'm such a fan%gender(i,boy,girl)% :)" id="57">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="likes" secondSubjective="" label="lame" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="I always sigh when I see a %CKB_((i,likes),(,),(romantic))%... soo romantic ;)" id="58">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="likes" secondSubjective="" label="romantic" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="%CKB_((i,likes),(,),(bad ass))%s are so bad ass..." id="59">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="likes" secondSubjective="" label="bad ass" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="Something about %CKB_((i,likes),(,),(mean))%s really brings out my evil streak ;)" id="60">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="likes" secondSubjective="" label="mean" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="u ppl all act like its a big deal. Can't a person be in2 %CKB_((i,likes),(,),(taboo))%s?" id="61">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="likes" secondSubjective="" label="taboo" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="come on people, %CKB_((i,likes),(,),(taboo))%s aren't *that* weird..." id="62">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="likes" secondSubjective="" label="taboo" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="Really don't get people being grossed out by %CKB_((i,likes),(,),(gross))%s. It's all part of nature people" id="63">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="likes" secondSubjective="" label="gross" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="This may gross you out, but I want to own the world's largest %CKB_((i,likes),(,),(gross))% 8)" id="64">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="likes" secondSubjective="" label="gross" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="%CKB_((i,likes),(,),(funny))%s %random(are,r)% hilarious" id="65">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="likes" secondSubjective="" label="funny" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="LOLOLOLOL %CKB_((i,likes),(,),(funny))%s ;)" id="66">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="likes" secondSubjective="" label="funny" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="haahahahahaa just saw the worlds most awesome %CKB_((i,likes),(,),(funny))%!!" id="67">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="likes" secondSubjective="" label="funny" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="Man I really want a %CKB_((i,wants),(,),())%! :/" id="68">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="wants" secondSubjective="" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="Does %random(anyone,any1)% wanna give me a %CKB_((i,wants),(,),())%?? ;)" id="69">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="wants" secondSubjective="" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="Maybe I'll get a %CKB_((i,wants),(,),())% as a graduation present 8-)" id="70">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="wants" secondSubjective="" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="i can has %CKB_((i,wants),(,),())%?" id="71">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="wants" secondSubjective="" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="%CKB_((i,wants),(,),())%s are like battle scars. The less %random(you,yuo)% have the more u want" id="72">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="wants" secondSubjective="" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="I would kill someone for a %CKB_((i,wants),(,),())% right now" id="73">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="wants" secondSubjective="" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="OK.... I admit it. I would kill for a new %CKB_((i,wants),(,),(lame))% right now." id="74">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="wants" secondSubjective="" label="lame" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="*sigh* if only someone would give me a %CKB_((i,wants),(,),(romantic))%..." id="75">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="wants" secondSubjective="" label="romantic" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="kinda want a %CKB_((i,wants),(,),(gross))% right now... TMI? ;)" id="76">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="wants" secondSubjective="" label="gross" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="Could use a good laugh. Anyone got a new %CKB_((i,wants),(,),(funny))% for me?" id="77">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="wants" secondSubjective="" label="funny" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="I would look so badass if I had a %CKB_((i,wants),(,),(bad ass))%..." id="78">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="wants" secondSubjective="" label="bad ass" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="Hatching evil plans. Anyone have a %CKB_((i,wants),(,),(mean))% I could borrow? *grin*" id="79">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="wants" secondSubjective="" label="mean" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="I mean who *wouldn't* want a %CKB_((i,wants),(,),(cool))%??" id="80">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="wants" secondSubjective="" label="cool" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="enjoyin my %CKB_((i,has),(,),())%..." id="81">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="has" secondSubjective="" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="Just bought a %CKB_((i,has),(,),())%%random(!,!,!!,!!!,!!!!)%" id="82">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="has" secondSubjective="" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="the only thing better than liking a %CKB_((i,has),(,),())% is having a %CKB_((i,has),(,),())% 8)" id="84">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="has" secondSubjective="" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="this %CKB_((i,has),(,),())% is totally %positiveadj%" id="85">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="has" secondSubjective="" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="best. %CKB_((i,has),(,),())%. ever." id="86">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="has" secondSubjective="" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="I suppose people are probably jealous of my %CKB_((i,has),(,),(cool))% ;)" id="87">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="has" secondSubjective="" label="cool" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="I'm here, I have a %CKB_((i,has),(,),(lame))%, get used to it." id="88">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="has" secondSubjective="" label="lame" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="I've got a %CKB_((i,has),(,),(romantic))%, now I just need a %gender(r,boy,girl)% :(" id="89">
+          <Predicate type="relationship" first="initiator" second="other" relationship="dating" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="network" networkType="romance" first="initiator" second="responder" comparator="greaterthan" value="60" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="has" secondSubjective="" label="romantic" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="This %CKB_((i,has),(,),(gross))% would have totally grossed out all the hotties at summer camp..." id="90">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="has" secondSubjective="" label="gross" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="I've got a hilarious %CKB_((i,has),(,),(funny))% here, who wants to share?? :)" id="91">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="has" secondSubjective="" label="funny" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="Maybe buying this %CKB_((i,has),(,),(taboo))% online was a bad idea..." id="92">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="has" secondSubjective="" label="taboo" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="Why are people at this school into %CKB_((i,dislikes),(,),())%s? I seriously don't get it." id="93">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="dislikes" secondSubjective="" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="%CKB_((i,dislikes),(,),())%s, are you kidding me? Get real people" id="95">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="dislikes" secondSubjective="" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="Saw some more %CKB_((i,dislikes),(,),())% kids... %random(pathetic,whatever,get real,omg losers,hilarious,sad)%" id="96">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="dislikes" secondSubjective="" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="OK, I'll just say it: I hate %CKB_((i,dislikes),(,),())%s." id="97">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="dislikes" secondSubjective="" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="Will ppl shutup about %CKB_((i,dislikes),(,),())%s? Soooo sick of it..." id="98">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="dislikes" secondSubjective="" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="%CKB_((i,dislikes),(,),())%s: dislike..." id="99">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="dislikes" secondSubjective="" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="Everyone is all talking about %CKB_((i,dislikes),(,),(cool))%s but I dunno. Boring..." id="100">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="dislikes" secondSubjective="" label="cool" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="What's the deal with %CKB_((i,dislikes),(,),(cool))%s? Seems unappealing %random(2,to)% me" id="101">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="dislikes" secondSubjective="" label="cool" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="%CKB_((i,dislikes),(,),(lame))%s are lame and I hate them. deal." id="102">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="dislikes" secondSubjective="" label="lame" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="I hate %CKB_((i,dislikes),(,),(lame))%s and the losers who like them." id="103">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="dislikes" secondSubjective="" label="lame" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="Ugh, %CKB_((i,dislikes),(,),(romantic))%s... so cheesy." id="104">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="dislikes" secondSubjective="" label="romantic" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="If some %gender(r,boy,girl)% tried to give me a %CKB_((i,dislikes),(,),(romantic))% and think that was romantic... I think I would puke." id="105">
+          <Predicate type="network" networkType="romance" first="initiator" second="responder" comparator="greaterthan" value="60" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="dislikes" secondSubjective="" label="romantic" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="oh god someone sent me this %CKB_((i,dislikes),(,),(gross))% link... disgusting" id="106">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="dislikes" secondSubjective="" label="gross" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="%CKB_((i,dislikes),(,),(gross))%s are super gross. Seriously people." id="107">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="dislikes" secondSubjective="" label="gross" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="Hardy har, %CKB_((i,dislikes),(,),(funny))%s, sooo funny. that was sarcasm. :/" id="108">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="dislikes" secondSubjective="" label="funny" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="Oooh, look at me, I have a %CKB_((i,dislikes),(,),(bad ass))% and I think I'm such a bad ass. %random(pathetic,sad,seriously?,whatever.)%" id="109">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="dislikes" secondSubjective="" label="bad ass" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="If I see one more %CKB_((i,dislikes),(,),(bad ass))% I'm going to personally murder everyone in Hollywood." id="110">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="dislikes" secondSubjective="" label="bad ass" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="Come on guys, %CKB_((i,dislikes),(,),(mean))%s are just mean. Aren't we more mature than that?" id="111">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="dislikes" secondSubjective="" label="mean" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="Not naming any names, but coming to school with a %CKB_((i,dislikes),(,),(taboo))% is not appropriate..." id="112">
+          <Predicate type="CKBEntry" first="initiator" second="" firstSubjective="dislikes" secondSubjective="" label="taboo" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="Does anyone want to buy a %CKB_((i,has),(i,dislikes),())%? :/" id="113">
+          <Predicate type="CKBEntry" first="initiator" second="initiator" firstSubjective="has" secondSubjective="dislikes" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="You know I used to be a lot more into %CKB_((i,has),(i,dislikes),())%s than I am these days." id="114">
+          <Predicate type="CKBEntry" first="initiator" second="initiator" firstSubjective="has" secondSubjective="dislikes" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="Free %CKB_((i,has),(i,dislikes),())% for a good home ;)" id="115">
+          <Predicate type="CKBEntry" first="initiator" second="initiator" firstSubjective="has" secondSubjective="dislikes" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="Hey, anyone need a %CKB_((i,has),(i,dislikes),())%? Txt me ;)" id="116">
+          <Predicate type="CKBEntry" first="initiator" second="initiator" firstSubjective="has" secondSubjective="dislikes" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="This %CKB_((i,has),(i,dislikes),())% is boring me. Who wants it?" id="117">
+          <Predicate type="CKBEntry" first="initiator" second="initiator" firstSubjective="has" secondSubjective="dislikes" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="Hey %r%, u still have that %CKB_((i,wants),(r,has),())% for me? 8) 8)" id="118">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="friends" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="CKBEntry" first="initiator" second="responder" firstSubjective="wants" secondSubjective="has" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="%r% my %gender(r,man,darling)%, when r u gonna hook me up w/a %CKB_((i,wants),(r,has),())%??" id="119">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="friends" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="CKBEntry" first="initiator" second="responder" firstSubjective="wants" secondSubjective="has" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="@%r%: dude I think I lost that %CKB_((i,wants),(r,has),())% you gave me..." id="120">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="friends" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="CKBEntry" first="initiator" second="responder" firstSubjective="wants" secondSubjective="has" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="@%r%: %sweetie% will you buy me a %CKB_((i,wants),(r,has),())%??" id="121">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="CKBEntry" first="initiator" second="responder" firstSubjective="wants" secondSubjective="has" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="I have the best %gender(r,boy,girl)%friend. %gender(r,He,She)%'ll buy me a %CKB_((i,wants),(r,has),())% any time I want one :)" id="122">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="CKBEntry" first="initiator" second="responder" firstSubjective="wants" secondSubjective="has" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="@%r%: you don't deserve that %CKB_((i,wants),(r,has),())%. It should be mine. :(" id="123">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="enemies" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="CKBEntry" first="initiator" second="responder" firstSubjective="wants" secondSubjective="has" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="How ironic that a %pejorative% like %r% has a %CKB_((i,wants),(r,has),())% and totally doesn't appreciate it." id="124">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="enemies" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="CKBEntry" first="initiator" second="responder" firstSubjective="wants" secondSubjective="has" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="Dear %r%: you are never touching my %CKB_((i,has),(r,wants),())%. Ever." id="125">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="enemies" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="CKBEntry" first="initiator" second="responder" firstSubjective="has" secondSubjective="wants" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="lolz that the only thing %r% wants in the world is my %CKB_((i,has),(r,wants),())%" id="126">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="enemies" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          <Predicate type="CKBEntry" first="initiator" second="responder" firstSubjective="has" secondSubjective="wants" label="" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+        </InfluenceRule>
+        <InfluenceRule weight="0" name="that was the hardest essay ever, glad it's over!" id="127"/>
+        <InfluenceRule weight="0" name="only a few more classes until summer!!" id="128"/>
+        <InfluenceRule weight="0" name="can't wait to get home today" id="129"/>
+        <InfluenceRule weight="0" name="school is so boring!" id="130"/>
+        <InfluenceRule weight="0" name="if I never have to listen to a teacher again, it'll be too soon" id="131"/>
+        <InfluenceRule weight="0" name="if I never have to listen to a teacher again, it'll be too soon" id="132"/>
+      </InitiatorInfluenceRuleSet>
+      <ResponderInfluenceRuleSet/>
+      <Effects/>
+      <Instantiations/>
+    </SocialGame>
+  </SocialGameLibrary>
+  <Microtheories/>
+</CiFLibraries>

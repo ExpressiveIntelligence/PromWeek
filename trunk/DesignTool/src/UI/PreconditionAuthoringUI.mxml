@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:UI="UI.*"
+		 contentBackgroundColor="#FFFFFF" 
+		 width="780" 
+		 height="640" 
+		 >
+    <fx:Metadata>
+		
+	</fx:Metadata>
+	
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	<s:HGroup>
+		<UI:RuleAuthoringUI id="ruleUI" />
+		<s:VGroup>
+			<s:Button id="addPreconditionRule" label="Add Precondition" click="addPreconditionRuleToWorkingSG();" />
+			<s:Button id="updatePreconditionRule" label="Update Precondition" click="updatePreconditionRuleToWorkingSG();" />
+		</s:VGroup>
+	</s:HGroup>
+	
+	<fx:Script>
+		<![CDATA[
+			import flash.events.Event;
+			import mx.collections.ArrayCollection;
+			import CiF.*;
+			import tool.DesignerToolEngine;
+			
+			public var dte:DesignerToolEngine = DesignerToolEngine.getInstance();
+			
+			public function addPreconditionRuleToWorkingSG():void {
+				var preconRule:Rule = new Rule();
+				var maxID:int;
+				var rIter:Rule;
+				
+				preconRule.predicates = ruleUI.rule.predicates.concat();
+				if (ruleUI.rule.name == "")// don't let things have a blank name
+					preconRule.name = "Anonymous Rule";
+				else 
+					preconRule.name = ruleUI.rule.name; 
+				
+				maxID = 0;
+				for each (rIter in dte.workingSocialGame.preconditions) {
+					if (maxID <= rIter.id) maxID = rIter.id + 1;
+				}
+				preconRule.id = maxID;
+				
+					
+				dte.workingSocialGame.preconditions.push(preconRule);
+				dte.preconditionPRDP = dte.generatePreconditionPRDP();
+				
+				dispatchEvent(new Event("preconditionListUpdate", true, true));
+			}
+			
+			public function updatePreconditionRuleToWorkingSG():void {
+				var ruleToUpdate:Rule = new Rule();
+				var i:uint;
+				
+				ruleToUpdate = this.ruleUI.rule.clone();
+				
+				//Debug.debug(this, "updatePreconditionRuleToWorkingSG() ruleToUpdate: " + ruleToUpdate);
+				
+				for (i = 0; i < dte.workingSocialGame.preconditions.length; ++i) {
+					//Debug.debug(this, "updatePreconditionRuleToWorkingSG() current working: " + dte.workingSocialGame.preconditions[i]);
+					if (ruleToUpdate.id == dte.workingSocialGame.preconditions[i].id) {
+						//Debug.debug(this, "updatePreconditionRuleToWorkingSG() found ID match.");
+						dte.workingSocialGame.preconditions[i] = ruleToUpdate;
+						dispatchEvent(new Event("preconditionListUpdate", true, true));
+						return;
+					}
+				}
+				//not found; make add a new rule
+				this.addPreconditionRuleToWorkingSG();
+			}
+		]]>
+	</fx:Script>
+	
+</s:Group>

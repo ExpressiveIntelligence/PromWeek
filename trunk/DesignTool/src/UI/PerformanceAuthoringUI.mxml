@@ -1,0 +1,805 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:UI="UI.*"
+		 xmlns:CiF="CiF.*"
+		 width="800" height="750" contentBackgroundColor="#FFFFFF"
+		 creationComplete="onCreationComplete()"
+		 >
+		 
+	<fx:Binding source="dte.bodyAnimationList" destination="this.bodyAnimationList" />
+	<fx:Binding source="dte.faceAnimationList" destination="this.faceAnimationList" />
+		 
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	<fx:Declarations>
+		<CiF:Instantiation id="workingInstantiation"
+			name="@{nameInput.text}"
+		/>
+		<CiF:LineOfDialogue id="workingLineOfDialog"
+			initiatorLine="@{initiatorDialog.text}"
+			responderLine="@{responderDialog.text}"
+			otherLine="@{otherDialog.text}"
+			primarySpeaker="@{primarySpeakerGroup.selectedValue}"
+			initiatorBodyAnimation="@{initiatorBodyAnimSelect.selectedItem}"
+			responderBodyAnimation="@{responderBodyAnimSelect.selectedItem}"
+			otherBodyAnimation="@{otherBodyAnimSelect.selectedItem}"
+			initiatorFaceAnimation="@{initiatorFaceAnimSelect.selectedItem}"
+			responderFaceAnimation="@{responderFaceAnimSelect.selectedItem}"
+			otherFaceAnimation="@{otherFaceAnimSelect.selectedItem}"
+			initiatorFaceState="@{initiatorFaceStateSelect.selectedItem}"
+			responderFaceState="@{responderFaceStateSelect.selectedItem}"
+			otherFaceState="@{otherFaceStateSelect.selectedItem}"
+			initiatorIsThought="@{initiatorIsThought.selected}"
+			responderIsThought="@{responderIsThought.selected}"
+			otherIsThought="@{otherIsThought.selected}"
+			initiatorIsDelayed="@{initiatorIsDelayed.selected}"
+			responderIsDelayed="@{responderIsDelayed.selected}"
+			otherIsDelayed="@{otherIsDelayed.selected}"
+			initiatorIsPicture="@{initiatorIsPicture.selected}"
+			responderIsPicture="@{responderIsPicture.selected}"
+			otherIsPicture="@{otherIsPicture.selected}"
+			initiatorAddressing="@{initiatorAddressingGroup.selectedValue}"
+			responderAddressing="@{responderAddressingGroup.selectedValue}"
+			otherAddressing="@{otherAddressingGroup.selectedValue}"
+			isOtherChorus="@{otherIsChorus.selected}"
+			otherApproach="@{otherApproach.selected}"
+			otherExit="@{otherExit.selected}"
+		/>
+		<s:RadioButtonGroup id="primarySpeakerGroup" itemClick="updateWorkingInstantiationDP();" />
+		<s:RadioButtonGroup id="initiatorAddressingGroup" itemClick="updateWorkingInstantiationDP();" />
+		<s:RadioButtonGroup id="responderAddressingGroup" itemClick="updateWorkingInstantiationDP();" />
+		<s:RadioButtonGroup id="otherAddressingGroup" itemClick="updateWorkingInstantiationDP();" />
+	</fx:Declarations>
+	<s:VGroup height="720" width="780" top="5" left="5">
+		<s:HGroup width="100%" height="5%" verticalAlign="middle" >
+			<s:Label text="Name of Instantiation:" color="#ffffff" verticalAlign="middle" />
+			<s:TextInput id="nameInput" width="504" text="Default Instantiation Name" />
+			<s:Button label="Add" id="addBtn" click="addInstantiationToWorkingGame();" />
+			<s:Button label="Update" id="updateBtn" click="updateWorkingInstantiationToWorkingGame();" /> 
+		</s:HGroup>
+		
+
+		<s:HGroup width="100%" verticalAlign="middle">
+			<s:Label text="Topic of Conversation 1:" color="#ffffff" />
+			<s:TextInput id="topicOfConversation1" />
+			<s:Label text="ToC 2:" color="#ffffff"/>
+			<s:TextInput id="topicOfConversation2" />
+			<s:Label text="ToC 3:" color="#ffffff"/>
+			<s:TextInput id="topicOfConversation3" />
+			<s:Button label="Preview Scene" id="previewSceneBtn" click="onPreviewSceneClick(event);" /> 
+		</s:HGroup>
+			
+		<mx:Accordion height="90%" width="100%" id="PerformanceAccordion" >
+		<mx:VBox label="Line of Dialogue" backgroundColor="#420909" width="100%">
+			
+			<s:HGroup width="100%" height="100%">
+				<s:VGroup height="100%" width="100%">
+					<s:Label text="Lines of Dialogue" color="#ffffff"/>
+					<s:HGroup height="100%" width="100%">
+						<s:VGroup>
+							<s:Button id="newBtn" label="New" click="insertNewLineOfDialogue();" />
+							<s:Button id="deleteBtn" label="Del" click="deleteLineOfDialogue();" />
+							<s:Button id="moveUpBtn" label="Up" click="moveUpLineOfDialogue();" />
+							<s:Button id="moveDownBtn" label="Down" click="moveDownLineOfDialogue();" />
+						</s:VGroup>
+						<s:List id="instantiationNameList" height="200" width="70%" click="instantiationNameListClicked();" 
+							dataProvider="{instantiationNameIndexDP}" />
+						<s:VGroup height="200" width="30%"> 
+							<s:Label text="Partial Change Predicates" color="#ffffff"/>
+							<s:List id="partialChangeRulesFromEffectsList" width="98%" height="100%" fontSize="11"
+							dataProvider="{this.partialChangeRulesFromEffectsDP}"/>
+							<s:HGroup>
+								<s:Button id="addPartialChangeRuleFromEffectsList" click="onAddPartialChangeRuleFromEffectsListClick();" label = "Add" toolTip="Add the selected Partial Change Predicate to the selected line of dialogue" />
+								<s:Button id="removePartialChangeRuleFromEffectsList" click="onRemovePartialChangeRuleFromEffectsListClick();" label="Remove" toolTip="Remove the selected Partial Change Predicate from the selected line of dialogue" />
+								<s:Button id="clearAllPartialChangeRulesFromEffectsList" click="onClearPartialChangeRuleFromEffectsListClick();" label="Clear All" toolTip="Clear all partial change predicates from the selected line of dialogue." />
+							</s:HGroup>
+						</s:VGroup>
+						
+					</s:HGroup>
+				</s:VGroup>
+			</s:HGroup>
+			<mx:HRule width="100%"/>
+
+			<s:HGroup width="100%" height="100%">
+				<s:VGroup width="100%">
+					<s:HGroup>
+						<s:Label text="Initiator Dialogue" color="#ffffff"/>
+						<s:RadioButton label="Primary Speaker" color="#ffffff" groupName="primarySpeakerGroup" selected="true" value="initiator" />
+					</s:HGroup>
+					<s:HGroup>
+						<s:VGroup>
+							<s:CheckBox id="initiatorIsThought" label="Thought?" color="#ffffff" selected="false" toolTip="If Checked, then the corresponding initiator line will be considered a 'thought', and will appear in a thought bubble during game play.  The default, unchecked, state simply means that the line of dialog is spoken aloud in a standard word baloon." />
+							<s:CheckBox id="initiatorIsPicture" label="Picture?" color="#ffffff" selected="false" toolTip="if Checked, and the initiator line of dialogue includes a reference to a CKB object, then a picture of the specified CKB object will be displayed in gameplay.  If unchecked (the default behavior), the CKB object will simply be referenced textually." />
+						</s:VGroup>
+						<s:VGroup>
+							<s:CheckBox id="initiatorIsDelayed" label="Delay?" color="#ffffff" selected="false" toolTip="If checked, the line of dialogue/animations for this character will appear after a brief pause" />
+						</s:VGroup>
+						<s:VGroup>
+							<s:RadioButton id="initAddressingResponder" label="To Responder" color="#ffffff" groupName="initiatorAddressingGroup" value="responder" selected="true" toolTip="If selected, it means that the Initiator is addressing this line of dialog to the responder" />
+							<s:RadioButton id="initAddressingOther" label="To Other" color="#ffffff" groupName="initiatorAddressingGroup" value="other" toolTip="If selected, it means that the Initiator is addressing this line of dialog to the 'other', OR, if the 'other' is marked as the 'chorus' for this specific line of dialog, then the initiator will be addressing the chorus." />
+						</s:VGroup>
+					</s:HGroup>		
+					<s:TextArea id="initiatorDialog" width="100%" height="75" focusIn="onInitiatorFocus()" change="updateWorkingInstantiationDP();" toolTip="Initiator Line" />
+				</s:VGroup>
+				<s:VGroup width="100%">
+					<s:HGroup>
+						<s:Label text="Responder Dialogue" color="#ffffff"/>
+						<s:RadioButton label="Primary Speaker" color="#ffffff" groupName="primarySpeakerGroup" value="responder" />
+					</s:HGroup>
+					<s:HGroup>
+						<s:VGroup>
+							<s:CheckBox id="responderIsThought" label="Thought?" color="#ffffff" selected="false" toolTip="If Checked, then the corresponding responder line will be considered a 'thought', and will appear in a thought bubble during game play.  The default, unchecked, state simply means that the line of dialog is spoken aloud in a standard word baloon." />
+							<s:CheckBox id="responderIsPicture" label="Picture?" color="#ffffff" selected="false" toolTip="if Checked, and the responder line of dialogue includes a reference to a CKB object, then a picture of the specified CKB object will be displayed in gameplay.  If unchecked (the default behavior), the CKB object will simply be referenced textually." />
+						</s:VGroup>
+						<s:VGroup>
+							<s:CheckBox id="responderIsDelayed" label="Delay?" color="#ffffff" selected="false" toolTip="If checked, the line of dialogue/animations for this character will appear after a brief pause" />
+						</s:VGroup>
+						<s:VGroup>
+							<s:RadioButton id="responderAddressingInitiator" label="To Initiator" color="#ffffff" groupName="responderAddressingGroup" selected="true" value="initiator" toolTip="If selected, it means that the Responder is addressing this line of dialog to the character that initiated the social game." />
+							<s:RadioButton id="responderAddressingOther" label="To Other" color="#ffffff" groupName="responderAddressingGroup" value="other" toolTip="If selected, it means that the Responder is addressing this line of dialog to the 'other', OR, if the 'other' is marked as the 'chorus' for this specific line of dialog, then the responder will be addressing the chorus." />
+						</s:VGroup>
+					</s:HGroup>
+					<s:TextArea id="responderDialog" width="100%" height="75" focusIn="onResponderFocus();" change="updateWorkingInstantiationDP();" toolTip="Responder Line"/>
+				</s:VGroup>
+				<s:VGroup width="100%">
+					<s:HGroup>
+						<s:Label text="Other Dialogue" color="#ffffff"/>
+						<s:RadioButton label="Primary Speaker" color="#ffffff" groupName="primarySpeakerGroup" value="other" />
+					</s:HGroup>
+					<s:HGroup>
+						<s:VGroup>
+							<s:CheckBox id="otherIsThought" label="Thought?" color="#ffffff" selected="false" toolTip="If Checked, then the corresponding other line will be considered a 'thought', and will appear in a thought bubble during game play.  The default, unchecked, state simply means that the line of dialog is spoken aloud in a standard word baloon." />
+							<s:CheckBox id="otherIsPicture" label="Picture?" color="#ffffff" selected="false" toolTip="if Checked, and the other line of dialogue includes a reference to a CKB object, then a picture of the specified CKB object will be displayed in gameplay.  If unchecked (the default behavior), the CKB object will simply be referenced textually." />		
+							<s:CheckBox id="otherApproach" label="Approach?" color="#ffffff" selected="false" toolTip="if Checked, the other will approach if not already in conversation." />		
+						</s:VGroup>
+						<s:VGroup>
+							<s:CheckBox id="otherIsDelayed" label="Delay?" color="#ffffff" selected="false" toolTip="If checked, the line of dialogue/animations for this character will appear after a brief pause" />
+							<s:CheckBox id="otherIsChorus" label="Chorus?" color="#ffffff" selected="false" toolTip="If Checked, then this specific 'other' line of dialog will not be prescribed to the third 'other' person, but instead will be treated as an utterance by the 'Greek Chorus', all of the spectators not involved in the social gamein the given level" />
+							<s:CheckBox id="otherExit" label="Exit?" color="#ffffff" selected="false" toolTip="if Checked, the other will exit if not already in conversation." />		
+						</s:VGroup>
+						<s:VGroup>
+							<s:RadioButton id="otherAddressingInitiator" label="To Initiator" color="#ffffff" groupName="otherAddressingGroup" selected="true" value="initiator" toolTip="If selected, it means that the Other (be they a third person or 'the chorus' is addressing this line of dialog to the character that initiated the social game." />
+							<s:RadioButton id="otherAddressingResponder" label="To Responder" color="#ffffff" groupName="otherAddressingGroup" value="responder" toolTip="If selected, it means that the Other (be they a third person or 'the chorus' is addressing this line of dialog to the responder, the character that this social game was initially directed at." />
+						</s:VGroup>
+					</s:HGroup>
+
+					<s:TextArea id="otherDialog" width="100%" height="75" focusIn="onOtherFocus();" change="updateWorkingInstantiationDP();" toolTip="Other Line"/>
+				</s:VGroup>
+			</s:HGroup>
+			
+			
+				<mx:VBox label="Animation Editor" width="100%">
+					<s:HGroup height="100%" width="100%" left="1" top="5">
+						<s:VGroup width="33.3%">
+							<s:HGroup width="100%" verticalAlign="middle">
+								<s:Label text="Face State" color="#FFFFFF" verticalAlign="middle" />
+								<s:DropDownList id="initiatorFaceStateSelect" dataProvider="{this.faceStateList}" width="100%" toolTip="Initiator Face State" selectedIndex="0" verticalCenter="50%" open="UIComponent(initiatorFaceStateSelect.dropDown).maxHeight = 200;"/>
+							</s:HGroup>
+							<s:HGroup width="100%" verticalAlign="middle">
+								<s:Label text="Face Action" color="#FFFFFF" verticalAlign="middle" />
+								<s:DropDownList id="initiatorFaceAnimSelect" dataProvider="{this.faceAnimationList}" width="100%" toolTip="Initiator Face Animation" selectedIndex="0" verticalCenter="50%" open="UIComponent(initiatorFaceAnimSelect.dropDown).maxHeight = 200;"/>
+							</s:HGroup>
+							<s:HGroup width="100%" verticalAlign="middle">
+								<s:Label text="Body Animation" color="#FFFFFF" verticalAlign="middle" />
+								<s:DropDownList id="initiatorBodyAnimSelect" dataProvider="{this.bodyAnimationList}" width="100%" toolTip="Initiator Body Animation" selectedIndex="0" open="UIComponent(initiatorBodyAnimSelect.dropDown).maxHeight = 200;"/>
+							</s:HGroup>
+						</s:VGroup>
+						<s:VGroup width="33.3%">
+							<s:HGroup width="100%" verticalAlign="middle">
+								<s:Label text="Face State" color="#FFFFFF" verticalAlign="middle" />
+								<s:DropDownList id="responderFaceStateSelect" dataProvider="{this.faceStateList}" width="100%" toolTip="Responder Face State" selectedIndex="0" open="UIComponent(responderFaceStateSelect.dropDown).maxHeight = 200;"/>
+							</s:HGroup>
+							<s:HGroup width="100%" verticalAlign="middle">
+								<s:Label text="Face Animation" color="#FFFFFF" verticalAlign="middle" />
+								<s:DropDownList id="responderFaceAnimSelect" dataProvider="{this.faceAnimationList}" width="100%" toolTip="Responder Face Animation" selectedIndex="0" open="UIComponent(responderFaceAnimSelect.dropDown).maxHeight = 200;"/>
+							</s:HGroup>
+							<s:HGroup width="100%" verticalAlign="middle">
+								<s:Label text="Body Animation" color="#FFFFFF" verticalAlign="middle" />
+								<s:DropDownList id="responderBodyAnimSelect" dataProvider="{this.bodyAnimationList}" width="100%" toolTip="Responder Body Animation" selectedIndex="0" open="UIComponent(responderBodyAnimSelect.dropDown).maxHeight = 200;"/>
+							</s:HGroup>
+						</s:VGroup>
+						<s:VGroup width="33.3%">
+							<s:HGroup width="100%" verticalAlign="middle">
+								<s:Label text="Face State" color="#FFFFFF" verticalAlign="middle" />
+								<s:DropDownList id="otherFaceStateSelect" dataProvider="{this.faceStateList}" width="100%" toolTip="Other Face State" selectedIndex="0" open="UIComponent(otherFaceStateSelect.dropDown).maxHeight = 200;"/>
+							</s:HGroup>
+							<s:HGroup width="100%" verticalAlign="middle">
+								<s:Label text="Face Animation" color="#FFFFFF" verticalAlign="middle" />
+								<s:DropDownList id="otherFaceAnimSelect" dataProvider="{this.faceAnimationList}" width="100%" toolTip="Other Face Animation" selectedIndex="0" open="UIComponent(otherFaceAnimSelect.dropDown).maxHeight = 200;"/>
+							</s:HGroup>
+							<s:HGroup width="100%" verticalAlign="middle">
+								<s:Label text="Body Animation" color="#FFFFFF" verticalAlign="middle" />
+								<s:DropDownList id="otherBodyAnimSelect" dataProvider="{this.bodyAnimationList}" width="100%" toolTip="Other Body Animation" selectedIndex="0" open="UIComponent(otherBodyAnimSelect.dropDown).maxHeight = 200;"/>
+							</s:HGroup>
+						</s:VGroup>
+					</s:HGroup>
+				</mx:VBox>
+				<s:Label text="Conditional Rule Bin:" color="#FFFFFF"/>
+				<s:HGroup width="100%" height="100%">
+					<s:List id="conditionalRuleList" width="100%" height="100%" doubleClickEnabled="true" doubleClick="onConditionalRuleListDoubleClick(event);" />
+					<s:VGroup>
+						<s:Button id="conditionalRuleListDeleteButton" label="Delete" click="conditionalRuleListDelete(event);" />
+						<s:CheckBox label="Show Name" color="#FFFFFF"  id="conditionalRuleShowNamesCheckBox" click="conditionalRuleListNameSwitch(event);" />
+					</s:VGroup>
+				</s:HGroup>
+			</mx:VBox>
+			<mx:VBox label="Partial Change Rule for Selected Line of Dialogue" backgroundColor="#420909" width="100%">
+				<s:HGroup>
+					<UI:RuleAuthoringUI id="partialRuleUI" />
+					<s:Button label="Add Partial Rule" click="addPartialRuleClick(event)" />
+				</s:HGroup>
+			</mx:VBox>
+			<mx:VBox label="Chorus Rule for Selected Line of Dialogue" backgroundColor="#420909" width="100%">
+				<s:HGroup>
+					<UI:RuleAuthoringUI id="chorusRuleUI" />
+					<s:Button label="Add Chorus Rule" click="addChorusRuleClick(event)" />
+				</s:HGroup>
+			</mx:VBox>
+			<mx:VBox label="if tag conditional rule editor" backgroundColor="#420909" width="100%">
+				<s:HGroup>
+					<UI:RuleAuthoringUI id="conditionalRuleUI" />
+					<s:Button label="Add Conditional Rule" click="addConditionalRuleClick(event)" />
+				</s:HGroup>
+			</mx:VBox>
+<!--			<mx:VBox label="Preview Scene" backgroundColor="#420909" width="100%">
+				<s:HGroup>
+					<UI:PreviewSceneUI id="previewSceneUI" />
+					<s:Button label="Preview Scene" id="previewSceneBtn" click="onPreviewSceneClick(event);" /> 
+				</s:HGroup>
+			</mx:VBox>-->
+		</mx:Accordion>
+	</s:VGroup>
+	
+	<fx:Script>
+		<![CDATA[
+		import flash.events.Event;
+		import flash.events.MouseEvent;
+		import mx.collections.ArrayCollection;
+		import CiF.*;
+		import mx.containers.TitleWindow;
+		import mx.core.DesignLayer;
+		import mx.events.CloseEvent;
+		import spark.components.Group;
+		import tool.DesignerToolEngine;
+		import mx.controls.Alert;
+		import mx.core.UIComponent;
+		import mx.managers.PopUpManager;
+		import mx.core.IFlexDisplayObject;
+		
+		
+		public var dte:DesignerToolEngine = DesignerToolEngine.getInstance();
+		public var instantiationNameIndexDP:ArrayCollection = new ArrayCollection;
+		public var partialChangeRulesFromEffectsDP:ArrayCollection = new ArrayCollection;
+		public var bodyAnimationList:ArrayCollection = new ArrayCollection;
+		public var faceAnimationList:ArrayCollection = new ArrayCollection;
+		public var faceStateList:ArrayCollection = new ArrayCollection;
+		
+		/**
+		 * The pop up window that the preview scene will be displayed on
+		 */
+		protected var previewWindowPopUp:TitleWindow;
+		
+		public function onCreationComplete():void {
+			this.insertNewLineOfDialogue();
+			/*
+			this.workingLineOfDialog = new LineOfDialogue();
+			this.workingLineOfDialog.initiatorLine = "Default Initiator Line";
+			this.workingLineOfDialog.responderLine = "Default Responder Line";
+			this.workingLineOfDialog.otherLine = "Default Other Line";
+			this.workingLineOfDialog.primarySpeaker = "initiator";
+			this.workingInstantiation.name = "Default Instantiation Name";
+			this.workingInstantiation.lines.push(this.workingLineOfDialog);
+			*/
+			initiatorFaceStateSelect.dataProvider = dte.generateFaceStateListProvider();
+			initiatorFaceAnimSelect.dataProvider = dte.generateFaceAnimationListProvider();
+			initiatorBodyAnimSelect.dataProvider = dte.generateBodyAnimationListProvider();
+			
+			responderFaceStateSelect.dataProvider = dte.generateFaceStateListProvider();
+			responderFaceAnimSelect.dataProvider = dte.generateFaceAnimationListProvider();
+			responderBodyAnimSelect.dataProvider = dte.generateBodyAnimationListProvider();
+
+			otherFaceStateSelect.dataProvider = dte.generateFaceStateListProvider();
+			otherFaceAnimSelect.dataProvider = dte.generateFaceAnimationListProvider();
+			otherBodyAnimSelect.dataProvider = dte.generateBodyAnimationListProvider();
+			
+			//partialChangeRulesFromEffectsList.dataProvider = dte.generatePartialChangeRulesListProvider();
+			
+			this.addEventListener(MouseEvent.CLICK, reloadDataProviders);
+			
+			this.partialRuleUI.predicateEd.isEvaluation = false;
+			this.chorusRuleUI.predicateEd.isEvaluation = false;
+		}
+
+		public function onPreviewSceneClick(e:Event):void
+		{
+			
+			//now build the pop up
+			previewWindowPopUp = new TitleWindow();
+			previewWindowPopUp.title = "Preview of: " + workingInstantiation.toString();
+			previewWindowPopUp.showCloseButton = true;
+			previewWindowPopUp.addEventListener(CloseEvent.CLOSE, previewWindowPopUpClose);
+			//
+			//So here I can build a scene in a pop up...
+			CiFSingleton.getInstance().isInPromToolPreviewMode = true;
+			var previewSceneUI:UI.PreviewSceneUI = new UI.PreviewSceneUI();
+			previewSceneUI.currentDialogueInstantiation = this.workingInstantiation;
+			previewWindowPopUp.width = 800;
+			previewWindowPopUp.height = 600;
+			previewWindowPopUp.addElement(previewSceneUI);
+			
+			PopUpManager.addPopUp(previewWindowPopUp,this,false);
+            PopUpManager.centerPopUp(previewWindowPopUp);
+		}
+		
+		/**
+		 * The cancel button that will not save changes
+		 * @param	evt
+		 */
+		protected function previewWindowPopUpClose(evt:CloseEvent):void {
+			PopUpManager.removePopUp(evt.currentTarget as IFlexDisplayObject);
+			
+			CiFSingleton.getInstance().isInPromToolPreviewMode = false;
+		}
+		
+		
+		public function addPartialRuleClick(e:MouseEvent):void
+		{
+			this.workingLineOfDialog.partialChange = partialRuleUI.rule.clone();
+			
+			Alert.show(this.workingLineOfDialog.partialChange.toString() + " added to line of dialogue");
+		}
+		
+		
+		public function addChorusRuleClick(e:MouseEvent):void
+		{
+			this.workingLineOfDialog.chorusRule = this.chorusRuleUI.rule.clone();
+			
+			Alert.show("Chorus rule added.\n" + this.workingLineOfDialog.chorusRule.toString() + " added to line of dialogue");
+		}
+		
+		public function addConditionalRuleClick(e:MouseEvent):void
+		{
+			//add the new Rule to working instantiation.
+			var rToAdd:Rule = this.conditionalRuleUI.rule.clone()
+			
+			conditionalRuleListNameSwitch();
+			PerformanceAccordion.selectedIndex = 0;
+			
+			//give it a new ID value
+			for each (var r:Rule in workingInstantiation.conditionalRules) {
+				if (r.id >= rToAdd.id) rToAdd.id = r.id + 1;
+			}
+			if (rToAdd.id == -1) rToAdd.id = 0;
+			
+			this.workingInstantiation.conditionalRules.push(rToAdd);
+			this.conditionalRuleListNameSwitch(e);
+		}
+		
+		public function conditionalRuleListDelete(e:MouseEvent):void {
+			var index:int = conditionalRuleList.selectedIndex;
+			workingInstantiation.conditionalRules.splice(index, 1);
+			conditionalRuleListNameSwitch();
+		
+		}
+		
+		public function conditionalRuleListNameSwitch(e:Event = null):void {
+			var result:ArrayCollection = new ArrayCollection;
+			var value:Boolean = this.conditionalRuleShowNamesCheckBox.selected;
+			for each (var r:Rule in workingInstantiation.conditionalRules) {
+				if (value) result.addItem(r.id + " : " + r.name);
+				else result.addItem(r.id + " : " + r.toString());
+			}
+			this.conditionalRuleList.dataProvider = result;
+		}
+		
+		public function onConditionalRuleListDoubleClick(e:MouseEvent):void {
+			if (conditionalRuleList.selectedIndex >= 0 && conditionalRuleList.selectedIndex < workingInstantiation.conditionalRules.length)
+			{
+				this.PerformanceAccordion.selectedIndex = 2;
+				var index:int = conditionalRuleList.selectedIndex;
+				var r:Rule = workingInstantiation.conditionalRules[index].clone() as Rule;
+				this.conditionalRuleUI.rule = r;
+				this.conditionalRuleUI.dispatchEvent(new Event("ruleChanged", true, true));
+			}
+		}
+		
+		public function reloadDataProviders(e:MouseEvent):void
+		{
+			initiatorFaceStateSelect.dataProvider = dte.generateFaceStateListProvider();
+			responderFaceStateSelect.dataProvider = dte.generateFaceStateListProvider();
+			otherFaceStateSelect.dataProvider = dte.generateFaceStateListProvider();
+			
+			
+			initiatorFaceAnimSelect.dataProvider = dte.generateFaceAnimationListProvider();
+			initiatorBodyAnimSelect.dataProvider = dte.generateBodyAnimationListProvider();
+			
+			responderFaceAnimSelect.dataProvider = dte.generateFaceAnimationListProvider();
+			responderBodyAnimSelect.dataProvider = dte.generateBodyAnimationListProvider();
+
+			otherFaceAnimSelect.dataProvider = dte.generateFaceAnimationListProvider();
+			otherBodyAnimSelect.dataProvider = dte.generateBodyAnimationListProvider();
+			
+			//partialChangeRulesFromEffectsList.dataProvider = dte.generatePartialChangeRulesListProvider();
+		
+			conditionalRuleListNameSwitch();
+			
+			this.removeEventListener(MouseEvent.CLICK, reloadDataProviders);
+		}
+		
+		public function insertNewLineOfDialogue():void {
+			this.workingLineOfDialog = new LineOfDialogue();
+			
+			//this.workingLineOfDialog.partialChange = new Rule();
+			this.partialRuleUI.rule = this.workingLineOfDialog.partialChange;
+			this.chorusRuleUI.rule = this.workingLineOfDialog.chorusRule;
+			partialRuleUI.dispatchEvent(new Event("ruleChanged", true, true));
+			
+			this.workingLineOfDialog.initiatorLine = "Default Initiator Line";
+			this.workingLineOfDialog.responderLine = "Default Responder Line";
+			this.workingLineOfDialog.responderLine = "Default Responder Line";
+			this.workingLineOfDialog.otherLine = "Default Other Line";
+			this.workingLineOfDialog.primarySpeaker = "initiator";
+			this.workingLineOfDialog.initiatorBodyAnimation = "idle";
+			this.workingLineOfDialog.responderBodyAnimation = "idle";
+			this.workingLineOfDialog.otherBodyAnimation = "idle";
+			this.workingLineOfDialog.initiatorFaceAnimation = "idle";
+			this.workingLineOfDialog.responderFaceAnimation = "idle";
+			this.workingLineOfDialog.otherFaceAnimation = "idle";
+			this.workingLineOfDialog.initiatorIsThought = false;
+			this.workingLineOfDialog.responderIsThought = false;
+			this.workingLineOfDialog.otherIsThought = false;
+			this.workingLineOfDialog.initiatorIsPicture = false;
+			this.workingLineOfDialog.responderIsPicture = false;
+			this.workingLineOfDialog.otherIsPicture = false;
+			this.workingLineOfDialog.initiatorIsDelayed = false;
+			this.workingLineOfDialog.responderIsDelayed = false;
+			this.workingLineOfDialog.otherIsDelayed = false;
+			this.workingLineOfDialog.initiatorAddressing = "responder";
+			this.workingLineOfDialog.responderAddressing = "initiator";
+			this.workingLineOfDialog.otherAddressing = "initiator";
+			this.workingLineOfDialog.isOtherChorus = false;
+			this.workingInstantiation.name = "Default Instantiation Name";
+			this.workingInstantiation.lines.push(this.workingLineOfDialog);
+			this.workingLineOfDialog.lineNumber = this.instantiationNameIndexDP.length;
+			this.instantiationNameList.selectedIndex = this.instantiationNameIndexDP.length;
+			this.updateWorkingInstantiationDP();
+		}
+		
+		public function instantiationNameListClicked():void {
+			if (instantiationNameList.selectedIndex != -1)
+			{
+				this.workingLineOfDialog = this.workingInstantiation.lines[instantiationNameList.selectedIndex];
+				
+				this.partialRuleUI.rule = this.workingLineOfDialog.partialChange;
+				this.partialRuleUI.dispatchEvent(new Event("ruleChanged", true, true));
+
+				this.chorusRuleUI.rule = this.workingLineOfDialog.chorusRule;
+				this.chorusRuleUI.dispatchEvent(new Event("ruleChanged", true, true));				
+				
+				this.updateWorkingInstantiationDP();
+			}
+		}
+		
+		/**
+		 * This function is to be called to populate the list of
+		 * partial change rules, based on the current effects available.
+		 */
+		public function makePartialRuleChangeDP():void {
+			//make the new dataprovider for the instantiation drop down list
+			var selectedIndex:uint = 0;
+			var currentIndex:uint = 0;
+			this.partialChangeRulesFromEffectsDP = new ArrayCollection;
+			
+			for each(var e:Effect in dte.workingSocialGame.effects) {
+					if (e.instantiationID == this.workingInstantiation.id) { //we only care about these change rules if they are associated with the correct instantiation id.
+						for each(var predicate:Predicate in e.change.predicates) { // look at each predicate in the effect change rule
+							this.partialChangeRulesFromEffectsDP.addItem(predicate); // and add it to our data provider.
+						}
+					}
+			}	
+			this.partialChangeRulesFromEffectsList.dataProvider = this.partialChangeRulesFromEffectsDP;
+		}
+		
+		/**
+		 * onClick handler for adding the selected partial change rule
+		 * to the currently selected line of dialogue.  The specific
+		 * partial change rule is coming from the effect changes, as opposed
+		 * to the custom-built partial change rules (though adding it to a 
+		 * line of dialogue that already has the partial change rule shouldn't
+		 * break anything!)
+		 */
+		public function onAddPartialChangeRuleFromEffectsListClick():void {
+			if(this.partialChangeRulesFromEffectsList.selectedIndex != -1){
+				//Debug.debug(this, "The add button was clicked! We are adding this predicate: " + this.partialChangeRulesFromEffectsList.selectedItem + " to line of dialogue number " + instantiationNameList.selectedIndex + "in instantiation: " + this.workingInstantiation.id);
+				this.workingLineOfDialog.partialChange.predicates.push(this.partialChangeRulesFromEffectsList.selectedItem);				
+				this.partialRuleUI.dispatchEvent(new Event("ruleChanged", true, true));
+				this.updateWorkingInstantiationDP();
+			}
+			else {
+				//Let the user know they need to select a predicate.
+				Alert.show("Please select the predicate you wish to add as a partial change!", "No Predicate Selected!");
+			}
+		}
+		
+		/**
+		 * onClick handler for removing the existing partial change rules
+		 * on the currently selected line of dialogue.  This will remove
+		 * all partial change rules -- both the ones that were included
+		 * via the 'add from effect change' method, as well as the custom
+		 * built ones from the 'partial change rule editor'
+		 */
+		public function onRemovePartialChangeRuleFromEffectsListClick():void {
+			if(this.partialChangeRulesFromEffectsList.selectedIndex != -1){
+				//Debug.debug(this, "The remove button was clicked!  We are removing something from line of dialogue number " + instantiationNameList.selectedIndex);
+				if (this.workingLineOfDialog.partialChange.predicates.length <= 0) {
+					//Let the user know there are no predicates to be removed.
+					Alert.show("Sorry!  The selected line of dialogue does not currently have any partial-change predicates!  There is nothing to be removed!", "No Predicates For Removal!");
+				}
+				for (var i:int = 0; i < this.workingLineOfDialog.partialChange.predicates.length; i++) {
+					if (Predicate.equals(this.workingLineOfDialog.partialChange.predicates[i], this.partialChangeRulesFromEffectsList.selectedItem)) {
+						this.workingLineOfDialog.partialChange.predicates.splice(i, 1);	//remove the matched predicate		
+						this.partialRuleUI.dispatchEvent(new Event("ruleChanged", true, true));
+						this.updateWorkingInstantiationDP();
+						break;
+					}
+					else {
+						//check to see if we got to the end without finding a match!
+						if (i == this.workingLineOfDialog.partialChange.predicates.length - 1) {
+							Alert.show("The requested predicate is not in this line of dialogue's partial change rule.  Since it doesn't exist, it cannot be removed!", 
+							"Tried To Remove Non-Existant Predicate!");
+						}
+					}
+				}
+			}
+			else {
+				//Let the user know they need to select a predicate.
+				Alert.show("Please select the predicate you wish to remove from the line of dialogue!", "No Predicate Selected!");
+			}
+		}
+		
+		/**
+		 * This is the callback for when the 'clear' button is clicked by the partial change
+		 * rule box.  It should clear all partial change rules from a line of dialogue.
+		 */
+		public function onClearPartialChangeRuleFromEffectsListClick():void {
+			Debug.debug(this, "The clear button got clicked!");
+			if (this.workingLineOfDialog.partialChange.predicates.length <= 0) {
+				//Let the user know there are no predicates to be removed.
+				Alert.show("Sorry!  The selected line of dialogue does not currently have any partial-change predicates!  There is nothing to be removed!", "No Predicates For Removal!");
+			}
+			else{
+				//Just delete all of 'em, we don't care!
+				this.workingLineOfDialog.partialChange.predicates.splice(0, this.workingLineOfDialog.partialChange.predicates.length);	//remove all predicates!
+				this.partialRuleUI.dispatchEvent(new Event("ruleChanged", true, true));
+				this.updateWorkingInstantiationDP();
+			}
+		}
+		
+		/**
+		 * Callback for "Add" Button
+		 * Adds the current instantiation from the 'left hand side' to the 
+		 * game overview on the right hand side.
+		 */
+		public function addInstantiationToWorkingGame():void {
+			this.stripDefaultLines(); // get rid of default line artifacts.
+			//give a new, fresh ID to the newly added instantiation
+			for each (var instantiation:Instantiation in dte.workingSocialGame.instantiations)
+				if (instantiation.id >= workingInstantiation.id) workingInstantiation.id = instantiation.id + 1;
+			if (workingInstantiation.id == -1) workingInstantiation.id = 0;
+			
+			this.workingInstantiation.toc1.rawString = this.topicOfConversation1.text;
+			this.workingInstantiation.toc2.rawString = this.topicOfConversation2.text;
+			this.workingInstantiation.toc3.rawString = this.topicOfConversation3.text;
+			
+			dte.workingSocialGame.instantiations.push(workingInstantiation.clone());
+			dispatchEvent(new Event("instantiationUpdate", true, true));
+		}
+		
+		/**
+		 * Callback for "update" button
+		 * Replaces the dte.workingSocialGame.instantiations entry with the one we're working on...
+		 * Might not work right...
+		 */
+		public function updateWorkingInstantiationToWorkingGame():void {
+			this.stripDefaultLines(); // get rid of default line artifacts.
+
+			this.workingInstantiation.toc1.rawString = this.topicOfConversation1.text;
+			this.workingInstantiation.toc2.rawString = this.topicOfConversation2.text;
+			this.workingInstantiation.toc3.rawString = this.topicOfConversation3.text;
+			
+			
+			
+			this.workingInstantiation.name = this.nameInput.text;
+			
+			var instantiation:Instantiation;
+			for (var i:int = 0; i < dte.workingSocialGame.instantiations.length; i++)
+			{
+				instantiation = dte.workingSocialGame.instantiations[i];
+				if (instantiation != null)
+				{
+					if (instantiation.id == workingInstantiation.id)
+					{
+						dte.workingSocialGame.instantiations[i] = workingInstantiation.clone();
+					}
+				}
+			}
+			
+			dispatchEvent(new Event("instantiationUpdate", true, true));
+		}
+		
+		/**
+		 * In case the user forgets to delete one of the 'default' lines of
+		 * dialogue, this function will strip out all occurences of the default
+		 * lines and replace them with an empty string.
+		 */
+		public function stripDefaultLines():void {
+			for (var i:int = 0; i < this.workingInstantiation.lines.length; ++i) {
+				if (this.workingInstantiation.lines[i].initiatorLine == "Default Initiator Line")
+					this.workingInstantiation.lines[i].initiatorLine = "";
+				if (this.workingInstantiation.lines[i].responderLine == "Default Responder Line")
+					this.workingInstantiation.lines[i].responderLine = "";
+				if (this.workingInstantiation.lines[i].otherLine == "Default Other Line")
+					this.workingInstantiation.lines[i].otherLine = "";
+			}
+		}
+		
+		/**
+		 * addLineOfDialog():void
+		 * Does this function ever get called?
+		 */
+		public function addLineOfDialog():void {
+			var instantiationNameIndex:int = instantiationNameList.selectedIndex;
+			
+			this.workingInstantiation.lines[instantiationNameIndex] = this.workingLineOfDialog.clone();
+			this.instantiationNameList.selectedIndex = instantiationNameIndex;
+		}
+		
+		public function deleteLineOfDialogue():void {
+			if (this.workingInstantiation.lines.length > 0)
+			{
+				var index:int = instantiationNameList.selectedIndex;
+				this.workingInstantiation.lines.splice(index, 1);
+				this.updateWorkingInstantiationDP();
+			}
+		}
+		
+		public function moveUpLineOfDialogue():void {
+			var selectedIndex:int = instantiationNameList.selectedIndex;
+			if (selectedIndex <= 0) return;
+			
+			var temp:LineOfDialogue;
+			temp = this.workingInstantiation.lines[selectedIndex].clone();
+			this.workingInstantiation.lines[selectedIndex] = this.workingInstantiation.lines[selectedIndex - 1].clone();
+			this.workingInstantiation.lines[selectedIndex - 1] = temp.clone();
+			this.updateWorkingInstantiationDP();
+		}
+		
+		public function moveDownLineOfDialogue():void {
+			var selectedIndex:int = instantiationNameList.selectedIndex;
+			if (selectedIndex >= workingInstantiation.lines.length - 1) return;
+			
+			var temp:LineOfDialogue;
+			temp = this.workingInstantiation.lines[selectedIndex].clone();
+			this.workingInstantiation.lines[selectedIndex] = this.workingInstantiation.lines[selectedIndex + 1].clone();
+			this.workingInstantiation.lines[selectedIndex + 1] = temp.clone();
+			this.updateWorkingInstantiationDP();
+		}
+		
+		/**
+		 * Callback function for the textbox's focusIn() event for Initiator Line
+		 * Makes it so that the default text goes away when you one clicks on
+		 * the textbox.
+		 */
+		public function onInitiatorFocus():void {
+			if (this.workingLineOfDialog.initiatorLine == "Default Initiator Line") {
+				this.workingLineOfDialog.initiatorLine = "";
+				updateWorkingInstantiationDP();
+			}
+		}
+		
+		/**
+		 * Callback function for the textbox's focusIn() event for Responder Line
+		 * Makes it so that the default text goes away when you one clicks on
+		 * the textbox.
+		 */	
+		public function onResponderFocus():void {
+			if (this.workingLineOfDialog.responderLine == "Default Responder Line") {
+				this.workingLineOfDialog.responderLine = "";
+				updateWorkingInstantiationDP();
+			}
+		}
+
+		/**
+		 * Callback function for the textbox's focusIn() event for Other Line
+		 * Makes it so that the default text goes away when you one clicks on
+		 * the textbox.
+		 */
+		public function onOtherFocus():void {
+			if (this.workingLineOfDialog.otherLine == "Default Other Line") {
+				this.workingLineOfDialog.otherLine = "";
+				updateWorkingInstantiationDP();
+			}
+		}
+		
+		public function updateWorkingInstantiationDP(e:Event=null):void {
+			if (instantiationNameList.selectedIndex == -1) {
+				return;
+			}
+			
+			if (this.initiatorDialog.text.search("\"") != -1
+				|| this.responderDialog.text.search("\"") != -1
+				|| this.otherDialog.text.search("\"") != -1
+				|| this.initiatorDialog.text.search("<") != -1
+				|| this.responderDialog.text.search("<") != -1
+				|| this.otherDialog.text.search("<") != -1
+				|| this.initiatorDialog.text.search(">") != -1
+				|| this.responderDialog.text.search(">") != -1
+				|| this.otherDialog.text.search(">") != -1
+				|| this.initiatorDialog.text.search("!--") != -1
+				|| this.responderDialog.text.search("!--") != -1
+				|| this.otherDialog.text.search("!--") != -1
+				|| this.initiatorDialog.text.search("--") != -1
+				|| this.responderDialog.text.search("--") != -1
+				|| this.otherDialog.text.search("--") != -1)
+			{
+				Alert.show("You entered a double quote or a less than or greater than sign somewhere in the dialogue. Also two dashes next to each other is bad.\nDon't do that please!","Error: Double quotes and friends are gonna screw your s up");
+			}
+			
+			var lastIndex:int = this.instantiationNameList.selectedIndex;
+			
+			
+			//The speech in the lines of dialog
+			this.initiatorDialog.text = this.workingLineOfDialog.initiatorLine;
+			this.responderDialog.text = this.workingLineOfDialog.responderLine;
+			this.otherDialog.text = this.workingLineOfDialog.otherLine;
+			
+			//The Animations
+			this.initiatorBodyAnimSelect.selectedItem = this.workingLineOfDialog.initiatorBodyAnimation;
+			this.responderBodyAnimSelect.selectedItem = this.workingLineOfDialog.responderBodyAnimation;
+			this.otherBodyAnimSelect.selectedItem = this.workingLineOfDialog.otherBodyAnimation;
+			this.initiatorFaceAnimSelect.selectedItem = this.workingLineOfDialog.initiatorFaceAnimation;
+			this.responderFaceAnimSelect.selectedItem = this.workingLineOfDialog.responderFaceAnimation;
+			this.otherFaceAnimSelect.selectedItem = this.workingLineOfDialog.otherFaceAnimation;
+			this.initiatorFaceStateSelect.selectedItem = this.workingLineOfDialog.initiatorFaceState;
+			this.responderFaceStateSelect.selectedItem = this.workingLineOfDialog.responderFaceState;
+			this.otherFaceStateSelect.selectedItem = this.workingLineOfDialog.otherFaceState;
+			
+			//The isThoughts
+			this.initiatorIsThought.selected = this.workingLineOfDialog.initiatorIsThought;
+			this.responderIsThought.selected = this.workingLineOfDialog.responderIsThought;
+			this.otherIsThought.selected = this.workingLineOfDialog.otherIsThought;
+
+			//The isDelayed
+			this.initiatorIsDelayed.selected = this.workingLineOfDialog.initiatorIsDelayed;
+			this.responderIsDelayed.selected = this.workingLineOfDialog.responderIsDelayed;
+			this.otherIsDelayed.selected = this.workingLineOfDialog.otherIsDelayed;
+			
+			
+			//The isPictures
+			this.initiatorIsPicture.selected = this.workingLineOfDialog.initiatorIsPicture;
+			this.responderIsPicture.selected = this.workingLineOfDialog.responderIsPicture;
+			this.otherIsPicture.selected = this.workingLineOfDialog.otherIsPicture;
+			
+			//Address who is addressing who!
+			if (this.workingLineOfDialog.initiatorAddressing == "responder") this.initAddressingResponder.selected = true; else this.initAddressingOther.selected = true;
+			if (this.workingLineOfDialog.responderAddressing == "initiator") this.responderAddressingInitiator.selected = true; else this.responderAddressingOther.selected = true;
+			if (this.workingLineOfDialog.otherAddressing == "initiator") this.otherAddressingInitiator.selected = true; else this.otherAddressingResponder.selected = true;
+			
+			//Is the other a chorus or a single human being?
+			this.otherIsChorus.selected = this.workingLineOfDialog.isOtherChorus;
+			
+			this.instantiationNameIndexDP.removeAll();
+			for each(var line:LineOfDialogue in this.workingInstantiation.lines) {
+				this.instantiationNameIndexDP.addItem(line.primarySpeaker + ": " + line.initiatorLine + ", " 
+						+ line.responderLine + ", " + line.otherLine + " | " + line.partialChange.toString());
+			}
+			this.instantiationNameList.selectedIndex = lastIndex;
+		}
+		
+		
+		]]>
+	</fx:Script>
+</s:Group>

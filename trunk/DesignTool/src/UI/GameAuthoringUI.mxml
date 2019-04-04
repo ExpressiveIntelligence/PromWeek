@@ -1,0 +1,750 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:UI="UI.*"
+		 minWidth="1280" 
+		 height="800" 
+		 
+		 creationComplete="onCreationComplete()">
+		
+	<fx:Metadata>
+		[Event(name="intentListUpdate", type="flash.events.Event")]
+		[Event(name="preconditionListUpdate", type="flash.events.Event")]
+		[Event(name="intentListUpdate", type="flash.events.Event")]
+		[Event(name="socialGameLibraryUpdate", type="flash.events.Event")] 
+		[Event(name="influenceRuleSetChange", type="flash.events.Event")]
+	</fx:Metadata>
+	<fx:Binding source="dte.intentPRDP" destination="intentList.dataProvider" />
+	<fx:Binding source="dte.preconditionPRDP" destination="preconditionList.dataProvider" />
+	<fx:Binding source="dte.initiatorIRSDP" destination="initiatorIRSList.dataProvider" />
+	<fx:Binding source="dte.responderIRSDP" destination="responderIRSList.dataProvider" />
+	<fx:Binding source="dte.effectEADP" destination="effectList.dataProvider" />
+	<fx:Binding source="dte.instantiationDP" destination="instantiationList.dataProvider"/>
+	
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<fx:Number id="posInitIRSTotal" >0</fx:Number>
+		<fx:Number id="negInitIRSTotal" >0</fx:Number>
+		<fx:Number id="posRespIRSTotal" >0</fx:Number>
+		<fx:Number id="negRespIRSTotal" >0</fx:Number>
+	</fx:Declarations>
+	
+	<s:Rect width="100%" height="105%">
+		<s:fill>
+				<s:LinearGradient rotation="90">
+				<s:entries>
+					<s:GradientEntry color="#980000" ratio="0.0" alpha="1.0"/>
+					<s:GradientEntry color="#080000" ratio="1.0" alpha="1.0"/>
+					<!--<s:GradientEntry color="0x336699" ratio="1.0" alpha="0.5"/>-->
+				</s:entries>
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+	
+	<mx:TabNavigator x="8" y="10" width="794"  height="768" id="tabNav" backgroundColor="#101010" backgroundAlpha="0.6" selectedIndex="3">
+		<s:NavigatorContent label="Game Simulation" width="100%" height="100%" skinClass="spark.skins.spark.SkinnableContainerSkin" show="onNewTabSelected();">
+			<UI:GameSummaryUI x="5" y="0" id="gameSimulation">
+			</UI:GameSummaryUI>
+		</s:NavigatorContent>
+		<s:NavigatorContent label="Intents" width="100%" height="100%" show="onNewTabSelected();">
+			<UI:IntentAuthoringUI x="6" y="-0.05" id="intentEd" />
+		</s:NavigatorContent>
+		<s:NavigatorContent label="Preconditions" width="100%" height="100%" show="onNewTabSelected();">
+			<UI:PreconditionAuthoringUI x="6" y="-0.05" id="preconditionEd"/>
+		</s:NavigatorContent>
+		<s:NavigatorContent label="Influence Rule Set" width="100%" height="100%" show="onNewTabSelected();">
+			<UI:InfluenceSetAuthoringUI x="5.85" y="-0.2" id="influenceEd" />
+		</s:NavigatorContent>
+		<s:NavigatorContent label="Effects Authoring" width="100%" height="100%" show="onNewTabSelected();">
+			<UI:EffectsAuthoringUI x="5.6" y="-0.35" id="effectsEd">
+			</UI:EffectsAuthoringUI>
+		</s:NavigatorContent>
+		<s:NavigatorContent label="Performance Authoring" width="100%" height="100%" show="onNewTabSelected();">
+			<UI:PerformanceAuthoringUI id="performanceEd">
+			</UI:PerformanceAuthoringUI>
+		</s:NavigatorContent>
+	</mx:TabNavigator>
+
+	<s:VGroup id="summaries" height="100%" x="812.85" y="5" width="440">
+		<s:VGroup>
+			<s:Label text="Game Overview" fontSize="20" color="#ffffff" />
+			<s:HGroup>
+				<s:Button id="saveGameButton" label="Save Game" click="onSaveGameButton(event)" />
+				<s:TextInput id="saveGameNameTextInput" width="125" text="Game Name" />
+				<!--<mx:PopUpButton id="loadGamePopUpButton" click="onLoadSocialGamePopUpButtonClick(event)" />-->
+				<s:DropDownList id="sgDropDown" color="0x000000" selectedIndex="0" change="onChangeSGClick(event)" alternatingItemColors="[#EEEEEE,#DFDFDF]" open="UIComponent(sgDropDown.dropDown).maxHeight = 600;">
+	<!--						<s:layout>
+						<s:VerticalLayout requestedRowCount="20"/>
+					</s:layout>-->
+				</s:DropDownList>
+				<s:Button id="loadSocialGameButton" label="Load" click="onLoadSGClick(event);" />
+			</s:HGroup>
+		</s:VGroup>
+		
+		<mx:Accordion id="gameOverviewAccordion" height="90%" top="50" backgroundAlpha="0" creationPolicy="all" >
+			
+			<mx:VBox label="Intent" height="100%" backgroundAlpha="0">
+				<s:HGroup width="100%" height="100%">
+					<s:List id="intentList" width="360" height="100%" doubleClickEnabled="true" doubleClick="onIntentListDoubleClick();"  />
+					<s:VGroup> 
+						<s:Button id="intentListDeleteButton" label="Delete" click="intentListDelete();" />
+						<s:CheckBox label="Show Name" color="#000000"  id="intentShowNames" click="intentListNameSwitch();" />
+					</s:VGroup>
+				</s:HGroup>
+			</mx:VBox>
+			
+			<mx:VBox label="Precondition" height="100%" backgroundAlpha="0">
+				<s:HGroup width="100%" height="100%">
+					<s:List id="preconditionList" width="360" height="100%" doubleClickEnabled="true" doubleClick="onPreconditionListDoubleClick();"  />
+					<s:VGroup>
+						<s:Button id="preconditionListDeleteButton" label="Delete" click="preconditionListDelete();" />
+						<!--s:CheckBox label="Show Name" color="#000000"  id="preconditionShowNames" click="preconditionListNameSwitch();" /-->
+						<s:RadioButton id="straightRulePrecondition" label="Rule" color="#000000" groupName="ruleNamesPrecondition" click="preconditionListNameSwitch();" />
+						<s:RadioButton id="handAuthoredNamePrecondition" label="Authored" color="#000000" groupName="ruleNamesPrecondition" click="preconditionListNameSwitch();" />
+						<s:RadioButton id="generatedNamePrecondition" label="Generated" color="#000000" groupName="ruleNamesPrecondition" click="preconditionListNameSwitch();" />
+						<s:CheckBox label="Mismatches" color="#000000"  id="preconditionShowMismatches" click="preconditionListNameSwitch();" />
+					</s:VGroup>
+				</s:HGroup>
+			</mx:VBox>
+			<mx:VBox label="Initiator Influence Rule Set" height="100%">
+<!--				<s:HGroup>
+					<mx:TextInput x="10" y="10" id="initiatorIRSFilterInputBox" width="200" fontWeight="bold" />
+					<s:Button label="Filter" width="50" id="filterInitiatorIRSButton" click="onClickFilterInitiatorIRS(event)"/>
+				</s:HGroup>-->
+				<s:HGroup width="100%" height="100%">
+					<s:List id="initiatorIRSList" width="360" height="100%" doubleClickEnabled="true" doubleClick="onInitiatorIRSListDoubleClick();" />
+					<s:VGroup>
+						<s:Button id="initiatorIRSListDeleteButton" label="Delete" click="initiatorIRSListDelete();" />
+						<!--s:CheckBox label="Show Name" color="#000000"  id="initiatorIRSShowNames" click="initiatorIRSListNameSwitch();" /-->
+						<s:RadioButton id="straightRuleInitiator" label="Rule" color="#000000" groupName="ruleNamesInitiator" click="initiatorIRSListNameSwitch();" />
+						<s:RadioButton id="handAuthoredNameInitiator" label="Authored" color="#000000" groupName="ruleNamesInitiator" click="initiatorIRSListNameSwitch();" />
+						<s:RadioButton id="generatedNameInitiator" label="Generated" color="#000000" groupName="ruleNamesInitiator" click="initiatorIRSListNameSwitch();" />
+						<s:CheckBox label="Mismatches" color="#000000"  id="initiatorShowMismatches" click="initiatorIRSListNameSwitch();" />
+						
+						<s:HGroup>
+							<s:RichText text="Pos: " color="#000000"/>
+							<s:RichText id="initiatorIRSPos" color="#000000" text="{posInitIRSTotal.toString()}" />
+						</s:HGroup>
+						<s:HGroup>
+							<s:RichText text="Neg: " color="#000000"/>
+							<s:RichText id="initiatorIRSNeg" color="#000000" text="{negInitIRSTotal.toString()}" />
+						</s:HGroup>
+					</s:VGroup>
+				</s:HGroup>
+			</mx:VBox>
+			<mx:VBox label="Responder Influence Rule Set" height="100%">
+				<s:HGroup width="100%" height="100%">
+					<s:List id="responderIRSList" width="360" height="100%" doubleClickEnabled="true" doubleClick="onResponderIRSListDoubleClick();" />
+					<s:VGroup>
+						<s:Button id="responderIRSListDeleteButton" label="Delete" click="responderIRSListDelete();" />
+						<!--s:CheckBox label="Show Name" color="#000000"  id="responderIRSShowNames" click="responderIRSListNameSwitch();" /-->
+						<s:RadioButton id="straightRuleResponder" label="Rule" color="#000000" groupName="ruleNamesResponder" click="responderIRSListNameSwitch();" />
+						<s:RadioButton id="handAuthoredNameResponder" label="Authored" color="#000000" groupName="ruleNamesResponder" click="responderIRSListNameSwitch();" />
+						<s:RadioButton id="generatedNameResponder" label="Generated" color="#000000" groupName="ruleNamesResponder" click="responderIRSListNameSwitch();" />
+						<s:CheckBox label="Mismatches" color="#000000"  id="responderShowMismatches" click="responderIRSListNameSwitch();" />
+						
+						<s:HGroup>
+							<s:RichText text="Pos: " color="#000000"/>
+							<s:RichText id="responderIRSPos" color="#000000" text="{posRespIRSTotal.toString()}" />
+						</s:HGroup>
+						<s:HGroup>
+							<s:RichText text="Neg: " color="#000000"/>
+							<s:RichText id="responderIRSNeg" color="#000000" text="{negRespIRSTotal.toString()}" />
+						</s:HGroup>
+					</s:VGroup>
+				</s:HGroup>
+			</mx:VBox>
+			<mx:VBox label="Effects" height="100%">
+				<s:HGroup width="100%" height="100%">
+					<s:List id="effectList" width="360" height="100%" doubleClickEnabled="true" doubleClick="onEffectListDoubleClick();" />
+					<s:VGroup>
+						<s:Button id="effectListDeleteButton" label="Delete" click="effectListDelete();" />
+						<s:CheckBox label="Show PRS" color="#000000" id="effectShowNames" click="effectListNameSwitch();" />
+					</s:VGroup>
+				</s:HGroup>
+			</mx:VBox>
+			<mx:VBox label="Instantiations" height="100%">				
+				<s:HGroup width="100%" height="100%">
+					<s:List id="instantiationList" width="360" height="100%" doubleClickEnabled="true" doubleClick="onInstantiationListDoubleClick();" />
+					<s:VGroup width="100%">
+						<s:Button label="Delete" click="instantiationListDelete();" />
+						<s:CheckBox id="instantiationShowNames" label="Show Names" color="#000000"  click="instantiationListNameSwitch();" />
+					</s:VGroup>
+				</s:HGroup>
+				
+			</mx:VBox>
+		</mx:Accordion>
+	</s:VGroup>
+
+	<fx:Script>
+		<![CDATA[
+		import flash.events.Event;
+		import flash.events.MouseEvent;
+		import mx.events.CloseEvent; 
+		import mx.collections.ArrayCollection;
+		import CiF.*;
+		import mx.controls.Menu;
+		import mx.controls.Alert; 
+		import mx.core.DesignLayer;
+		import mx.events.MenuEvent;
+		import tool.DesignerToolEngine;
+		import mx.core.UIComponent;
+		
+		public var dte:DesignerToolEngine = DesignerToolEngine.getInstance();
+		private var menu:Menu;
+		private var selectedSocialGameName:String;
+		
+		public function onCreationComplete():void 
+		{
+			
+			//event handlers
+			addEventListener("socialGameLibraryUpdate", onSocialGameLibraryUpdate);
+			addEventListener("intentListUpdate", intentListUpdateCallback);
+			addEventListener("preconditionListUpdate", preconditionListUpdateCallback);
+			addEventListener("irsListUpdate", irsListUpdateCallback);
+			addEventListener("effectListUpdate", effectListUpdateCallback);
+			addEventListener("instantiationUpdate", instantiationListUpdateCallback);
+			addEventListener("influenceRuleSetChange", onNewTabSelected); // open the correct accordian tab!
+		}
+		
+		
+		public function onChangeSGClick(event:Event):void {
+			this.selectedSocialGameName = sgDropDown.dataProvider[event.currentTarget.selectedIndex];
+		}
+		
+		public function onLoadSGClick(event:Event):void 
+		{
+			try{
+			this.dte.workingSocialGame = this.dte.cif.socialGamesLib.getByName(this.selectedSocialGameName).clone();
+			}
+			catch (e:Error) {
+					Alert.show("Oops! You pushed load but didn't select a social game!  Make sure you select a social game!", "This used to crash everything!");
+			}
+			//for each (var ir:InfluenceRule in this.dte.workingMicrotheory.initiatorIRS.influenceRules) {
+				//trace(ir.generateRuleName());
+			//}
+			
+			this.saveGameNameTextInput.text = this.dte.workingSocialGame.name;
+			
+			this.intentListNameSwitch();
+			this.preconditionListNameSwitch();
+			this.initiatorIRSListNameSwitch();
+			this.responderIRSListNameSwitch();
+			this.effectListNameSwitch();
+			this.instantiationListNameSwitch();
+		}
+		
+		public function onClickFilterInitiatorIRS(e:MouseEvent):void
+		{
+			/* To get this function to work, only edit variables filterText, columnArray, gridDataProvider, and dataGridName. 
+			Everything else is dynamic. Do not edit variable names. */
+			//var filterText:String = StringUtil.trim(txtFilter.text.toLowerCase()); //Trimmed text String to filter by
+			//var columnArray:Array = ['firstName','lastName','bandName','recordLabel']; //Datagrid column names to filter on
+			//var gridDataProvider:ArrayCollection = this.famousMusicians as ArrayCollection; //Name of datagrid's dataprovider. In this case e.g. databases
+			//var dataGridName:String = 'musicianGrid'; //Name of the datagrid you are filtering by
+			//
+			//Do not edit code past this point
+			//var filteredData:Array = [];
+			//var added:Boolean=false;
+			//var i:int;
+			//var j:int;
+				//
+			// Loop Through Grid
+			//for(i=0; i < gridDataProvider.length; i++){    
+				//added = false;
+				//
+				//Loop through grid column
+				//for(j=0; j<columnArray.length; j++){            
+					//if(gridDataProvider[i][columnArray[j]]!=null){
+						//
+						//Grab datagrid cell contents, trim it, and convert to lowercase for comparison.
+						//var filterString:String = gridDataProvider[i][columnArray[j]].toString().toLowerCase();
+						//
+						//Compare the datagrid string(filterString) to the user typed string(filterText).  
+						//if(!added){      
+							//If the datagrid string matches the users string, put it into the array.
+							//if(filterString.indexOf(filterText) != -1){
+							   //filteredData.push(gridDataProvider[i]);
+							   //added = true;
+							//} 
+						//}else{
+							//Do nothing, break out.
+							//break;
+						//}
+					//}    
+				//}
+			//}
+		}
+		
+		/**
+		 * This component's callback to the socialGameLibraryUpdate event. It
+		 * creates a new menu for the loadSocialGamePopUpButton. This function
+		 * also generates the locution vectors of the dialogue instantiations.
+		 * @param	event	The incoming event.
+		 */
+		public function onSocialGameLibraryUpdate(event:Event):void {
+			var cif:CiFSingleton = CiFSingleton.getInstance()
+			cif.prepareLocutions();
+			
+/*			var menuXML:XML = new XML("<root></root>");
+			//Debug.debug(this, this.dte.gameNamesDP.toString());
+			for each (var game:SocialGame in this.dte.cif.socialGamesLib.games) {
+				var newNode:XML = new XML();
+				newNode = <menuitem label={game.name} />;
+				menuXML.appendChild(newNode);
+			}
+			
+			//update the instantiations <-> effects link drop down list
+			this.effectsEd.makeInstantiationsDP();
+			
+			//Debug.debug(this, "onSocialGameLibraryUpdate(): menuXML is " + menuXML);
+			
+			menu = new Menu();
+			menu.dataProvider = menuXML..menuitem;
+			
+			menu.labelField = "@label";
+			menu.addEventListener("itemClick", onMenuItemClick);
+			menu.selectedIndex = 0;
+			
+			this.selectedSocialGameName = menuXML.menuitem[0].@label;
+			
+			this.loadGamePopUpButton.popUp = menu;
+			this.loadGamePopUpButton.label = "Load '" + menuXML.menuitem[0].@label + "'";*/
+			var sg:SocialGame;
+			var sgArrayCollection:ArrayCollection = new ArrayCollection();
+			
+			for each (sg in cif.socialGamesLib.games) {
+				//newNode = new XML();
+				//newNode = <menuitem label={mt.name} />;
+				//menuXML.appendChild(newNode);
+				
+				sgArrayCollection.addItem(new Array(sg.name))
+			}
+			
+			//menu = new Menu();
+			//menu.dataProvider = menuXML..menuitem;
+			
+			
+			sgDropDown.dataProvider = sgArrayCollection;
+			
+			//Debug.debug(this, "onSocialGameLibrayUpdate() mtArrayCollection: " + mtArrayCollection);
+			
+			//menu.labelField = "@label";
+			//menu.addEventListener("itemClick", onMenuItemClick);
+			//menu.selectedIndex = 0;
+			
+			if (cif.socialGamesLib.games.length > 0)
+			{
+				this.selectedSocialGameName= sgDropDown.selectedItem as String;
+				
+				//this.selectedMicrotheoryName = menuXML.menuitem[0].@label;
+				//
+				//this.loadMicrotheoryPopUpButton.popUp = menu;
+				//this.loadMicrotheoryPopUpButton.label = "Load '" + menuXML.menuitem[0].@label + "'";
+			}
+			
+			this.intentListNameSwitch();
+			this.preconditionListNameSwitch();
+			this.initiatorIRSListNameSwitch();
+			this.responderIRSListNameSwitch();
+			this.effectListNameSwitch();
+			this.instantiationListNameSwitch();
+			
+			
+			
+		}
+		
+		/**
+		 * The loadSocialGamePopUpButton.menu's itemClick callback. It loads
+		 * the social game denoted by the popup button's label from the 
+		 * social game library to the dte's working social game.
+		 * @param	event	The incoming event.
+		 */
+/*		public function onMenuItemClick(event:MenuEvent):void {
+			this.loadGamePopUpButton.label = "Load '" + event.item.@label + "'";
+			this.selectedSocialGameName = event.item.@label;
+			this.menu.selectedIndex = event.index;
+			//Debug.debug(this, "selected menu item event: " + event.index);
+			this.loadGamePopUpButton.close();
+			
+		}*/
+		
+		/**
+		 * The loadSocialGamePopUpButton's on click event handler. It retrieves
+		 * the social game corresponding to the button's label from the social
+		 * game library and loads it into the dte's working social game.
+		 * @param	event	The incoming event.
+		 */
+		public function onLoadSocialGamePopUpButtonClick(event:Event):void {
+			//var sgName:String = this.loadGamePopUpButton.selectedField;
+			//Debug.debug(this, "selected menu item index: " + this.menu.selectedIndex);
+			//var sgName:String = this.menu.dataProvider[this.menu.selectedIndex].@label;
+			//this.menu.selectedItem as String;
+			//Debug.debug(this, "selected: " + this.selectedSocialGameName);
+			this.dte.workingSocialGame = this.dte.cif.socialGamesLib.getByName(this.selectedSocialGameName).clone();
+			//Debug.debug(this, "onLoadSocialGamePopUpButtonClick(): selected game name " + this.dte.workingSocialGame.name);
+			this.saveGameNameTextInput.text = this.dte.workingSocialGame.name;
+			this.dte.initializeDataProviders();
+			this.effectsEd.makeInstantiationsDP();
+			this.performanceEd.makePartialRuleChangeDP();
+			
+			//if (initiatorIRSNeg && initiatorIRSPos && responderIRSNeg && responderIRSPos)
+				updateIRSTotalWeightLabels();
+		}
+		
+		/**
+		 * The click event handler for the saveGameButton. It determines if a 
+		 * social game of the same name exists in the social games library. If
+		 * there is no game corresponding to the name specified in the
+		 * saveGameNameTextInput, a new game is pushed to the library. If there
+		 * exists a game with the name in the library, the user is presented with
+		 * a prompt asking if they wish to replace the game.
+		 * @param	event	The incoming event.
+		 */
+		public function onSaveGameButton(event:MouseEvent):void {
+			var name:String = this.saveGameNameTextInput.text;
+			var sg:SocialGame = this.dte.cif.socialGamesLib.getByName(name);
+			/*if(!sg) {
+				Debug.debug(this, "onSaveGameButton(): game is null");
+			} else {
+				Debug.debug(this, "onSaveGameButton(): save game name is " + sg.name);
+			}*/
+			//determine if game of the same name is already in the library
+			if (!sg) {
+				//if the game is not present in the library, add it.
+				//Debug.debug(this, "onSaveGameButton(): adding social game " + name);
+				sg = this.dte.workingSocialGame.clone();
+				sg.name = name;
+				this.dte.cif.socialGamesLib.addGame(sg);
+				dispatchEvent(new Event("socialGameLibraryUpdate", true));
+			} else {
+				//if the game is present, prompt to replace it
+				var alertText:String = "Do you wish to replace the social game '" + name + "' in the social game library with the game currently being edited?";
+				var alertTitle:String = "Replace social game?";
+				Alert.yesLabel = "Yes";
+				Alert.noLabel = "No";
+				Alert.show(alertText, alertTitle, Alert.YES | Alert.NO, this, confirmReplaceSocialGameClickHandler);// confirmOverwriteClickHandler);
+				//if the user chooses to replace it, get the reference to the game
+				//and point it to the new game instance.
+				//if the user decides not to replace it, do nothing.
+			}
+		}
+		
+		/**
+		 * The close event handler for the saveGameButton's replace alert
+		 * dialog box. If the user selected yes, the game in the social games
+		 * library is replaced with the game in the editor. If the user selects
+		 * no, the social games library remains unchanged.
+		 * @param	event	The incoming event.
+		 */
+		private function confirmReplaceSocialGameClickHandler(event:CloseEvent):void {
+			if (Alert.YES == event.detail ) {
+				//replace game
+				var sgIndex:int = this.dte.cif.socialGamesLib.getIndexByName(this.saveGameNameTextInput.text);
+				//Debug.debug(this, "confirmReplaceSocialGameClickHandler(): sgIndex " + sgIndex);
+				var sg:SocialGame = this.dte.workingSocialGame.clone();
+				sg.name = this.saveGameNameTextInput.text;
+				this.dte.cif.socialGamesLib.games[sgIndex] = sg;
+				this.dte.cif.socialGamesLib.gamesByName[sg.name] = sg;
+				
+				
+				
+				dispatchEvent(new Event("socialGameLibraryUpdate", true));
+			}
+			//leave unchanged
+		}
+		
+		//{ Summary Double Click functions
+		public function onIntentListDoubleClick():void {
+			if (intentList.selectedIndex != -1)
+			{
+				var index:int = intentList.selectedIndex;
+				tabNav.selectedIndex = 1;
+				intentEd.ruleUI.rule = dte.workingSocialGame.intents[index].clone();
+				intentEd.ruleUI.dispatchEvent(new Event("ruleChanged", true, true));
+			}
+		}
+		
+		
+		public function onPreconditionListDoubleClick():void {
+			if (preconditionList.selectedIndex != -1)
+			{
+				var index:int = preconditionList.selectedIndex;
+				tabNav.selectedIndex = 2;
+				preconditionEd.ruleUI.rule = dte.workingSocialGame.preconditions[index].clone();
+				preconditionEd.ruleUI.dispatchEvent(new Event("ruleChanged", true, true));
+			}
+		}
+		
+		public function onInitiatorIRSListDoubleClick():void {
+			if (initiatorIRSList.selectedIndex != -1)
+			{
+				var index:int = initiatorIRSList.selectedIndex;
+				var ir:InfluenceRule = dte.workingSocialGame.initiatorIRS.influenceRules[index].clone() as InfluenceRule;
+				Debug.debug(this, "onInitiatorIRSListDoubleClick() rule to load in influenceEd: " + ir);
+				tabNav.selectedIndex = 3;
+				influenceEd.ruleUI.rule = ir;
+				influenceEd.ruleUI.dispatchEvent(new Event("ruleChanged", true, true));
+				influenceEd.isInitiatorRule = true;
+				influenceEd.weight = ir.weight;
+			}
+		}
+		
+		public function onResponderIRSListDoubleClick():void {
+			if (responderIRSList.selectedIndex != -1)
+			{
+				var index:int = responderIRSList.selectedIndex;
+				var ir:InfluenceRule = dte.workingSocialGame.responderIRS.influenceRules[index].clone() as InfluenceRule;
+				tabNav.selectedIndex = 3;
+				influenceEd.ruleUI.rule = ir;
+				influenceEd.ruleUI.dispatchEvent(new Event("ruleChanged", true, true));
+				influenceEd.isResponderRule = true;
+				influenceEd.weight = ir.weight;
+			}
+		}
+		
+		public function onEffectListDoubleClick():void {
+			if (effectList.selectedIndex != -1)
+			{
+				var index:int = effectList.selectedIndex;
+				tabNav.selectedIndex = 4;
+				effectsEd.effect = dte.workingSocialGame.effects[index].clone();
+				
+				//match the selected value in the instantiation id drop down list
+				//to the effect's instantiation id
+				effectsEd.makeInstantiationsDP();
+				
+				effectsEd.dispatchEvent(new Event("ruleChanged", true, true));
+			}
+		}
+		
+		public function onInstantiationListDoubleClick():void {
+			if (instantiationList.selectedIndex != -1)
+			{
+				var index:int = instantiationList.selectedIndex;
+				this.tabNav.selectedIndex = 5;
+				this.performanceEd.workingInstantiation = dte.workingSocialGame.instantiations[index].clone();
+				
+	
+				//If a new instantiation is being looked at, successfully re-set the "working line of dialogue
+				//to be the first line of the new instantiation.
+				this.performanceEd.instantiationNameList.selectedIndex = 0;
+				this.performanceEd.workingLineOfDialog = this.performanceEd.workingInstantiation.lines[this.performanceEd.instantiationNameList.selectedIndex];
+		
+				
+				
+				//Debug.debug(this, "onInstantiationListDoubleClick() "+this.performanceEd.workingInstantiation.lines);
+				
+				//trace("1: "+this.performanceEd.workingInstantiation.toc1.rawString);
+				//trace("2: "+this.performanceEd.workingInstantiation.toc2.rawString);
+				//trace("3: "+this.performanceEd.workingInstantiation.toc3.rawString);
+				this.performanceEd.topicOfConversation1.text = this.performanceEd.workingInstantiation.toc1.rawString;
+				this.performanceEd.topicOfConversation2.text = this.performanceEd.workingInstantiation.toc2.rawString;
+				this.performanceEd.topicOfConversation3.text = this.performanceEd.workingInstantiation.toc3.rawString;
+				
+				this.performanceEd.updateWorkingInstantiationDP();
+				
+				this.performanceEd.conditionalRuleListNameSwitch();
+				
+				//Updates the partial rule change list with the correct rules given the selected instantiation.
+				this.performanceEd.makePartialRuleChangeDP();
+			}
+		}
+		//}
+		
+		//{ Event Listener stuffs =D
+		public function intentListUpdateCallback(e:Event):void {
+			intentListNameSwitch();
+		}
+		
+		public function preconditionListUpdateCallback(e:Event):void {
+			preconditionListNameSwitch();
+		}
+		
+		public function updateIRSTotalWeightLabels():void
+		{
+			var posTotal:Number = 0;
+			var negTotal:Number = 0;
+			var ir:InfluenceRule;
+			for each (ir in dte.workingSocialGame.initiatorIRS.influenceRules)
+			{
+				if (ir.weight > 0)
+				{
+					posTotal += ir.weight;
+				}
+				else
+				{
+					negTotal += ir.weight;
+				}
+			}
+			//initiatorIRSPos.text = posTotal.toString();
+			//initiatorIRSNeg.text = negTotal.toString();
+			posInitIRSTotal = posTotal;
+			negInitIRSTotal = negTotal;
+			
+			posTotal = 0;
+			negTotal = 0;
+			for each (ir in dte.workingSocialGame.responderIRS.influenceRules)
+			{
+				if (ir.weight > 0)
+				{
+					posTotal += ir.weight;
+				}
+				else
+				{
+					negTotal += ir.weight;
+				}
+			}
+			//responderIRSPos.text = posTotal.toString();
+			//responderIRSNeg.text = negTotal.toString();
+			posRespIRSTotal = posTotal;
+			negRespIRSTotal = negTotal;
+		}
+		
+		public function irsListUpdateCallback(e:Event):void {
+			initiatorIRSListNameSwitch();
+			responderIRSListNameSwitch();
+			
+			
+			//if (initiatorIRSNeg && initiatorIRSPos && responderIRSNeg && responderIRSPos)
+				updateIRSTotalWeightLabels();
+		}
+		
+		public function effectListUpdateCallback(e:Event):void {
+			effectListNameSwitch();
+			performanceEd.makePartialRuleChangeDP();
+		}
+		
+		public function instantiationListUpdateCallback(e:Event):void {
+			instantiationListNameSwitch();
+			this.effectsEd.makeInstantiationsDP();
+		}
+		//}
+		
+		//FIXME: write event listeners for initiator and responder IRS to handle the switching AND update dte's list generators (make the ___NameDP() functions worthless)
+		
+		//{ Summary Name ChkBox functions
+		public function intentListNameSwitch():void {
+			dte.intentPRDP = dte.generateIntentPRDP(intentShowNames.selected);
+		}
+		
+		public function preconditionListNameSwitch():void {
+			//dte.preconditionPRDP = dte.generatePreconditionPRDP(preconditionShowNames.selected);
+			dte.preconditionPRDP = dte.generatePreconditionPRDP(this.straightRulePrecondition.selected, this.handAuthoredNamePrecondition.selected, this.generatedNamePrecondition.selected, this.preconditionShowMismatches.selected);
+		}
+		
+		public function initiatorIRSListNameSwitch():void {
+			//dte.initiatorIRSDP = dte.generateInitiatorIRSDP(initiatorIRSShowNames.selected);
+			dte.initiatorIRSDP = dte.generateInitiatorIRSDP(this.straightRuleInitiator.selected, this.handAuthoredNameInitiator.selected, this.generatedNameInitiator.selected, this.initiatorShowMismatches.selected);
+		}
+		
+		public function responderIRSListNameSwitch():void {
+			//dte.responderIRSDP = dte.generateResponderIRSDP(responderIRSShowNames.selected);
+			dte.responderIRSDP = dte.generateResponderIRSDP(this.straightRuleResponder.selected, this.handAuthoredNameResponder.selected, this.generatedNameResponder.selected, this.responderShowMismatches.selected);
+		}
+		
+		public function effectListNameSwitch():void {
+			dte.effectEADP = dte.generateEffectEADP(effectShowNames.selected);
+		}
+		
+		public function instantiationListNameSwitch():void {
+			dte.instantiationDP = dte.generateInstantiationDP(instantiationShowNames.selected);
+			
+			
+		}
+		//}
+		
+		//{ Summary Delete Button functions
+		
+		public function intentListDelete():void {
+			var index:int = intentList.selectedIndex;
+			dte.workingSocialGame.intents.splice(index, 1);
+			intentListNameSwitch();
+		}
+		
+		public function preconditionListDelete():void {
+			var index:int = preconditionList.selectedIndex;
+			dte.workingSocialGame.preconditions.splice(index, 1);
+			preconditionListNameSwitch();
+		}
+
+		public function preconditionListNew():void {			
+			//dte.preconditionPRDP = dte.generatePreconditionPRDP(preconditionShowNames.selected);
+		}
+		
+		public function initiatorIRSListDelete():void {
+			var index:int = initiatorIRSList.selectedIndex;
+			dte.workingSocialGame.initiatorIRS.influenceRules.splice(index, 1);
+			initiatorIRSListNameSwitch();
+			
+			//if (initiatorIRSNeg && initiatorIRSPos && responderIRSNeg && responderIRSPos)
+				updateIRSTotalWeightLabels();
+		}
+		
+		public function responderIRSListDelete():void {
+			var index:int = responderIRSList.selectedIndex;
+			dte.workingSocialGame.responderIRS.influenceRules.splice(index, 1);
+			responderIRSListNameSwitch();
+			
+			//if (initiatorIRSNeg && initiatorIRSPos && responderIRSNeg && responderIRSPos)
+				updateIRSTotalWeightLabels();
+		}
+		
+		public function effectListDelete():void {
+			var index:int = effectList.selectedIndex;
+			dte.workingSocialGame.effects.splice(index, 1);
+			effectListNameSwitch();
+		}
+		
+		public function instantiationListDelete():void {
+			var index:int = this.instantiationList.selectedIndex;
+			dte.workingSocialGame.instantiations.splice(index, 1);
+			this.instantiationListNameSwitch();
+		}
+		
+		/**
+		 * Returns the value of the private variaable selectedSocialGame
+		 * @return The current value of the selectedSocialGame.
+		 */
+		public function getSelectedSocialGameString():String {
+			return selectedSocialGameName;
+		}
+		
+		/**
+		 * Sets the value of the private variaable selectedSocialGame
+		 * @param newSGName the name of the new selectedSocialGame.
+		 */
+		public function setSelectedSocialGameString(newSGName:String):void {
+			selectedSocialGameName = newSGName;
+		}
+		
+		/**
+		 * A tab was pushed!  Open up the corresponding accordian,
+		 * if that functionality is set--it is set as part of a boolean flag
+		 * in the dte, who in turn gets it's value determined by the state
+		 * of the "tabs/accordian linked" checkbox that lives in main.mxml
+		 */
+		public function onNewTabSelected(e:Event=null):void {
+			if (dte.tabAndAccordianLinkBoxValue) {
+				if (this.tabNav.selectedIndex == 0) {  } // game authoring tab -- has no corresponding accordian pane.
+				else if (this.tabNav.selectedIndex == 1) gameOverviewAccordion.selectedIndex = 0; // Intents
+				else if (this.tabNav.selectedIndex == 2) gameOverviewAccordion.selectedIndex = 1; // Preconditions
+				else if (this.tabNav.selectedIndex == 3) { //Influence Rule Set -- But is it Initiator or Responder?
+					if(influenceEd.isInitiatorRule) gameOverviewAccordion.selectedIndex = 2; // Initiator Influence Rule Set
+					else if(influenceEd.isResponderRule) gameOverviewAccordion.selectedIndex = 3; // Responder Influence Rule Set
+				}
+				else if (this.tabNav.selectedIndex == 4) gameOverviewAccordion.selectedIndex = 4; // Effects
+				else if (this.tabNav.selectedIndex == 5) gameOverviewAccordion.selectedIndex = 5; // Performance Authoring
+			}
+		}
+		
+		//}
+		
+		]]>
+	</fx:Script>
+	
+</s:Group>

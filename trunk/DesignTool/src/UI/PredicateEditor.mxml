@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:CiF="CiF.*"
+		 width="300" 
+		 height="300" 
+		 currentState="network"
+		 creationComplete="onCreationComplete();"
+		 >
+	<fx:Metadata>
+	</fx:Metadata>
+	
+	<fx:Binding source="dte.predTypes" destination="this.predTypes" />
+	<fx:Binding source="dte.traitTypes" destination="this.traitTypes" />
+	<fx:Binding source="dte.relationTypes" destination="this.relationTypes" />
+	<fx:Binding source="dte.statusTypes" destination="this.statusTypes" />
+	<fx:Binding source="dte.ckbTruthTypes" destination="this.ckbTruthTypes" />
+	<fx:Binding source="dte.ckbSubjectiveTypes" destination="this.ckbSubjectiveTypes" />
+	<fx:Binding source="dte.sfdbLabels" destination="this.sfdbLabels" />
+	<fx:Binding source="dte.networkTypes" destination="this.networkTypes" />
+	<fx:Binding source="dte.networkComparatorTypes" destination="this.networkComparatorTypes" />
+	<fx:Binding source="dte.networkOperatorTypes" destination="this.networkOperatorTypes" />
+	<fx:Binding source="dte.roleTypes" destination="this.roleTypes" />
+	
+	<s:states>
+		<s:State name="trait"/>
+		<s:State name="relationship"/>
+		<s:State name="status"/>
+		<s:State name="ckb"/>
+		<s:State name="sfdblabel"/>
+		<s:State name="network"/>
+	</s:states>
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<CiF:Predicate  id="predicate"
+			
+			trait="@{traitValue.selectedIndex}"
+			primary="@{firstRole.selectedItem}"
+			secondary="@{secondRole.selectedItem}"
+			
+			networkValue="@{networkValueStepper.value}" 
+			comparator="@{comparator.selectedItem}"
+			operator="@{comparator.selectedItem}"
+			relationship="@{relationValue.selectedIndex}" 
+			status="@{statusValue.selectedIndex}"
+			networkType="@{networkType.selectedIndex}" 
+			firstSubjectiveLink="@{firstRoleSubjective.selectedItem}"
+			secondSubjectiveLink="@{secondRoleSubjective.selectedItem}"
+			truthLabel="@{ckbValue.selectedItem}"
+			window="@{sfdbWindowStepper.value}"
+			sfdbLabel="@{sfdbValue.selectedIndex}"
+			isSFDB="@{isSFDB.selected}"
+			negated="@{notChkBox.selected}" 
+			numTimesUniquelyTrueFlag="@{isNumTimesUniquelyTrueCheckBox.selected}" 
+			numTimesUniquelyTrue="@{numTimesUniquelyTrueStepper.value}"
+			sfdbOrder="@{sfdbOrderStepper.value}"
+			/>
+			
+		<fx:Boolean id="isEvaluation">true</fx:Boolean>
+		<fx:String id="networkOperatorLabel">Comparator:</fx:String>
+		<s:RadioButtonGroup id="numTimesUniquelyTrueRadioGroup" valueCommit="predicate.numTimesRoleSlot = numTimesUniquelyTrueRadioGroup.selection.label.toLowerCase()" />
+	</fx:Declarations>
+
+	<s:VGroup left = "11.65" top="10">
+		<s:HGroup paddingBottom="10" paddingTop="1" id="Title">
+			<s:Label id="predicateEditorTitle" x="10" y="10" fontSize="18" verticalAlign="middle" color="#ffffff"
+					 text.trait="TRAIT PREDICATE EDIT"   text.relationship="RELATIONSHIP PREDICATE EDIT" 
+					 text.status="STATUS PREDICATE EDIT" text.ckb="CKB PREDICATE EDIT" 
+					 text.sfdblabel="SFDBLABEL PREDICATE EDIT"     text.network="NETWORK PREDICATE EDIT"/>
+		</s:HGroup>
+		<s:HGroup>
+			<s:CheckBox id="isIntent" includeIn="network,relationship,sfdblabel" label="Intent" color="#ffffff" selected="false" toolTip="" click="comparatorOnCreationComplete();" />
+		</s:HGroup>
+		<s:HGroup id="roleChooser" includeIn="ckb,network,relationship,sfdblabel,trait,status">
+			<s:VGroup>
+				<s:Label text="First Role:" color="#ffffff"/>
+				<s:DropDownList id="firstRole" dataProvider="{this.roleTypes}"/>
+				<s:HGroup>
+					<s:DropDownList id="firstRoleSubjective" dataProvider="{this.ckbSubjectiveTypes}" includeIn="ckb" enabled.ckb="{!useFirstRoleSubjective.selected}" />
+					<s:CheckBox id="useFirstRoleSubjective" label="exclude" color="#ffffff" includeIn="ckb" click="useFirstRoleCheckBoxClick(event)" />
+				</s:HGroup>
+				
+				<s:Label text="Second Role:"  color="#ffffff" paddingTop="3" />
+				
+				<s:HGroup>
+					<s:DropDownList id="secondRole" dataProvider="{this.roleTypes}" enabled.trait="false" enabled.ckb="{!useSecondRole.selected}" enabled.sfdblabel="{!useSecondRole.selected}"/>
+					<s:CheckBox id="useSecondRole" label="exclude" color="#ffffff" includeIn="ckb,sfdblabel" click="useSecondRoleCheckBoxClick(event)" />
+				</s:HGroup>
+				<s:HGroup>
+					<s:DropDownList id="secondRoleSubjective" dataProvider="{this.ckbSubjectiveTypes}" includeIn="ckb" enabled.ckb="{!useSecondRoleSubjective.selected}" enabled.sfdblabel="{!useSecondRoleSubjective.selected}"/>
+					<s:CheckBox id="useSecondRoleSubjective" label="exclude" color="#ffffff" includeIn="ckb" click="useSecondRoleSubjectiveCheckBoxClick(event)" />
+				</s:HGroup>
+			</s:VGroup>
+		</s:HGroup>
+		<s:HGroup verticalAlign="middle">
+			<s:Label color="#ffffff"
+				 text.trait="Trait:" 
+				 text.relationship="Relation:" 
+				 text.status="Status:"
+				 text.ckb="CKB Truth:" 
+				 text.sfdblabel="SFDB Label:"  
+				 text.network="Network:"/>
+			<s:DropDownList id="traitValue" includeIn="trait" dataProvider="{traitTypes}"/>
+			<s:DropDownList id="relationValue" includeIn="relationship" dataProvider="{relationTypes}" />
+			<s:DropDownList id="statusValue" includeIn="status" dataProvider="{statusTypes}" />
+			<s:HGroup includeIn="ckb" > 
+				<s:DropDownList id="ckbValue" includeIn="ckb" enabled.ckb="{!useCKBTruthValue.selected}" dataProvider="{ckbTruthTypes}" />
+				<s:CheckBox id="useCKBTruthValue" label="exclude" color="#ffffff" includeIn="ckb" click="useCBKTruthValueCheckBoxClick(event)" />
+			</s:HGroup>
+			<s:HGroup includeIn="sfdblabel" > 
+				<s:DropDownList id="sfdbValue" includeIn="sfdblabel" dataProvider="{sfdbLabels}" enabled.sfdblabel="{!useSFDBLabel.selected}" />
+				<s:CheckBox id="useSFDBLabel" label="exclude" color="#ffffff" includeIn="sfdblabel" click="useSFDBLabelCheckBoxClick(event)" />
+			</s:HGroup>
+			<s:DropDownList id="networkType" includeIn="network" dataProvider="{networkTypes}" />
+			
+		</s:HGroup>
+		<s:VGroup includeIn="network" >
+			<s:HGroup verticalAlign="middle">
+				<s:Label text="{networkOperatorLabel}" color="#ffffff"/>
+				<s:DropDownList id="comparator" dataProvider="{networkComparatorTypes}" creationComplete="comparatorOnCreationComplete()"  />
+			</s:HGroup>
+			<s:HGroup visible="{!isIntent.selected}">
+				<s:Label text="Weight" color="#ffffff"/>
+				<s:NumericStepper id="networkValueStepper" minimum="-100" maximum="100"  /> 
+			</s:HGroup>
+		</s:VGroup>
+		<s:VGroup id="NotBox" color="#ffffff">
+			<s:CheckBox label="Not" id="notChkBox" width="41" includeIn="trait,relationship,status,sfdblabel,network" />
+			<s:HGroup>
+				<s:CheckBox label="SFDB Entry:" id="isSFDB" includeIn="relationship,status,ckb,network,sfdblabel" enabled.sfdblabel="false" click="trace('isSFDB Button: ' + isSFDB.selected);" />
+				<s:NumericStepper color="0x000000" id="sfdbWindowStepper" minimum="0" maximum="100"  includeIn="relationship,status,ckb,network,sfdblabel" enabled="{isSFDB.selected}" /> 
+			</s:HGroup>
+		</s:VGroup>
+		<s:VGroup color="#ffffff">
+			<s:CheckBox label="Number of Times Uniquely True:" id="isNumTimesUniquelyTrueCheckBox" includeIn="relationship,status,ckb,network,sfdblabel" selected="false" />
+			<s:NumericStepper color="0x000000" id="numTimesUniquelyTrueStepper" minimum="0" maximum="100"  includeIn="relationship,status,ckb,network,sfdblabel" enabled="{isNumTimesUniquelyTrueCheckBox.selected}" /> 
+			<s:HGroup enabled="{isNumTimesUniquelyTrueCheckBox.selected}"> 
+				<s:RadioButton id="numTimesUniquelyTrueFirstRole" groupName="numTimesUniquelyTrueRadioGroup" label="First"></s:RadioButton>
+				<s:RadioButton id="numTimesUniquelyTrueSecondRole" groupName="numTimesUniquelyTrueRadioGroup" label="Second"></s:RadioButton>
+				<s:RadioButton id="numTimesUniquelyTrueThirdRole" groupName="numTimesUniquelyTrueRadioGroup" label="Third"></s:RadioButton>
+				<s:RadioButton id="numTimesUniquelyTrueBothRole" groupName="numTimesUniquelyTrueRadioGroup" label="Both"></s:RadioButton>
+			</s:HGroup>
+		</s:VGroup>
+		<s:VGroup>
+			<s:HGroup>
+				<s:Label color="white" text="SFDB Order"/>
+				<s:NumericStepper color="0x000000" id="sfdbOrderStepper" value="0" minimum="0" maximum="100" /> 
+			</s:HGroup>
+		</s:VGroup>
+		<s:VGroup color="#ffffff">
+			<s:Label paddingTop="10" includeIn="trait,status,ckb,sfdblabel">Locution Translation:</s:Label>
+			<s:TextArea id="locutionTranslation" includeIn="trait,status,ckb,sfdblabel" text="Push the save up button when authoring an effect, and I will translate your predicate into something useable in lines of dialogue!" color="#000000" height="75" />
+		</s:VGroup>
+		
+	</s:VGroup>
+	
+	<fx:Script>
+		<![CDATA[
+		import CiF.*;
+		import flash.events.Event;
+		import mx.collections.ArrayCollection;
+		import mx.utils.OnDemandEventDispatcher;
+	
+		import tool.DesignerToolEngine;
+		import flash.events.MouseEvent;
+		
+		public var dte:DesignerToolEngine = DesignerToolEngine.getInstance();
+		
+		public var predTypes:ArrayCollection; // list of available predicates
+		public var traitTypes:ArrayCollection; // list of available traits
+		public var relationTypes:ArrayCollection; // list of available relationships
+		public var statusTypes:ArrayCollection; // list of available statuses (statii)
+		public var ckbTruthTypes:ArrayCollection; // list of available ckbs
+		public var ckbSubjectiveTypes:ArrayCollection; // list of available ckbs
+		public var sfdbLabels:ArrayCollection; // list of available sfdbs
+		public var networkTypes:ArrayCollection; // list of available networks
+		public var networkComparatorTypes:ArrayCollection; //list of network comparators
+		public var networkOperatorTypes:ArrayCollection;
+		public var roleTypes:ArrayCollection; //list of character roles
+		
+		private function onCreationComplete():void {
+			this.predTypes = dte.generatePredListProvider();
+			this.traitTypes = dte.generateTraitTypeListProvider();
+			this.relationTypes = dte.generateRelationListProvider();
+			this.statusTypes = dte.generateStatusListProvider();
+			this.ckbTruthTypes = dte.generateCKBTruthListProvider();
+			this.ckbSubjectiveTypes = dte.generateCKBSubjectiveListProvider();
+			this.sfdbLabels = dte.generateSFDBLabelListProvider();
+			this.networkTypes = dte.generateNetworkListProvider();
+			this.networkComparatorTypes = dte.generateNetworkComparatorListProvider();
+			this.networkOperatorTypes = dte.generateNetworkOperatorListProvider();
+			this.roleTypes = dte.generateRoleListProvider();
+			
+			setCurrentState("trait");
+			setCurrentState("relationship");
+			setCurrentState("status");
+			setCurrentState("ckb");
+			setCurrentState("sfdblabel");
+			setCurrentState("network");
+		
+			firstRole.executeBindings();
+			secondRole.executeBindings();
+			firstRoleSubjective.executeBindings();
+			secondRoleSubjective.executeBindings();
+			traitValue.executeBindings();
+			relationValue.executeBindings();
+			statusValue.executeBindings();
+			ckbValue.executeBindings();
+			sfdbValue.executeBindings();
+			networkType.executeBindings();
+			comparator.executeBindings();
+			isSFDB.executeBindings();
+			isNumTimesUniquelyTrueCheckBox.executeBindings();
+			locutionTranslation.executeBindings();
+			
+			
+			this.addEventListener(MouseEvent.CLICK, reloadDataProviders);
+		}
+		
+		public function reloadDataProviders(e:Event):void
+		{
+			this.predTypes = dte.generatePredListProvider();
+			this.traitTypes = dte.generateTraitTypeListProvider();
+			this.relationTypes = dte.generateRelationListProvider();
+			this.statusTypes = dte.generateStatusListProvider();
+			this.ckbTruthTypes = dte.generateCKBTruthListProvider();
+			this.ckbSubjectiveTypes = dte.generateCKBSubjectiveListProvider();
+			this.sfdbLabels = dte.generateSFDBLabelListProvider();
+			this.networkTypes = dte.generateNetworkListProvider();
+			this.networkComparatorTypes = dte.generateNetworkComparatorListProvider();
+			this.networkOperatorTypes = dte.generateNetworkOperatorListProvider();
+			this.roleTypes = dte.generateRoleListProvider();
+		
+			firstRole.executeBindings();
+			secondRole.executeBindings();
+			firstRoleSubjective.executeBindings();
+			secondRoleSubjective.executeBindings();
+			traitValue.executeBindings();
+			relationValue.executeBindings();
+			statusValue.executeBindings();
+			ckbValue.executeBindings();
+			sfdbValue.executeBindings();
+			sfdbWindowStepper.executeBindings();
+			networkType.executeBindings();
+			comparator.executeBindings();
+			isSFDB.executeBindings();
+			isNumTimesUniquelyTrueCheckBox.executeBindings();
+			locutionTranslation.executeBindings();
+			
+			if (!this.isEvaluation) {
+				this.networkOperatorLabel = "Operator:";
+				this.comparator.dataProvider = dte.generateNetworkOperatorListProvider();
+			}
+			else
+			{
+				this.networkOperatorLabel = "Comparator:";
+				this.comparator.dataProvider = this.networkComparatorTypes;
+			}
+			
+			
+			this.removeEventListener(MouseEvent.CLICK, reloadDataProviders);
+		}
+		
+		public function useSecondRoleCheckBoxClick(event:MouseEvent):void {
+			if(this.useSecondRole.selected) {
+				this.predicate.secondary = "";
+			}else {
+				this.predicate.secondary = this.secondRole.selectedItem as String;
+			}
+		}
+		
+		public function useFirstRoleCheckBoxClick(event:MouseEvent):void {
+			if(this.useFirstRoleSubjective.selected) {
+				this.predicate.firstSubjectiveLink = "";
+			}else {
+				this.predicate.firstSubjectiveLink = this.firstRoleSubjective.selectedItem as String;
+			}
+		}
+		
+		public function useSecondRoleSubjectiveCheckBoxClick(event:MouseEvent):void {
+			if(this.useSecondRoleSubjective.selected) {
+				this.predicate.secondSubjectiveLink = "";
+			}else {
+				this.predicate.secondSubjectiveLink = this.secondRoleSubjective.selectedItem as String;
+			}
+		}
+		
+		public function useCBKTruthValueCheckBoxClick(event:MouseEvent): void {
+			if(this.useCKBTruthValue.selected) {
+				this.predicate.truthLabel= "";
+			}else {
+				this.predicate.truthLabel = this.ckbValue.selectedItem as String;
+			}
+		}
+		
+		public function useSFDBLabelCheckBoxClick(event:MouseEvent): void {
+			if(this.useSFDBLabel.selected) {
+				this.predicate.sfdbLabel= -1;
+			}else {
+				this.predicate.sfdbLabel= this.sfdbValue.selectedIndex;
+			}
+		}
+		
+		public function comparatorOnCreationComplete():void {
+			if (!this.isEvaluation || isIntent.selected) {
+				this.networkOperatorLabel = "Operator:";
+				//this.comparator.dataProvider = this.networkOperatorTypes;
+				if (isIntent.selected)
+				{
+					predicate.intent = true;
+				}
+				this.comparator.dataProvider = dte.generateNetworkOperatorListProvider();
+			}
+			else
+			{
+				this.networkOperatorLabel = "Comparator:";
+				
+				predicate.intent = false;
+				this.comparator.dataProvider = this.networkComparatorTypes;
+			}
+		}
+		]]>
+	</fx:Script>
+</s:Group>

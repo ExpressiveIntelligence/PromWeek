@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 width="100%"
+		 height="100%"
+		 styleName="classicPromWeek">
+	
+		 
+	<fx:Metadata>
+	</fx:Metadata>
+		
+	<fx:Declarations>
+		<fx:Boolean id="shouldDisplayName">false</fx:Boolean>
+		<fx:Boolean id="shouldDisplayTimeRemaining">true</fx:Boolean>
+	</fx:Declarations>
+	
+	
+	<s:BorderContainer id="statusIconContainer" cornerRadius="5"  width="{width}" height="{height}"
+					 borderWeight="2" borderStyle="solid" borderColor="{getStyle('backgroundStroke')}" creationPolicy="all">
+	  <s:Group maskType="clip"  width="40" height="40">
+		  <s:mask>
+			  <s:Graphic>
+				  <s:Rect radiusX="{statusIconContainer.getStyle('cornerRadius')}"
+						  radiusY="{statusIconContainer.getStyle('cornerRadius')}"
+						  width="{statusIconContainer.width-(statusIconContainer.getStyle('borderWeight')*2)+1}"
+						  height="{statusIconContainer.height-(statusIconContainer.getStyle('borderWeight')*2)+1}"
+						  >
+					  <s:fill>
+						  <s:SolidColor id = "iconBackground" color="0xCCFFFF" alpha="0.2" />
+					  </s:fill>
+				  </s:Rect>
+			  </s:Graphic>
+		  </s:mask>
+		  <s:Group id="iconGroup">
+				<util:SmoothImage id="statusIcon" width="{width-2}" height="{height-2}" />
+				<util:SmoothImage id="statusIconTowards" width="{width-2}" height="{height-2}" />
+		  </s:Group>
+			<s:Group width="{statusIcon.width - statusIcon.width/5}" height="{statusIcon.height/8}" left="{statusIcon.width/10}" top="{this.height-statusIcon.height/8 - 5}" visible="{this.shouldDisplayName}">
+				<s:Rect width="100%" height="100%">
+					<s:fill>
+						<mx:SolidColor color="white" alpha="0.8" />
+					</s:fill>
+				</s:Rect>
+				<s:RichText id="statusName" width="100%" height="100%" fontSize="12" color="black" verticalAlign="middle" textAlign="center"/>
+			</s:Group>
+			<s:Group id="timeRemainingGroup" width="100%" height="100%" visible="false" >
+				<s:Rect id="timeRemainingBGRect" width="{this.width/8}" height="{this.height}">
+					<s:fill>
+						<s:SolidColor color="#FFFFFF" alpha=".8"/>
+					</s:fill>
+				</s:Rect>
+				<s:Rect id="timeRemainingFGRect" width="{this.width/8}" >
+					<s:fill>
+						<s:SolidColor color="{getStyle('statusTimeRemainingColor')}" alpha="1"/>
+					</s:fill>
+				</s:Rect>
+				<s:Rect id="timeRemainingFrameRect" width="{this.width/8}" height="{this.height}">
+					<s:stroke>
+						<s:SolidColorStroke weight="2" color="{getStyle('backgroundStroke')}" />
+					</s:stroke>
+				</s:Rect>
+			</s:Group>
+	  </s:Group>
+	</s:BorderContainer>
+	
+	<s:Line id="line1" xFrom="0" yFrom="0" xTo="{width}" yTo="{height}" visible="false">
+        <s:stroke>
+            <s:SolidColorStroke color="red" alpha="1.0" weight="7" />
+        </s:stroke>
+    </s:Line>
+    <s:Line id="line2" xFrom="0" yFrom="{height}" xTo="{width}" yTo="0" visible="false">
+        <s:stroke>
+            <s:SolidColorStroke color="red" alpha=".8" weight="10"/>
+        </s:stroke>
+    </s:Line>
+	
+	
+	<fx:Script>
+		<![CDATA[		
+		import CiF.*;
+		import flash.events.Event;
+		import flash.events.MouseEvent;
+		import PromWeek.assets.ResourceLibrary;
+		
+		
+		public var statusID:Number;
+		public var towardsWho:String = ""; 
+		public var timeRemaining:int = 0;
+		public var negated:Boolean = false;
+		
+		public var readyToPopulateComponents:Boolean = false;
+		
+		
+		private var resourceLibrary:ResourceLibrary = PromWeek.assets.ResourceLibrary.getInstance();
+		
+		
+		
+		public function onCreationComplete():void
+		{
+			//resourceLibrary = PromWeek.assets.ResourceLibrary.getInstance();
+			
+			this.addEventListener(MouseEvent.ROLL_OVER, rollOverHandler);
+			this.addEventListener(MouseEvent.ROLL_OUT, rollOutHandler);
+		}
+		
+		public function rollOverHandler(e:Event = null):void
+		{
+			if (this.shouldDisplayTimeRemaining)
+			{
+				this.timeRemainingGroup.visible = true;
+			}
+		}
+		
+		public function rollOutHandler(e:Event = null):void
+		{
+			this.timeRemainingGroup.visible = false;
+		}
+		
+		override protected function commitProperties():void
+		{
+			if (readyToPopulateComponents)
+			{
+				this.statusIconTowards.visible = false;
+				this.statusIcon.source = resourceLibrary.statusIcons[Status.getStatusNameByNumber(this.statusID)];
+				
+				
+				
+				this.statusIconTowards.source = resourceLibrary.portraits[this.towardsWho.toLowerCase()];
+				this.statusIconTowards.visible = true;
+				
+				if (this.shouldDisplayTimeRemaining)
+				{
+					if (this.statusID >= Status.FIRST_DIRECTED_STATUS && this.towardsWho != "")
+					{
+						this.toolTip = Status.getStatusNameByNumber(this.statusID) + " " + this.towardsWho;
+					}
+					else
+					{
+						this.toolTip = Status.getStatusNameByNumber(this.statusID);
+					}
+				}
+				if (this.shouldDisplayTimeRemaining)
+				{
+					this.toolTip += " (" + this.timeRemaining.toString() + " turns remaining)";
+				}
+				
+				this.visible = true;
+				
+				if (this.negated)
+				{
+					this.line1.visible = true;
+					this.line2.visible = true;
+				}else {
+					this.line1.visible = false;
+					this.line2.visible = false;
+				}
+				
+				var remainingHeight:Number = timeRemaining/Status.DEFAULT_INITIAL_DURATION * timeRemainingBGRect.height;
+				timeRemainingFGRect.height = remainingHeight;
+				timeRemainingFGRect.top =  timeRemainingBGRect.height - remainingHeight;
+				
+				if (this.shouldDisplayName)
+				{
+					this.statusName.text = Status.getShortStatusNameByNumber(this.statusID);
+				}
+
+			}
+			
+			super.commitProperties();
+		}
+		
+		
+		
+		public function loadStatusImagesToIcon(statusID1:Number,towardsWho1:String = "", timeRemaining1:int=0, negated1:Boolean = false):void
+		{	
+			this.statusID = statusID1;
+			this.towardsWho = towardsWho1;
+			this.timeRemaining = timeRemaining1;
+			this.negated = negated1;
+			
+			this.readyToPopulateComponents = true;
+			
+			this.invalidateProperties();
+			this.invalidateSize();
+			this.invalidateDisplayList();
+		}
+		
+		]]>
+	</fx:Script>
+		
+	
+</s:Group>

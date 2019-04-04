@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project>
+  <!-- Output SWF options -->
+  <output>
+    <movie disabled="False" />
+    <movie input="" />
+    <movie path="bin\PromWeek.swf" />
+    <movie fps="30" />
+    <movie width="758" />
+    <movie height="600" />
+    <movie version="11" />
+    <movie background="#FFFFFF" />
+  </output>
+  <!-- Other classes to be compiled into your SWF -->
+  <classpaths>
+    <class path="src" />
+  </classpaths>
+  <!-- Build options -->
+  <build>
+    <option accessible="False" />
+    <option allowSourcePathOverlap="False" />
+    <option benchmark="False" />
+    <option es="False" />
+    <option locale="" />
+    <option loadConfig="" />
+    <option optimize="True" />
+    <option showActionScriptWarnings="True" />
+    <option showBindingWarnings="True" />
+    <option showInvalidCSS="True" />
+    <option showDeprecationWarnings="False" />
+    <option showUnusedTypeSelectorWarnings="True" />
+    <option strict="True" />
+    <option useNetwork="True" />
+    <option useResourceBundleMetadata="True" />
+    <option warnings="True" />
+    <option verboseStackTraces="False" />
+    <option linkReport="" />
+    <option loadExterns="" />
+    <option staticLinkRSL="True" />
+    <option additional="" />
+    <option compilerConstants="" />
+    <option customSDK="" />
+  </build>
+  <!-- SWC Include Libraries -->
+  <includeLibraries>
+    <!-- example: <element path="..." /> -->
+  </includeLibraries>
+  <!-- SWC Libraries -->
+  <libraryPaths>
+    <element path="src\TheProm\data\characters\edward-animated.swc" />
+    <element path="src\TheProm\data\characters\karen-animated.swc" />
+    <element path="src\TheProm\data\characters\robert-animated.swc" />
+    <element path="lib\CiF.swc" />
+    <element path="lib\FacebookGraphAPI.swc" />
+    <element path="data\characters\edward-animated.swc" />
+    <element path="data\characters\karen-animated.swc" />
+    <element path="data\characters\robert-animated.swc" />
+    <element path="data\characters\nelson.swc" />
+    <element path="data\characters\mave.swc" />
+    <element path="data\characters\karen.swc" />
+    <element path="data\icons\relationships\friendsEnd.swc" />
+    <element path="data\icons\relationships\friends.swc" />
+    <element path="data\icons\relationships\enemiesEnd.swc" />
+    <element path="data\icons\relationships\enemies.swc" />
+    <element path="data\icons\relationships\datingEnd.swc" />
+    <element path="data\icons\relationships\dating.swc" />
+    <element path="data\characters\edward_body.swc" />
+    <element path="data\characters\buzz.swc" />
+    <element path="data\characters\cassie.swc" />
+    <element path="data\characters\doug.swc" />
+    <element path="data\characters\jordan.swc" />
+    <element path="data\characters\lil.swc" />
+    <element path="data\characters\monica.swc" />
+    <element path="data\characters\naomi.swc" />
+    <element path="data\characters\nicholas.swc" />
+    <element path="data\characters\simon.swc" />
+    <element path="data\characters\zach.swc" />
+    <element path="data\characters\phoebe.swc" />
+    <element path="data\characters\oswald.swc" />
+    <element path="data\characters\lucas.swc" />
+    <element path="data\characters\kate.swc" />
+    <element path="data\characters\gunter.swc" />
+    <element path="data\characters\edward.swc" />
+    <element path="data\characters\chloe.swc" />
+    <element path="data\characters\cassandra.swc" />
+    <element path="lib\resources.swc" />
+    <element path="data\menus\TimeClockComponent.swc" />
+    <element path="data\menus\shinyButton.swc" />
+    <element path="data\menus\AutonomousActionNotifier.swc" />
+    <element path="CiF.swc" />
+    <element path="lib\AuthoringLibrary.swc" />
+    <element path="lib\DConsole2_r203.swc" />
+    <element path="lib\ResourceLibrary.swc" />
+    <element path="lib\MonsterDebugger.swc" />
+  </libraryPaths>
+  <!-- External Libraries -->
+  <externalLibraryPaths>
+    <!-- example: <element path="..." /> -->
+  </externalLibraryPaths>
+  <!-- Runtime Shared Libraries -->
+  <rslPaths>
+    <!-- example: <element path="..." /> -->
+  </rslPaths>
+  <!-- Intrinsic Libraries -->
+  <intrinsics>
+    <element path="Library\AS3\frameworks\Flex4" />
+  </intrinsics>
+  <!-- Assets to embed into the output SWF -->
+  <library>
+    <!-- example: <asset path="..." id="..." update="..." glyphs="..." mode="..." place="..." sharepoint="..." /> -->
+  </library>
+  <!-- Class files to compile (other referenced classes will automatically be included) -->
+  <compileTargets>
+    <compile path="src\Main.mxml" />
+  </compileTargets>
+  <!-- Paths to exclude from the Project Explorer tree -->
+  <hiddenPaths>
+    <!-- example: <hidden path="..." /> -->
+  </hiddenPaths>
+  <!-- Executed before build -->
+  <preBuildCommand />
+  <!-- Executed after build -->
+  <postBuildCommand alwaysRun="False" />
+  <!-- Other project options -->
+  <options>
+    <option showHiddenPaths="False" />
+    <option testMovie="ExternalPlayer" />
+  </options>
+</project>

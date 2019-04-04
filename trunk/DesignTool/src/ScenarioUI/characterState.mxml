@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 width="800" 
+		 height="700"
+		 xmlns:ScenarioUI="ScenarioUI.*"
+		 xmlns:CiF="CiF.*"
+		 creationComplete="onCreationComplete()">
+		 
+	
+	<fx:Metadata>
+	</fx:Metadata>
+		 
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<fx:uint id="characterCount">1</fx:uint>
+		<CiF:Character id="selectedCharacter" />
+	</fx:Declarations>
+	
+	<!--<fx:Binding source="this.cif.cast.length" destination="characterCount" />-->
+	<fx:Binding source="selectedTraitsDP" destination="traitsList.dataProvider" />
+	<fx:Binding source="selectedStatusesDP" destination="statusesList.dataProvider" />
+	
+	<s:ButtonBar id="networkTypeButtonBar" x="260" y="505" click="onClickButtonBar(event)">
+		<mx:ArrayCollection id="networkButtons">
+			<fx:String>Buddy</fx:String>
+			<fx:String>Romance</fx:String>
+			<fx:String>Cool</fx:String>
+			<fx:String>Relation</fx:String>
+		</mx:ArrayCollection>
+	</s:ButtonBar>
+	<s:Panel x="15" y="538" width="219" height="152" title="Traits" id="traitsPanel" > 
+		<s:List id="traitsList" height="100%" width="100%" />
+	</s:Panel>
+	<s:Panel x="242" y="537" width="222" height="153" title="Statuses" id="statusesPanel" > 
+		<s:List id="statusesList" height="100%" width="100%" />
+	</s:Panel>
+	<s:Panel x="472" y="537" width="318" height="153" id="ckbPanel" title="CKB" >
+		<s:List id="ckbList" height="100%" width="100%" />
+	</s:Panel>
+	
+	<s:BorderContainer x="0" y="0" width="800" height="495">
+		<s:Group x="-1" y="-1" width="799" height="484" id="canvas" />
+	</s:BorderContainer>
+	
+	<fx:Script>
+		<![CDATA[
+		import flash.events.Event;
+		import mx.collections.ArrayCollection;
+		import mx.graphics.SolidColor;
+		import mx.graphics.SolidColorStroke;
+		import ScenarioUI.*;
+		import CiF.*;
+		import spark.primitives.Ellipse;
+		import spark.primitives.Line;
+		import spark.primitives.Rect;
+
+		public var minNetworkWeight:Number = 2;
+		public var maxNetworkWeight:Number = 12;
+		
+		public var networkLineToFromSeparation:Number = 10;
+		
+		public var networkLineVerticalOffset:Number = 10;
+		public var networkLineHorizontalOffset:Number = 0.0;
+		
+		private var cif:CiFSingleton = CiFSingleton.getInstance();
+		private var charReps:Vector.<CharacterRepresentation>;
+		public var levelCast:Vector.<Character>;
+		private var socialNetworkLines:Vector.<Line>;
+		private var relationshipIcons:Vector.<RelationshipIcon>;
+		private var selectedCharacterRepresentationIndex:int = 0;
+		
+		private var selectedTraitsDP:ArrayCollection;
+		private var selectedStatusesDP:ArrayCollection;
+		private var selectedCBKDP:ArrayCollection;
+		
+		public var relationshipToggle:Boolean = false;
+		
+		
+		
+		private var networkRepresentation:NetworkRepresentation;
+		
+		public function onCreationComplete():void {
+			this.charReps = new Vector.<CharacterRepresentation>();
+			this.socialNetworkLines = new Vector.<Line>();
+			this.relationshipIcons = new Vector.<RelationshipIcon>();
+
+			this.selectedTraitsDP = new ArrayCollection;
+			this.selectedStatusesDP = new ArrayCollection;
+			this.selectedCBKDP = new ArrayCollection;
+			
+			this.networkRepresentation = new NetworkRepresentation();
+			
+			addEventListener(CharacterRepresentationSelectedEvent.CHARACTER_REPRESENTATION_SELECTED, onCharacterRepresentationSelected); 
+			addEventListener("CiFStateUpdate", setUp);
+			setUp();
+			//trace("display index of first character representation: " + this.canvas.getElementIndex(this.charReps[0]));
+		}
+		
+		
+		
+		/**
+		 * This function initializes the component's data structures according
+		 * to the state CiF is in. It is called both in the CreationComplete
+		 * and CiFStateUpdate events.
+		 */
+		public function setUp(event:Event=null):void {
+			//trace("CharacterState:setUp() called");
+			this.getCharacterRepresentationsFromCast();
+			
+			
+			this.selectedCharacterRepresentationIndex = 0;
+			//this.charReps[selectedCharacterRepresentationIndex].currentState = "selected";
+			//this.selectedCharacter = this.charReps[selectedCharacterRepresentationIndex].character;
+			this.networkRepresentation.characterRepresentations = this.charReps;
+			this.canvas.addElementAt(this.networkRepresentation, 0);
+			this.networkRepresentation.createNetworkLines();
+			this.networkRepresentation.selectedChar = this.selectedCharacter;
+			this.circularLayout();
+			this.updateNetworkRepresentation();
+			this.updateCharacterDPs();
+//			this.drawSocialNetwork();
+			
+			/* 
+			 * Test ellipse for character representation alignment.
+			 */
+			var e:Ellipse = new Ellipse();
+			e.stroke = new SolidColorStroke(0x222222);
+			e.width = this.canvas.width * .75;
+			e.height = this.canvas.height * .75;
+			//e.x = this.canvas.width - e.width;
+			//e.y = this.canvas.height - e.height;
+			e.left = this.canvas.width * .125;
+			e.top = this.canvas.height * .125;
+			this.canvas.addElementAt(e, 0);
+		}
+		
+		/**
+		 * Updates the network representation with the type to display, the
+		 * most current character represetnation vector, and redisplays.
+		 */
+		public function updateNetworkRepresentation():void {
+			//this.networkRepresentation.typeToDisplay = SocialNetwork.BUDDY;
+			//this.networkRepresentation.characterRepresentations = this.charReps;
+			this.networkRepresentation.update();
+		}
+		
+		
+		/**
+		 * The callback function for the onCharacterRepresentationSelected
+		 * event. The selected character representation index is updated and
+		 * the networks are redrawn.
+		 * @param	event
+		 */
+		private function onCharacterRepresentationSelected(event:CharacterRepresentationSelectedEvent):void {
+			this.selectedCharacterRepresentationIndex = this.charReps.indexOf(event.target as ScenarioUI.CharacterRepresentation);
+			this.selectedCharacter = event.selectedChar;
+			//this.drawSocialNetwork();
+			
+			//Debug.debug(this, "onCharacterRepresentationSelected()");
+			for each(var rep:ScenarioUI.CharacterRepresentation in this.charReps) 
+				if(rep != event.target as ScenarioUI.CharacterRepresentation)
+					rep.currentState = "notSelected";
+			
+			this.updateCharacterDPs();
+			this.updateNetworkRepresentation();
+			if (relationshipToggle)
+			{
+				this.clearRelationshipIcons();
+				this.drawRelationshipIcons();
+			}
+			
+			//var charRepEvent:CharacterRepresentationSelectedEvent = new CharacterRepresentationSelectedEvent();
+			//charRepEvent.selectedChar = this.selectedCharacter;
+			//dispatchEvent(charRepEvent);
+		}
+		
+		/**
+		 * Creates the vector of characterRepresentation components based on
+		 * the charcters in cif.cast. They are added to the canvas' display
+		 * list. Removes the old character representations and populates
+		 * a new vector.
+		 */
+		private function getCharacterRepresentationsFromCast(cast:Vector.<Character>=null):void {
+			for each (var cr:ScenarioUI.CharacterRepresentation in this.charReps) {
+				this.canvas.removeElement(cr);
+			}
+			
+			var castToUse:Vector.<Character> = (cast!=null)?cast:cif.cast.characters;
+			
+			Debug.debug(this, "getCharacterRepresentationFromCast() using " + ((cast != null)?"level cast":"full cast"));
+			
+			this.charReps = new Vector.<CharacterRepresentation>();
+			for (var i:int = 0; i < castToUse.length; ++i) {
+				this.charReps.push(new CharacterRepresentation());
+				this.charReps[i].width = 75;
+				this.charReps[i].height = 50;
+				this.charReps[i].x = 55 * (i);
+				this.charReps[i].y = 55 * (i);
+				this.charReps[i].color = 0x110011 * i+1;
+				this.charReps[i].borderColor = 0x050005 * i + 1;
+				this.charReps[i].character = this.cif.cast.characters[i];
+				this.canvas.addElement(this.charReps[i]);
+			}			
+		}
+		
+		
+			/**
+			 * Places the character representations in a ciruclar layout in the
+			 * canvas.
+			 */
+			public function circularLayout():void {
+				//var midx:Number = this.canvas.x + this.canvas.width / 2;
+				//var midy:Number = this.canvas.y + this.canvas.height / 2;
+				var midx:Number = this.canvas.width / 2;
+				var midy:Number = this.canvas.height / 2;
+				var radx:Number = 0.75 * this.canvas.width / 2;
+				var rady:Number = 0.75 * this.canvas.height / 2 ;
+				
+				//var offsetForFirstLocation:Number = Math.PI * 0.75;
+				var offsetForFirstLocation:Number = 0;
+				var iterativeOffset:Number = 2 * Math.PI / this.cif.cast.length;
+				
+				//trace("iterativeOffset: " + iterativeOffset);
+				
+				for (var i:Number = 0; i < this.cif.cast.length; ++i) {
+					/*
+					 * We are subtracting to get the next location in stead of adding
+					 * as to grow the location list in a clockwise direction. This
+					 * is due to the y-axis being flipped from the standard Cartesian
+					 * representation.
+					 */
+					this.charReps[i].horizontalCenter = radx * Math.sin(offsetForFirstLocation - i * iterativeOffset);
+					this.charReps[i].verticalCenter = rady * Math.cos(offsetForFirstLocation - i * iterativeOffset);
+					//trace("centers : " + this.charReps[i].horizontalCenter + ", " + this.charReps[i].verticalCenter);
+					//trace("position: " + this.charReps[i].left+ ", " + this.charReps[i].top);
+				}
+				
+				//trace(Math.sin(0) + " " + Math.cos(0));
+				
+			}
+				
+		public function updateCharacterDPs():void {
+			var char:Character = this.cif.cast.getCharByName(this.charReps[this.selectedCharacterRepresentationIndex].character.characterName);
+			//update traits dp
+			this.selectedTraitsDP.removeAll();
+			this.selectedStatusesDP.removeAll();
+			this.selectedCBKDP.removeAll();
+			
+			for each (var trait:Number in char.traits) {
+				this.selectedTraitsDP.addItem(Trait.getNameByNumber(trait));
+			}
+	
+			//update statuses dp
+			for each (var status:Status in char.statuses) {
+				if (status.isDirected) {
+					this.selectedStatusesDP.addItem(Status.getStatusNameByNumber(status.type) + " " + status.directedToward);
+				}else {
+					this.selectedStatusesDP.addItem(Status.getStatusNameByNumber(status.type));
+				}
+			}
+			//update ckb dp
+			//for each (entry: in cif.ckb.
+			//cif.ckb.findItem(char.characterName,
+			//char.
+			for each (var ckbpath:CKBPath in cif.ckb.findFullCKBPaths(selectedCharacter.characterName)) {
+				this.selectedCBKDP.addItem(ckbpath.toString());
+				//Debug.debug(this, "updateCharacterDPs() ckbpath: " + ckbpath.toString());
+			}
+			
+			//reset data providers to force change event
+			this.traitsList.dataProvider = this.selectedTraitsDP;
+			this.statusesList.dataProvider = this.selectedStatusesDP;
+			this.ckbList.dataProvider = this.selectedCBKDP;
+		}
+		
+		
+		/**
+		 * Draws relationshipIcons for the selected character towards all other charReps
+		 */
+		public function drawRelationshipIcons():void
+		{	
+			//relationship got presses on the button bar got clicked
+			//this.charReps[selectedCharacterRepresentationIndex].character
+			var icon:RelationshipIcon;
+			var selectedChar:Character = this.charReps[selectedCharacterRepresentationIndex].character;
+			var char:Character;
+			for each (var charRep:CharacterRepresentation in charReps)
+			{
+				char = charRep.character;
+				if (char.characterName != selectedChar.characterName)
+				{
+					if (cif.relationshipNetwork.getRelationship(RelationshipNetwork.FRIENDS, cif.cast.getCharByName(selectedChar.characterName), cif.cast.getCharByName(char.characterName)))
+					{
+						//trace(gameEngine.primaryAvatarSelection + " is friends with " + char.characterName);
+						icon = new RelationshipIcon("friends", char.characterName);								
+						icon.left = icon.offsetX + charRep.x;
+						icon.top = icon.offsetY + charRep.y;								
+						this.relationshipIcons.push(icon);
+						this.addElement(icon);
+					}
+					if (cif.relationshipNetwork.getRelationship(RelationshipNetwork.DATING, cif.cast.getCharByName(selectedChar.characterName), cif.cast.getCharByName(char.characterName)))
+					{
+						//trace(gameEngine.primaryAvatarSelection + " is dating " + char.characterName);
+						icon = new RelationshipIcon("dating", char.characterName);	
+						icon.left = icon.offsetX + charRep.x;
+						icon.top = icon.offsetY + charRep.y;								
+						this.relationshipIcons.push(icon);
+						this.addElement(icon);
+					}
+					if (cif.relationshipNetwork.getRelationship(RelationshipNetwork.ENEMIES, cif.cast.getCharByName(selectedChar.characterName), cif.cast.getCharByName(char.characterName)))
+					{
+						//trace(gameEngine.primaryAvatarSelection + " is enemies with " + char.characterName);
+						icon = new RelationshipIcon("enemies", char.characterName);
+						icon.left = icon.offsetX + charRep.x;
+						icon.top = icon.offsetY + charRep.y;								
+						this.relationshipIcons.push(icon);
+						this.addElement(icon);
+					}
+				}
+			}
+		}
+		
+		/**
+		 * Removes all relationshipIcons
+		 */
+		public function clearRelationshipIcons():void
+		{
+			//go through and remove all of the icons
+			for each (var iconToRemove:RelationshipIcon in this.relationshipIcons)
+			{
+				this.removeElement(iconToRemove);
+			}
+			this.relationshipIcons = new Vector.<RelationshipIcon>();			
+		}
+		
+		/**
+		 * The button bar's mouse click event handler. It should update which
+		 * type of network (if any) that should be displayed and call update
+		 * on the network representation.
+		 * @param	event
+		 */
+		private function onClickButtonBar(event:MouseEvent):void 
+		{
+			//this.traceDisplayList(this);
+			//if (networkTypeButtonBar.selectedItem == "Relation")
+			if (event.target.label == "Relation")
+			{
+				relationshipToggle = !relationshipToggle;
+				if (relationshipToggle)
+				{
+					this.clearRelationshipIcons();
+					drawRelationshipIcons();
+				}
+				else
+				{
+					clearRelationshipIcons();
+				}
+			}
+			else
+			{
+				//this means we had a network button clicked on
+				switch (SocialNetwork.getTypeFromName(networkTypeButtonBar.selectedItem as String)) {
+					case SocialNetwork.BUDDY:
+						this.networkRepresentation.typeToDisplay = SocialNetwork.BUDDY;
+						this.networkRepresentation.update();
+						break;
+					case SocialNetwork.COOL:
+						this.networkRepresentation.typeToDisplay = SocialNetwork.COOL;
+						this.networkRepresentation.update();
+						break;
+					case SocialNetwork.ROMANCE:
+						this.networkRepresentation.typeToDisplay = SocialNetwork.ROMANCE;
+						this.networkRepresentation.update();
+						break;
+					default:
+				}
+			}
+		}
+		
+		
+		
+		]]>
+	</fx:Script>
+</s:Group>

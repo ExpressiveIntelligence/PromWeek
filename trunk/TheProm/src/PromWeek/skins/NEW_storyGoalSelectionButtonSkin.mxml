@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Skin 
+    xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:mx="library://ns.adobe.com/flex/mx" 
+    xmlns:s="library://ns.adobe.com/flex/spark"  
+	creationComplete="onCreationComplete()"
+	styleName="classicPromWeek"
+	xmlns:util="com.util.*"
+    alpha.disabled="0.5"
+	width="{hostComponent.width}" height="{hostComponent.height}"> 
+ 
+     <fx:Metadata> 
+        [HostComponent("PromWeek.NEW_storyGoalSelectionButton")] 
+    </fx:Metadata> 
+ 
+	<fx:Declarations>
+		<fx:Number id="contentBGColor">0x144278</fx:Number>
+	 </fx:Declarations>
+	
+    <s:states> 
+		 <s:State name="up" enterState="onEnterState(event)" />
+		 <s:State name="over" enterState="onEnterState(event)" />
+		 <s:State name="down" enterState="onEnterState(event)" />
+		 <s:State name="disabled" enterState="onEnterState(event)" />
+		 <s:State name="selected" enterState="onEnterState(event)"/>
+    </s:states>
+ 
+	
+	<!--<util:SmoothImage id="upImage" visible="false" width="{hostComponent.width}" height="{hostComponent.height}" maintainAspectRatio="false"/>
+    <util:SmoothImage id="overImage" visible="false" width="{hostComponent.width}" height="{hostComponent.height}" maintainAspectRatio="false"/>
+    <util:SmoothImage id="downImage" visible="false" width="{hostComponent.width}" height="{hostComponent.height}" maintainAspectRatio="false"/>
+    <util:SmoothImage id="selectedImage" visible="false" width="{hostComponent.width}" height="{hostComponent.height}" maintainAspectRatio="false"/>-->
+	
+	<s:Rect id="upImage" width="100%" height="100%">
+		<s:fill>
+			<mx:SolidColor color="0x082d57"/>
+		</s:fill>
+		<!--<s:stroke>
+			<mx:SolidColorStroke color="0x000000" weight="2" />
+		</s:stroke>-->
+	</s:Rect>
+	<s:Rect id="overImage" width="100%" height="100%">
+		<s:fill>
+			<mx:SolidColor color="0x0a3464"/>
+		</s:fill>
+		<!--<s:stroke>
+			<mx:SolidColorStroke color="0x000000" weight="2" />
+		</s:stroke>-->
+	</s:Rect>
+	<s:Rect id="downImage" width="100%" height="100%">
+		<s:fill>
+			<mx:SolidColor color="0x052c5a"/>
+		</s:fill>
+		<!--<s:stroke>
+			<mx:SolidColorStroke color="0x000000" weight="2" />
+		</s:stroke>-->
+	</s:Rect>
+	<s:Rect id="selectedImage" width="100%" height="100%">
+		<s:fill>
+			<mx:SolidColor color="{this.contentBGColor}" />
+		</s:fill>
+		<!--<s:stroke>
+			<mx:SolidColorStroke color="0x000000" weight="5" />
+		</s:stroke>-->
+	</s:Rect>
+	
+	
+	<s:VGroup width="{hostComponent.width}" height="{hostComponent.height}" gap="0" paddingBottom="10" paddingTop="10">
+		<s:Label id="storyGoalNameLabel" 
+				 color.selected="#ffffff"
+				 color.up="#cacaca"
+				 color.over="#cacaca"
+				 color.down="#cacaca"
+				 width="100%" height="60%"
+				 textAlign="center" 
+				 fontSize="16"
+				 verticalAlign="middle" 
+				 styleName="basicFontStyle" />
+		<s:Label id="progressText" 
+				 color.selected="#ffffff"
+				 color.up="#cacaca"
+				 color.over="#cacaca"
+				 color.down="#cacaca"
+				 width="100%" height="40%"
+				 textAlign="center" 
+				 fontSize="14"
+				 verticalAlign="middle" 
+				 styleName="basicFontStyle" />
+	</s:VGroup>
+	<s:VGroup width="{hostComponent.width}" height="{hostComponent.height}" gap="0" paddingBottom="10" paddingTop="10">
+		<mx:Spacer height="60%" />
+		<s:VGroup width="100%" height="40%" horizontalAlign="left" verticalAlign="middle" paddingLeft="10">
+			<util:SmoothImage id="completedImage" visible="false" width="25" height="25" />
+		</s:VGroup>
+	</s:VGroup>
+		
+    <fx:Script> 
+        <![CDATA[
+			import flash.events.Event;
+			import PromWeek.assets.ResourceLibrary;
+		
+			public var rL:ResourceLibrary;
+		
+			public function onCreationComplete():void 
+			{
+				rL = ResourceLibrary.getInstance();
+				
+				this.completedImage.source = rL.uiIcons["star"];
+				
+				//this.selectedImage.source = rL.uiIcons["sgThoughtBubToggleSelected"];
+				//
+				//this.overImage.source = rL.uiIcons["sgThoughtBubToggleUnlockedUp"];
+				//this.downImage.source = rL.uiIcons["sgThoughtBubToggleUnlockedDown"];
+				//this.upImage.source = rL.uiIcons["sgThoughtBubToggleUnlockedOver"];
+				
+			}
+		
+			override protected function updateDisplayList(w:Number, h:Number):void 
+			{
+				super.updateDisplayList(w,h);
+				if (hostComponent.completed)
+				{
+					this.completedImage.visible = true;
+				}
+				else
+				{
+					this.completedImage.visible = false;
+				}
+				
+				storyGoalNameLabel.text = hostComponent.storyGoalName;
+				
+				if (hostComponent.isBottom)
+				{
+					upImage.bottomLeftRadiusX = 20;
+					upImage.bottomLeftRadiusY = 20;
+					
+					overImage.bottomLeftRadiusX = 20;
+					overImage.bottomLeftRadiusY = 20;
+					
+					downImage.bottomLeftRadiusX = 20;
+					downImage.bottomLeftRadiusY = 20;
+					
+					selectedImage.bottomLeftRadiusX = 20;
+					selectedImage.bottomLeftRadiusY = 20;
+				}
+				
+				if (hostComponent.isTop)
+				{
+					upImage.topLeftRadiusX = 20;
+					upImage.topLeftRadiusY = 20;
+					
+					overImage.topLeftRadiusX = 20;
+					overImage.topLeftRadiusY = 20;
+					
+					downImage.topLeftRadiusX = 20;
+					downImage.topLeftRadiusY = 20;
+					
+					selectedImage.topLeftRadiusX = 20;
+					selectedImage.topLeftRadiusY = 20;
+				}
+				
+				progressText.text = hostComponent.progressText;
+				
+				//hostComponent.skin.invalidateSkinState();
+			}
+			
+			
+			public function onEnterState(e:Event):void
+			{	
+				if (e.currentTarget.name == "selected")
+				{	
+					this.selectedImage.visible = true;
+					this.upImage.visible = false;
+					this.downImage.visible = false; 
+					this.overImage.visible = false;	
+				}
+				else if (e.currentTarget.name == "up")
+				{	
+					this.selectedImage.visible = false;
+					this.upImage.visible = true;
+					this.downImage.visible = false; 
+					this.overImage.visible = false;	
+				}
+				else if (e.currentTarget.name == "down")
+				{
+					this.selectedImage.visible = false;
+					this.upImage.visible = false;
+					this.downImage.visible = true; 
+					this.overImage.visible = false;
+				}
+				else if (e.currentTarget.name == "over")
+				{
+					this.selectedImage.visible = false;
+					this.upImage.visible = false;
+					this.downImage.visible = false; 
+					this.overImage.visible = true;	
+				}
+			}
+           
+        ]]>
+    </fx:Script> 
+	
+	
+</s:Skin >

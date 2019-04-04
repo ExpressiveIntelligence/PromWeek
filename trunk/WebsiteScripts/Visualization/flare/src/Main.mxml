@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+    xmlns:s="library://ns.adobe.com/flex/spark"
+    xmlns:mx="library://ns.adobe.com/flex/mx"
+	width="800"
+	height="600"
+	creationComplete="onCreationComplete()"
+	xmlns:PromWeekVisualization="PromWeekVisualization.*">
+			   
+	<fx:Binding source="pwvt.idCollection" destination="this.idList" />
+	
+	<s:VGroup id="maingrid" width="100%">
+		<s:HGroup id="fileOpenDialogGroup">
+			<mx:Button id="selectFileButton" label="Select File" buttonDown="selectUpFileDialog()"/>
+			<mx:Button id="openFileButton" label="Load File" buttonDown="loadFile()" />
+			<mx:Text id="openFileText" text="No File Selected"/>
+			<mx:Button id="zoomOut" width="25" label="-" buttonDown="zoomOutTreeCanvas()"/>
+			<mx:Button id="zoomReset" width="25" label="=" buttonDown="zoomResetTreeCanvas()"/>
+			<mx:Button id="zoomIn" width="25" label="+" buttonDown="zoomInTreeCanvas()"/>
+		</s:HGroup>
+		<mx:List id="facebookIDs" width="100" height="150" dataProvider="{this.idList}" mouseOver="dragging=false" />
+		<s:SpriteVisualElement id="treeCanvas" /> 
+	</s:VGroup>
+   
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+		import flash.display.DisplayObject;
+		import flash.display.Sprite;
+		import flash.net.URLLoader;
+		import flash.ui.Mouse;
+		import mx.collections.ArrayCollection
+		import PromWeekVisualization.*
+		import flash.events.*
+		import flash.net.FileReference
+		import spark.core.SpriteVisualElement;
+		
+		// the list of IDs for facebookIDs list. Shows all the IDs and will be selectable
+		// to highlight specific ones
+		[Bindable]
+		public var idList:ArrayCollection
+		
+		// pwvt singleton
+		[Bindable]
+		public var pwvt:PromWeekVisTree = PromWeekVisTree.getInstance()
+		
+		// file reference for the file to open
+		var levelTraceSourceFile:FileReference = new FileReference()
+		
+		// create the data array for parseFormattedTraceFileToArray function to populate
+		var dataArray:Array;
+		// for debugging
+		var gameCount:Number = 0
+		
+		// mouse handling!
+		var dragging:Boolean = false
+		var dragStartX:Number = 0
+		var dragStartY:Number = 0
+		
+		public function onCreationComplete():void {
+			this.addEventListener(MouseEvent.MOUSE_DOWN, treeCanvasMouseDown)
+			this.addEventListener(MouseEvent.MOUSE_UP, treeCanvasMouseUp)
+			this.addEventListener(MouseEvent.MOUSE_MOVE,treeCanvasMouseMove)
+		}
+		
+		/**
+		 * mouse movement functions. They're pretty basic and have no error correction!
+		 * FIXME: Do bounds correction on the mouse movement
+		 * @param	e
+		 */
+		public function treeCanvasMouseUp(e:MouseEvent):void {
+			dragging = false
+		}
+		
+		public function treeCanvasMouseMove(e:MouseEvent):void {
+			if (dragging) {
+				if (treeCanvas.numChildren != 0) {
+					var s:DisplayObject = treeCanvas.getChildAt(0)
+					s.x += mouseX - dragStartX
+					s.y += mouseY - dragStartY
+				}
+				dragStartX = mouseX
+				dragStartY = mouseY
+			}
+			if (mouseX < 5 || mouseX > this.width -5 || mouseY < 5 || mouseY > this.height - 5) {
+				dragging = false
+			}
+			
+		}
+		
+		public function treeCanvasMouseDown(e:MouseEvent):void {
+			if(mouseY > treeCanvas.y)dragging = true
+			dragStartX = mouseX
+			dragStartY = mouseY
+		}
+		
+		public function zoomOutTreeCanvas():void {
+			treeCanvas.getChildAt(0).scaleX -= 0.1
+			treeCanvas.getChildAt(0).scaleY -= 0.1
+		}
+		
+		public function zoomResetTreeCanvas():void {
+			treeCanvas.getChildAt(0).scaleX = 1
+			treeCanvas.getChildAt(0).scaleY = 1
+		}
+		
+		public function zoomInTreeCanvas():void {
+			treeCanvas.getChildAt(0).scaleX += 0.1
+			treeCanvas.getChildAt(0).scaleY += 0.1
+		}
+		
+		/**
+		 * load the file that's located in levelTraceSourceFile.name.
+		 * It also handles reloading and/or loading new trees so they don't stack on top of each
+		 * other and looks bad :D
+		 */
+		public function loadFile():void {
+			if(treeCanvas.numChildren > 0) // NAILED IT!
+				treeCanvas.removeChildAt(0)
+			pwvt.clear()
+			if(openFileText.text != "No File Selected") {
+				levelTraceSourceFile.addEventListener(Event.COMPLETE, parseLevelTraceFile)
+				levelTraceSourceFile.load()
+			}
+			
+		}
+		
+		private function parseLevelTraceFile(e:Event):void {
+			// give TestTheTree.dataArray a fresh new array
+			this.dataArray = new Array()
+			// create a temporary array
+			var tArray = new Array()
+			// create an array that contains each line of the text file that was read
+			var file:String = e.target.data.readUTFBytes(e.target.data.bytesAvailable)
+			trace("eh?")
+			var data:Array = file.split("\n");
+			// create an array 
+			var line:Array = new Array()
+			// make the playerID var so we don't call new a bazillion times (AS3 probably optimizes this for us, but just to be safe
+			var playerID:Number = 0
+			// now iterate through each line, and manipulate the data accordingly
+			for (var i:int = 0; i < data.length; ++i) {
+				if (data[i].indexOf(">") != -1 || i == data.length - 1) { // this is where the new level trace occurs
+					playerID = data[i].split(" ")[1] // set the playerID variable immidiately 
+					if (tArray.length != 0) {
+						dataArray.push(tArray)
+					}
+					tArray = new Array()
+					trace("new game! " + "PlayerID is: " + playerID)
+					gameCount += 1
+					continue
+				}
+				line = data[i].split(",")
+				trace(line)
+				// data[i].split(" ")[1] < this is how we grab the player ID. It's on the > line.
+				tArray.push(new VisSocialGameObj(line[0],line[1],line[2],line[3],playerID))
+			}
+			trace("The number of games is: " + gameCount)
+			pwvt.insertPathArray(dataArray)
+			
+			// now that the tree has data, draw the tree! :D
+			treeCanvas.addChild(pwvt.drawTree())
+		}
+		
+		/**
+		 * function callback when fileOpenDialogGroup::selectFileButton is pressed. This will open up a 
+		 * file browser on your machine and once you click it, it changes the value of the text (openFileText)
+		 * is right next to the button. This is really just for show, but it's a good confirmation of what
+		 * file you selected.
+		 */
+		public function selectUpFileDialog():void {
+			levelTraceSourceFile.browse()
+			// once you've chosen a file, change the name of this text to signify it
+			levelTraceSourceFile.addEventListener(Event.SELECT,
+				function(e:Event){openFileText.text = (e.target as FileReference).name})
+		}
+		]]>
+	</fx:Script>
+</s:Application>

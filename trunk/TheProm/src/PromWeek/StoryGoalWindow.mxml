@@ -1,0 +1,649 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 width="515"
+		 height="430"
+		 styleName="classicPromWeek">
+	
+	<fx:Declarations>
+		<fx:Number id="requiresThirdProgressSize">20</fx:Number>
+		<fx:Number id="doesntRequireThirdProgressSize">30</fx:Number>
+		
+	</fx:Declarations>
+	<s:Group width="100%" height="100%" id="cloakOfInvisibility" visible="false">
+	<!--<s:Rect width="100%" height="100%" radiusX="20" radiusY="20">-->
+	<s:Rect width="515" height="100%" radiusX="20" radiusY="20">
+		<s:stroke>
+			<s:SolidColorStroke color="{getStyle('backgroundStroke')}" weight="{getStyle('backgroundStrokeWeight')}"></s:SolidColorStroke>
+		</s:stroke>
+		<s:fill>
+			<!--<s:SolidColor color="{getStyle('backgroundColor')}" alpha="{getStyle('backgroundColorAlpha')}"></s:SolidColor>-->
+			<s:SolidColor color="{getStyle('backgroundColor')}" alpha="0.9"></s:SolidColor>
+		</s:fill>
+	</s:Rect>
+	<s:HGroup width="100%" height="100%" gap="0" paddingBottom="15">
+		<s:Group id="todoItemAccordianGroup" width="515" height="100%">
+			<prom:ToDoItemAccordion id="toDoItemAccordion"/>
+		</s:Group>
+		<s:Group width="{this.width - todoItemAccordianGroup.width}" height="100%" visible="false">
+			<s:VGroup id="theGroupThatIAmInterestedInRightNow" width="100%" height="100%" paddingTop="10">
+				<s:VGroup id="progressGroup" width="100%" height="25%" paddingLeft="10" paddingRight="10" paddingTop="10" paddingBottom="10" depth="1" maxHeight="{theGroupThatIAmInterestedInRightNow.height}">
+					<s:HGroup width="100%" height="30%">
+						<!--<s:RichText text="Check Character Progress:" width="100%" height="100%" color="{getStyle('contentAreaTextColor')}" fontSize="14" />-->
+						<s:RichText text="Check Progress:" fontWeight="bold" fontSize="18" color="{getStyle('contentAreaTextColor')}"/>
+						<!--<s:RichText id="goalText" width="100%" height="30%" color="{getStyle('contentAreaTextColor')}" fontSize="14" visible="false" />-->
+						<mx:Spacer width="40"></mx:Spacer>
+					</s:HGroup>
+					<s:HGroup id="progressCharHeadGroup" width="100%" height="70%">
+						<!--<s:RichText id="firstText" text="1st" fontSize="10" color="{getStyle('contentAreaTextColor')}"/>-->
+						<!--<prom:ToggleableContainerButton id="firstBestGroup" width="65" height="40" rollOver="mouseOverCharacters(event)" rollOut="mouseOutCharacters(event)" click="currentBestClicked(event)" toggleable="false" boxPadding="0" toolTip="" enabled="false" selected="true" alpha="0.1" />-->
+						<prom:ToggleableContainerButton id="firstBestGroup" width="65" height="40" rollOver="mouseOverCharacters(event)" rollOut="mouseOutCharacters(event)" click="currentBestClicked(event)" selected="false" toggleable="false" boxPadding="0" toolTip="" enabled="false" alpha="0.1" />
+						<!--<prom:ToggleableContainerButton id="firstBestGroup" width="33%" height="100%" click="currentBestClicked(event)" toggleable="false" boxPadding="0" toolTip="" enabled="false" selected="true" />-->
+						<prom:CharPortraitDrawer id="characterFilterGroup" buttonWidth="120" height="25" visible="true" downward="true" maintainList="false" buttonLabel="Choose Character" enabled="false" />
+						<!--<s:RichText id="secondText" text="2nd" fontSize="10" color="{getStyle('contentAreaTextColor')}"/>
+						<prom:ToggleableContainerButton id="secondBestGroup" width="33%" height="100%" rollOver="mouseOverCharacters(event)" rollOut="mouseOutCharacters(event)" click="currentBestClicked(event)" toggleable="false" boxPadding="0" toolTip="" enabled="false" selected="true"/>
+						<s:RichText id="thirdText" text="3rd" fontSize="10" color="{getStyle('contentAreaTextColor')}"/>
+						<prom:ToggleableContainerButton id="thirdBestGroup" width="33%" height="100%" rollOver="mouseOverCharacters(event)" rollOut="mouseOutCharacters(event)" click="currentBestClicked(event)" toggleable="false" boxPadding="0" toolTip="" enabled="false" selected="true"/>-->
+					</s:HGroup>
+				</s:VGroup>
+				<prom:HintComponent id="hintComponent" width="100%" height="75%" depth="0" />
+			</s:VGroup>
+			<!--
+			<s:VGroup width="100%" height="100%">
+				<s:VGroup id="progressGroup" width="100%" height="25%" paddingLeft="5" paddingRight="5" paddingTop="5" paddingBottom="5">
+					<s:RichText text="True for:" width="100%" height="30%" color="{getStyle('contentAreaTextColor')}" fontSize="14"/>
+					<s:Scroller width="100%" height="70%">
+						<s:HGroup id="trueForCharHeadGroup" width="100%" height="100%">
+						</s:HGroup>
+					</s:Scroller>
+				</s:VGroup>
+				<prom:HintComponent id="hintComponent" width="100%" height="75%"/>
+			</s:VGroup>
+			-->
+			
+			
+		</s:Group>
+	</s:HGroup>
+	</s:Group>
+	<fx:Script>
+		<![CDATA[
+		import CiF.Character;
+		import CiF.CiFSingleton;	
+		import CiF.Predicate;
+		import flash.display.DisplayObject;
+		import flash.events.Event;
+		import flash.events.MouseEvent;
+		import flash.geom.Vector3D;
+		import flash.utils.Dictionary;
+		import flashx.textLayout.utils.CharacterUtil;
+		import mx.collections.ArrayCollection;
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import PromWeek.assets.ResourceLibrary;
+		import spark.components.HGroup;
+		import spark.components.List;
+
+		public var gameEngine:GameEngine;
+		public var cif:CiFSingleton;
+		public var resourceLibrary:ResourceLibrary;
+		
+		/**
+		 * This is a simple flag to deal with the fact that when we click on the character drawer it sends a
+		 * roll out event, and we don't want that.
+		 */
+		public var filterJustClickedOn:Boolean = false;
+		
+		public function onCreationComplete():void
+		{	
+			this.addEventListener("STORY_GOAL_SELECTED",updateCurrentBest);
+			
+			gameEngine = GameEngine.getInstance();
+			cif = CiFSingleton.getInstance()
+			resourceLibrary = ResourceLibrary.getInstance();
+			
+			this.addEventListener("charPortraitRolledOver", updateCurrentBest);
+			this.addEventListener("charPortraitRolledOut", rollOutCharacterDrawer);
+			this.addEventListener("centralCharacterChanged", filterClickedOn);
+			
+			//theGroupThatIAmInterestedInRightNow.setElementIndex(progressGroup, theGroupThatIAmInterestedInRightNow.numChildren - 1);
+		}
+		
+		public function exitToDoList(e:MouseEvent = null):void
+		{
+			gameEngine.hudGroup.storyGoalWindow.visible = false;
+		}
+		
+		
+		public function rollOutCharacterDrawer(e:Event = null):void
+		{
+			if (filterJustClickedOn)
+			{
+				filterJustClickedOn = false;
+				return;
+			}
+			/*
+			if (!this.firstBestGroup.selected)
+			{
+				//make sure we are not selected: this is to fix some weird behavior with the char drawer when you don't select anything
+				this.firstBestGroup.selected = true;
+			}
+			*/
+			
+			this.updateCurrentBest();
+			this.mouseOutCharacters();
+		}
+		
+		
+		public function mouseOutCharacters(e:MouseEvent=null):void
+		{
+			if (this.toDoItemAccordion.selectedList)// && this.firstBestGroup.selected)
+			{
+				var seenResponderBefore:Boolean = false;
+				var seenOtherBefore:Boolean = false;
+				
+				var primaryCharacter:Character;
+				var secondaryCharacter:Character;
+				var other:Character;
+				
+				var pred:Predicate;
+
+				PromWeek.StoryGoalWindow.updateGoalList(this.toDoItemAccordion.selectedList, null, null, false, true);
+
+				//this.toDoItemAccordion.selectedToDoItemComponent.setProgressWidthPercent(this.toDoItemAccordion.selectedToDoItemComponent.toDoItem.condition.getPercentageTrueForInitiator(cif.cast.getCharByName(gameEngine.currentStory.storyLeadCharacter), null, null, null)["percent"]);
+			}
+		}
+		
+		
+		
+		public function mouseOverCharacters(e:MouseEvent=null):void
+		{
+			if (this.toDoItemAccordion.selectedList)
+			{
+				//var tTip:String = (e.currentTarget as ToggleableContainerButton).toolTip;
+				var tTip:String = firstBestGroup.toolTip;
+				
+				var responder:Character;
+				var other:Character;
+				var i:int;
+				var words:Array = tTip.split(" ");
+				for (i = 0; i < words.length; i++)
+				{
+					if (i == 0)
+					{
+						//this means we must have a second char
+						responder = cif.cast.getCharByName(words[i]);
+					}
+					if (i == 2)
+					{
+						//this means we must have a third char
+						other = cif.cast.getCharByName(words[i]);
+					}
+				}
+				if (responder != null)
+				{
+					PromWeek.StoryGoalWindow.updateGoalList(this.toDoItemAccordion.selectedList, responder, other, true);	
+				}
+				else
+				{
+					PromWeek.StoryGoalWindow.updateGoalList(this.toDoItemAccordion.selectedList, responder, other, false);
+				}
+				//var numPredTrue:int = 0;
+
+				//var percentTrue:Number = numPredTrue / this.toDoItemAccordion.selectedList.dataProvider.length;
+				//this.toDoItemAccordion.selectedToDoItemComponent.setProgressWidthPercent(this.toDoItemAccordion.selectedToDoItemComponent.toDoItem.condition.getPercentageTrueForInitiator(cif.cast.getCharByName(gameEngine.currentStory.storyLeadCharacter),null, responder, other)["percent"]);
+				//this.toDoItemAccordion.selectedToDoItemComponent.setProgressWidthPercent(percentTrue);
+			}
+		}
+
+		
+		public function filterClickedOn(e:Event=null,shouldSetFilterJustClicked:Boolean=true):void
+		{
+			if (shouldSetFilterJustClicked)
+			{
+				filterJustClickedOn = true;
+			}
+			if (this.toDoItemAccordion.selectedToDoItemComponent == null) return;
+			
+			this.firstBestGroup.mainContainer.removeAllElements();
+			//var shouldEvenHaveCurrentBest:Boolean = true;
+			
+			var image:SmoothImage;
+			
+			//if (this.toDoItemAccordion.selectedToDoItemComponent)
+			//{
+				//for each (var p:Predicate in this.toDoItemAccordion.selectedToDoItemComponent.toDoItem.condition)
+				//{
+					//if (!p.numTimesUniquelyTrueFlag)
+					//{
+						//shouldEvenHaveCurrentBest = true;
+					//}
+				//}
+			//}
+			
+			//if (shouldEvenHaveCurrentBest)
+			//{
+				var responder:Character;
+				var other:Character;
+				
+				//this.firstBestGroup.selected = false;
+				
+				if (this.characterFilterGroup.characterLastClicked != "")
+				{
+					responder = cif.cast.getCharByName(this.characterFilterGroup.characterLastClicked);
+				}
+				else
+				{
+					return;
+				}
+				
+				var requiresThird:Boolean = this.toDoItemAccordion.selectedToDoItemComponent.toDoItem.condition.requiresThreeBoundCharacters();
+				
+				
+				var percentAndResponderAndOther:Dictionary = this.toDoItemAccordion.selectedToDoItemComponent.toDoItem.condition.getPercentageTrueForInitiator(CiFSingleton.getInstance().cast.getCharByName(gameEngine.currentStory.storyLeadCharacter),cif.cast.characters,responder);
+				
+				
+				//var image:Image;
+				//var image:Image;
+				//var percentAndResponderAndOther:Dictionary = toDoItemComponent.toDoItem.condition.getPercentageTrueForInitiator(cif.cast.getCharByName(gameEngine.currentStory.storyLeadCharacter),null,responder,other);
+				//Find the first best characters
+				//if (percentAndResponderAndOther["responder"])
+				//{
+				image = new SmoothImage();
+				//image.source = resourceLibrary.charHeads[percentAndResponderAndOther["responder"].toLowerCase()];
+				if (responder != null)
+				{
+					image.source = resourceLibrary.charHeads[responder.characterName.toLowerCase()];
+					this.firstBestGroup.toolTip = responder.characterName;
+				}
+			
+				//percentAndResponderAndOther["responder"]
+				if (requiresThird)
+				{
+					image.width = this.requiresThirdProgressSize;
+					image.height = this.requiresThirdProgressSize;
+				}
+				else
+				{
+					image.width = this.doesntRequireThirdProgressSize;
+					image.height = this.doesntRequireThirdProgressSize;
+				}
+				this.firstBestGroup.mainContainer.addElement(image);
+
+				if (percentAndResponderAndOther["other"] && requiresThird)
+				{
+					image = new SmoothImage();
+					image.source = resourceLibrary.charHeads[percentAndResponderAndOther["other"].toLowerCase()];
+					this.firstBestGroup.toolTip += " and " + percentAndResponderAndOther["other"];
+					if (requiresThird)
+					{
+						image.width = this.requiresThirdProgressSize;
+						image.height = this.requiresThirdProgressSize;
+					}
+					else
+					{
+						image.width = this.doesntRequireThirdProgressSize;
+						image.height = this.doesntRequireThirdProgressSize;
+					}
+					this.firstBestGroup.mainContainer.addElement(image);
+				}
+			//}
+		}
+		
+		public function currentBestClicked(e:MouseEvent = null):void
+		{
+			
+			var button:ToggleableContainerButton = firstBestGroup;//e.currentTarget as ToggleableContainerButton;
+			var responder:Character;
+			var other:Character;
+	
+
+			
+			
+			
+				if (button.id == "firstBestGroup")
+				{
+					button = this.firstBestGroup;
+				}
+			
+			
+			//if (button.selected == false)
+			//{
+				//this.firstBestGroup.selected = true;
+			//}
+			//else
+			//{
+				//if (button.id == "firstBestGroup")
+				//{
+					//this.firstBestGroup.selected = false;
+				//}
+
+				var tTip:String = (e.currentTarget as ToggleableContainerButton).toolTip;
+				
+				var i:int;
+				var words:Array = tTip.split(" ");
+				for (i = 0; i < words.length; i++)
+				{
+					if (i == 0)
+					{
+						//this means we must have a second char
+						responder = cif.cast.getCharByName(words[i]);
+						//gameEngine.hudGroup.topBar.toDoItemComponent.responderFace.source = ResourceLibrary.getInstance().charHeads[responder.characterName.toLowerCase()];
+						//gameEngine.hudGroup.topBar.toDoItemComponent.responderFace.visible = true;
+						
+					}
+					if (i == 2)
+					{
+						//this means we must have a third char
+						other = cif.cast.getCharByName(words[i]);
+						//gameEngine.hudGroup.topBar.toDoItemComponent.otherFace.source = ResourceLibrary.getInstance().charHeads[other.characterName.toLowerCase()];
+						//gameEngine.hudGroup.topBar.toDoItemComponent.otherFace.visible = true;
+					}
+				}
+				//if (responder != null)
+				//{
+					//PromWeek.StoryGoalWindow.updateGoalList(gameEngine.hudGroup.topBar.todoListList, responder, other, true,false);
+				//}
+				//else
+				//{
+					//PromWeek.StoryGoalWindow.updateGoalList(gameEngine.hudGroup.topBar.todoListList, responder, other, false,false);
+				//}
+			//}
+			//var percentTrue:Number = numPredTrue / this.toDoItemAccordion.selectedList.dataProvider.length;
+		}
+		
+		public static function updateGoalList(list:List,responder:Character = null, other:Character = null, shouldDisplayChecks:Boolean=false, autoDrawBackground:Boolean=true):void
+		{
+			
+			var cif1:CiFSingleton = CiFSingleton.getInstance();
+			
+			if (list.dataProvider == null) return;
+			
+			var newDP:ArrayCollection = new ArrayCollection();
+			
+			var seenResponderBefore:Boolean = false;
+			var seenOtherBefore:Boolean = false;
+			
+			var primaryCharacter:Character;
+			var secondaryCharacter:Character;
+			
+			for (var i:int = 0; i < list.dataProvider.length; i++)
+			{
+				primaryCharacter = null;
+				secondaryCharacter = null;
+				//other = null;
+				
+				var obj:Object = list.dataProvider[i];
+				var newObj:Object = new Object();
+				newObj.rule = obj.rule;
+
+				
+				if (obj.isTheyAreTheSamePerson)
+				{
+					newObj.isTheyAreTheSamePerson = true;
+					newObj.textToUse = "They are the same \"someone.\"";
+					newObj.taskVGroup = VisibilityManager.getInstance().createGroupWithTextAndImages(obj.textToUse, "GoalTaskStyle", 35, 395);
+					newObj.vGroupHeight = newObj.taskVGroup.height;
+					newObj.shouldDisplayChecks = true;
+					newObj.autoDrawBackground = autoDrawBackground;
+					newDP.addItem(newObj);
+				}
+				else
+				{
+					newObj.pred = obj.pred;
+					//get the right primary and secondary characters
+					if (newObj.pred.primary.toLowerCase() == "initiator") {
+						primaryCharacter = CiFSingleton.getInstance().cast.getCharByName(PromWeek.GameEngine.getInstance().currentStory.storyLeadCharacter);
+					}
+					else if (newObj.pred.primary.toLowerCase() == "responder") {
+						primaryCharacter = responder;
+					}
+					else if (newObj.pred.primary.toLowerCase() == "other") {
+						primaryCharacter = other;
+					}
+					else
+					{
+						primaryCharacter = cif1.cast.getCharByName(newObj.pred.primary);
+					}
+					if (newObj.pred.secondary.toLowerCase() == "initiator") {
+						secondaryCharacter = CiFSingleton.getInstance().cast.getCharByName(PromWeek.GameEngine.getInstance().currentStory.storyLeadCharacter);
+					}
+					else if (newObj.pred.secondary.toLowerCase() == "responder") {
+						secondaryCharacter = responder;
+					}
+					else if (newObj.pred.second.toLowerCase() == "other") {
+						secondaryCharacter = other;
+					}
+					else
+					{
+						secondaryCharacter = cif1.cast.getCharByName(newObj.pred.secondary);
+					}
+					
+					newObj.responder = responder;
+					newObj.other = other;
+
+					//newObj.textToUse = PromWeek.GameEngine.getInstance().hudGroup.storyGoalWindow.toDoItemAccordion.getTaskNameText(newObj.pred, CiFSingleton.getInstance().cast.getCharByName(PromWeek.GameEngine.getInstance().currentStory.storyLeadCharacter), responder, other, seenResponderBefore, seenOtherBefore);
+					newObj.textToUse = obj.textToUse;//PromWeek.GameEngine.getInstance().hudGroup.storyGoalWindow.toDoItemAccordion.getTaskNameText(newObj.pred, CiFSingleton.getInstance().cast.getCharByName(PromWeek.GameEngine.getInstance().currentStory.storyLeadCharacter),null, null, seenResponderBefore, seenOtherBefore);
+					newObj.taskVGroup = VisibilityManager.getInstance().createGroupWithTextAndImages(obj.textToUse, "GoalTaskStyle", 35, 395);
+					newObj.vGroupHeight = newObj.taskVGroup.height;
+					var pred:Predicate;
+					if (obj.pred.numTimesUniquelyTrue || StoryGoalWindow.hasNoVariableCharacters(obj.pred))
+					{
+						newObj.shouldDisplayChecks = true;
+					}
+					else
+					{
+						newObj.shouldDisplayChecks = shouldDisplayChecks;
+					}
+					newObj.autoDrawBackground = autoDrawBackground;
+					newDP.addItem(newObj);
+				
+					/*
+					//check to see if we wanna say "That same" for next next preds in the list we are generating
+					if ((newObj.pred.primary ==  "responder"
+						|| newObj.pred.secondary ==  "responder") && responder == null)
+					{
+						seenResponderBefore = true;
+					}
+					if ((newObj.pred.primary ==  "other"
+						|| newObj.pred.secondary ==  "other") && other == null)
+					{
+						seenOtherBefore = true;
+					}
+					*/
+				}
+			}
+			list.dataProvider = newDP;
+		}
+		
+		public function updateTrueFor(pred:Predicate):void
+		{
+			/*
+			this.trueForCharHeadGroup.removeAllElements();
+			
+			var initiator:Character = cif.cast.getCharByName(gameEngine.currentStory.storyLeadCharacter);
+			var responder:Character;
+			var other:Character;
+			
+			var trueCombinations:Vector.<Dictionary> = new Vector.<Dictionary>();
+			var dictionary:Dictionary = new Dictionary();
+			if (pred.getTertiaryValue() == "")
+			{
+				//this means that the pred doesn't need an other
+				for each (responder in cif.cast.characters)
+				{
+					if (responder.characterName != initiator.characterName)
+					{
+						if (pred.evaluate(initiator, responder))
+						{
+							
+						}
+					}
+				}
+			}
+			else
+			{
+				//this means that it does need a third
+				for each (responder in cif.cast.characters)
+				{
+					if (responder.characterName != initiator.characterName)
+					{
+						for each (other in cif.cast.characters)
+						{
+							if (responder.characterName != other.characterName && initiator.characterName != other.characterName)
+							{
+								if (pred.evaluate(initiator, responder, other))
+								{
+									
+								}
+							}
+						}
+					}
+				}
+			}
+		*/	
+		}
+		
+		
+		
+		public function updateCurrentBest(e:Event=null):void
+		{
+			this.firstBestGroup.mainContainer.removeAllElements();
+			//this.secondBestGroup.mainContainer.removeAllElements();
+			//this.thirdBestGroup.mainContainer.removeAllElements();
+			
+			var toDoItemComponent:ToDoItemComponent = this.toDoItemAccordion.selectedToDoItemComponent;
+			
+			var remainingCharacters:Vector.<Character> = new Vector.<Character>();
+			var remainingCharactersAfterSecondBest:Vector.<Character> = new Vector.<Character>();
+			
+			var responder:Character;
+			var other:Character;
+
+			if (toDoItemComponent != null)
+			{
+				var shouldEvenHaveCurrentBest:Boolean = true;
+				var numPredIAmCounting:int = 0;
+				if (this.toDoItemAccordion.selectedToDoItemComponent)
+				{
+					for each (var p:Predicate in this.toDoItemAccordion.selectedToDoItemComponent.toDoItem.condition.predicates)
+					{
+						if (p.numTimesUniquelyTrueFlag || PromWeek.StoryGoalWindow.hasNoVariableCharacters(p))
+						{
+							numPredIAmCounting++;
+						}
+					}
+				}
+				if (numPredIAmCounting == this.toDoItemAccordion.selectedToDoItemComponent.toDoItem.condition.predicates.length)
+				{
+					shouldEvenHaveCurrentBest = false;
+				}
+				
+				
+				if (shouldEvenHaveCurrentBest)
+				{
+					var requiresThird:Boolean = toDoItemComponent.toDoItem.condition.requiresThreeBoundCharacters();
+					
+					var image:SmoothImage;
+					
+					if (this.characterFilterGroup.characterLastRolledOver)
+					{
+						responder = cif.cast.getCharByName(this.characterFilterGroup.characterLastRolledOver);
+					}
+					
+					var percentAndResponderAndOther:Dictionary = toDoItemComponent.toDoItem.condition.getPercentageTrueForInitiator(cif.cast.getCharByName(gameEngine.currentStory.storyLeadCharacter),null,responder,other);
+					if (percentAndResponderAndOther["other"])
+					{
+						other = cif.cast.getCharByName(percentAndResponderAndOther["other"]);
+					}
+					
+					
+					
+					
+					
+					//Find the first best characters
+					if (percentAndResponderAndOther["responder"])
+					{
+						image = new SmoothImage();
+						image.source = resourceLibrary.charHeads[percentAndResponderAndOther["responder"].toLowerCase()];
+						this.firstBestGroup.toolTip = percentAndResponderAndOther["responder"];
+						//percentAndResponderAndOther["responder"]
+						if (requiresThird)
+						{
+							image.width = this.requiresThirdProgressSize;
+							image.height = this.requiresThirdProgressSize;
+						}
+						else
+						{
+							image.width = this.doesntRequireThirdProgressSize;
+							image.height = this.doesntRequireThirdProgressSize;
+						}
+						this.firstBestGroup.mainContainer.addElement(image);
+					}
+					if (percentAndResponderAndOther["other"] && requiresThird)
+					{
+						image = new SmoothImage();
+						image.source = resourceLibrary.charHeads[percentAndResponderAndOther["other"].toLowerCase()];
+						this.firstBestGroup.toolTip += " and " + percentAndResponderAndOther["other"];
+						//percentAndResponderAndOther["responder"]
+						if (requiresThird)
+						{
+							image.width = this.requiresThirdProgressSize;
+							image.height = this.requiresThirdProgressSize;
+						}
+						else
+						{
+							image.width = this.doesntRequireThirdProgressSize;
+							image.height = this.doesntRequireThirdProgressSize;
+						}
+						this.firstBestGroup.mainContainer.addElement(image);
+					}
+					
+					this.firstBestGroup.enabled = true;
+					this.firstBestGroup.alpha = 1.0;
+					this.characterFilterGroup.enabled = true;				
+					
+					if (responder != null)
+					{
+						PromWeek.StoryGoalWindow.updateGoalList(this.toDoItemAccordion.selectedList, responder, other, true);	
+					}
+					else
+					{
+						PromWeek.StoryGoalWindow.updateGoalList(this.toDoItemAccordion.selectedList, responder, other, false);
+					}
+				}
+				else
+				{
+					this.firstBestGroup.enabled = false;
+					this.firstBestGroup.alpha = 0.1;
+					this.characterFilterGroup.enabled = false;
+				}
+			}
+			
+		}
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			this.firstBestGroup.setStyleName();
+			this.characterFilterGroup.setStyleName();
+			this.toDoItemAccordion.setStyleName();
+			
+			this.invalidateProperties();
+		}
+
+		public static function hasNoVariableCharacters(p:Predicate):Boolean
+		{
+			if (p.primary == "responder" || p.primary == "other") return false;
+			if (p.secondary == "responder" || p.secondary == "other") return false;
+			return true;
+		}
+		
+		]]>
+	</fx:Script>
+	
+</s:Group>

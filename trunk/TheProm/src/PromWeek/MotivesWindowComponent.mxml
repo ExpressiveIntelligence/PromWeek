@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 initialize="initializeMotivesWindow()"
+		 width="400"
+		 height="150"
+		 styleName="classicPromWeek">
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+			 <fx:Boolean id="initiatorMotivesBool"></fx:Boolean>
+			 <fx:Boolean id="responderMotivesBool"></fx:Boolean>
+		 </fx:Declarations>
+		 
+		<s:Group id="MotivesWindow" width="100%" height="100%">
+			<s:Rect id="backgroundSquare" width="100%" height="100%">
+					<s:stroke>
+						<s:SolidColorStroke weight="{getStyle('backgroundStrokeWeight')}" color="{getStyle('backgroundStroke')}" />
+					</s:stroke>
+					<s:fill>
+						<s:SolidColor color="{getStyle('backgroundColor')}" alpha="1.0"/>
+					</s:fill>
+			</s:Rect>
+			
+			<!-- Upper right portion of the motives window -->
+			<!--<prom:PlayerPortrait id="daPortrait" x="{MotivesWindow.width - 115}" y="30" />-->
+			
+			<!-- Upper left portion of the motives window -->
+			<!--<util:SmoothImage id="infoImage" x="3" y="3" width="15" height="15" />-->
+			<!--<s:RichText id="roleInfo" color="{getStyle('textColor')}" x="15" y="8" paddingRight="5" paddingLeft="10" paddingBottom="5" fontSize="16" />-->
+			<!--<s:RichText id="SGName" color="{getStyle('textColor')}" x="20" y="{infoImage.y + infoImage.height + 15}" paddingLeft="5" fontSize="26" width="200" />-->
+			<!--<mx:Button id="switchRoles" x="{roleInfo.x + 130}" y="3" width="120" label="Switch Characters" click="switchMotivesFocus()"/>-->
+			
+			<!-- Intent plus picture under it -->
+			<!--<s:Label color="{getStyle('textColor')}" id="intentLabel" left="15" top="{SGName.y + 60}" fontSize="24">
+				<s:text>Intent:</s:text>
+			</s:Label>-->
+			
+			<!--<util:SmoothImage id="intentPicture" x="20" y="{intentLabel.y + 25}" width="70" height="50" />
+			<s:Group id="theX" x="20" y="{intentLabel.y + 25}" width="{intentPicture.width}" height="{intentPicture.height}" visible="false">
+				<s:Line id="crossLine1" xFrom="0" xTo="50" yFrom="50" yTo="0">
+					<s:stroke>
+						<s:SolidColorStroke color="black" alpha="1.0" weight="2" />
+					</s:stroke>
+				</s:Line>
+				<s:Line id="crossLine2" xFrom="0" xTo="50" yFrom="0" yTo="50">
+					<s:stroke>
+						<s:SolidColorStroke color="black" alpha="1.0" weight="2"/>
+					</s:stroke>
+				</s:Line>
+			</s:Group>-->
+			
+			<!-- Intensity -->
+			<s:VGroup width="100%" height="100%" paddingBottom="10" paddingTop="10" paddingLeft="10" paddingRight="10">
+				<s:HGroup width="100%" height="12%">
+					<s:RichText id="intentOrResponseTitle" color="{getStyle('textColor')}" fontSize="14" fontWeight="bold"/>
+					<s:RichText id="intentOrResponseValue" color="{getStyle('textColor')}" fontSize="14" />
+					<mx:Spacer width="25%" />
+					<s:RichText color="{getStyle('textColor')}" id="intensityLabel" fontSize="14" fontWeight="bold" text="Intensity: " />
+					<s:RichText id="intensityValues" color="{getStyle('textColor')}" fontSize="14" />
+				</s:HGroup>
+				<s:HGroup width="100%" height="12%">
+					<s:RichText id="roleInfo" color="{getStyle('textColor')}" fontSize="14" />
+				</s:HGroup>
+				
+				<!-- Bottom part of the window -->
+				<s:TextArea id="motivesText" width="100%" height="76%" contentBackgroundColor="{getStyle('contentAreaColor')}" color="{getStyle('textColor')}" fontSize="12" editable="false" selectable="false" />
+			</s:VGroup>
+			<!--X button to exit -->
+			<!--<s:Group id="removeIconGroup" x="{MotivesWindow.width - 15}" y="5" width="15" height="15" click="xClickedOn()" toolTip="Close Window" mouseDown="xClickedOn()">
+				<s:Rect x="-15" y="0" width="15" height="15">
+					<s:stroke>
+						<s:SolidColorStroke color="black" alpha="1.0" />
+					</s:stroke>
+					<s:fill>
+						<s:SolidColor color="white" alpha="0.8" />
+					</s:fill>
+				</s:Rect>
+				<s:Line id="line1" xFrom="{removeIconGroup.x}" yFrom="{removeIconGroup.y - 5}" xTo="{removeIconGroup.x + 15}" yTo="{removeIconGroup.y + 13}" >
+					<s:stroke>
+						<s:SolidColorStroke color="black" alpha="1.0" weight="2" />
+					</s:stroke>
+				</s:Line>
+				<s:Line id="line2" xFrom="{removeIconGroup.x}" yFrom="{removeIconGroup.y + 13}" xTo="{removeIconGroup.x + 15}" yTo="{removeIconGroup.y - 5}" >
+					<s:stroke>
+						<s:SolidColorStroke color="black" weight="2"/>
+					</s:stroke>
+				</s:Line>		
+			</s:Group>-->
+		</s:Group>
+		
+	<fx:Script>
+		<![CDATA[
+		import mx.controls.Button
+		import flash.events.Event;
+		import flash.utils.Dictionary;
+		import PromWeek.assets.ResourceLibrary;
+		import CiF.*;
+		private var resourceLib:ResourceLibrary = ResourceLibrary.getInstance();
+		private var gameEngine:PromWeek.GameEngine = PromWeek.GameEngine.getInstance();
+		private var cif:CiFSingleton = CiFSingleton.getInstance();
+		
+		public var intentType:Number;
+		//public var responderMotivesBool:Boolean;
+		//public var initiatorMotivesBool:Boolean;
+		public var socialGameName:String;
+		//public var initiatorIntent:int;
+		//public var responderIntent:int;
+		public var intent:int;
+		public var intentOrResponse:String;
+		
+		//public var initiatorIntensity:String;
+		//public var responderIntensity:String;
+		public var intensity:String;
+		//public var initiatorMotives:Vector.<Dictionary>;
+		//public var responderMotives:Vector.<Dictionary>;
+		public var motives:Vector.<Dictionary>;
+		//public var initiatorName:String;
+		//public var responderName:String;
+		public var charName:String;
+		public var daText:String;
+		
+		public function onCreationComplete():void {
+		}
+		public function initializeMotivesWindow():void {
+		}
+		
+		//Closes the box when the x is clicked on.
+		//public function xClickedOn():void {
+			//this.visible = false;
+		//}
+		
+		/**
+		 * This displays the motives of the initiator with the button that switches windows.
+		 * @param	
+		 */
+		public function loadMotives():void {
+			
+			if (initiatorMotivesBool)
+			{
+				this.roleInfo.text = "Initiator's Motives:";
+				this.intentOrResponseTitle.text = "Intent: "
+				this.intentOrResponseValue.text = intentOrResponse;
+			}
+			else if (responderMotivesBool)
+			{
+				this.roleInfo.text = "Responder's Factors:";
+				this.intentOrResponseTitle.text = "Response: "
+				this.intentOrResponseValue.text = intentOrResponse;
+			}
+			
+			daText = "";
+			for each(var d:Dictionary in motives) {
+				daText += d["percent"] + "% " + d["motive"] + "\n";
+			}
+			motivesText.text = daText;
+			this.intensityValues.text = intensity.toUpperCase();
+			
+			
+			//this.visible = true;
+			//this.infoImage.source = resourceLib.portraits["gunter"];
+			//this.SGName.text = socialGameName;
+			//intentType = cif.socialGamesLib.getByName(socialGameName).intents[0].predicates[0].getIntentType();
+			//if (intentType == Predicate.INTENT_DATING) {
+				//intentPicture.source = resourceLib.relationshipIcons["dating"];
+				//theX.visible = false;
+			//}
+			//else if (intentType == Predicate.INTENT_END_DATING) {
+				//intentPicture.source = resourceLib.relationshipIcons["dating"];
+				//theX.visible = true;
+			//}
+			//else if (intentType == Predicate.INTENT_ENEMIES) {
+				//intentPicture.source = resourceLib.relationshipIcons["enemies"];
+				//theX.visible = false;
+			//}
+			//else if (intentType == Predicate.INTENT_END_ENEMIES) {
+				//intentPicture.source = resourceLib.relationshipIcons["enemies"];
+				//theX.visible = true;
+			//}
+			//else if (intentType == Predicate.INTENT_FRIENDS) {
+				//intentPicture.source = resourceLib.relationshipIcons["friends"];
+				//theX.visible = false;
+			//}
+			//else if (intentType == Predicate.INTENT_END_FRIENDS) {
+				//intentPicture.source = resourceLib.relationshipIcons["friends"];
+				//theX.visible = true;
+			//}
+			//else if (intentType == Predicate.INTENT_BUDDY_UP) {
+				//intentPicture.source = resourceLib.networkArrowIcons["buddyUp"];
+				//theX.visible = false;
+			//}
+			//else if (intentType == Predicate.INTENT_BUDDY_DOWN) {
+				//intentPicture.source = resourceLib.networkArrowIcons["buddyDown"];
+				//theX.visible = false;
+			//}
+			//else if (intentType == Predicate.INTENT_COOL_UP) {
+				//intentPicture.source = resourceLib.networkArrowIcons["coolUp"];
+				//theX.visible = false;
+			//}
+			//else if (intentType == Predicate.INTENT_COOL_DOWN) {
+				//intentPicture.source = resourceLib.networkArrowIcons["coolDown"];
+				//theX.visible = false;
+			//}
+			//else if (intentType == Predicate.INTENT_ROMANCE_UP) {
+				//intentPicture.source = resourceLib.networkArrowIcons["romanceUp"];
+				//theX.visible = false;
+			//}
+			//else if (intentType == Predicate.INTENT_ROMANCE_DOWN) {
+				//intentPicture.source = resourceLib.networkArrowIcons["romanceDown"];
+				//theX.visible = false;
+			//}
+			//if (initiatorMotivesBool) {
+				//daPortrait.PortraitImage.source = resourceLib.portraits[initiatorName.toLowerCase()];
+				//daPortrait.NameRichText.text = gameEngine.initiatorName;
+				//this.roleInfo.text = "Initiator Info:";
+				//this.switchRoles.label = "Switch to Responder";
+				//daText = "";
+				//for each(var d:Dictionary in initiatorMotives) {
+					//daText += d["percent"] + "% " + d["motive"] + "\n";
+				//}
+				//motivesText.text = daText;
+				//this.intensityValues.text = initiatorIntensity.toUpperCase();
+			//}
+			//if (responderMotivesBool) {
+				//daPortrait.PortraitImage.source = resourceLib.portraits[responderName.toLowerCase()];
+				//daPortrait.NameRichText.text = gameEngine.responderName;
+				//this.roleInfo.text = "Responder Info:";
+				//this.switchRoles.label = "Switch to Initiator";
+				//daText = "";
+				//for each(var e:Dictionary in responderMotives) {
+					//daText += e["percent"] + "% " + e["motive"] + "\n";
+				//}
+				//motivesText.text = daText;
+				//this.intensityValues.text = responderIntensity.toUpperCase();
+			//}
+		}
+		
+		/**
+		 * This displays the motives of the responder with the button that switches windows.
+		 * @param	
+		 */
+		public function switchMotivesFocus():void {
+			if (initiatorMotivesBool) {
+				responderMotivesBool = true;
+				initiatorMotivesBool = false;
+			}
+			else if (responderMotivesBool) {
+				responderMotivesBool = false;
+				initiatorMotivesBool = true;
+			}
+			this.loadMotives();
+		}
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			/*if(gameEngine.classicPromColors) {
+				this.setStyle("styleName", "classicPromWeek");
+			}
+			else if(gameEngine.greenPromColors) {
+				this.setStyle("styleName", "greenColor");
+			}
+			else if(gameEngine.redPromColors) {
+				this.setStyle("styleName", "redColor");
+			}*/
+			this.invalidateProperties();
+		}
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

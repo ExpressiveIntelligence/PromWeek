@@ -1,0 +1,666 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 initialize="initializeConsole()"
+		 preinitialize="preinitializeConsole()"
+		 width="340"
+		 height="130"
+		 styleName="classicPromWeek">
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+		 </fx:Declarations>
+		 
+		<s:Group id="ConsoleWindow" width="100%" height="100%">
+			<s:Rect width="100%" height="100%">
+					<s:stroke>
+						<s:SolidColorStroke weight="{getStyle('windowStrokeWeight')}" color="{getStyle('backgroundStrokeWeight')}" />
+					</s:stroke>
+					<s:fill>
+						<s:SolidColor color="{getStyle('backgroundColor')}" alpha="1.0"/>
+					</s:fill>
+			</s:Rect>
+			<s:VGroup width="100%" height="100%" top="5" left="5">
+				<s:Label id="consoleTextOutput" top="15" left="10" height="25" width="90%" text="Type your command below." color="#FFFFFF" />
+				<s:TextArea id="consoleTextInput" top="20" left="10" height="25" width="95%" enabled="true" editable="true" />
+				<s:HGroup width="100%">
+					<s:Button id="doCommandButton" label="Just do it already!" top="35" left="10" height="20" width="150" click="carryOutConsoleCommand()" />
+					<s:Button id="formIntent" label="Re-Form Intent!" top="35" left="150" height="20" width="150" click="formIntentButtonClicked()" />
+				</s:HGroup>
+			</s:VGroup>
+			<s:Group id="removeIconGroup" x="155" y="0" width="15" height="15" click="xClickedOn()" toolTip="Close Window" mouseDown="xClickedOn()">
+				<s:Rect x="{removeIconGroup.x}" y="{removeIconGroup.y}" width="15" height="15">
+					<s:stroke>
+						<s:SolidColorStroke color="black" alpha="1.0" />
+					</s:stroke>
+					<s:fill>
+						<s:SolidColor color="white" alpha="0.8" />
+					</s:fill>
+				</s:Rect>
+				<s:Line id="line1" xFrom="{removeIconGroup.x}" yFrom="{removeIconGroup.y}" xTo="{removeIconGroup.x + 15}" yTo="{removeIconGroup.y + 15}" >
+					<s:stroke>
+						<s:SolidColorStroke color="black" alpha="1.0" weight="2" />
+					</s:stroke>
+				</s:Line>
+				<s:Line id="line2" xFrom="{removeIconGroup.x}" yFrom="{removeIconGroup.y + 15}" xTo="{removeIconGroup.x + 15}" yTo="{removeIconGroup.y}" >
+					<s:stroke>
+						<s:SolidColorStroke color="black" weight="2"/>
+					</s:stroke>
+				</s:Line>		
+			</s:Group>
+
+		</s:Group>
+		
+	<fx:Script>
+		<![CDATA[
+		import CiF.Character;
+		import CiF.CiFSingleton;
+		import CiF.Cast;
+		import CiF.Status;
+		import CiF.RelationshipNetwork;
+		import CiF.Trait;
+		import flash.utils.Dictionary;
+		import flash.events.Event;
+		import flash.events.TimerEvent;
+		import flash.utils.getTimer;
+		import flash.utils.Timer;
+		import PromWeek.assets.ResourceLibrary;
+		import PromWeek.assets.SoundLibrary;
+		import flash.media.Sound;
+		import flash.media.SoundChannel;
+		import flash.events.MouseEvent;
+		import flash.text.TextField;
+		import CiF.Debug;
+		import PromWeek.assets.SoundLibrary;
+		
+		private var resourceLib:ResourceLibrary = ResourceLibrary.getInstance();
+		private var soundLibrary:SoundLibrary = SoundLibrary.getInstance();
+		private var gameEngine:GameEngine;
+		private var cif:CiFSingleton;
+		
+		public function preinitializeConsole():void {
+			gameEngine = GameEngine.getInstance();
+			cif = CiFSingleton.getInstance();
+		}
+		
+		public function onCreationComplete():void {
+		}
+		public function initializeConsole():void {
+			
+		}
+		
+		//Closes the box when the x is clicked on.
+		public function xClickedOn():void {
+			this.visible = false;
+			gameEngine.shouldAcceptNormalKeyboardInput = true;
+		}	
+		
+		/**
+		 * This function parses the information found in the console input
+		 * and carries out the specified command.  It also updates the label
+		 * to let people know if there was a success or not!
+		 */
+		public function carryOutConsoleCommand():void {
+		//	Debug.debug(this, "carryOutConsoleCommand()");
+			var searchString:String = this.consoleTextInput.text.toLowerCase();
+			var returnDictionary:Dictionary = new Dictionary();
+			if (searchString.slice(0, 7) == "juiceUp") {
+				JuicePointManager.getInstance().setJuicePoints(100);
+			}
+			else if (searchString.slice(0, 12) == "relationship") {
+				//relationship(i,r,friends)
+				returnDictionary = handleStartRelationship(searchString);
+				if (returnDictionary["success"] == "false") { 
+					this.consoleTextOutput.text = "Relationship Start Failure! syntax: relationship(name1,name2,rel)";
+				}
+				else {
+					this.consoleTextOutput.text = returnDictionary["char1"] + " and " + returnDictionary["char2"] + " are now " + returnDictionary["relationship"];
+					this.consoleTextInput.text = "";
+				}
+			}
+			else if (searchString.slice(0, 13) == "~relationship") {
+			//	Debug.debug(this, "dealing with ~relationship!")
+				//~relationship(i,r,friends)
+				returnDictionary = handleStopRelationship(searchString);
+				if (returnDictionary["success"] == "false") { this.consoleTextOutput.text = "Relationship Stop Failure! syntax: ~relationship(name1,name2,rel)"; }
+				else {
+					this.consoleTextOutput.text = returnDictionary["char1"] + " and " + returnDictionary["char2"] + " are no longer " + returnDictionary["relationship"];
+					this.consoleTextInput.text = "";
+				}
+			}
+			else if (searchString.slice(0, 7) == "network") {
+				//Debug.debug(this, "dealing with network!")
+				returnDictionary = handleNetwork(searchString);
+				if (returnDictionary["success"] == "false") this.consoleTextOutput.text = "Network Change Failure! syntax: network(network,from,to,amount)";
+				else {
+					this.consoleTextOutput.text = returnDictionary["network"] + " network from " + returnDictionary["fromChar"] + " to " + returnDictionary["toChar"] + " changed from " + returnDictionary["oldWeight"] + " to " + returnDictionary["newWeight"] +  "." ;
+					this.consoleTextInput.text = "";
+				}
+			}
+			else if (searchString.slice(0, 6) == "status") {
+				//Debug.debug(this, "dealing with status!")
+				returnDictionary = handleStartStatus(searchString);
+				if (returnDictionary["success"] == "false") this.consoleTextOutput.text = "Status Start Failure! syntax: status(char,status) OR status(char1,status,char2)";
+				else {
+					this.consoleTextOutput.text = returnDictionary["char1"] + " now has status " + returnDictionary["status"] + " towards " + returnDictionary["char2"] + returnDictionary["warning"]
+					this.consoleTextInput.text = "";
+				}
+			}
+			else if (searchString.slice(0, 7) == "~status") {
+				//Debug.debug(this, "dealing with ~status!")
+				returnDictionary = handleStopStatus(searchString);
+				if (returnDictionary["success"] == "false") this.consoleTextOutput.text = "Status Stop Failure! syntax: ~status(char,status) OR ~status(char1,status,char2)";
+				else {
+					this.consoleTextOutput.text = returnDictionary["char1"] + " no longer has status " + returnDictionary["status"] + " towards " + returnDictionary["char2"]
+					this.consoleTextInput.text = "";
+				}
+			}
+			else if (searchString.slice(0, 5) == "trait") {
+				//Debug.debug(this, "dealing with ~status!")
+				returnDictionary = handleStartTrait(searchString);
+				if (returnDictionary["success"] == "false") this.consoleTextOutput.text = "Trait Start Failure! syntax: trat(char,trait)";
+				else {
+					this.consoleTextOutput.text = returnDictionary["char1"] + " now has trait " + returnDictionary["trait"];
+					this.consoleTextInput.text = "";
+				}
+			}
+			else if (searchString.slice(0, 6) == "~trait") {
+				//Debug.debug(this, "dealing with ~status!")
+				returnDictionary = handleStopTrait(searchString);
+				if (returnDictionary["success"] == "false") this.consoleTextOutput.text = "Trait Stop Failure! syntax: ~trait(char,trait)";
+				else {
+					this.consoleTextOutput.text = returnDictionary["char1"] + " no longer has trait " + returnDictionary["trait"];
+					this.consoleTextInput.text = "";
+				}	
+			}else if (searchString == "backend") {
+				this.consoleTextOutput.text = "FBID: " + this.gameEngine.getBackend().getFacebookId();
+				this.consoleTextInput.text= "";
+			}else if (searchString == "reset") {
+				this.gameEngine.resetGameState();
+				this.gameEngine.currentLevelIndex--;
+				this.gameEngine.isLevelFinished = true;
+				this.consoleTextOutput.text = "Story reset.";
+				this.consoleTextInput.text= "";
+			}else if (searchString.toLowerCase() == "minimap") {
+				this.gameEngine.toggleMiniMap();
+				this.consoleTextOutput.text = "Minimap toggled.";
+				this.consoleTextInput.text= "";
+			}else if (searchString.toLowerCase() == "sgdropdown") {
+				this.gameEngine.dropDownListShouldDisplay = !this.gameEngine.dropDownListShouldDisplay;
+				this.consoleTextOutput.text = "sgdropdown toggled.";
+				this.consoleTextInput.text= "";
+			}else if (searchString.toLowerCase() == "sginfo") {
+				gameEngine.toolTipShowsAcceptReject = !gameEngine.toolTipShowsAcceptReject
+				gameEngine.toolTipShowEffectChangePredicates = !gameEngine.toolTipShowEffectChangePredicates
+				gameEngine.toolTipShowMotives = !gameEngine.toolTipShowMotives;
+				this.consoleTextOutput.text = "sginfo toggled.";
+				this.consoleTextInput.text= "";
+				//SocialGameButton.toolTipShowForecast = !SocialGameButton.toolTipShowForecast;
+			}else if (searchString == "dc" || searchString == "dconsole") {
+				CONFIG::monster {
+					gameEngine.toggleDConsole();
+				}
+					this.consoleTextOutput.text = "DoomConsole toggled.";
+					this.consoleTextInput.text = "";
+				
+			}else if (searchString.toLowerCase() == "help") {
+				this.consoleTextOutput.text= "Social state modification commands:\n"
+				this.consoleTextOutput.text= "relationship(char1,char2,relationship) --starts a relationship\n"
+				this.consoleTextOutput.text= "~relationship(char1,char2,relationship) -- ends a relationship\n"
+				this.consoleTextOutput.text= "network(buddy,charFrom,charTo,amountToChangeBy) --'buddy' can be 'buddy', 'cool', or 'romance', amountToChangeBy can be positive or negative\n"
+				this.consoleTextOutput.text= "status(char,sad)\n"
+				this.consoleTextOutput.text= "~status(char,sad) -- takes that status away\n"
+				this.consoleTextOutput.text= "status(char1,scared of,char2) -- makes char1 scared of char2\n"
+				this.consoleTextOutput.text= "~status(char1,scared of,char2) -- no longer scared!\n"
+				this.consoleTextOutput.text= "trait(char,witty) --makes char have trait witty (any trait can be used instead of witty)\n"
+				this.consoleTextOutput.text= "~trait(char, witty) -- char is no longer witty.\n"
+				this.consoleTextOutput.text= "There should be no spaces anywhere, unless it is in the name of the status.\n"
+				this.consoleTextOutput.text= "\n"
+				this.consoleTextOutput.text= "game config commands:\n"
+				this.consoleTextOutput.text= "MiniMap -- toggles the minimap UI\n"
+				this.consoleTextOutput.text= "sgdropdown -- toggles the drop down list of all possible social games in the social game button ring\n"
+				this.consoleTextOutput.text= "sginfo -- toggles the information about social game play on the social game buttons\n"
+				this.consoleTextOutput.text= "help -- help dialogue\n"
+
+				this.consoleTextInput.text= "";
+
+
+			}
+			else if (searchString.toLowerCase() == "next") {
+				this.gameEngine.isLevelFinished = true;
+			}else if (searchString == "null") {
+				this.consoleTextInput.text = "";
+				this.consoleTextOutput.text = "null error created.";
+				var v:Vector.<int>;
+				v[0] = 1; // should create a null error
+			}
+			else {
+				this.consoleTextOutput.text = "Unrecognized Console Command! Type \"help\" for information on commands.";
+				//Debug.debug(this, "dunno. This is split on 11: " + searchString.slice(0, 11) + " this is on 12: " + searchString.slice(0, 12) + " this is on 6: " + searchString.slice(0, 6));
+			}
+			/*
+			switch(this.consoleTextInput.text.toLowerCase()) {
+				case "test":
+					this.consoleTextOutput.text = "Success!";
+					break;
+				default:
+					this.consoleTextOutput.text = "Failure!";
+					break;
+			}
+			*/
+		}
+		
+		//want to add a relationship between two characters
+		public function handleStartRelationship(searchString:String):Dictionary {
+			var relationship:String = "";
+			var returnDictionary:Dictionary = new Dictionary();
+			var char1:Character = null;
+			var char2:Character = null;
+			//Debug.debug(this, "dealing with relationship!")
+			searchString = searchString.slice(12, searchString.length);
+			searchString = searchString.slice(0, searchString.length - 1); // get rid of closing brace;
+			//Debug.debug(this, "current search string: " + searchString);
+			searchString = searchString.slice(1, searchString.length); // get rid of opening brace;
+			//Debug.debug(this, "current search string: " + searchString);
+			var relationshipArray:Array = searchString.split(",");
+			//Debug.debug(this, "contents of array?: " + relationshipArray);
+			if (relationshipArray[0]) {
+			//	Debug.debug(this, "should be init name: " + relationshipArray[0]);
+				char1 = cif.cast.getCharByName(relationshipArray[0]);
+			}
+			if (relationshipArray[1]) {
+				//Debug.debug(this, "should be resp name: " + relationshipArray[1]);
+				char2 = cif.cast.getCharByName(relationshipArray[1]);
+			}
+			if (relationshipArray[2]) {
+			//	Debug.debug(this, "should be relationshp name: " + relationshipArray[2]);
+				relationship = relationshipArray[2]
+			}
+			if (!char1 || !char2 || relationship == "") {
+				//we ran into a problem! return false!
+				//Debug.debug(this, "PROBLEM!!!");
+				returnDictionary["success"] = "false";
+			}
+			else {
+				// SUCCESS! Do the calculation!
+			//	Debug.debug(this, "Success!!!");
+				cif.relationshipNetwork.setRelationship(RelationshipNetwork.getRelationshipNumberByName(relationship), char1, char2);
+				returnDictionary["success"] = "true";
+				returnDictionary["char1"] = char1.characterName;
+				returnDictionary["char2"] = char2.characterName;
+				returnDictionary["relationship"] = relationship;
+			}
+			return returnDictionary;
+		}
+		
+		//want to remove a relationship between two characters
+		public function handleStopRelationship(searchString:String):Dictionary {
+			var relationship:String = "";
+			var returnDictionary:Dictionary = new Dictionary();
+			var char1:Character = null;
+			var char2:Character = null;
+			//Debug.debug(this, "dealing with stop relationship!")
+			searchString = searchString.slice(13, searchString.length);
+			searchString = searchString.slice(0, searchString.length - 1); // get rid of closing brace;
+			//Debug.debug(this, "current search string: " + searchString);
+			searchString = searchString.slice(1, searchString.length); // get rid of opening brace;
+			//Debug.debug(this, "current search string: " + searchString);
+			var relationshipArray:Array = searchString.split(",");
+			Debug.debug(this, "contents of array?: " + relationshipArray);
+			if (relationshipArray[0]) {
+				//Debug.debug(this, "should be init name: " + relationshipArray[0]);
+				char1 = cif.cast.getCharByName(relationshipArray[0]);
+			}
+			if (relationshipArray[1]) {
+				//Debug.debug(this, "should be resp name: " + relationshipArray[1]);
+				char2 = cif.cast.getCharByName(relationshipArray[1]);
+			}
+			if (relationshipArray[2]) {
+				//Debug.debug(this, "should be relationshp name: " + relationshipArray[2]);
+				relationship = relationshipArray[2]
+			}
+			if (!char1 || !char2 || relationship == "") {
+				//we ran into a problem! return false!
+				//Debug.debug(this, "PROBLEM!!!");
+				returnDictionary["success"] = "false";
+			}
+			else {
+				// SUCCESS! Do the calculation!
+				//Debug.debug(this, "Success!!!");
+				
+				cif.relationshipNetwork.removeRelationship(RelationshipNetwork.getRelationshipNumberByName(relationship), char1, char2);
+				returnDictionary["success"] = "true";
+				returnDictionary["char1"] = char1.characterName;
+				returnDictionary["char2"] = char2.characterName;
+				returnDictionary["relationship"] = relationship;
+			}
+			return returnDictionary;
+		}
+			
+		//parse a network!
+		public function handleNetwork(searchString:String):Dictionary {
+			var returnDictionary:Dictionary = new Dictionary();
+			var network:String = "";
+			var fromChar:Character = null;
+			var toChar:Character = null;
+			var amount:String = "";
+			searchString = searchString.slice(7, searchString.length);
+			searchString = searchString.slice(0, searchString.length - 1); // get rid of closing brace;
+			searchString = searchString.slice(1, searchString.length); // get rid of opening brace;
+			var networkArray:Array = searchString.split(",");
+			if (networkArray[0]) {
+				//Debug.debug(this, "should be init name: " + relationshipArray[0]);
+				network = networkArray[0];
+			}
+			if (networkArray[1]) {
+				//Debug.debug(this, "should be resp name: " + relationshipArray[1]);
+				fromChar = cif.cast.getCharByName(networkArray[1]);
+			}
+			if (networkArray[2]) {
+				//Debug.debug(this, "should be relationshp name: " + relationshipArray[2]);
+				toChar = cif.cast.getCharByName(networkArray[2]);
+			}
+			if (networkArray[3]) {
+				//Debug.debug(this, "should be relationshp name: " + relationshipArray[2]);
+				amount = networkArray[3]
+			}
+			if (!fromChar || !toChar || network == "" || amount == "") {
+				returnDictionary["success"] = "false"; // something was left blank/wasnt filled correctly.
+			}
+			else {
+				var numberAmount:Number = Number(amount);
+				//Debug.debug(this, "nmeric number amount is: " + numberAmount);
+				returnDictionary["fromChar"] = fromChar.characterName;
+				returnDictionary["toChar"] = toChar.characterName;
+				returnDictionary["network"] = network;
+				returnDictionary["success"] = "true";
+				if (network == "buddy") {
+					//Debug.debug(this, "prev weight: " + cif.buddyNetwork.getWeight(fromChar.networkID, toChar.networkID));
+					returnDictionary["oldWeight"] = cif.buddyNetwork.getWeight(fromChar.networkID, toChar.networkID);
+					cif.buddyNetwork.addWeight(numberAmount, fromChar.networkID, toChar.networkID);
+					returnDictionary["newWeight"] = cif.buddyNetwork.getWeight(fromChar.networkID, toChar.networkID);
+					//Debug.debug(this, "new weight: " + cif.buddyNetwork.getWeight(fromChar.networkID, toChar.networkID));
+				}
+				else if (network == "romance") {
+					returnDictionary["oldWeight"] = cif.romanceNetwork.getWeight(fromChar.networkID, toChar.networkID);
+					cif.romanceNetwork.addWeight(numberAmount, fromChar.networkID, toChar.networkID);
+					returnDictionary["newWeight"] = cif.romanceNetwork.getWeight(fromChar.networkID, toChar.networkID);
+				}
+				else if (network == "cool") {
+					returnDictionary["oldWeight"] = cif.coolNetwork.getWeight(fromChar.networkID, toChar.networkID);
+					cif.coolNetwork.addWeight(numberAmount, fromChar.networkID, toChar.networkID);
+					returnDictionary["newWeight"] = cif.coolNetwork.getWeight(fromChar.networkID, toChar.networkID);
+				}
+				else { // oops, we have a bad network name!
+					returnDictionary["success"] = "false";
+				}
+				
+			}
+			return returnDictionary;
+		}
+		
+		//start a status
+		public function handleStartStatus(searchString:String):Dictionary {
+			var returnDictionary:Dictionary = new Dictionary();
+			var status:String = "";
+			var statusNumber:Number = -1;
+			var fromChar:Character = null;
+			var toChar:Character = null;
+			var amount:String = "";
+			returnDictionary["warning"] = "";
+			searchString = searchString.slice(6, searchString.length);
+			searchString = searchString.slice(0, searchString.length - 1); // get rid of closing brace;
+			searchString = searchString.slice(1, searchString.length); // get rid of opening brace;
+			var statusArray:Array = searchString.split(",");
+			if (statusArray[0]) {
+				//Debug.debug(this, "should be init name: " + relationshipArray[0]);
+				fromChar = cif.cast.getCharByName(statusArray[0]);
+			}
+			if (statusArray[1]) {
+				//Debug.debug(this, "should be init name: " + relationshipArray[0]);
+				status = statusArray[1];
+				statusNumber = Status.getStatusNumberByName(status);
+			}
+			if (statusArray[2]) { // we don't NEED this! Might be undirected status!
+				//Debug.debug(this, "should be init name: " + relationshipArray[0]);
+				toChar = cif.cast.getCharByName(statusArray[2]);
+			}
+			if (fromChar && statusNumber != -1 && !toChar) {
+				//we HAVE a first char and a status,, but no to char.
+				//this BETTER be an undirected status. Otherwise it is a problem.
+				if (Status.getStatusNumberByName(status) < Status.FIRST_DIRECTED_STATUS) {
+					// OK, phew, we are still good! mark this as a success!
+					//err, we still hav to actually st the status!!!!!!
+					returnDictionary["success"] = "true";
+					returnDictionary["char1"] = fromChar.characterName;
+					returnDictionary["status"] = status;
+					returnDictionary["char2"] = "changed";
+					if (fromChar.statuses.length == 4) {
+						returnDictionary["warning"] = "WARNING - already had 4 statuses";
+					}
+					fromChar.addStatus(Status.getStatusNumberByName(status));
+					
+				}
+				else {
+					//only one role specified for a directed status! this is a failure!
+					returnDictionary["success"] = "false";
+				}
+			}
+			else if (fromChar && statusNumber != -1 && toChar) {
+				//we HAVE all three -- hope it is directed!
+				if (Status.getStatusNumberByName(status) >= Status.FIRST_DIRECTED_STATUS) {
+					returnDictionary["success"] = "true";
+					returnDictionary["char1"] = fromChar.characterName;
+					returnDictionary["status"] = status;
+					returnDictionary["char2"] = toChar.characterName;
+					if (fromChar.statuses.length == 4) {
+						returnDictionary["warning"] = "WARNING - already had 4 statuses";
+					}
+					fromChar.addStatus(Status.getStatusNumberByName(status),toChar);
+				}
+				else {
+					returnDictionary["success"] = "false";
+				}
+			}
+			else {
+				returnDictionary["success"] = "false";
+			}
+			return returnDictionary;
+		}
+		
+		//remove a status.
+		public function handleStopStatus(searchString:String):Dictionary {
+			var returnDictionary:Dictionary = new Dictionary();
+			var status:String = "";
+			var statusNumber:Number = -1;
+			var fromChar:Character = null;
+			var toChar:Character = null;
+			var amount:String = "";
+			searchString = searchString.slice(7, searchString.length);
+			searchString = searchString.slice(0, searchString.length - 1); // get rid of closing brace;
+			searchString = searchString.slice(1, searchString.length); // get rid of opening brace;
+			var statusArray:Array = searchString.split(",");
+			if (statusArray[0]) {
+				//Debug.debug(this, "should be init name: " + relationshipArray[0]);
+				fromChar = cif.cast.getCharByName(statusArray[0]);
+			}
+			if (statusArray[1]) {
+				//Debug.debug(this, "should be init name: " + relationshipArray[0]);
+				status = statusArray[1];
+				statusNumber = Status.getStatusNumberByName(status);
+			}
+			if (statusArray[2]) { // we don't NEED this! Might be undirected status!
+				//Debug.debug(this, "should be init name: " + relationshipArray[0]);
+				toChar = cif.cast.getCharByName(statusArray[2]);
+			}
+			if (fromChar && statusNumber != -1 && !toChar) {
+				//we HAVE a first char and a status,, but no to char.
+				//this BETTER be an undirected status. Otherwise it is a problem.
+				if (Status.getStatusNumberByName(status) < Status.FIRST_DIRECTED_STATUS) {
+					// OK, phew, we are still good! mark this as a success!
+					//err, we still hav to actually st the status!!!!!!
+					returnDictionary["success"] = "true";
+					returnDictionary["char1"] = fromChar.characterName;
+					returnDictionary["status"] = status;
+					returnDictionary["char2"] = "changed";
+					fromChar.removeStatus(Status.getStatusNumberByName(status))					
+				}
+				else {
+					//only one role specified for a directed status! this is a failure!
+					returnDictionary["success"] = "false";
+				}
+			}
+			else if (fromChar && statusNumber != -1 && toChar) {
+				//we HAVE all three -- hope it is directed!
+				if (Status.getStatusNumberByName(status) >= Status.FIRST_DIRECTED_STATUS) {
+					returnDictionary["success"] = "true";
+					returnDictionary["char1"] = fromChar.characterName;
+					returnDictionary["status"] = status;
+					returnDictionary["char2"] = toChar.characterName;
+					fromChar.removeStatus(Status.getStatusNumberByName(status),toChar);
+				}
+				else {
+					returnDictionary["success"] = "false";
+				}
+			}
+			else {
+				returnDictionary["success"] = "false";
+			}
+			return returnDictionary;
+		}
+		
+		
+		//start a status
+		public function handleStartTrait(searchString:String):Dictionary {
+			var returnDictionary:Dictionary = new Dictionary();
+			var trait:String = "";
+			var traitNumber:Number = -1;
+			var char:Character
+			searchString = searchString.slice(5, searchString.length);
+			searchString = searchString.slice(0, searchString.length - 1); // get rid of closing brace;
+			searchString = searchString.slice(1, searchString.length); // get rid of opening brace;
+			var traitArray:Array = searchString.split(",");
+			if (traitArray[0]) {
+				//Debug.debug(this, "should be init name: " + relationshipArray[0]);
+				char = cif.cast.getCharByName(traitArray[0]);
+			}
+			if (traitArray[1]) {
+				//Debug.debug(this, "should be init name: " + relationshipArray[0]);
+				trait = traitArray[1];
+				traitNumber = Trait.getNumberByName(trait);
+			}
+			if (char && traitNumber != -1) {
+				//we HAVE what we need--looks good!
+				returnDictionary["success"] = "true";
+				returnDictionary["char1"] = char.characterName;
+				returnDictionary["trait"] = trait;
+				char.addTrait(traitNumber);
+			}
+			else {
+				returnDictionary["success"] = "false";
+			}
+			return returnDictionary;
+		}
+		
+		//remove a trait.
+		public function handleStopTrait(searchString:String):Dictionary {
+			var returnDictionary:Dictionary = new Dictionary();
+			var trait:String = "";
+			var traitNumber:Number = -1;
+			var char:Character = null;
+			searchString = searchString.slice(6, searchString.length);
+			searchString = searchString.slice(0, searchString.length - 1); // get rid of closing brace;
+			searchString = searchString.slice(1, searchString.length); // get rid of opening brace;
+			var traitArray:Array = searchString.split(",");
+			if (traitArray[0]) {
+				char = cif.cast.getCharByName(traitArray[0]);
+			}
+			if (traitArray[1]) {
+				trait = traitArray[1];
+				traitNumber = Trait.getNumberByName(trait);
+			}
+			if (char && traitNumber != -1) {
+				//We've got what we need!
+				returnDictionary["success"] = "true";
+				returnDictionary["char1"] = char.characterName;
+				returnDictionary["trait"] = trait;
+				char.removeTrait(traitNumber);					
+			}
+			else {
+				//only one role specified for a directed status! this is a failure!
+				returnDictionary["success"] = "false";
+			}
+			return returnDictionary;
+		}
+		
+		/**
+		 * after several adjustments have been made, reform the intent!
+		 * 
+		 */
+		public function formIntentButtonClicked():void {
+			//REFORM INTENT?
+			
+			//var castLength:Number =  currentLevel.cast.length;
+			//hudGroup.initIntentProgressBar(this.cif.socialGamesLib.games.length* this.currentLevel.cast.length * (this.currentLevel.cast.length-1));
+			
+			gameEngine.hudGroup.initIntentProgressBar( gameEngine.currentLevel.cast.length * gameEngine.currentLevel.cast.length);
+			gameEngine.hudGroup.intentProgressBar.visible = true;
+			cif.clearProspectiveMemory();
+			
+			gameEngine.startIntentTime = new Date().time;
+			
+			//Debug.debug(this,"clearProspectiveMemory happened!");
+			
+			gameEngine.intentInitiatorIterator = 0;
+			gameEngine.intentResponderIterator = 0;
+			gameEngine.intentSGIterator = 0;
+			gameEngine.isFormingIntent = true;
+			gameEngine.isFormingIntent = true;
+			gameEngine.consoleFormIntent = true
+
+			/*
+			gameEngine.hudGroup.initIntentProgressBar( gameEngine.currentLevel.cast.length * gameEngine.currentLevel.cast.length);
+			gameEngine.hudGroup.intentProgressBar.visible = true;
+			cif.clearProspectiveMemory();
+			
+			//Debug.debug(this,"clearProspectiveMemory happened!");
+			
+			gameEngine.intentInitiatorIterator = 0;
+			gameEngine.intentResponderIterator = 0;
+			gameEngine.intentSGIterator = 0;
+			gameEngine.isFormingIntent = true;
+			
+			gameEngine.startIntentTime = new Date().time;
+			*/
+		}
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			/*if(gameEngine.classicPromColors) {
+				this.setStyle("styleName", "classicPromWeek");
+			}
+			else if(gameEngine.greenPromColors) {
+				this.setStyle("styleName", "greenColor");
+			}
+			else if(gameEngine.redPromColors) {
+				this.setStyle("styleName", "redColor");
+			}*/
+			this.invalidateProperties();
+		}
+		
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

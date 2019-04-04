@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+				xmlns:s="library://ns.adobe.com/flex/spark"
+				xmlns:mx="library://ns.adobe.com/flex/mx"
+				creationComplete="onCreationComplete()"
+				initialize="initializeMLProject()"
+				width="100%"
+				height="100%">
+				
+	<fx:Declarations>
+		<fx:XML id="cifStateXMLFoGState" source="../../CiFStates/FoGState.xml" />
+		<fx:XML id="cifLibrariesXML" source="../../CiFStates/libraries (master).xml" />
+		<fx:XML id="gameXML" source="gameConfig.xml" />
+	</fx:Declarations>
+	
+	<s:states>
+		<s:State name="Compute"/>
+		<s:State name="TakeABreath"/>
+	</s:states>
+	
+	<fx:Script>
+		<![CDATA[
+		import CiF.*;
+		import flash.filesystem.File;
+		import flash.filesystem.FileStream;
+		
+		private var cif:CiFSingleton;
+		private var level:Level;
+		private var stories:Vector.<Story>;
+		private var playTrace:Vector.<GameScore>;
+		private var availableSocialGames:Vector.<GameScore>;
+		private static const TIMES_TO_EXECUTE:int = 2; // Number of times to 'execute the level' as it were (e.g. if level is 30 turns and times to execute is 2, then would output 60 social games played).
+		private var turnsInLevel:int = 0;
+		private var timesRan:int = 0;
+		private var xmlString:String = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n";
+		private var myTimer:Timer = new Timer(1000); // 1 second
+		private var turnsRemainingInLevel:int;
+		private var isInitialRun:Boolean = true;
+		private var isGamewon:Boolean = false;
+		private var firstInANewLevel:Boolean = false;
+		
+		public function initializeMLProject():void {
+			cif = CiFSingleton.getInstance();
+			playTrace = new Vector.<GameScore>();
+			this.currentState = "Compute";
+			xmlString += "<GeneratedRuns bot=\"matchmaker\" state=\"iFoG\" libraries=\"libraries (master).xml\" date=\"May9th\">";
+		} 
+		
+		public function onCreationComplete():void {
+			this.cif.parseCiFState(cifStateXMLFoGState); // game state (all of the the characters and relationships to each other.
+			this.cif.parseCiFState(cifLibrariesXML); // master file (social games and microtheories
+			this.cif.prepareLocutions();
+			
+			//as of now, this will load a scenario based on the xml
+			this.loadStories(this.gameXML.Stories[0]);
+			
+			this.level = stories[0].levels[0]; // let's look at the first level of the first story for now.
+			trace ("level description is: " + level.description);
+			trace ("level goal is: " + level.goalRules);
+			
+			turnsInLevel = 2;
+			
+			turnsRemainingInLevel = turnsInLevel;
+			
+			
+			/*
+			for each(var guy:Character in level.cast) {
+				trace(guy.characterName + " is in the level"); // and yes, these are the guys in the level! Sweet!
+			}
+			
+			trace ("I think this might be every person ever:");
+			for each(var person:Character in cif.cast.characters) {
+				trace(person.characterName + " is in the cif cast"); // yes, it is every person ever!
+			}
+			
+			
+
+						
+			}
+			
+			*/
+			
+			// Set up the timer listening, to go again and again!
+			
+			xmlString += "<InitialVolitions>";
+			
+			myTimer.addEventListener(TimerEvent.TIMER, runMany);
+			myTimer.start();
+			
+		}
+		
+		/**
+		 * Translates XML story specifications into instances of the Story class.
+		 * @param	storiesXML	Stories as XML.
+		 */
+		public function loadStories(storiesXML:XML):void {
+			var story:Story;
+			this.stories = new Vector.<Story>();
+			for each (var storyXML:XML in storiesXML..Story) {
+				story = new Story();
+				story.loadFromXML(storyXML);
+				this.stories.push(story);
+			}
+		}
+		
+		/*
+		public function gameLoop():void {
+			if (this.currentState == "Compute") {
+				if (timesRan < TIMES_TO_EXECUTE) {
+					trace("************EXECUTION " + timesRan + " *************");
+					oneIteration();
+					timesRan++;
+				}
+				else {
+					trace("DONE! We ran the whole thing: " + timesRan + " times");
+				}
+			}
+			else if (this.currentState == "TakeABreath") {
+				breathe();
+			}
+			
+		}
+		*/
+		
+		/**
+		 * This function will form the intent, pick a social game (based on a bot policy), and then
+		 * play the selected social game.
+		 */
+		public function oneIteration():void {				
+				//Reset the availableSocial Games.
+				availableSocialGames = new Vector.<GameScore>();
+				
+				//Form the intent for the characters.
+				this.formIntentForAll(level.cast, cif.cast.characters);
+	
+				
+				trace("Lets go through each character and see what they want to do, maybe?");
+				for each (var guy1:Character in level.cast) {
+					for each (var guy2:Character in level.cast) {
+						if (guy1.characterName == guy2.characterName) continue;
+						var gameScores:Vector.<GameScore> = guy1.prospectiveMemory.getHighestGameScoresTo(guy2.characterName);
+						trace ("volition from " + guy1.characterName + " to " + guy2.characterName);
+						xmlString += "<TopSocialGames from=\"" + guy1.characterName + "\" to=\"" + guy2.characterName + "\">";
+						for each (var gs:GameScore in gameScores) {
+							trace("name: " + gs.name + " score: " + gs.score);
+							xmlString += "<SocialGame name=\"" + gs.name + "\" score=\"" + gs.score + "\"/>";
+							availableSocialGames.push(gs);
+						}
+						trace( "\n\n same 'from' new 'to' ");
+						xmlString += "</TopSocialGames>";
+					}
+					trace ( "\n****New 'from'*****");
+					
+				}
+				
+				//FIND A GAME TO PLAY
+				
+				var gameToPlay:GameScore = matchmakerBot(level.cast, availableSocialGames, level.goalRules);
+				
+				var init:Character = new Character();
+				var respond:Character = new Character();
+				var other:Character = new Character();
+				for each (var person2:Character in level.cast) {
+					if (person2.characterName.toLowerCase() == gameToPlay.initiator.toLowerCase())
+						init = person2;
+					else if (person2.characterName.toLowerCase() == gameToPlay.responder.toLowerCase())
+						respond = person2;
+					else if (person2.characterName.toLowerCase() == gameToPlay.other.toLowerCase())
+						other = person2;
+				}
+								
+				
+				
+				if (isInitialRun) {
+					isInitialRun = false;
+					xmlString += "</InitialVolitions>";
+					xmlString += "<LevelTrace id=\"" + timesRan + "\">";
+				}
+				else {
+					xmlString += "</SocialGameContext>";
+					turnsRemainingInLevel--;
+				}
+				
+				if (level.evaluateGoals()) {
+					var timeEllapsed:int = level.timeLimit - turnsRemainingInLevel;
+					xmlString += "<GameWon iteration=\"" + timesRan + "\" turnNumber=\"" + timeEllapsed + "\"/>";
+					isGamewon = true;
+					return; // we are done with this  for now!
+				}
+				
+				//play the game, enact the changes, and add the game to a running list of all games played.
+				var sgContext:SocialGameContext = cif.playGame(cif.socialGamesLib.getByName(gameToPlay.name), init, respond, other, cif.cast.characters);
+				cif.changeSocialState(sgContext);
+				playTrace.push(gameToPlay);
+				
+	
+				
+				xmlString += "<SocialGameContext gameName=\"" + sgContext.gameName + "\" initiator=\"" + 
+				sgContext.initiator + "\" responder=\"" + sgContext.responder + "\" other=\"" + sgContext.other + "\" time=\"" + 
+				sgContext.time + "\" effectIndex=\"" + sgContext.effectIndex + "\">";
+				
+				//xmlString += sgContext.toXMLString();
+				
+				//Figure out which triggers just transpired.
+				xmlString += "<NewTriggers>";
+				for (var i:int = 0; i < cif.sfdb.contexts.length; i++) {
+					if (cif.sfdb.contexts[i].isTrigger() && cif.sfdb.contexts[i].getTime() == cif.time -1 ) { // cif time has already been incremented... we subtract one from it to look at the triggers that were just applied.
+						//trace("Trigger was just applied: " + cif.sfdb.contexts[i]);
+						var trigCon:TriggerContext = cif.sfdb.contexts[i] as TriggerContext;
+						xmlString += trigCon.toXMLString();
+					}
+				}
+				xmlString += "</NewTriggers>";
+				
+		}
+		
+		/**
+		 * //Selects a random game to play, based on which games are available.  As such it doesn't depend too much on
+		 * the social state, BUT, if it NEEDS the social state, it would look within all of the fields of cif (our cif singleton object)
+		 * to divine it.
+		 * @param	cast the people in the level, i.e. the people that can actualy play a social game.
+		 * @param	availableSocialGames all of the social games that are options at this time, that is, the top five social games from each member of the cast TO each member of the cast.
+		 * @param	goals the goals of the level.  Smarter bots will take these into account when determining which social game to play.
+		 */
+		public function randomBot(cast:Vector.<Character>, availableSocialGames:Vector.<GameScore>, goals:Vector.<Rule>):GameScore {			
+			//find out which social game to play.
+			var gameIndex:int = Math.floor(Math.random() * (availableSocialGames.length));
+			trace ("Going to play the following social game: " + availableSocialGames[gameIndex]);
+			return availableSocialGames[gameIndex];
+		}
+		
+		/**
+		 *  This bot just wants to make people fall in love -- will always play 'rom up' games or 'dating' games if they
+		 * are available, otherwise they will just pick something at random.
+		 * @param	cast
+		 * @param	availableSocialGames
+		 * @param	goals
+		 * @return
+		 */
+		public function matchmakerBot(cast:Vector.<Character>, availableSocialGames:Vector.<GameScore>, goals:Vector.<Rule>):GameScore {
+			var startingIndex:int = Math.floor(Math.random() * (availableSocialGames.length));
+			
+			for (var i:int = startingIndex; i < availableSocialGames.length; i++) {
+				for each(var r:Rule in cif.socialGamesLib.getByName(availableSocialGames[i].name).intents) {
+					if (r.name == "intent(RomUp)" || r.name == "intent(Dating)") {
+						trace("going to play the following social game: " + availableSocialGames[i]);
+						return availableSocialGames[i];
+					}
+				}
+			}
+			
+			//Loop around at the beginning!
+			for (var j:int = 0; j < startingIndex; j++) {
+				for each(var r2:Rule in cif.socialGamesLib.getByName(availableSocialGames[j].name).intents) {
+					if (r2.name == "intent(RomUp)" || r2.name == "intent(Dating)") {
+						trace("going to play the following social game: " + availableSocialGames[j]);
+						return availableSocialGames[j];
+					}
+				}				
+			}
+			
+			/*
+			for each (var gs:GameScore in availableSocialGames) {
+				for each(var r:Rule in cif.socialGamesLib.getByName(gs.name).intents) {
+					if (r.name == "intent(RomUp)" || r.name == "intent(Dating)") {
+						trace("going to play the following social game: " + gs);
+						return gs;
+					}
+				}
+			}
+			*/
+			
+			trace ("No available social games had intent intent(RomUp) or intent(Dating)! Picking something at random!");
+			return randomBot(cast, availableSocialGames, goals);
+		}
+		
+		public function runMany(event:TimerEvent):void {
+			if (turnsRemainingInLevel <= 0 || isGamewon) {
+				xmlString += "</SocialGameContext>";
+				xmlString += "</LevelTrace>";
+				
+				//ran out of time! Try again!
+				timesRan++;
+				xmlString += "<LevelTrace id=\"" + timesRan + "\">";
+				isGamewon = false;
+				turnsRemainingInLevel = turnsInLevel;
+				this.cif.parseCiFState(cifStateXMLFoGState); // game state (all of the the characters and relationships to each other.
+				this.cif.parseCiFState(cifLibrariesXML); // master file (social games and microtheories
+				this.cif.prepareLocutions();
+				firstInANewLevel = true;
+				
+			}
+			if (timesRan < TIMES_TO_EXECUTE) {
+				var timeEllapsed:int = level.timeLimit - turnsRemainingInLevel;
+				trace("*************Times Played this Level: " + timesRan + " Turns on this level: " + timeEllapsed);
+				oneIteration();
+				//timesRan++;
+			}
+			if (timesRan >= TIMES_TO_EXECUTE) {
+				myTimer.removeEventListener(TimerEvent.TIMER, runMany);
+				/*
+				trace("All Done!  Here is a play trace:");
+				for each(var gs:GameScore in playTrace) {
+					trace(gs);
+				}
+				*/
+				//xmlString += "</SocialGameContext>";
+				xmlString += "</LevelTrace>";
+				xmlString += "</GeneratedRuns>";
+				outputToXML();
+			}
+		}
+		
+		/**
+		 * This is my personalized formIntentForAll function.  This way I will be able to print out more better microtheory information.
+		 * @param	activeInitiatorAndResponderCast
+		 * @param	activeOtherCast
+		 */
+		public function formIntentForAll(activeInitiatorAndResponderCast:Vector.<Character>, activeOtherCast:Vector.<Character> = null):void {
+			cif.clearProspectiveMemory();
+			for each (var char:Character in activeInitiatorAndResponderCast) {
+				this.formIntent(char, activeInitiatorAndResponderCast, activeOtherCast);
+			}
+		}
+		
+		/**
+		 * Taken from cifSingleton -- it does exactly the same thing as the original formIntent, though it prints out
+		 * microtheory information on a per-character-pair basis.
+		 * 
+		 * @param	initiator 	The subject of the intent formation process.
+		 * @param	activeCast	An optional cast of characters that can be responders.
+		 */
+		public function formIntent(initiator:Character, activeInitiatorAndResponderCast:Vector.<Character> = null, activeOtherCast:Vector.<Character>=null):void {			
+			for each (var responder:Character in activeInitiatorAndResponderCast) {
+				var start:int = getTimer();
+				
+				if (responder.characterName != initiator.characterName){
+					cif.formIntentForSocialGames(initiator, responder, activeOtherCast);
+					trace("True microtheories with init: " + initiator.characterName + " and respond: " + responder.characterName);
+					xmlString += "<IntentFormation from=\"" + initiator.characterName + "\" to=\"" + responder.characterName + "\">";
+					for each (var mt:Microtheory in cif.microtheories) {
+							//So, because we just formed intent for all, this is only going to capture the microtheories
+							//for certain people...
+							//we may not be able to make use of the form intent for all function.  Sad Face.
+							var influenceRuleIndex:int = 0;
+							
+							var isFirstTime:Boolean = true;
+							var didISeeAMT:Boolean = false;
+							for each (var wasTrue:Boolean in mt.initiatorIRS.lastTruthValues) {
+								
+								if (wasTrue) {
+									
+									//trace("mt name: " + mt.name + " had influence rule at index " + influenceRuleIndex + 
+									//" was true with name of: " + mt.initiatorIRS.influenceRules[influenceRuleIndex].generateRuleName());
+									
+									
+									if (isFirstTime) {
+										xmlString += "<Microtheory name=\"" + mt.name + "\">";
+										isFirstTime = false;
+										didISeeAMT = true;
+									}
+									xmlString += "<TrueRule index=\"" + influenceRuleIndex + 
+									"\" ruleName=\"" + mt.initiatorIRS.influenceRules[influenceRuleIndex].generateRuleName() + "\"/>";
+								}
+								influenceRuleIndex++;
+							}
+							if(didISeeAMT){
+								xmlString += "</Microtheory>";
+							}
+					}
+					xmlString += "</IntentFormation>";
+				}
+				
+				Debug.debug(this, "formIntent() intent formation done in " + (getTimer() - start) + "ms between " + initiator.characterName + " and " + responder.characterName);
+			}
+		}
+		
+		//Lifted from design tool main.mxml -- will need to change it lots, for sure but a good starting point I think.
+		public function outputToXML():void {
+			trace ("wouho h");
+			var stream:FileStream = new FileStream();
+			var outXML:XML;
+			
+			trace(xmlString);
+			
+			var date:Date = new Date();
+			var fileName:String = "/" + (date.month + 1) + "-" + date.date + "-" + date.fullYear + "-" + date.hours + "-" + date.minutes + "-" + date.seconds + ".xml";
+			
+			var applicationDirectoryPath:File = File.applicationDirectory;
+			var nativePathToApplicationDirectory:String = applicationDirectoryPath.nativePath.toString();
+			//nativePathToApplicationDirectory += "/output.xml";
+			nativePathToApplicationDirectory += fileName;
+			var xmlFile:File = new File(nativePathToApplicationDirectory);
+								
+			trace ("hello?")
+			
+			//if the user wishes to overwrite the file, they are warned in the save dialog
+			//if (!this.workingFile.exists) {
+			stream.open(xmlFile, FileMode.WRITE);
+			trace ("what?");
+			outXML = new XML(xmlString);
+			trace ("hi?");
+			stream.writeUTFBytes(outXML); 	
+			//stream.writeUTFBytes(this.cif.toXMLString());
+			stream.close();
+			
+		}
+		
+		
+		
+		]]>
+	</fx:Script>
+	
+</s:Application>

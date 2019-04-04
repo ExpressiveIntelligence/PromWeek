@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:UI="UI.*"
+		 contentBackgroundColor="#FFFFFF" 
+		 width="780" 
+		 height="640" 
+		 >
+    <fx:Metadata>
+		
+	</fx:Metadata>
+	
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	<s:HGroup>
+		<UI:RuleAuthoringUI id="ruleUI" />
+		<s:VGroup>
+			<s:Button id="addIntentRule" label="Add Intent" click="addIntentRuleToWorkingSG();" />
+			<s:Button id="updateIntentRule" label="Update Intent" click="updateIntentRuleToWorkingSG();" />
+		</s:VGroup>
+	</s:HGroup>
+	
+	<fx:Script>
+		<![CDATA[
+			import flash.events.Event;
+			import mx.collections.ArrayCollection;
+			import CiF.*;
+			import tool.DesignerToolEngine;
+			
+			public var dte:DesignerToolEngine = DesignerToolEngine.getInstance();
+			
+			public function addIntentRuleToWorkingSG():void {
+				var intentRule:Rule = new Rule();
+				var maxID:int;
+				var rIter:Rule;
+				
+				intentRule.predicates = ruleUI.rule.predicates.concat();
+				if (ruleUI.rule.name == "")// don't let things have a blank name
+					intentRule.name = "Anonymous Rule";
+				else 
+					intentRule.name = ruleUI.rule.name; 
+				
+					
+				maxID = 0;
+				for each (rIter in dte.workingSocialGame.intents) {
+					if (maxID <= rIter.id) maxID = rIter.id + 1;
+				}
+				intentRule.id = maxID;
+					
+				dte.workingSocialGame.intents.push(intentRule);
+				
+				//trace(intentRule)
+				
+				dte.intentPRDP = dte.generateIntentPRDP();
+				
+				dispatchEvent(new Event("intentListUpdate", true, true));
+			}
+			
+			public function updateIntentRuleToWorkingSG():void {
+				var ruleToUpdate:Rule = new Rule();
+				var i:uint;
+				
+				ruleToUpdate = this.ruleUI.rule.clone();
+				
+				//Debug.debug(this, "updateIntentRuleToWorkingSG() ruleToUpdate: " + ruleToUpdate);
+				
+				for (i = 0; i < dte.workingSocialGame.intents.length; ++i) {
+					//Debug.debug(this, "updateIntentRuleToWorkingSG() current working: " + dte.workingSocialGame.intents[i]);
+					if (ruleToUpdate.id == dte.workingSocialGame.intents[i].id) {
+						//Debug.debug(this, "updatePreconditionRuleToWorkingSG() found ID match.");
+						dte.workingSocialGame.intents[i] = ruleToUpdate;
+						dispatchEvent(new Event("intentListUpdate", true, true));
+						return;
+					}
+				}
+				//not found; make add a new rule
+				this.addIntentRuleToWorkingSG();
+			}
+		]]>
+	</fx:Script>
+	
+</s:Group>

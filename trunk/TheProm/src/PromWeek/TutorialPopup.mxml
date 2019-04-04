@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 initialize="tutorialInitialize()"
+		 width="400"
+		 height="150"
+		 styleName="classicPromWeek">
+	
+	<fx:Metadata>
+	</fx:Metadata>
+		
+	<fx:Declarations>
+	</fx:Declarations>
+	
+	<s:Rect id="Background" left="0" width="100%" height="100%" radiusX="15" radiusY="15">
+		<s:stroke>
+			<!--<s:SolidColorStroke weight="3" color="{getStyle('backgroundStroke')}" caps="none" />-->
+			<s:SolidColorStroke weight="3" color="black" caps="none" />
+		</s:stroke>
+		<s:fill>
+			<s:SolidColor color="white" alpha="0.9"/>
+			<!--<s:SolidColor color="{getStyle('backgroundColor')}" alpha="0.9"/>-->
+		</s:fill>
+	</s:Rect>
+	
+	<s:VGroup width="100%" height="100%" paddingLeft="15" paddingRight="15" paddingTop="15" paddingBottom="15">
+		<!--<s:Label id="topText" width="100%" height="20%" fontWeight="bold" fontSize="20" color="{getStyle('textColor')}" textAlign="center" visible="false">-->
+		<s:Label id="topText" width="100%" height="20%" fontWeight="bold" fontSize="20" color="black" textAlign="center" visible="false">
+			<s:text>Tutorial:</s:text>
+		</s:Label>
+		
+		<s:HGroup width="100%" height="65%" paddingLeft="15" paddingRight="15">
+			<!--<s:RichText id="tutorialText" minWidth="0" width="100%" fontSize="16" color="{getStyle('textColor')}" />-->
+			<s:RichText id="tutorialText" minWidth="0" width="100%" fontSize="15" color="black" styleName="basicFontStyle" />
+		</s:HGroup>
+		
+		<s:Group id="buttonGroup" width="100%" height="15%">
+			<prom:PromWeekButton id="nextButton" x="{buttonGroup.width - this.width*.2}" width="20%"  label="Next" visible="true" color="black" />
+			<prom:PromWeekButton id="stopButton" x="{buttonGroup.width - this.width*.4}" width="40%" label="Get Started" visible="false" />
+			<prom:PromWeekButton id="finishButton" x="{buttonGroup.width - this.width*.4}" width="40%" label="Finish Tutorial" visible="false" />
+		</s:Group>
+	
+	</s:VGroup>
+	<fx:Script>
+		<![CDATA[
+		import CiF.Debug;
+		import flash.events.KeyboardEvent;
+		import flash.text.TextField;
+		import PromWeek.assets.ResourceLibrary;
+		import flash.text.TextFormat;
+		import spark.utils.TextFlowUtil;
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			this.nextButton.setStyleName();
+			this.stopButton.setStyleName();
+			this.finishButton.setStyleName();
+			this.invalidateProperties();
+		}
+		
+		
+		/*
+		 * We're gonna try to do some fancy stuff here to color text within the text field.
+		 * We're gonna have to do a lot of stuff with regular expressions to dynamically see
+		 * when text here is using the magic words.
+		 * */
+		/*
+		public var buddyFormat:TextFormat;
+		public var romanceFormat:TextFormat;
+		public var coolFormat:TextFormat;
+		
+		public var buddyString:RegExp;
+		public var romanceString:RegExp;
+		public var coolString:RegExp;
+		*/
+		//public var tutorialText:TextField;
+		
+		
+		
+		public function tutorialInitialize():void {
+				//tutorialText.text = "";
+				//tutorialText = new PromWeek.CustomTextField();
+				/*
+				tutorialText.textField = new TextField();
+				tutorialText.textField.text = "";
+				tutorialText.textField.width = 300;
+				tutorialText.textField.visible = true;
+				tutorialText.textField.height = 300;
+				tutorialText.textField.x = 200;
+				tutorialText.textField.y = 200;
+				*/
+				/*
+				tutorialText = new TextField();
+				tutorialText.text = "";
+				tutorialText.width = 300;
+				tutorialText.visible = true;
+				tutorialText.height = 300;
+				tutorialText.x = 200;
+				tutorialText.y = 200;
+				//addElement(tutorialText);
+*/
+				/*
+				buddyFormat = new TextFormat(null, null, getStyle("buddyColor"));
+				romanceFormat = new TextFormat(null, null, getStyle("romanceColor"));
+				coolFormat = new TextFormat(null, null, getStyle("coolColor"));
+				
+				buddyString = new RegExp("buddy", "g");
+				romanceString = new RegExp("romance", "g");
+				coolString = new RegExp("cool", "g");
+				
+				TextFlowUtil
+				*/
+				
+				
+		}
+		
+		/*
+		override protected function createChildren():void {
+			
+				tutorialText = new TextField();
+				tutorialText.text = "";
+				tutorialText.width = 300;
+				tutorialText.visible = true;
+				tutorialText.height = 300;
+				tutorialText.x = 200;
+				tutorialText.y = 200;
+				
+				var myFormat:TextFormat = new TextFormat();
+				myFormat.color = 0xAA0000;
+				myFormat.size = 24;
+				myFormat.italic = true;
+				tutorialText.setTextFormat(myFormat);
+				
+				//tutorialText.content
+				
+		}
+		*/
+		
+		/*
+		public function highlightTutorialText():void {
+			//for (var i:int = 0; i < tutorialText.textField.numLines; i++) {
+			//for (var i:int = 0; i < tutorialText.numLines; i++) {
+				parseExpression(buddyString, buddyFormat, i);
+				parseExpression(romanceString, romanceFormat, i);
+				parseExpression(coolString, coolFormat, i);
+			//}
+		}
+		
+		
+		public function parseExpression(exp:RegExp, format:TextFormat, lineNumber:Number):Boolean {
+			//var result:Object = exp.exec(tutorialText.textField.getLineText(lineNumber));
+			//var result:Object = exp.exec(tutorialText.getLineText(lineNumber));
+			var result:Object = exp.exec(tutorialText.text);
+			if (result == null) { return false };
+			while (result != null) {
+				//tutorialText.textField.setTextFormat(format, tutorialText.textField.getLineOffset(lineNumber) + 1);
+				//tutorialText.setTextFormat(format, tutorialText.getLineOffset(lineNumber) + 1);
+				
+//				result = exp.exec(tutorialText.textField.getLineText(lineNumber));
+				//result = exp.exec(tutorialText.getLineText(lineNumber));
+				result = exp.exec(tutorialText.text);
+			}
+			return true;
+		}
+		*/
+		]]>
+	</fx:Script>
+
+	
+</s:Group>

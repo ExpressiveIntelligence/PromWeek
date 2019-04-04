@@ -1,0 +1,73 @@
+<?php
+
+/*
+ * Set APPLICATION_ENV to production if it's not set externally
+ */
+defined('APPLICATION_ENV') ||
+  define('APPLICATION_ENV', (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV') : 'production'));
+
+
+/*
+ * Setup configuration for all environments
+ */
+$_config = array();
+
+/*$dbInfo = array(
+	'host' => 'db-01.soe.ucsc.edu',
+	'user' => 'promweek',
+	'pass' => 'PR0MW33K@SOE',
+	'db'   => 'promweek'
+);*/
+
+$_config['development'] = array(
+	'host' => '127.0.0.1',
+	'user' => 'root',
+	'pass' => '',
+	'db'   => 'prom_test',
+	'baseURL' => 'http://promweek/'
+);
+
+$_config['staging'] = array(
+	'host'    => 'db-01.soe.ucsc.edu',
+	'user'    => 'promweek_test',
+	'pass'    => 'A5kCqFiKHWh85irU',
+	'db'      => 'promweek_test',
+	'baseURL' => 'http://promweek.soe.ucsc.edu/staging/'
+);
+
+$_config['production'] = array(
+	'host' => 'db-01.soe.ucsc.edu',
+	'user' => 'promweek',
+	'pass' => 'PR0MW33K@SOE',
+	'db'   => 'promweek',
+	'baseURL' => 'http://promweek.soe.ucsc.edu/'
+);
+
+/*
+ * Set concrete configuration to configuration for active environment
+ */
+ 
+if (!array_key_exists(APPLICATION_ENV, $_config)) {
+  die("There is no configuration for the specified environment '" . htmlentities(APPLICATION_ENV) ."'.");
+}
+
+$dbConfig = $_config[APPLICATION_ENV];
+
+/*
+ * Due to PHPUnit seemingly killing all global variables, store
+ * config in a static class variable too
+ */
+
+class PromweekConfig {
+	static $config;
+	
+	static function get() {
+		return self::$config;
+	}
+	
+	static function set($config) {
+		self::$config = $config;
+	}
+}
+
+PromweekConfig::set($dbConfig);

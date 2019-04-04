@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 width="100%"
+		 height="100%"
+		 styleName="classicPromWeek">
+		 
+		<fx:Metadata>
+		</fx:Metadata>
+		 
+		<fx:Declarations>
+		</fx:Declarations>
+		
+		
+		<!--<s:Rect id="buttonBoxFrame" width="100%" height="100%">
+			<s:stroke>
+				<s:SolidColorStroke weight="{getStyle('backgroundStrokeWeight')}" color="{getStyle('backgroundStroke')}" />
+			</s:stroke>
+			<s:fill>
+				<mx:SolidColor color="{getStyle('backgroundColor')}" alpha="1.0"/> 
+			</s:fill>
+		</s:Rect>-->
+		 
+		
+		<s:Rect x="0" y="0" width="100%" height="100%" alpha="1.0">
+		<s:fill>
+			<s:LinearGradient rotation="125">
+				<s:entries>
+					<!--<s:GradientEntry color="#EEEEEE" alpha="1.0" ratio="0.0" />-->
+					<s:GradientEntry color="{getStyle('backgroundColor')}" alpha="1.0"  />
+					<s:GradientEntry color="{getStyle('contentAreaAltColor')}" alpha="1.0" />
+				</s:entries>
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+		
+		<s:VGroup width="100%" height="100%" paddingTop="50" paddingBottom="20" paddingLeft="30" paddingRight="30">
+			<s:RichText text="THE END" width="100%" height="20%" fontSize="40" color="{getStyle('contentAreaTextColor')}" verticalAlign="middle" textAlign="center" styleName="basicFontStyle"/>
+			<s:HGroup width="100%" height="65%">
+				<s:VGroup width="65%" height="100%">
+					<s:VGroup width="100%" height="50%" gap="10">
+						<s:RichText text="Goals Completed:" width="100%" height="20%" fontSize="25" color="{getStyle('contentAreaTextColor')}" verticalAlign="middle" styleName="basicFontStyle"/>
+						<s:Scroller width="100%" height="80%">
+							<s:VGroup id="goalsCompletedGroup" width="100%" height="100%" gap="0" paddingLeft="20" />
+						</s:Scroller>
+					</s:VGroup>
+					<s:VGroup width="100%" height="50%" gap="10">
+						<s:RichText text="Statistics:" width="100%" height="20%" fontSize="25" color="{getStyle('contentAreaTextColor')}" verticalAlign="middle" styleName="basicFontStyle" />
+						<s:HGroup width="100%" height="80%" paddingLeft="20">
+							<s:TextArea id="statisticsText" width="100%" height="100%" contentBackgroundColor="{getStyle('contentAreaColor')}" color="{getStyle('textColor')}" fontSize="14" editable="false" selectable="false" styleName="basicFontStyle"/>
+						</s:HGroup>
+					</s:VGroup>
+				</s:VGroup>
+				<s:Group id="avatarGroup" width="35%" height="100%"/>
+			</s:HGroup>
+			<s:HGroup width="100%" height="15%" horizontalAlign="center" paddingTop="15">
+				<prom:PromWeekButton id="returnToMainMenuButton" label="Play Another Story" width="35%" height="60%" click="goToMainMenuClicked(event)" />
+			</s:HGroup>
+		</s:VGroup>
+		
+		 <fx:Script>
+			 <![CDATA[
+			import CiF.CiFSingleton;
+			import flash.events.MouseEvent;
+			import flash.utils.Timer;
+			import mx.controls.Image;  import com.util.SmoothImage;
+			import PromWeek.assets.ResourceLibrary;
+			import PromWeek.skins.NEW_listScrollSkin;
+			import spark.components.HGroup;
+			 
+			public var avatar:Avatar;
+			public var resourceLibrary:ResourceLibrary;
+			public var gameEngine:PromWeek.GameEngine;
+			public var statisticsManager:StatisticsManager;
+			
+
+			
+			public function onCreationComplete():void
+			{
+				resourceLibrary = ResourceLibrary.getInstance();
+				gameEngine = PromWeek.GameEngine.getInstance();
+				statisticsManager = StatisticsManager.getInstance();
+				
+				statisticsText.scroller.verticalScrollBar.setStyle("skinClass", NEW_listScrollSkin);
+			}
+			
+			
+			public function updateEndOfStoryScreen():void
+			{
+				updateCompletedGoals();
+				updateStatistics();
+				setAvatar(gameEngine.currentStory.storyLeadCharacter.toLowerCase());
+			}
+			
+			public function updateCompletedGoals():void
+			{
+				var image:SmoothImage;
+				var hGroup:HGroup;
+				this.goalsCompletedGroup.removeAllElements();
+				var goalCompletedToDo:PromWeek.ToDoItemComponent;
+				for each (var toDoItem:ToDoItem in gameEngine.currentStory.todoList)
+				{
+					if (toDoItem.evaluateCondition())
+					{
+						hGroup = new HGroup();
+						
+						goalCompletedToDo = new ToDoItemComponent();
+						//goalCompletedToDo.width = ;
+						goalCompletedToDo.height = 30;
+						goalCompletedToDo.todoItemNameLabel.text = toDoItem.name; 
+						//goalCompletedToDo.setProgressWidthPercent(1);
+						hGroup.addElement(goalCompletedToDo);
+						
+						//something like this needs to be done to get persistent goal progress notifications working
+						var goalString:String = gameEngine.currentStory.storyLeadCharacter + "-" + toDoItem.name;
+						/*
+						if (!statisticsManager.goalsSeen[goalString]) 
+						{
+							image = new SmoothImage();
+							image.source = resourceLibrary.uiIcons["star"];
+							image.width = 25;
+							image.height = 25;
+							hGroup.addElement(image);
+							hGroup.toolTip = "New goal completed in " + gameEngine.currentStory.storyLeadCharacter + "'s story!"
+						}
+						*/
+						this.goalsCompletedGroup.addElement(hGroup);
+					}
+				}
+				//Utility.log(this, "updateCompletedGoals() about to call sendNewGoalsSeen() for " + endingManager.newlyFulfilledItems.length + " goals.");
+				var endingManager:EndingManager = new EndingManager(gameEngine.currentStory);
+				//this is a little wastefull, but what evs
+				endingManager.determineEndings(true);
+				//var itemsToFill:Vector.<ToDoItem> = gameEngine.currentStory.evaluateToDoItems(CiFSingleton.getInstance().cast.characters);
+				//endingManager.setNewlyFulfilledItems(itemsToFill);
+				//endingManager.markGoalsAsSeen(itemsToFill);
+				gameEngine.getBackend().sendNewGoalsSeen(gameEngine.currentStory, endingManager.newlyFulfilledItems);
+			}
+			
+			
+			/**
+			 * Based on the user's current stats, this will give them a sense of how much
+			 * work they've done and/or how much the social state has changed at the end
+			 * of a level.
+			 */
+			public function updateStatistics():void {
+				var formattedText:String = statisticsManager.createEndOfLevelResultString();
+				statisticsText.text = ""; // zero it out
+				statisticsText.text += formattedText;
+				
+			}
+			
+			public function setAvatar(charName:String):void 
+			{
+				this.avatarGroup.removeAllElements();
+
+				avatar = new Avatar(resourceLibrary.characterClips[charName.toLowerCase()+"Prom"]);
+				
+				avatar.setLocation(0, 0);
+				
+				avatar.clip.scaleX = -1.5;
+				avatar.clip.scaleY = 1.5;
+				
+				avatar.width = avatarGroup.width;
+				avatar.height = avatarGroup.width;
+				
+				avatar.clip.x += avatar.clip.width/2 + 40;
+				avatar.clip.y = avatar.clip.height/2;
+				avatar.alpha = 1;
+				
+				this.avatarGroup.addElement(avatar);
+			}
+			 
+			
+			public function goToMainMenuClicked(e:MouseEvent = null):void
+			{	
+				gameEngine.sawEnding();
+				
+				if (gameEngine.hudGroup.levelResultsScreen.tdContainer != null)
+				{
+					gameEngine.hudGroup.storyGoalWindow.toDoItemAccordion.tdContainerHolder.addElement(gameEngine.hudGroup.levelResultsScreen.tdContainer);
+					gameEngine.hudGroup.levelResultsScreen.storyGoalGroup.removeAllElements();
+					gameEngine.hudGroup.levelResultsScreen.tdContainer = null;
+				}
+								
+				this.visible = false;
+			}
+			
+			/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			this.returnToMainMenuButton.setStyleName();
+			this.invalidateProperties();
+		}
+			 
+			 ]]>
+		 </fx:Script>
+</s:Group>

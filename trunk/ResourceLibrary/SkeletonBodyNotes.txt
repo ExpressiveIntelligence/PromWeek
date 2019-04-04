@@ -1,0 +1,55 @@
+playAnim(accuse)
+playAnim(punch)
+
+
+NOTES FOR THE NEW SKELETAL SYSTEM:
+
+new skeleton()
+
+*****************************************
+******** Skeleton Components ************
+*****************************************
+rightUpperArm
+rightLowerArm
+hair
+head
+body
+rightLeg
+leftLeg
+leftUpperArm
+leftLowerArm
+hairBack
+
+faceMC 
+(*Access these by faceMC.name*)
+    rEye ***INSTANCE OF "lEye"***
+    lPupil
+    lEye ***INSTANCE OF "rEye"***
+    rPupil
+    rBrow
+    lBrow
+    mouth
+
+
+****************************
+**** SKINNED COMPONENTS ****
+****************************
+leftLeg
+rightLeg
+body
+rightLowerArm
+rightUpperArm
+leftLowerArm
+leftUpperArm
+hairBack
+hair
+head
+faceMC
+faceMC.rEye //***INSTANCE OF "lEye"***
+faceMC.lEye //***INSTANCE OF "rEye"***
+faceMC.lPupil
+faceMC.rPupil
+faceMC.rBrow
+faceMC.lBrow
+faceMC.mouth
+    

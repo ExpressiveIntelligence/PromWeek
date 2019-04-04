@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 xmlns:cif="CiF.*"
+		 creationComplete="onCreationComplete()"
+		 initialize="initializeOpinionLines()"
+		 styleName="classicPromWeek">
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+<!--			 <fx:Number id="{this.width/4}">{this.width/4}</fx:Number>
+			 <fx:Number id="2 * this.height/3">{2 * this.height/3}</fx:Number>
+			 <fx:Number id="secondaryCharacterIconWidth">{this.height/3}</fx:Number>
+			 <fx:Number id="secondaryCharacterIconHeight">{this.height/3}</fx:Number>-->
+			 
+			 <fx:Number id="offsetX">-40</fx:Number>
+			 <fx:Number id="offsetY">50</fx:Number>
+			 
+		 </fx:Declarations>
+		 
+		<s:Group width="100%" height="100%">
+			<s:Rect id="backgroundRect" height="100%" width="100%" radiusX="15" radiusY="15" visible="false">
+				<s:fill>
+					<s:SolidColor color="#FFFFFF" alpha=".8"/>
+				</s:fill>
+				<s:stroke>
+					<s:SolidColorStroke weight="2" color="black" />
+				</s:stroke>
+			</s:Rect>
+			<s:VGroup width="100%" height="100%" horizontalAlign="center">
+				<s:HGroup width="100%" height="100%">
+					<s:Group width="100%" height="100%">
+						<s:Rect id="buddyBGRect" width="{this.width/4}" height="{2 * this.height/3}">
+							<s:fill>
+								<s:SolidColor color="#FFFFFF" alpha=".8"/>
+							</s:fill>
+						</s:Rect>
+						<s:Rect id="buddyFGRect" width="{this.width/4}" >
+							<s:fill>
+								<s:SolidColor color="{getStyle('buddyColor')}" alpha="1"/>
+							</s:fill>
+						</s:Rect>
+						<s:Rect id="buddyFrameRect" width="{this.width/4}" height="{2 * this.height/3}">
+							<s:stroke>
+								<s:SolidColorStroke weight="2" color="black" />
+							</s:stroke>
+						</s:Rect>
+					</s:Group>
+					
+					<s:Group width="100%" height="100%">
+						<s:Rect id="romanceBGRect" width="{this.width/4}" height="{2 * this.height/3}">
+							<s:fill>
+								<s:SolidColor color="#FFFFFF" alpha=".8"/>
+							</s:fill>
+						</s:Rect>
+						<s:Rect id="romanceFGRect" width="{this.width/4}" >
+							<s:fill>
+								<s:SolidColor color="{getStyle('romanceColor')}" alpha="1"/>
+							</s:fill>
+						</s:Rect>
+						<s:Rect id="romanceFrameRect" width="{this.width/4}" height="{2 * this.height/3}">
+							<s:stroke>
+								<s:SolidColorStroke weight="2" color="black" />
+							</s:stroke>
+						</s:Rect>
+					</s:Group>
+					
+					<s:Group width="100%" height="100%">
+						<s:Rect id="coolBGRect" width="{this.width/4}" height="{2 * this.height/3}">
+							<s:fill>
+								<s:SolidColor color="#FFFFFF" alpha=".8"/>
+							</s:fill>
+						</s:Rect>
+						<s:Rect id="coolFGRect" width="{this.width/4}" >
+							<s:fill>
+								<s:SolidColor color="{getStyle('coolColor')}" alpha="1"/>
+							</s:fill>
+						</s:Rect>
+						<s:Rect id="coolFrameRect" width="{this.width/4}" height="{2 * this.height/3}">
+							<s:stroke>
+								<s:SolidColorStroke weight="2" color="black" />
+							</s:stroke>
+						</s:Rect>
+					</s:Group>
+					
+				</s:HGroup>
+				<s:Group width="{this.height/3}" height="{this.height/3}">
+					<util:SmoothImage id="towardCharImage" width="100%" height="100%" />
+				</s:Group>
+			</s:VGroup>
+		</s:Group>
+		
+
+	<fx:Script>
+		<![CDATA[
+		
+		import CiF.CiFSingleton;
+		import flash.geom.Rectangle;
+		import flashx.textLayout.utils.CharacterUtil;
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import flash.events.*;
+		import CiF.*;
+		import PromWeek.assets.ResourceLibrary;
+		
+		// These are for use in determining how long the network lines are
+		public static const BUDDY_BUDDY_UP_SIGNIFICANCE:Number = 0.4;
+		public static const BUDDY_FRIENDS_SIGNIFICANCE:Number = 0.4;
+		public static const BUDDY_END_ENEMIES_SIGNIFICANCE:Number = 0.2;	
+		
+		public static const BUDDY_END_FRIENDS_SIGNIFICANCE:Number = 0.4;
+		public static const BUDDY_BUDDY_DOWN_SIGNIFICANCE:Number = 0.4;		
+		public static const BUDDY_ENEMIES_SIGNIFICANCE:Number = 0.2;
+		
+		
+		
+		public static const ROMANCE_ROMANCE_UP_SIGNIFICANCE:Number = 0.4;
+		public static const ROMANCE_DATING_SIGNIFICANCE:Number = 0.6;
+		
+		public static const ROMANCE_END_DATING_SIGNIFICANCE:Number = 0.6;
+		public static const ROMANCE_ROMANCE_DOWN_SIGNIFICANCE:Number = 0.4;
+		
+		
+		
+		public static const COOL_COOL_UP_SIGNIFICANCE:Number = 1.0;
+		
+		public static const COOL_COOL_DOWN_SIGNIFICANCE:Number = 1.0;
+		//-------------------------------------------------
+
+		// These are used to say what percent of the rules must be true of an intent type in order to contribute 
+		// that intent's full significance to the network line. Seems like something that would require tuning
+		// Lots of magic numbers...
+		public static const BUDDY_UP_POS_THRESHOLD:Number = 0.05
+		public static const BUDDY_UP_NEG_THRESHOLD:Number = 0.05
+		public static const BUDDY_DOWN_POS_THRESHOLD:Number = 0.05
+		public static const BUDDY_DOWN_NEG_THRESHOLD:Number = 0.05
+		public static const ROMANCE_UP_POS_THRESHOLD:Number = 0.05
+		public static const ROMANCE_UP_NEG_THRESHOLD:Number = 0.05
+		public static const ROMANCE_DOWN_POS_THRESHOLD:Number = 0.05
+		public static const ROMANCE_DOWN_NEG_THRESHOLD:Number = 0.05
+		public static const COOL_UP_POS_THRESHOLD:Number = 0.05
+		public static const COOL_UP_NEG_THRESHOLD:Number = 0.05
+		public static const COOL_DOWN_POS_THRESHOLD:Number = 0.05
+		public static const COOL_DOWN_NEG_THRESHOLD:Number = 0.05
+		public static const FRIENDS_POS_THRESHOLD:Number = 0.05
+		public static const FRIENDS_NEG_THRESHOLD:Number = 0.05
+		public static const END_FRIENDS_POS_THRESHOLD:Number = 0.05
+		public static const END_FRIENDS_NEG_THRESHOLD:Number = 0.05
+		public static const DATING_POS_THRESHOLD:Number = 0.05
+		public static const DATING_NEG_THRESHOLD:Number = 0.05
+		public static const END_DATING_POS_THRESHOLD:Number = 0.05
+		public static const END_DATING_NEG_THRESHOLD:Number = 0.05
+		public static const ENEMIES_POS_THRESHOLD:Number = 0.05
+		public static const ENEMIES_NEG_THRESHOLD:Number = 0.05
+		public static const END_ENEMIES_POS_THRESHOLD:Number = 0.05
+		public static const END_ENEMIES_NEG_THRESHOLD:Number = 0.05
+		//---------------------------------------------------------------
+		
+		
+		private var gameEngine:GameEngine = GameEngine.getInstance();
+		private var resourceLibrary:PromWeek.assets.ResourceLibrary = PromWeek.assets.ResourceLibrary.getInstance();
+		private var cif:CiFSingleton = CiFSingleton.getInstance();
+		
+		public var primaryCharacterName:String;
+		public var secondaryCharacterName:String;
+		
+		public var currentPrimaryCharacter:Character;
+		public var currentSecondaryCharacter:Character;
+		
+		public var created:Boolean = false;
+		
+		public function onCreationComplete():void {
+
+		}
+		
+		public function initializeOpinionLines():void 
+		{	
+			//trace("character sheet initialize");
+
+			setStyleName();
+			this.created = true;
+		}
+
+		public function updateOpinionLinesData(fromChar:String,towardChar:String):void
+		{
+			this.primaryCharacterName = fromChar;
+			this.secondaryCharacterName = towardChar;
+			
+			this.currentPrimaryCharacter = cif.cast.getCharByName(this.primaryCharacterName);
+			this.currentSecondaryCharacter = cif.cast.getCharByName(this.secondaryCharacterName);
+			
+			towardCharImage.source = resourceLibrary.charHeads[this.secondaryCharacterName];
+			
+			//this is totally where I'll update subjective opinion line values
+			updateNetworkValues();
+			
+		}
+		
+		public function updateNetworkValues():void
+		{
+			var value:Number;
+			var lineLength:Number;
+			setStyleName();
+			//buddy
+			//Debug.debug(this,"drawNetworkLines() " + getIntentPercentImpact(Predicate.INTENT_FRIENDS))//,.1,.1));
+			value = getIntentPercentImpact(this.currentPrimaryCharacter, this.currentSecondaryCharacter,Predicate.INTENT_FRIENDS, FRIENDS_POS_THRESHOLD, FRIENDS_NEG_THRESHOLD) * BUDDY_FRIENDS_SIGNIFICANCE;
+			value -= getIntentPercentImpact(this.currentPrimaryCharacter, this.currentSecondaryCharacter,Predicate.INTENT_END_FRIENDS, END_FRIENDS_POS_THRESHOLD, END_FRIENDS_NEG_THRESHOLD) * BUDDY_END_FRIENDS_SIGNIFICANCE;
+			value -= getIntentPercentImpact(this.currentPrimaryCharacter, this.currentSecondaryCharacter,Predicate.INTENT_ENEMIES, ENEMIES_POS_THRESHOLD, ENEMIES_NEG_THRESHOLD) * BUDDY_ENEMIES_SIGNIFICANCE;
+			value += getIntentPercentImpact(this.currentPrimaryCharacter, this.currentSecondaryCharacter,Predicate.INTENT_END_ENEMIES, END_ENEMIES_POS_THRESHOLD, END_ENEMIES_NEG_THRESHOLD) * BUDDY_END_ENEMIES_SIGNIFICANCE;
+			value += getIntentPercentImpact(this.currentPrimaryCharacter, this.currentSecondaryCharacter,Predicate.INTENT_BUDDY_UP, BUDDY_UP_POS_THRESHOLD, BUDDY_UP_NEG_THRESHOLD) * BUDDY_BUDDY_UP_SIGNIFICANCE;
+			value -= getIntentPercentImpact(this.currentPrimaryCharacter, this.currentSecondaryCharacter, Predicate.INTENT_BUDDY_DOWN, BUDDY_DOWN_POS_THRESHOLD, BUDDY_DOWN_NEG_THRESHOLD) * BUDDY_BUDDY_DOWN_SIGNIFICANCE;
+			value = Math.max(0, value);
+			//Debug.debug(this, "drawNetworkLines() Buddy Value: " + value);
+			//value = cif.buddyNetwork.getWeight(this.currentPrimaryCharacter.networkID, this.currentSecondaryCharacter.networkID);
+			lineLength = 0.03 * buddyBGRect.height + value * buddyBGRect.height * 0.97;
+			buddyFGRect.height = lineLength;
+			buddyFGRect.top =  buddyBGRect.height - lineLength;
+
+			//romance
+			value = getIntentPercentImpact(this.currentPrimaryCharacter, this.currentSecondaryCharacter,Predicate.INTENT_DATING, DATING_POS_THRESHOLD, DATING_NEG_THRESHOLD) * ROMANCE_DATING_SIGNIFICANCE;
+			value -= getIntentPercentImpact(this.currentPrimaryCharacter, this.currentSecondaryCharacter, Predicate.INTENT_END_DATING, END_DATING_POS_THRESHOLD, END_DATING_NEG_THRESHOLD) * ROMANCE_END_DATING_SIGNIFICANCE;
+			value += getIntentPercentImpact(this.currentPrimaryCharacter, this.currentSecondaryCharacter,Predicate.INTENT_ROMANCE_UP, ROMANCE_UP_POS_THRESHOLD, ROMANCE_UP_NEG_THRESHOLD) * ROMANCE_ROMANCE_UP_SIGNIFICANCE;
+			value -= getIntentPercentImpact(this.currentPrimaryCharacter, this.currentSecondaryCharacter, Predicate.INTENT_ROMANCE_DOWN, ROMANCE_DOWN_POS_THRESHOLD, ROMANCE_DOWN_NEG_THRESHOLD) * ROMANCE_ROMANCE_DOWN_SIGNIFICANCE;
+			value = Math.max(0, value);
+			//value = cif.romanceNetwork.getWeight(this.currentPrimaryCharacter.networkID, this.currentSecondaryCharacter.networkID);
+			lineLength = 0.03 * romanceBGRect.height + value * romanceBGRect.height * 0.97;
+			romanceFGRect.height = lineLength;
+			romanceFGRect.top =  romanceBGRect.height - lineLength;
+			
+			//cool
+			value = getIntentPercentImpact(this.currentPrimaryCharacter, this.currentSecondaryCharacter,Predicate.INTENT_COOL_UP, COOL_UP_POS_THRESHOLD, COOL_UP_NEG_THRESHOLD) * COOL_COOL_UP_SIGNIFICANCE;
+			value -= getIntentPercentImpact(this.currentPrimaryCharacter, this.currentSecondaryCharacter, Predicate.INTENT_COOL_DOWN, COOL_DOWN_POS_THRESHOLD, COOL_DOWN_NEG_THRESHOLD) * COOL_COOL_DOWN_SIGNIFICANCE;
+			value = Math.max(0, value);
+			//value = cif.coolNetwork.getWeight(this.currentPrimaryCharacter.networkID, this.currentSecondaryCharacter.networkID);
+			lineLength = 0.03 * coolBGRect.height + value * coolBGRect.height * 0.97;	
+			coolFGRect.height = lineLength;
+			coolFGRect.top =  coolBGRect.height - lineLength;
+		}
+		
+		/**
+		 * This function will return the percent that we oughta fill the network line for a specified intent
+		 * The math is suspect at this point. It will require tuning, and even then it may not be what we want...
+		 * 
+		 * @param	intentType As defined in Predicate
+		 * @param	posMagicScaleMod TBD scale modifiers...
+		 * @param	negMagicScaleMod
+		 * @return
+		 */
+		public function getIntentPercentImpact(char1:Character, char2:Character,intentType:int, posMagicScaleMod:Number=1,negMagicScaleMod:Number=1):Number
+		{	
+			//if the prospective memory intent cache hasn't been filled yet, return 0. btw, this shouldn't ever happen
+			if (char1.prospectiveMemory.intentPosScoreCache[char2.networkID][intentType] == ProspectiveMemory.DEFAULT_INTENT_SCORE) return 0.0;
+			
+			var percent:Number;
+				
+			//Debug.debug(this,"getIntentPercentImpact() " +Predicate.getIntentNameByNumber(intentType)+" PosScore: " + this.currentPrimaryCharacter.prospectiveMemory.intentPosScoreCache[this.currentSecondaryCharacter.networkID][intentType])
+			//Debug.debug(this,"getIntentPercentImpact() " +Predicate.getIntentNameByNumber(intentType)+" NegScore: " + this.currentPrimaryCharacter.prospectiveMemory.intentNegScoreCache[this.currentSecondaryCharacter.networkID][intentType])			
+			
+			var posPercent:Number = char1.prospectiveMemory.intentPosScoreCache[char2.networkID][intentType] / (cif.intentsTotalPos[intentType] * posMagicScaleMod);
+			var negPercent:Number = char1.prospectiveMemory.intentNegScoreCache[char2.networkID][intentType] / (cif.intentsTotalNeg[intentType] * negMagicScaleMod);
+
+			//Debug.debug(this,"getIntentPercentImpact() " + Predicate.getIntentNameByNumber(intentType)+" Pos%: " + posPercent + " Neg%: " + negPercent)
+			
+			percent = Math.min(Math.max((posPercent - negPercent), 0), 1);
+			
+			//Debug.debug(this, "getIntentPercentImpact() " + Predicate.getIntentNameByNumber(intentType) + " Total%: " + percent);
+
+			return Math.abs(percent);
+		}
+		/*
+		public function drawRelationshipIcons():void
+		{
+			var hasRelationship:Boolean;
+
+			//friends
+			hasRelationship = cif.relationshipNetwork.getRelationship(RelationshipNetwork.FRIENDS, this.currentPrimaryCharacter, this.currentSecondaryCharacter);
+			if (hasRelationship)
+			{
+				this.friendsIcon.source = resourceLibrary.relationshipIcons["friends"];
+			}
+			else
+			{
+				this.friendsIcon.source = resourceLibrary.relationshipIcons["notFriends"];
+			}
+			
+			//dating
+			hasRelationship = cif.relationshipNetwork.getRelationship(RelationshipNetwork.DATING, this.currentPrimaryCharacter, this.currentSecondaryCharacter);
+			if (hasRelationship)
+			{
+				this.datingIcon.source = resourceLibrary.relationshipIcons["dating"];
+			}
+			else
+			{
+				this.datingIcon.source = resourceLibrary.relationshipIcons["notDating"];
+			}
+			
+			//enemies
+			hasRelationship = cif.relationshipNetwork.getRelationship(RelationshipNetwork.ENEMIES, this.currentPrimaryCharacter, this.currentSecondaryCharacter);
+			if (hasRelationship)
+			{
+				this.enemiesIcon.source = resourceLibrary.relationshipIcons["enemies"];
+			}
+			else
+			{
+				this.enemiesIcon.source = resourceLibrary.relationshipIcons["notEnemies"];
+			}
+		}
+		*/
+		public function updatePosition(elapsedTime:Number=0):void
+		{
+			if (!this.created)
+			{
+				return;
+			}
+			
+			
+			var charX:Number = gameEngine.worldGroup.avatars[this.primaryCharacterName].locX;
+			var charY:Number = gameEngine.worldGroup.avatars[this.primaryCharacterName].locY;
+			
+			//this.deltaY += (elapsedTime/1000.0)*this.moveSpeed;
+
+			var newLoc:Point = gameEngine.worldGroup.avatars[this.primaryCharacterName].localToGlobal(new Point(charX + this.offsetX, charY + this.offsetY));
+			if (newLoc.y + this.height >= gameEngine.hudGroup.height || newLoc.x + this.width >= gameEngine.hudGroup.width)
+			{
+				//Debug.debug(this, "OUT OF BOUNDS!!!!!");
+				this.backgroundRect.visible = true;
+			}
+			else
+			{		
+				this.backgroundRect.visible = false;
+				this.top = newLoc.y;
+				this.left = newLoc.x;
+			}
+			
+		}
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			/*if(gameEngine.classicPromColors) {
+				this.setStyle("styleName", "classicPromWeek");
+			}
+			else if(gameEngine.greenPromColors) {
+				this.setStyle("styleName", "greenColor");
+			}
+			else if(gameEngine.redPromColors) {
+				this.setStyle("styleName", "redColor");
+			}*/
+			this.invalidateProperties();
+		}
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

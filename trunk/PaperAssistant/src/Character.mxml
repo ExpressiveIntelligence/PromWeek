@@ -1,0 +1,341 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<s:Group 
+	xmlns:fx="http://ns.adobe.com/mxml/2009"
+	xmlns:s="library://ns.adobe.com/flex/spark"
+	xmlns:mx="library://ns.adobe.com/flex/halo"
+	width="200" height="150"
+	creationComplete = "onCreationComplete()">
+
+		
+		
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	
+	
+	<s:states>
+		<mx:State name="goth"/>
+		<mx:State name="emo"/>
+		<mx:State name="black"/>
+		<mx:State name="white"/>
+		<mx:State name="inactive" />
+		<mx:State name="active" />
+	</s:states>
+
+	
+	
+	<s:Rect left="0" top="0" right="0" bottom="0">
+		<s:stroke>
+			<mx:SolidColorStroke color="0x090909"/>
+		</s:stroke>
+		<s:fill>
+			<mx:SolidColor 
+				color.goth="0x888888" 
+				color.emo="0xb070b0" 
+				color.black="0x000000"  
+				color.white="0xffffff"
+				color.inactive="0xa02020"/>
+		</s:fill>
+	</s:Rect>
+	
+	<mx:Label 
+		id="nameLabel" 
+		top="1" 
+		left="0" 
+		width="100%" 
+		textAlign="center" 
+		fontWeight="bold" 
+		color.white="0x000000" 
+		color.black="0xffffff"
+		color.inactive="0xffffff" />
+
+	<s:Button 
+		id = "activeButton" 
+		top = "100" 
+		left = "25" 
+		width = "100" 
+		label.inactive = "Enable" 
+		label = "Disable" 
+		click="currentState='inactive';activeButtonClick();update();"
+		click.inactive = "currentState=this.type;activeButtonClick();update();//" />
+	
+	<mx:HSlider 
+		id="chanceSlider" 
+		top="120"
+		snapInterval=".25"
+		toolTip="volition multiplier" 
+		minimum="0.0"
+		maximum="10.0"
+		value="{chanceModifier}"
+		thumbRelease="chanceModifier=chanceSlider.value"
+		change="chanceModifier=chanceSlider.value"
+		/>
+	<!--	
+	<s:Button
+		id="increaseGameChanceButton"
+		top="150"
+		left="25" 
+		width="100"
+		label="Increase Chance"
+		click="increaseGameChance=!increaseGameChance;update();"/>-->
+	
+	<s:Button id="negP" label="-" click="pState=modState((tankRep)?1:-1,pState,pCap);update();" />
+	<s:Button id="negS" label="-" click="sState=modState((tankRep)?1:-1,sState,sCap);update();" />
+	<s:Button id="negA" label="-" click="aState=modState((tankRep)?1:-1,aState,aCap);update();" />
+	<s:Button id="negV" label="-" click="vState=modState((tankRep)?1:-1,vState,vCap);update();" />
+	
+	<s:Button id="posP" label="-" click="pState=modState((tankRep)?-1:1,pState,pCap);update();" />
+	<s:Button id="posS" label="-" click="sState=modState((tankRep)?-1:1,sState,sCap);update();" />
+	<s:Button id="posA" label="-" click="aState=modState((tankRep)?-1:1,aState,aCap);update();" />
+	<s:Button id="posV" label="-" click="vState=modState((tankRep)?-1:1,vState,vCap);update();" />
+			
+	<fx:Script>
+		
+		
+		<![CDATA[
+			/*psav
+			[Romance]               255     171     7
+			[Vengeance]             233     213     88
+			[Acceptance]            114     173     117             (184 243 187)
+			[Status]                 14      141     148             (84 211 218)
+			[Power]                  67      77      83              (137 147 153)
+			*/
+			//import flash.filters.ColorMatrixFilter; 
+			import spark.primitives.*;
+			
+			public var characterName:String;
+			public var type:String;
+			
+			public var rCap:Number;
+			public var vCap:Number;
+			public var aCap:Number;
+			public var sCap:Number;
+			public var pCap:Number;
+			
+			public var activeButtonClick:Function;
+			
+			[Bindable]
+			public var rState:Number = 0.0;
+			[Bindable]
+			public var vState:Number = 0.0;
+			[Bindable]
+			public var aState:Number = 0.0;
+			[Bindable]
+			public var sState:Number = 0.0;
+			[Bindable]
+			public var pState:Number = 0.0;
+			
+			public var increaseGameChance:Boolean = false;
+			[Bindable]
+			public var chanceModifier:Number = 1.0;
+			
+			public var tankRep:Boolean = true;
+			
+			public function onCreationComplete():void {
+				currentState = type;
+				//nameLabel.text = new String("a name");
+				characterName = "a char";
+				//vCap = -4;
+				//vState = -1;
+				activeButton.left = 25;
+				activeButton.width = this.width - 50;
+				//increaseGameChanceButton.left = 25;
+				
+				//increaseGameChanceButton.width = this.width - 50;
+				chanceSlider.left = 25;
+				chanceSlider.width = this.width - 50;
+				drawNeedCirclesRows()
+				
+				var fromCompSide:int = 5;
+				var stateButtonHeight:int = 13;
+				var stateButtonWidth:int = 25;
+				var stateButtonFontSize:int = 7;
+				
+				//init buttons
+				negP.width = stateButtonWidth;
+				negP.height = stateButtonHeight;
+				negP.left = fromCompSide;
+				negP.top = 30;
+				negP.setStyle("fontSize", stateButtonFontSize);
+				
+				negS.width = stateButtonWidth;
+				negS.height = stateButtonHeight;
+				negS.left = fromCompSide;
+				negS.top = 45;
+				negS.setStyle("fontSize", stateButtonFontSize);
+				
+				negA.width = stateButtonWidth;
+				negA.height = stateButtonHeight;
+				negA.left = fromCompSide;
+				negA.top = 60;
+				negA.setStyle("fontSize", stateButtonFontSize);
+				
+				negV.width = stateButtonWidth;
+				negV.height = stateButtonHeight;
+				negV.left = fromCompSide;
+				negV.top = 75;
+				negV.setStyle("fontSize", stateButtonFontSize);
+
+				posP.width = stateButtonWidth;
+				posP.height = stateButtonHeight;
+				posP.right = fromCompSide;
+				posP.top = 30;
+				posP.setStyle("fontSize", stateButtonFontSize);
+				
+				posS.width = stateButtonWidth;
+				posS.height = stateButtonHeight;
+				posS.right = fromCompSide;
+				posS.top = 45;
+				posS.setStyle("fontSize", stateButtonFontSize);
+				
+				posA.width = stateButtonWidth;
+				posA.height = stateButtonHeight;
+				posA.right = fromCompSide;
+				posA.top = 60;
+				posA.setStyle("fontSize", stateButtonFontSize);
+				
+				posV.width = stateButtonWidth;
+				posV.height = stateButtonHeight;
+				posV.right = fromCompSide;
+				posV.top = 75;
+				posV.setStyle("fontSize", stateButtonFontSize);
+				
+			}
+			
+			public function update():void {
+				this.drawNeedCirclesRows();
+				nameLabel.text = characterName;
+				
+				//(increaseGameChance)?increaseGameChanceButton.label = "Decrease Chance" : increaseGameChanceButton.label = "Increase Chance";
+				//trace(pState);
+				//trace("state="+this.currentState);
+			}
+			
+			public function activeButtonHandler():void {
+				
+			}
+			
+			public function modState(amt:Number, state:Number, cap:Number):Number {
+				//over cap w/ same sign
+				//different signs
+				var newState:Number;
+				//same sign
+				if ( ((state + amt) > 0.0 && cap > 0.0) || ((state + amt) < 0.0 && cap < 0.0) ) {
+					if (Math.abs(state + amt) >= Math.abs(cap)) 
+						newState = cap;
+					else
+						newState = (state + amt);
+					
+				}else{
+					//diferent sign
+					newState =  0.0;	
+				}
+				//trace("newState: " + newState);
+				
+				return newState;
+				/*if (cap < 0.0) {
+					//since the cap is negative, we don't want state to go above 0
+					(state + amt > 0.0)? return 0.0 : return state + amt;
+				} else if (cap > 0.0) {
+					(Math.abs(state + amt) >= Math.abs(cap)) ? return cap : state + amt;
+					(state + amt < 0.0)? return 0.0 : return state + amt;
+				}*/
+			}
+			
+			public function drawNeedCirclesRows():void {
+				
+				var dividingLine:Rect = new Rect();	
+				dividingLine.width = 5;
+				dividingLine.height = 65;
+				dividingLine.top = 25;
+				dividingLine.left = this.width / 2 - dividingLine.width / 2;
+				var dividingLineFill:SolidColor = new SolidColor();
+				dividingLineFill.color = 0xaaaaaa;
+				var dividingLineStroke:SolidColorStroke = new SolidColorStroke();
+				dividingLineStroke.color = 0x666666;
+				
+				dividingLine.fill = dividingLineFill;
+				dividingLine.stroke = dividingLineStroke;
+				this.addElement(dividingLine);
+				
+				//draw vengeance
+				//color 233     213     88 or 0xE9D558
+				var i:int = new int(0);
+				var direction:int = new int(1);
+				
+				drawNeedRow(30, pCap, pState, 0x434D53);
+				drawNeedRow(45, sCap, sState, 0x0E8D94);
+				drawNeedRow(60, aCap, aState, 0x72AD75);
+				drawNeedRow(75, vCap, vState, 0xE9D558);
+
+				
+				
+				
+				/*(vCap > 0.0)? direction = 1:direction = -1;
+				for (i = 0; i < Math.floor(Math.abs(vCap)); ++i ) {
+					var newEllipse:Ellipse = new Ellipse();
+					
+					newEllipse.width = 13;
+					newEllipse.height = 13;
+					
+					newEllipse.top = 30;
+					newEllipse.left = 65 + (14 * (i + 1) * direction) + 5*direction;
+					
+					var fill:SolidColor = new SolidColor();
+					
+					(i < Math.floor(Math.abs(vState)))?fill.color = 0xE9D558:fill.color = 0xcccccc;
+					
+					trace("left: " + newEllipse.left + " direction: " + direction + " fill.color: " + fill.color);
+					
+					newEllipse.fill = fill;
+				   
+					this.addElement(newEllipse);
+				}*/
+			}
+			
+			private function drawNeedRow(top:int, cap:int, state:int, color:int):void {
+				var i:int = new int(0);
+				var direction:int = new int(1);
+				
+				(cap > 0.0)? direction = 1:direction = -1;
+				
+				for (i = 0; i < Math.floor(Math.abs(cap)); ++i ) {
+					var newEllipse:Ellipse = new Ellipse();
+					
+					newEllipse.width = 13;
+					newEllipse.height = 13;
+					
+					newEllipse.top = top;
+					if(direction < 0)
+						//newEllipse.left = 65 + (14 * (i + 1) * direction) + 5 * direction;
+						newEllipse.left = (this.width/2) + (14 * (i + 0) * direction) - newEllipse.width + 5*direction;
+					if (direction > 0)
+						//newEllipse.left = 47 + (14 * (i + 1) * direction) + 5 * direction;
+						newEllipse.left = (this.width/2) + (14 * (i + 0) * direction) + 5 * direction;
+					
+					var fill:SolidColor = new SolidColor();
+					var stroke:SolidColorStroke = new SolidColorStroke();
+					
+					stroke.color = 0x666666;
+					if(tankRep) {
+						((Math.abs(cap) - i) > Math.floor(Math.abs(state)))?fill.color = color:fill.color = 0xcccccc;
+					} else {
+						(i < Math.floor(Math.abs(state)))?fill.color = color:fill.color = 0xcccccc;
+					}
+					
+					//trace("left: " + newEllipse.left + " direction: " + direction + " fill.color: " + fill.color);
+					
+					newEllipse.fill = fill;
+					newEllipse.stroke = stroke;
+				   
+					this.addElement(newEllipse);
+				}
+				
+			}
+			
+			
+			
+		]]>		
+	</fx:Script>
+	
+</s:Group>

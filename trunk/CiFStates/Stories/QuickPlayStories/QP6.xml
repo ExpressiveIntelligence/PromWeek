@@ -1,0 +1,45 @@
+<PromWeek>
+		<Story title="QP6" storyLeadCharacter="Zack" locked="false" toUnlock="0" isTutorial="false" isQuickPlay="true" numberOfQuickPlaySGAvailable="2" startState="quickPlayStartState6" nextChallengeName="QP7">
+			<Description>Social physics.</Description>
+			<QuickPlayDescription>
+				<![CDATA[Use ###Monica### to make ###NAOMI### like ###ZACK### more]]> <!--in two moves. Hint: sometimes the enemy of an enemy is a friend. -->
+			</QuickPlayDescription>
+			<QuickPlayEndingDescription>
+				<![CDATA[Sometimes it takes three to tango.]]>
+			</QuickPlayEndingDescription>
+			<ForcedSGs>
+				<ForcedSG initiator="Zack" responder="Monica" gameName="Insult Friend of" turnsIn="0" instantiationID="-1" />
+				<ForcedSG initiator="Naomi" responder="Zack" gameName="Brag" turnsIn="0" instantiationID="-1" />
+				<ForcedSG initiator="Naomi" responder="Zack" gameName="Shoot Down" turnsIn="0" instantiationID="-1" />
+				<ForcedSG initiator="Zack" responder="Naomi" gameName="Brag" turnsIn="0" instantiationID="-1" />
+				<ForcedSG initiator="Zack" responder="Naomi" gameName="Woo" turnsIn="0" instantiationID="-1" />
+				<ForcedSG initiator="Zack" responder="Naomi" gameName="Confide In" turnsIn="1" instantiationID="29" />
+			</ForcedSGs>
+			<ToDoList>
+				<ToDoItem name="It takes 3 to tango">
+					<Condition>
+						<Rule>
+							<!-- <Predicate type="relationship" first="Zack" second="Naomi" relationship="friends" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/> -->
+							<Predicate type="network" networkType="buddy" first="Naomi" second="Zack" comparator="greaterthan" value="75" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+						<taskNaturalLanguage words="Make ###NAOMI### like ###ZACK### more."/>
+					</Condition>
+				</ToDoItem>
+			</ToDoList>
+			<Levels>
+				<Level title="LEVEL 6" timeLimit="2" cameraZoom="1" useDefinedCameraPosition="false" cameraX="800" cameraY="1400" endable="false" isTutorial="false" tutorialScript="">
+					<Description>Make Zack and Naomi friends.</Description>
+					<Setting>cornerstore</Setting>
+					<Cast>
+						<CharacterName>Zack</CharacterName>
+						<CharacterName>Monica</CharacterName>
+						<CharacterName>Naomi</CharacterName>
+					</Cast>
+					<GoalRules>
+					</GoalRules>
+				</Level>
+			</Levels>
+			<Endings>
+			</Endings>
+		</Story>
+</PromWeek>

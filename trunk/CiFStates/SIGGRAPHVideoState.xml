@@ -1,0 +1,197 @@
+<CiFState time="0">
+  <Cast>
+    <Character name="Mave" networkID="0" >
+      <Trait type="female"/>
+      <Trait type="irritable"/>
+      <Trait type="witty"/>
+      <Trait type="sympathetic"/>
+      <Trait type="loyal"/>
+      <Locution type="greeting">Greetings</Locution>
+      <Locution type="shocked">Yeeuuuchh</Locution>\
+      <Locution type="positiveadj">Good</Locution>
+      <Locution type="pejorative">Sheep</Locution>
+      <Locution type="sweetie">Sugar</Locution>
+			<Status type="envies" from="Mave" to="Karen"/>
+      <Status type="anxious" from="Mave" to=""/>
+    </Character>
+    <Character name="Edward" networkID="1" >
+	<Trait type="male"/>
+	<Trait type="shallow"/>
+	<Trait type="arrogant"/>
+	<Trait type="witty"/>
+	<Trait type="sex magnet"/>
+      <Locution type="greeting">Hey</Locution>
+      <Locution type="shocked">Uhh</Locution>\
+      <Locution type="positiveadj">Wicked</Locution>
+      <Locution type="pejorative">Tool</Locution>
+      <Locution type="sweetie">Butterface</Locution>	
+	  <Status type="angry at" from="Edward" to="Mave"/>
+    </Character>
+    <Character name="Nelson" networkID="2" >
+	  <Trait type="male"/>
+      <Trait type="sympathetic"/>
+      <Trait type="loyal"/>
+      <Trait type="clumsy"/>
+      <Trait type="emotional"/>
+      <Trait type="competitive"/>
+      <Locution type="greeting">Word</Locution>
+      <Locution type="shocked">Whoah</Locution>\
+      <Locution type="positiveadj">Awesome</Locution>
+      <Locution type="pejorative">n00b</Locution>
+      <Locution type="sweetie">Sweetie</Locution>
+    </Character>
+    <Character name="Karen" networkID="3" >
+	  <Trait type="female"/>
+      <Trait type="loving"/>
+      <Trait type="jealous"/>
+      <Trait type="smooth talker"/>
+      <Locution type="greeting">Hey there</Locution>
+      <Locution type="shocked">Holy cow</Locution>\
+      <Locution type="positiveadj">precious</Locution>
+      <Locution type="pejorative">lame-o-saur</Locution>
+      <Locution type="sweetie">googly-woogly</Locution>      
+    </Character>
+  </Cast>
+  <SFDB/>
+  <Triggers>
+    <Trigger id="0">
+      <PerformanceRealization/>
+      <ConditionRule>
+        <Rule name="Anonymous Rule" id="-1">
+          <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="false" intent="false" isSFDB="false" window="0"/>
+          <Predicate type="relationship" first="initiator" second="other" relationship="dating" negated="false" intent="false" isSFDB="false" window="0"/>
+					<Predicate type="status" status="cheater" first="initiator" second="" negated="true" intent="false" isSFDB="false" window="0"/>
+        </Rule>
+      </ConditionRule>
+      <ChangeRule>
+        <Rule name="Anonymous Rule" id="-1">
+          <Predicate type="status" status="cheater" first="initiator" second="" negated="false" intent="false" isSFDB="false" window="0"/>
+					<Predicate type="status" status="cheating on" first="initiator" second="responder" negated="false" intent="false" isSFDB="false" window="0"/>
+        </Rule>
+      </ChangeRule>
+    </Trigger>
+		<Trigger id="1">
+		  <PerformanceRealization/>
+		  <ConditionRule>
+			<Predicate type="trait" trait="afraid of commitment" first="initiator" negated="false" intent="false" isSFDB="false" window="0"/>
+			<Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="false" intent="false" isSFDB="false" window="0"/>
+		  </ConditionRule>
+		  <ChangeRule>
+			<Predicate type="status" status="anxious" first="initiator" second="responder" negated="false" intent="false" isSFDB="false" window="0"/>
+		  </ChangeRule>
+		</Trigger>
+		<Trigger id="2">
+			<PerformanceRealization>This is the default performance realization string</PerformanceRealization>
+			<ConditionRule>
+				<Predicate type="trait" trait="swinger" first="initiator" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot="first"/>
+				<Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+				<Predicate type="status" status="cheating on" first="responder" second="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+			</ConditionRule>
+			<ChangeRule>
+				<Predicate type="status" status="angry at" first="initiator" second="responder" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+				<Predicate type="status" status="heartbroken" first="initiator" second="responder" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+			</ChangeRule>
+		</Trigger>
+        <Trigger id="3">
+          <PerformanceRealization>This is the default performance realization string</PerformanceRealization>
+          <ConditionRule>
+            <Predicate type="status" status="cheating on" first="initiator" second="responder" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+            <Predicate type="trait" trait="loyal" first="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          </ConditionRule>
+          <ChangeRule>
+            <Predicate type="status" status="guilty" first="initiator" second="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          </ChangeRule>
+        </Trigger>
+        <Trigger id="4">
+          <PerformanceRealization>This is the default performance realization string</PerformanceRealization>
+          <ConditionRule>
+            <Predicate type="status" status="cheating on" first="initiator" second="responder" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+            <Predicate type="relationship" first="initiator" second="responder" relationship="dating" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          </ConditionRule>
+          <ChangeRule>
+            <Predicate type="status" status="cheating on" first="initiator" second="responder" negated="true" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+          </ChangeRule>
+      </Trigger>
+			<Trigger id="5">
+				<PerformanceRealization>This is the default performance realization string</PerformanceRealization>
+				<ConditionRule>
+					<Predicate type="relationship" first="initiator" second="other" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+					<Predicate type="status" status="cheating on" first="other" second="initiator" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+					<Predicate type="relationship" first="initiator" second="responder" relationship="friends" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+					<Predicate type="relationship" first="responder" second="other" relationship="dating" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+				</ConditionRule>
+				<ChangeRule>
+					<Predicate type="status" status="angry at" first="initiator" second="responder" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+				</ChangeRule>
+			</Trigger>	
+
+	
+  </Triggers>
+  <Network type="buddy" numChars="4">
+    <edge from="0" to="1" value="40"/>
+    <edge from="0" to="2" value="20"/>
+    <edge from="0" to="3" value="80"/>
+    <edge from="1" to="0" value="55"/>
+    <edge from="1" to="2" value="10"/>
+    <edge from="1" to="3" value="40"/>
+    <edge from="2" to="0" value="75"/>
+    <edge from="2" to="1" value="10"/>
+    <edge from="2" to="3" value="75"/>
+    <edge from="3" to="0" value="35"/>
+    <edge from="3" to="1" value="40"/>
+    <edge from="3" to="2" value="75"/>    
+  </Network>
+  <Network type="cool" numChars="4">
+    <edge from="0" to="1" value="35"/>
+    <edge from="0" to="2" value="30"/>
+    <edge from="0" to="3" value="50"/>
+    <edge from="1" to="0" value="75"/>
+    <edge from="1" to="2" value="10"/>
+    <edge from="2" to="0" value="90"/>
+    <edge from="2" to="1" value="35"/>
+    <edge from="2" to="3" value="15"/>
+    <edge from="3" to="0" value="50"/>
+    <edge from="3" to="2" value="50"/>
+  </Network>
+  <Network type="romance" numChars="4">
+    <edge from="0" to="1" value="48"/>
+    <edge from="0" to="2" value="28"/>
+    <edge from="1" to="0" value="85"/>
+    <edge from="1" to="2" value="55"/>
+    <edge from="2" to="0" value="100"/>
+    <edge from="2" to="1" value="55"/>
+    <edge from="2" to="3" value="40"/>
+    <edge from="3" to="1" value="60"/>
+    <edge from="3" to="2" value="60"/>
+  </Network>
+  <Relationships>
+    <Relationship type="dating" from="Mave" to="Edward"/>
+    <Relationship type="friends" from="Mave" to="Karen"/>
+    <Relationship type="friends" from="Nelson" to="Karen"/>
+	<Relationship type="friends" from="Edward" to="Karen"/>
+    <Relationship type="enemies" from="Edward" to="Nelson"/>
+  </Relationships>
+  <CulturalKB>
+    <Proposition type="subjective" head="Mave" connection="likes" tail="Jar Jar Binks"/>
+    <Proposition type="subjective" head="Nelson" connection="likes" tail="Jar Jar Binks"/>
+    <Proposition type="subjective" head="Karen" connection="dislike" tail="pizza"/>
+    <Proposition type="subjective" head="Edward" connection="dislike" tail="The Notebook"/>
+    <Proposition type="subjective" head="Nelson" connection="has" tail="The Notebook"/>
+    <Proposition type="subjective" head="Nelson" connection="wants" tail="pizza"/>
+    <Proposition type="subjective" head="Edward" connection="has" tail="pizza"/>
+    <Proposition type="subjective" head="Mave" connection="dislikes" tail="spiders"/>
+    <Proposition type="subjective" head="Mave" connection="wants" tail="roses"/>
+    <Proposition type="subjective" head="Edward" connection="has" tail="roses"/>
+    <Proposition type="subjective" head="Karen" connection="likes" tail="Stephen Colbert"/>
+    <Proposition type="truth" head="Jar Jar Binks" connection="are" tail="lame"/>
+    <Proposition type="truth" head="math" connection="are" tail="lame"/>
+    <Proposition type="truth" head="pizza" connection="are" tail="cool"/>
+    <Proposition type="truth" head="Teenage Mutant Ninja Turtles" connection="are" tail="cool"/>
+    <Proposition type="truth" head="school lunch" connection="are" tail="gross"/>
+    <Proposition type="truth" head="wedgies" connection="are" tail="mean"/>
+    <Proposition type="truth" head="Stephen Colbert" connection="are" tail="funny"/>
+    <Proposition type="truth" head="spider" connection="are" tail="bad ass"/>
+    <Proposition type="truth" head="roses" connection="are" tail="romantic"/>
+    <Proposition type="truth" head="The Notebook" connection="are" tail="romantic"/>
+  </CulturalKB>
+</CiFState>

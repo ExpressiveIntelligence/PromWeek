@@ -1,0 +1,117 @@
+<!-- 0=Doug, 1=Jordan, 2=Buzz, 3=Naomi, 4=Lil, 5=Nicholas, 6=Zack, 7=Chloe, 8=Simon, 9=Monica, 10=oswald, 11=Lucas, 12=Edward, 13=Mave, 14=Gunter, 15=Cassandra, 16=Phoebe  17=Kate --> 
+<CiFState time="0">
+  <Cast>
+	<Character name="Trip" networkID="0" >
+      <Trait type="male"/>
+      <Trait type="afraid of commitment"/>
+      <Trait type="shallow"/>
+      <Trait type="arrogant"/>
+      <Trait type="defensive"/>	  
+	  
+      <Locution type="greeting">Hey</Locution>
+      <Locution type="shocked">Oh, how European</Locution>
+	  <Locution type="positiveadj">really, uh... pretty great</Locution>
+      <Locution type="pejorative">jerk</Locution>
+
+      <Locution type="sweetie">honey</Locution>
+	  <Locution type="buddymale">buddy</Locution>
+	  <Locution type="buddyfemale">buddy</Locution>	  
+    </Character>
+	
+	<Character name="Grace" networkID="1" >
+      <Trait type="female"/>
+      <Trait type="deep"/>
+      <Trait type="self destructive"/>
+	  <Trait type="hothead"/>
+	  <Trait type="insecure"/>
+	  
+      <Locution type="greeting">Oh, hello</Locution>
+      <Locution type="shocked">*nervous coughing*</Locution>
+	  <Locution type="positiveadj">really great</Locution>
+      <Locution type="pejorative">child</Locution>
+
+      <Locution type="sweetie">dear</Locution>
+	  <Locution type="buddymale">sweetheart</Locution>
+	  <Locution type="buddyfemale">sweetheart</Locution>	  
+    </Character>
+	
+    <Character name="Nicholas" networkID="2" >	
+	  <Trait type="male"/>
+	  <Trait type="arrogant"/>
+	  <Trait type="swinger"/>
+	  <Trait type="vengeful"/>
+	  <Trait type="witty"/>
+	  <Trait type="cares about fashion"/>
+	   <Trait type="nicholas"/>
+	   <Trait type="anyone"/>
+	  
+	  <Locution type="greeting">greetings</Locution>
+	  <Locution type="shocked">my oh my</Locution>
+	  <Locution type="positiveadj">lovely</Locution>
+	  <Locution type="pejorative">simpering moron</Locution>
+	  <Locution type="sweetie">snookie-wookums</Locution>
+	  <Locution type="buddymale">my man</Locution>
+	  <Locution type="buddyfemale">dahhrling</Locution>
+	  
+    </Character>	
+  </Cast>
+  
+  
+  
+  
+  
+  <SFDB>
+	<BackstoryContext time="-250" initiator="Trip" responder="Grace" other="" SFDBLabel="lame" PerformanceRealizationString="%i% took %r% on that vacation to Italy" />
+	<BackstoryContext time="-251" initiator="Grace" responder="Trip" other="" SFDBLabel="cool" PerformanceRealizationString="%i% redecorated the apartment" />
+	 
+	
+	  
+  </SFDB>	  
+
+		
+  
+  <Network type="buddy" numChars="3">
+	<edge from="0" to="1" value="50"/>
+	<edge from="1" to="0" value="20"/>
+  </Network>
+  <Network type="romance" numChars="3">
+	<edge from="0" to="1" value="50"/>
+	<edge from="1" to="0" value="30"/>
+  </Network>
+  <Network type="cool" numChars="3">
+	<edge from="0" to="1" value="40"/>
+	<edge from="1" to="0" value="10"/>
+  </Network>
+  <Relationships>	 
+	<!-- FACADE-->
+	<Relationship type="dating" from="Trip" to="Grace"/> 
+	<Relationship type="friends" from="Trip" to="Grace"/> 
+
+	
+  </Relationships>
+  <CulturalKB>
+	  <!-- CKB SHOULD BE SINGULAR, NOT IRREGULARLY PLURAL, AND NOT START WITH A VOWEL. You must be able to have a X, want a X, hold a X behind your back, be into Xs before they were cool, ask someone to give you their X, show someone your awesome X collection. -->
+
+	
+	<!-- FACADE-->
+	<Proposition type="truth" head="martini" connection="are" tail="cool"/>
+	<Proposition type="truth" head="magic eight-ball" connection="are" tail="funny"/>
+	<Proposition type="truth" head="Italy picture" connection="are" tail="lame"/>
+	<Proposition type="truth" head="brass bull" connection="are" tail="taboo"/>
+	<Proposition type="truth" head="experimental interactive drama" connection="are" tail="bad ass"/>
+	
+	<Proposition type="subjective" head="Trip" connection="likes" tail="martini"/>
+	<Proposition type="subjective" head="Trip" connection="has" tail="martini"/>
+	<Proposition type="subjective" head="Trip" connection="has" tail="magic eight-ball"/>
+	<Proposition type="subjective" head="Grace" connection="dislikes" tail="martini"/>
+	<Proposition type="subjective" head="Grace" connection="dislikes" tail="magic eight-ball"/>
+	<Proposition type="subjective" head="Trip" connection="has" tail="Italy picture"/>
+	<Proposition type="subjective" head="Grace" connection="dislikes" tail="Italy picture"/>
+	<Proposition type="subjective" head="Trip" connection="has" tail="brass bull"/>
+	<Proposition type="subjective" head="Grace" connection="dislikes" tail="brass bull"/>
+	<Proposition type="subjective" head="Trip" connection="likes" tail="experimental interactive drama"/>
+	<Proposition type="subjective" head="Grace" connection="likes" tail="experimental interactive drama"/>
+	
+	
+  </CulturalKB>
+</CiFState>

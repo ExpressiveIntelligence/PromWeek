@@ -1,0 +1,184 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+				xmlns:s="library://ns.adobe.com/flex/spark"
+				xmlns:mx="library://ns.adobe.com/flex/mx"
+				creationComplete="onCreationComplete()"
+				initialize="initializeLibraryMerger()"
+				width="100%"
+				height="100%">
+				
+	<fx:Declarations>
+		<fx:XML id="sourceLibrary" source="../../CiFStates/mergeTest/libraries (master) Zane_YouWin TOC FIXES.xml" />
+		<fx:XML id="destinationLibrary" source="../../CiFStates/libraries (master).xml" />
+		<fx:String id="gameName">You Win</fx:String>
+	</fx:Declarations>
+	
+	
+	<fx:Script>
+		<![CDATA[
+		import CiF.*;
+		import flash.filesystem.File;
+		import flash.filesystem.FileStream;
+		import flash.events.*;
+		import mx.controls.Alert;
+		
+		private var cif:CiFSingleton;
+		//private var socialGamesLib:SocialGamesLib;
+		public var workingFile:File;
+		
+		
+		public function onCreationComplete():void {
+			Debug.debug(this, "Library Merger on creation complete!");
+		}
+		
+		public function initializeLibraryMerger():void 
+		{
+			this.cif = CiFSingleton.getInstance();
+			cif.shouldTriggerGamesBeIncludedInSocialGames = true; // We DO want Trigger and StoryTrigger social games to count and be included!
+			
+			
+			this.cif.parseCiFState(destinationLibrary);
+			var cifComponents:XMLList = sourceLibrary.children();
+			var newSocialGame:SocialGame;
+			for each (var component:XML in cifComponents) 
+			{
+				if (component.name() == "SocialGameLibrary") {
+					//this.socialGamesLib = SocialGamesLib.getInstance();
+					//this.socialGamesLib.games = new Vector.<SocialGame>();
+					
+					//ParseXML.addGameToLibrary(component); // This function is oddly named... it actually adds ALL games to library.
+
+					var sg:SocialGame;
+					var i:int;
+					
+					var sgIterator:SocialGame
+					
+					for each (var sgXML:XML in component..SocialGame) 
+					{
+						sg = ParseXML.parseSocialGame(sgXML);
+						
+						if (sg.name == this.gameName)
+						{
+							for (i = 0; i < cif.socialGamesLib.games.length; i++ )
+							{
+								sgIterator = cif.socialGamesLib.games[i];
+								if (sgIterator.name == this.gameName)
+								{
+									cif.socialGamesLib.games[i] = sg;
+								}
+							}
+						}
+					}
+					
+				}
+			}
+
+			this.workingFile = new File();
+			
+			/*
+			try {
+				//this.workingFile.browseForSave("Save CiF State", [txtFilter]);
+				this.workingFile.browseForSave("Save CiF State");
+				this.workingFile.addEventListener(Event.SELECT, onBrowseForSaveStateSelect);
+			}catch(error:Error) {
+				Debug.debug(this, "Failed to open CiF state file for saving: " + error.message);
+			}
+			*/
+			try {
+				//this.workingFile.browseForSave("Save CiF State", [txtFilter]);
+				this.workingFile.browseForSave("Save CiF State");
+				this.workingFile.addEventListener(Event.SELECT, onBrowseForSaveLibrariesSelect);
+			}catch(error:Error) {
+				Debug.debug(this, "Failed to open CiF library file for saving: " + error.message);
+			}
+		
+			
+		}
+		
+		
+		
+		
+/**
+		 * The callback for the File.browseForOpen dialog functionality. The
+		 * chosen file path is will be filled with the XML of CiF's current
+		 * libraries.
+		 * @param	event	The incoming event.
+		 */
+		public function onBrowseForSaveLibrariesSelect(event:Event):void {
+			this.workingFile = event.target as File;
+			
+			var stream:FileStream = new FileStream();
+			var outXML:XML;
+			var confirmAlert:Alert = new Alert();
+			if (this.workingFile.type == null) { // make unspecified type .xml
+				var xmlFile:File = new File(this.workingFile.nativePath + ".xml");
+								
+				//if the user wishes to overwrite the file, they are warned in the save dialog
+				//if (!this.workingFile.exists) {
+					stream.open(xmlFile, FileMode.WRITE);
+					outXML = new XML(this.cif.librariesToXMLString());
+					stream.writeUTFBytes(outXML); 	
+					//stream.writeUTFBytes(this.cif.toXMLString());
+					stream.close();
+			}
+			else if(this.workingFile.type.toLocaleLowerCase() == ".xml"){			
+				//if the user wishes to overwrite the file, they are warned in the save dialog
+				//if (!this.workingFile.exists) {
+					stream.open(this.workingFile, FileMode.WRITE);
+					outXML = new XML(this.cif.librariesToXMLString());
+					stream.writeUTFBytes(outXML); 	
+					//stream.writeUTFBytes(this.cif.toXMLString());
+					stream.close();
+				/*}else {
+					Alert.yesLabel = "Yes";
+					Alert.noLabel = "No";
+					Alert.show("Do you wish to overwrite the CiF state file " + this.workingFile.name + "?", "Overwrite CiF State File?", 3, this, confirmOverwriteClickHandler);
+				}*/
+			}
+			else { // some extension that isn't xml!  This is a problem!  Shouldn't be around!
+			Debug.debug(this, "ERROR! UNRECOGNIZED FILE EXTENSION! .XML IS ONLY ACCEPTABLE FILE TYPE");
+			}
+		}
+		
+		/*
+		public function onBrowseForSaveStateSelect(event:Event):void 
+		{
+			this.workingFile = event.target as File;
+			
+			var stream:FileStream = new FileStream();
+			var outXML:XML;
+			var confirmAlert:Alert = new Alert();
+			if (this.workingFile.type == null) { // make unspecified type .xml
+				var xmlFile:File = new File(this.workingFile.nativePath + ".xml");
+								
+				//if the user wishes to overwrite the file, they are warned in the save dialog
+				//if (!this.workingFile.exists) {
+					stream.open(xmlFile, FileMode.WRITE);
+					outXML = new XML(this.cif.stateToXMLString());
+					stream.writeUTFBytes(outXML); 	
+					//stream.writeUTFBytes(this.cif.toXMLString());
+					stream.close();
+			}
+			else if(this.workingFile.type.toLocaleLowerCase() == ".xml"){			
+				//if the user wishes to overwrite the file, they are warned in the save dialog
+				//if (!this.workingFile.exists) {
+					stream.open(this.workingFile, FileMode.WRITE);
+					outXML = new XML(this.cif.stateToXMLString());
+					stream.writeUTFBytes(outXML); 	
+					//stream.writeUTFBytes(this.cif.toXMLString());
+					stream.close();
+				//}else {
+				//	Alert.yesLabel = "Yes";
+				//	Alert.noLabel = "No";
+				//	Alert.show("Do you wish to overwrite the CiF state file " + this.workingFile.name + "?", "Overwrite CiF State File?", 3, this, confirmOverwriteClickHandler);
+				//}
+			}
+			else { // some extension that isn't xml!  This is a problem!  Shouldn't be around!
+			Debug.debug(this, "ERROR! UNRECOGNIZED FILE EXTENSION! .XML IS ONLY ACCEPTABLE FILE TYPE");
+			}
+		}
+		*/
+		
+		]]>
+	</fx:Script>
+</s:Application>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 initialize="initializeLevelObjectiveScreen()"
+		 click="onClickHandler(event)"
+		 width="100%"
+		 height="100%"
+		 styleName="classicPromWeek">
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+		 </fx:Declarations>
+		 
+		 <s:Rect id="backgroundRect" width="100%" height="100%">
+			<s:fill>
+				<s:SolidColor color="{getStyle('backgroundColor')}" alpha="1.0" />
+			</s:fill>
+		</s:Rect>
+		<s:HGroup width="100%" x="10" y="90" ><s:RichText id="levelTitle" text="" width="100%" fontSize="38" textAlign="center" color="{getStyle('textColor')}" /></s:HGroup>
+		<s:HGroup width="100%" x="0" y="170" paddingLeft="50" paddingRight="50">
+			<s:RichText id="levelObjective" text="" width="100%" fontSize="24" textAlign="center" color="{getStyle('textColor')}" />
+		</s:HGroup>
+		<s:RichText id="clickToBegin" text="" width="100%" x="200" y="500" fontSize="42" color="{getStyle('textColor')}" />
+		 <fx:Script>
+			 <![CDATA[
+			
+		import CiF.CiFSingleton;
+		import flash.geom.Rectangle;
+		import flash.text.TextField;
+		import flash.text.TextFormat;
+		import mx.controls.Button;
+		import spark.components.Group;
+		import spark.components.Button;
+		import mx.graphics.SolidColor;
+		import mx.graphics.SolidColorStroke;
+		import spark.components.RichText;
+		import spark.primitives.*;
+		import flash.text.TextField;
+		import spark.components.Label;
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import flash.events.*;
+		import spark.filters.*;
+		import CiF.*;
+		import flashx.textLayout.formats.TextAlign;
+		
+		public var gameEngine:GameEngine;
+		
+		public function initializeLevelObjectiveScreen():void {		
+				
+			gameEngine = GameEngine.getInstance();
+		}
+		
+		public function setLevelObjectiveText(title:String,objective:String):void {
+			levelObjective.text = objective;
+			levelTitle.text = title;
+		}
+		
+		// we want a gentle fade if we click in the level objective state.  
+		//OTHERWISE this screen is here because we clicked on the level timer
+		//and what is being presented to us is just a reminder of what we have
+		//to do for this level.
+		public function onClickHandler(event:Event = null):void {
+			return;
+			if (gameEngine.currentState != "LevelObjective") {
+				this.visible = false; 
+				//Debug.debug(this, "Why am I not becoming invisible?");
+			}
+			else {
+				
+				Debug.debug(this, "I don't think you should see me! This is what the current state is: " + gameEngine.currentState);
+			}
+		}
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			/*if(gameEngine.classicPromColors) {
+				this.setStyle("styleName", "classicPromWeek");
+			}
+			else if(gameEngine.greenPromColors) {
+				this.setStyle("styleName", "greenColor");
+			}
+			else if(gameEngine.redPromColors) {
+				this.setStyle("styleName", "redColor");
+			}*/
+			this.invalidateProperties();
+		}
+			 
+			 ]]>
+		 </fx:Script>
+		 
+	
+</s:Group>

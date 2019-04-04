@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 width="205" height="107" >
+		 <!--width="235" height="107" >-->
+		 
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+			 <fx:Number id="iconDim">20</fx:Number>
+		 </fx:Declarations>
+		 
+		 <util:SmoothImage id="thoughtBubbleImageStem" x="-35" y="0" width="75" height="45" visible="false" />
+		 <!--<util:SmoothImage id="thoughtBubbleImage" width="235" height="107"/>-->
+		 <util:SmoothImage id="thoughtBubbleImage" width="205" height="107"/>
+		 
+		 <s:VGroup x="50" y="5" width="100%" height="100%" paddingLeft="15" paddingRight="15" paddingTop="15" paddingBottom="20">
+			<s:HGroup width="100%" height="33%">
+				<util:SmoothImage id="friendsIcon" width="{this.iconDim}" height="{this.iconDim}"/>
+				<s:RichText id="buddyText" width="100%" height="100%" textAlign="left" verticalAlign="middle" color="0x4ED13C" styleName="subjectiveOpinionWords" />
+			</s:HGroup>
+			<s:HGroup width="100%" height="33%">
+				<util:SmoothImage id="datingIcon" width="{this.iconDim}" height="{this.iconDim}"/>
+				<s:RichText id="romText" width="100%" height="100%" textAlign="left" verticalAlign="middle" color="0xC41E1E" styleName="subjectiveOpinionWords" />
+			</s:HGroup>
+			<s:HGroup width="100%" height="33%">
+				<util:SmoothImage id="enemiesIcon" width="{this.iconDim}" height="{this.iconDim}"/>
+				<s:RichText id="coolText" width="100%" height="100%" textAlign="left" verticalAlign="middle" color="0x3F41E7" styleName="subjectiveOpinionWords" />
+			</s:HGroup>
+		 </s:VGroup>
+		 
+		 <!--<s:VGroup id="directedStatusGroup" x="195" y="30">
+		 </s:VGroup>-->
+		 
+		 <util:SmoothImage id="objectOfThoughtImage" width="50" height="50" visible="false" x="10" y="30" />
+		 
+	<fx:Script>
+		<![CDATA[
+		import CiF.Character;
+		import CiF.CiFSingleton;
+		import CiF.LineOfDialogue;
+		import CiF.RelationshipNetwork;
+		import CiF.Status;
+		import com.util.SmoothImage;
+		import flash.events.Event;
+		import flash.events.MouseEvent;
+		import flash.geom.Point;
+		import flash.ui.Mouse;
+		import flash.utils.Dictionary;
+		import mx.effects.Glow;
+		import PromWeek.assets.ResourceLibrary;
+		import CiF.Debug;
+		import flash.filters.GlowFilter;
+		
+		
+		public var rL:ResourceLibrary;
+		public var cif:CiFSingleton;
+		private var subjectiveOpinionManager:NEW_subjectiveOpinionManager;
+		
+		public var currentPrimaryCharacter:Character;
+		public var currentSecondaryCharacter:Character;
+		
+		private var _objectOfThought:String;
+		private var gameEngine:GameEngine;
+		
+		
+		
+		public function onCreationComplete():void 
+		{
+			rL = ResourceLibrary.getInstance();
+			cif = CiFSingleton.getInstance();
+			subjectiveOpinionManager = NEW_subjectiveOpinionManager.getInstance();
+			
+			gameEngine = PromWeek.GameEngine.getInstance();
+			
+			thoughtBubbleImage.source = rL.uiIcons["thoughtBubble"];
+			thoughtBubbleImageStem.source = rL.uiIcons["responderBigThoughtBubbleStem"];
+		}
+		
+		public function get objectOfThought():String
+		{
+			return this._objectOfThought;
+		}
+		public function set objectOfThought(str:String):void
+		{
+			this._objectOfThought = str;
+			
+			if (this._objectOfThought == "")
+			{
+				this.objectOfThoughtImage.visible = false;
+			}
+			else
+			{
+				this.objectOfThoughtImage.source = rL.charHeads[this._objectOfThought];
+				this.objectOfThoughtImage.visible = true;
+				this.thoughtBubbleImageStem.visible = true;
+			}
+		}
+		
+		public function updateSubjectiveThoughtBubble(thinker:String,objectOfThought:String):void
+		{
+			
+			this.currentPrimaryCharacter = cif.cast.getCharByName(thinker);
+			this.currentSecondaryCharacter = cif.cast.getCharByName(objectOfThought);
+			
+			
+
+			var hasRelationship:Boolean;
+			var names:String = currentPrimaryCharacter.characterName + " and " + currentSecondaryCharacter.characterName;
+			//friends
+			hasRelationship = cif.relationshipNetwork.getRelationship(RelationshipNetwork.FRIENDS, currentPrimaryCharacter, currentSecondaryCharacter);
+			if (hasRelationship)
+			{
+				friendsIcon.source = rL.relationshipIcons["friends"];
+				friendsIcon.toolTip = names + " are friends";
+			}
+			else
+			{
+				friendsIcon.source = rL.relationshipIcons["notFriends"];
+				friendsIcon.toolTip = names + " are not friends";
+			}
+			
+			//dating
+			hasRelationship = cif.relationshipNetwork.getRelationship(RelationshipNetwork.DATING, currentPrimaryCharacter, currentSecondaryCharacter);
+			if (hasRelationship)
+			{
+				datingIcon.source = rL.relationshipIcons["dating"];
+				datingIcon.toolTip = names + " are dating";
+			}
+			else
+			{
+				datingIcon.source = rL.relationshipIcons["notDating"];
+				datingIcon.toolTip = names + " are not dating";
+			}
+			
+			//enemies
+			hasRelationship = cif.relationshipNetwork.getRelationship(RelationshipNetwork.ENEMIES, currentPrimaryCharacter, currentSecondaryCharacter);
+			if (hasRelationship)
+			{
+				enemiesIcon.source = rL.relationshipIcons["enemies"];
+				enemiesIcon.toolTip = names + " are enemies";
+			}
+			else
+			{
+				enemiesIcon.source = rL.relationshipIcons["notEnemies"];
+				enemiesIcon.toolTip = names + " are not enemies";
+			}
+			
+			
+			this.setBuddyText();//"My best pal!";
+			this.setRomanceText();//"Ohhh la laa";
+			this.setCoolText();//"Dorkity Dork";
+			
+			//this.updateDirectedStatuses();
+
+		}
+
+		
+		/*
+		public function updateDirectedStatuses():void
+		{
+			this.directedStatusGroup.removeAllElements();
+			
+			
+			
+			var status:Status;
+			var statusIcon:StatusIcon;
+			
+			var shouldDisplayStatus:Boolean;
+			for each (status in this.currentPrimaryCharacter.statuses)
+			{
+				shouldDisplayStatus = false;
+
+				if (status.type >= Status.FIRST_DIRECTED_STATUS && status.type < Status.STATUS_COUNT)
+				{
+					if (status.directedToward.toLowerCase() == this.currentSecondaryCharacter.characterName.toLowerCase())
+					{
+						shouldDisplayStatus = true;
+					}
+				}
+				
+				if (shouldDisplayStatus)
+				{
+					statusIcon = new PromWeek.StatusIcon();
+					statusIcon.width = 25;
+					statusIcon.height = 25;
+					statusIcon.loadStatusImagesToIcon(status.type, status.directedToward, status.remainingDuration);
+					this.directedStatusGroup.addElement(statusIcon);
+				}
+				
+			}
+		}
+		*/
+		
+		public function updatePosition(elapsedTime:Number = 0):void
+		{
+			if (currentPrimaryCharacter == null) return;
+			
+			var offsetX:Number = 72;
+			var offsetY:Number = -170;
+			
+			var charX:Number = (gameEngine.worldGroup.avatars[currentPrimaryCharacter.characterName.toLowerCase()] as Avatar).locX;
+			var charY:Number = (gameEngine.worldGroup.avatars[currentPrimaryCharacter.characterName.toLowerCase()] as Avatar).locY;
+			
+			// fancy local to global trickery
+			//var newPt:Point = gameEngine.worldGroup.avatars[currentPrimaryCharacter.characterName.toLowerCase()].localToGlobal(new Point(charX + offsetX, charY + offsetY))
+			var newPt:Point = new Point(charX + offsetX, charY + offsetY);
+			var finalPoint:Point = Utility.translatePoint(newPt, gameEngine.worldGroup, gameEngine.hudGroup);
+			//this.scaleX = gameEngine.camera.zoom
+			//this.scaleY = gameEngine.camera.zoom
+
+			//newPt = this.trapPointOnScreen(newPt);
+			
+			this.left = finalPoint.x
+			this.top = finalPoint.y
+		}
+		
+		public function trapPointOnScreen(pt:Point):Point
+		{
+			if (pt.y < 50)
+			{	
+				pt.y = 50;
+			}
+			
+			if (pt.y + this.height > gameEngine.APPLICATION_HEIGHT)
+			{
+				pt.y = gameEngine.APPLICATION_HEIGHT - this.height;
+			}
+			if (pt.x < 0)
+			{
+				pt.x = 0;
+			}
+			if (pt.x + this.width > gameEngine.APPLICATION_WIDTH)
+			{
+				pt.x = gameEngine.APPLICATION_WIDTH - this.width;
+			}
+			
+			return pt;
+		}
+		
+		public function setBuddyText():void
+		{
+			var buddyDictionary:Dictionary = subjectiveOpinionManager.getBuddyText(currentPrimaryCharacter,currentSecondaryCharacter);
+			
+			this.buddyText.text = buddyDictionary["text"];
+		}
+		public function setRomanceText():void
+		{
+			var romanceDictionary:Dictionary = subjectiveOpinionManager.getRomanceText(currentPrimaryCharacter,currentSecondaryCharacter);
+			
+			this.romText.text = romanceDictionary["text"];
+		}
+		public function setCoolText():void
+		{
+			var coolDictionary:Dictionary = subjectiveOpinionManager.getCoolText(currentPrimaryCharacter,currentSecondaryCharacter);
+			
+			this.coolText.text = coolDictionary["text"];
+		}
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

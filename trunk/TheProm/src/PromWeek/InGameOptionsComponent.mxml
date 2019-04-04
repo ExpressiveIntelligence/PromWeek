@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 initialize="onInitialize()"
+		 width="100%"
+		 height="100%"
+		 styleName="classicPromWeek">
+	
+	<fx:Metadata>
+	</fx:Metadata>
+		
+	<fx:Declarations>
+		<fx:Boolean id="isSkipLevelPopUp">false</fx:Boolean>
+		<fx:Boolean id="isEndingLevel">false</fx:Boolean>
+		<fx:Boolean id="isContinue">false</fx:Boolean>
+		<fx:Boolean id="isResetState">false</fx:Boolean>
+		<fx:Boolean id="isQuickPlayFailed">false</fx:Boolean>
+		<fx:String id="storyLeadCharacter"></fx:String>
+	</fx:Declarations>
+	
+	<s:Rect id="Background" left="0" width="100%" height="100%" radiusX="6" radiusY="6">
+		<s:stroke>
+			<s:SolidColorStroke weight="{getStyle('backgroundStrokeWeight')}" color="{getStyle('backgroundStroke')}" caps="none" />
+		</s:stroke>
+		<s:fill>
+			<s:SolidColor color="{getStyle('backgroundColor')}" alpha="1.0" />
+		</s:fill>
+	</s:Rect>
+
+	<s:VGroup width="100%" height="100%" paddingBottom="15" paddingTop="15" paddingLeft="15" paddingRight="15">
+		<s:RichText id="msgText" text="Do you want to return to the main menu? NOTE: Your progress will be saved." fontWeight="bold" fontSize="14" color="{getStyle('textColor')}" verticalAlign="middle" width="100%" height="70%" styleName="basicFontStyle" textAlign="center" />
+		<s:HGroup width="100%" height="30%" paddingLeft="20" paddingRight="20">
+			<prom:PromWeekButton id="noButton" click="noClicked(event)" width="50%" label="No" />
+			<prom:PromWeekButton id="yesButton" click="yesClicked(event)" width="50%" label="Yes" />
+		</s:HGroup>
+<!--		<s:Group id="removeIconGroup" right="70" width="15" height="15" click="closeWindow(event)" toolTip="Close Window">
+			<s:Rect width="{removeIconGroup.width}" height="{removeIconGroup.height}">
+				<s:stroke>
+					<s:SolidColorStroke color="black" alpha="1.0" />
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor color="white" alpha="0.8" />
+				</s:fill>
+			</s:Rect>
+			<s:Line id="line1" xFrom="0" yFrom="0" xTo="{removeIconGroup.width}" yTo="{removeIconGroup.height}" >
+				<s:stroke>
+					<s:SolidColorStroke color="black" alpha="1.0" weight="2" />
+				</s:stroke>
+			</s:Line>
+			<s:Line id="line2" xFrom="0" yFrom="{removeIconGroup.height}" xTo="{removeIconGroup.width}" yTo="0" >
+				<s:stroke>
+					<s:SolidColorStroke color="black" weight="2"/>
+				</s:stroke>
+			</s:Line>		
+		</s:Group>-->
+	</s:VGroup>
+	
+	<fx:Script>
+		<![CDATA[
+		import CiF.CiFSingleton;
+		import CiF.Debug;
+		import CiF.Predicate;
+		import flash.events.KeyboardEvent;
+		import flash.events.Event;
+		import flash.events.MouseEvent;
+		import PromWeek.assets.ResourceLibrary;
+		
+		public var statisticsManager:StatisticsManager;
+		private var gameEngine:PromWeek.GameEngine;
+		private var cif:CiFSingleton;
+		
+		public function onInitialize():void {
+			statisticsManager = StatisticsManager.getInstance();
+			this.gameEngine = GameEngine.getInstance();
+			
+			this.cif = CiFSingleton.getInstance();
+			
+			if (this.isSkipLevelPopUp)
+			{
+				msgText.text = "Do you want to end this level and go to the next day?"
+			}
+		
+			//this.title.text = "Options";
+			//button.label = "Return to Main Menu";
+			
+		}
+		
+		public function updateUponNewStory():void
+		{
+			if (this.isEndingLevel)
+			{
+				msgText.text = "Do you want to go to the end of the night and see the ending you've created for " + this.storyLeadCharacter + "?";
+			}
+		}
+		
+		public function populateForExitStory():void
+		{
+			this.isSkipLevelPopUp = false;
+			this.isEndingLevel = false;
+			this.isContinue = false;
+			this.isResetState = false;
+			this.isQuickPlayFailed = false;
+
+			msgText.text = "Do you want to return to the main menu? NOTE: Your progress will be saved.";
+		}
+		
+		public function noClicked(e:Event):void {
+			//gameEngine.hudGroup.megaUI.optionsMenuButton.selected = true;
+			this.visible = false;
+			if (this.isResetState) {
+				this.isResetState = false; // just trying to clean up after myself, a little...
+				msgText.text = "Do you want to return to the main menu? NOTE: Your progress will be saved.";
+			}
+			else if (this.isQuickPlayFailed) {
+				this.isQuickPlayFailed = false;
+				enableGameplayClicks();
+				this.yesClicked(e); // kind of a work around, but this should result in the same behavior as if you returned to the main menu via the wrench icon.
+			}
+		}
+		
+		public function populateForContinue(story:Story, levelName:String):void
+		{
+			msgText.text = "Do you want to continue " + story.storyLeadCharacter + "'s story from \"" + levelName + "\"?";
+		}
+		
+		public function populateForResetGameState():void {
+			msgText.text = "Are you sure you want to start this challenge over?";
+		}
+		
+		public function populateForQuickPlayChallengeFailed():void {
+			msgText.text = "Whoops!\nThat wasn't quite right... Try again?";
+			
+		}
+		
+		/**
+		 * Very similar to the function 'sawEnding' inside of game engine!
+		 * @param	e
+		 */
+		public function yesClicked(e:Event):void {
+			//Utility.log(this, "yesClicked() entered.");
+			this.visible = false;
+			
+			if (this.isSkipLevelPopUp)
+			{
+				//Utility.log(this, "yesClicked() this.isSkipLevelPopUp is true. Inside it's conditional.");
+				//end the level.
+				//gameEngine.dealWithEndingLevelStuff();
+				gameEngine.currentState = "EndOfLevelResult";
+				//gameEngine.onClickInEndOfLevelResultState();
+
+			}
+			else if (this.isResetState) {
+				resetStateYesClicked();
+			}
+			else if (this.isQuickPlayFailed) {
+				enableGameplayClicks();
+				resetStateYesClicked(); // I believe that, morally, they both have the exact same function.
+				isQuickPlayFailed = false; // we just have to make sure we turn this off as well.
+				
+			}
+			else if (this.isEndingLevel)
+			{
+				//Utility.log(this, "yesClicked() this.isEndingLevel.");
+				this.gameEngine.hudGroup.skipToEndOfNight();
+			}
+			else if (this.isContinue)
+			{
+				this.continueStoryYesClicked();
+			}
+			else
+			{
+				//this is for the exit case
+				//Utility.log(this, "yesClicked() return to main menu branch.");
+				//return to main menu
+				if(gameEngine.currentLevel.isSandbox){
+					gameEngine.dealWithEndingLevelStuff("freeplay");
+				}else{
+					gameEngine.dealWithEndingLevelStuff("exit");
+				}
+					
+				
+				//This might not be where we want this to go BUT...
+				//Now that inidividual stories can have their own starting states
+				//when we actually EXIT, I *think* what we are going to do is set the 
+				//initial state to the 'default state' -- that way you can do things that have
+				//crazy starting states, but then when you navigate around in the main menu 
+				//screen UI (and specifically, the Freeplay UI), it will be consistent...
+				//Is the hope, at least!
+				gameEngine.intitialState = gameEngine.defaultState;
+				
+				gameEngine.sawEnding(e);
+				
+				gameEngine.hudGroup.storySelectionScreen.selectedStory = null;
+				
+				enableGameplayClicks(); // I think we need to do this here,too, just in case we exit via the wrench.
+			}
+			
+			//1.) Revert the social state back to the start state
+			/*
+			gameEngine.resetGameState();
+			
+			//Any characters that were in the middle of fading back into existence--make them come back completely into existence!
+			for each(var a:Avatar in gameEngine.worldGroup.avatars) {
+				a.clip.alpha = 1;
+			}
+			
+			//2) Clean up the UI elements that might be left lingering.
+			gameEngine.hudGroup.endingButtons = new Vector.<PromWeekButton>();
+			gameEngine.tutorialPopup.visible = false;
+			gameEngine.hudGroup.megaUI.visible = false;
+			gameEngine.hudGroup.levelClock.visible = false;
+			//gameEngine.hudGroup.topBar.visible = false;
+			gameEngine.hudGroup.juiceBar.visible = false;
+			gameEngine.hudGroup.endingWindow.visible = false;
+			gameEngine.hudGroup.endingWindow.allTheEndings.removeAllElements();
+			gameEngine.hudGroup.endingWindow.endingsCount = 0;
+			gameEngine.hudGroup.endingWindow.atleastOneEnding = false;
+			gameEngine.hudGroup.endingWindow.setDynamicHeight();
+			gameEngine.endingToPerform = null;
+			for (var i:int = 0; i < hudGroup.autonomousActionGroup.numElements; i++){
+				gameEngine.hudGroup.autonomousActionGroup.getElementAt(i).visible = false;
+			}
+			*/
+		}
+		
+		
+		public function continueStoryYesClicked(e:MouseEvent = null):void
+		{
+			gameEngine.hudGroup.mainMenuScreen.visible = false;
+			gameEngine.hudGroup.mainMenuScreen.continuePopUp.visible = false;
+
+			//did we get a real level trace? We know it's good because the button was enabled and clicked.
+			
+			
+			//to test story continuation wihtout being hosted on the web
+			//gameEngine.continueLevelTraceXML = gameEngine.testContinueLevelTraceXML;
+			
+			//create the state
+			gameEngine.resetGameState();
+			
+			//flag this story as continued
+			gameEngine.isCurrentContinued = true;
+			
+			//start a story and level corresponding to the continue trace
+			for each (var s:Story in gameEngine.stories) {
+				if (s.storyLeadCharacter == gameEngine.continueLevelTraceXML.@storyName) {
+					gameEngine.hudGroup.storySelectionScreen.selectedStory = s;
+				}
+			}
+			
+			//create the continue state
+			//parse XML into SFDB
+			Utility.log(this, "the level trace XML: " + gameEngine.continueLevelTraceXML);
+						
+			//Utility.log(this, "continueButtonClicked() SFDB after initialState loaded: " + cif.sfdb.toXMLString());
+			
+			//append the incoming level trace's SFDB contexts.
+			cif.parseCiFState(gameEngine.continueLevelTraceXML);
+			//cif.parseCiFState(gameEngine.testContinueLevelTraceXML);
+			
+			//Utility.log(this, "continueButtonClicked() SFDB after continue trace appended: " + cif.sfdb.toXMLString());
+			
+			//valuate history
+			cif.valuateHistory();
+			//deal with juice
+			JuicePointManager.getInstance().setJuicePoints(gameEngine.continueLevelTraceXML.@juice);
+			
+			//time is set in storySelectionScreen.startStory()
+			
+			gameEngine.hudGroup.storySelectionScreen.startStory(null, gameEngine.continueLevelTraceXML.@name);
+		}
+		
+		
+		/**
+		 * There are a couple of ways to get here (if the user actually chooses to reset the state, OR if they 
+		 * lost the challenge, and then choose to start over again from the beginning), so let's move it into
+		 * it's own function that we can then call from other places.
+		 */
+		public function resetStateYesClicked():void {
+			this.visible = false;
+			gameEngine.levelTimeRemaining = gameEngine.currentLevel.timeLimit; // reset the time limit
+			cif.resetLastSeenTimes(); // makes it so that you can see the 'most salient' instantiations again after resetting.
+			this.gameEngine.resetGameState();
+			this.gameEngine.removeAllAutonomousActions();
+			
+			//Clean out the to-do list?
+			for each (var toDoItem:ToDoItem in gameEngine.currentStory.todoList)
+			{
+				toDoItem.predTruthValuesPerResponderOtherPair = new Vector.<Dictionary>();
+				for each (var pred:Predicate in toDoItem.condition.predicates)
+				{
+					toDoItem.predTruthValuesPerResponderOtherPair.push(new Dictionary());
+				}
+			}
+			
+			//super weird to be calling this function from way over here,
+			//BUT, I'm pretty sure it will get the job done!
+			//gameEngine.hudGroup.consolePopUp.formIntentButtonClicked();
+			this.isResetState = false;
+			//It seems like I have to clean up after myself in weird ways here...
+			msgText.text = "Do you want to return to the main menu? NOTE: Your progress will be saved.";
+			gameEngine.hudGroup.storySelectionScreen.selectedStory = gameEngine.currentStory;
+			gameEngine.hudGroup.storySelectionScreen.startStory();
+		}
+		
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			this.noButton.setStyleName();
+			this.yesButton.setStyleName();
+			this.invalidateProperties();
+		}
+		
+		/**
+		 * This is a function for disablin certain things that we don't want the user to be able to click on
+		 * during certain moments of gameplay.  For example, if they have just lost a quickplay challenge,
+		 * we don't want them to be able to select characters, play more social games, or click on certain
+		 * things in teh top bar -- we ONLY want them to be able to click on the buttons in the inGameOptionsComponent.
+		 */
+		public function disableGameplayClicks():void {
+			gameEngine.worldGroup.mouseEnabled = false; //disables the clicking of avatars or anything.
+			gameEngine.worldGroup.mouseChildren = false; // disables the clicking of avatars even more.
+			
+			gameEngine.hudGroup.topBar.goalButton.mouseEnabled = false;
+			gameEngine.hudGroup.topBar.numTurnsLeftButton.mouseEnabled = false;
+			gameEngine.hudGroup.selectInitiatorGroup.mouseChildren = false;
+		}
+		
+		/**
+		 * Undoes all the clicks that were disabled inside of disableGamePlayClicks (including certain topbar buttons,
+		 * the init char head selection group, and others.
+		 */
+		public function enableGameplayClicks():void {
+			gameEngine.worldGroup.mouseEnabled = true; //disables the clicking of avatars or anything.
+			gameEngine.worldGroup.mouseChildren = true; // disables the clicking of avatars even more.
+			
+			gameEngine.hudGroup.topBar.goalButton.mouseEnabled = true;
+			gameEngine.hudGroup.topBar.numTurnsLeftButton.mouseEnabled = true;
+			gameEngine.hudGroup.selectInitiatorGroup.mouseChildren = true;
+		}
+		
+		]]>
+	</fx:Script>
+
+	
+</s:Group>

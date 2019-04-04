@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()">
+	
+		 
+	<fx:Metadata>
+	</fx:Metadata>
+		
+	<fx:Declarations>
+		<fx:Number id="statusIconWidth">50</fx:Number>
+		<fx:Number id="statusIconHeight">50</fx:Number>
+		<fx:Number id="charIconWidth">35</fx:Number>
+		<fx:Number id="charIconHeight">35</fx:Number>
+		<fx:Number id="crossWidth">85</fx:Number>
+		<fx:Number id="crossHeight">50</fx:Number>
+		
+		<fx:Boolean id="shouldDisplayName">false</fx:Boolean>
+	</fx:Declarations>
+		
+	  <s:Group id="iconGroup">
+			<!--<util:SmoothImage id="statusIcon" width="{statusIconWidth}" height="{statusIconHeight}" />-->
+			<prom:StatusIcon id="statusIcon" width="{statusIconWidth}" height="{statusIconHeight}" shouldDisplayTimeRemaining="false" />
+			<util:SmoothImage id="charIconLeft" width="{charIconWidth}" height="{charIconHeight}" />
+			<util:SmoothImage id="charIconRight" width="{charIconWidth}" height="{charIconHeight}" />
+			<s:Group width="{crossWidth}" height="{crossHeight/10}" top="40" visible="{this.shouldDisplayName}">
+				<s:Rect width="100%" height="100%" radiusX="3" radiusY="3">
+					<s:fill>
+						<mx:SolidColor color="white"/>
+					</s:fill>
+				</s:Rect>
+				<s:RichText id="statusName" width="100%" height="100%" fontSize="9" color="black" verticalAlign="middle" textAlign="center" styleName="basicFontStyle"/>
+			</s:Group>
+			<s:Group id="negatedGroup" visible="false">
+				<s:Line id="line1" xFrom="0" yFrom="0" xTo="{crossWidth}" yTo="{crossHeight}">
+					<s:stroke>
+						<s:SolidColorStroke color="red" alpha="1.0" weight="7" />
+					</s:stroke>
+				</s:Line>
+				<s:Line id="line2" xFrom="0" yFrom="{crossHeight}" xTo="{crossWidth}" yTo="0">
+					<s:stroke>
+						<s:SolidColorStroke color="red" alpha=".8" weight="10"/>
+					</s:stroke>
+				</s:Line>
+			</s:Group> 
+	  </s:Group>
+
+	  
+	  
+	<fx:Script>
+		<![CDATA[		
+		import CiF.*;
+		import PromWeek.assets.ResourceLibrary;
+		import flash.utils.Dictionary;
+		
+		private var resourceLibrary:PromWeek.assets.ResourceLibrary = ResourceLibrary.getInstance()
+		private var gameEngine:GameEngine;
+		private var _statID:Number;
+		private var _char1:String;
+		private var _char2:String;
+		private var _negated:Boolean;
+		private var _whyText:String;
+		private var _pred:Predicate;
+		private var _primed:Boolean;
+		
+		public function onCreationComplete():void
+		{
+			//resourceLibrary = PromWeek.assets.ResourceLibrary.getInstance();
+			gameEngine = GameEngine.getInstance();
+		}
+		
+		override protected function commitProperties():void {
+			if(this._primed) {
+				var tempDictionary:Dictionary;// = new Dictionary()
+				statusIcon.loadStatusImagesToIcon(this._statID);
+				//this.statusIcon.source = resourceLibrary.statusIcons[Status.getStatusNameByNumber(this._statID)];
+				if (!gameEngine)
+					gameEngine = GameEngine.getInstance();
+					
+					
+				if (this.shouldDisplayName)
+				{
+					this.statusName.text = Status.getShortStatusNameByNumber(this._statID);
+				}
+					
+				if (this._negated)
+				{
+					if (!this._pred)
+						this.toolTip = this._char1 + " is no longer " + Status.getStatusNameByNumber(this._statID) + " by " + this._char2;
+					else {
+						//tempDictionary = new Dictionary()
+						//tempDictionary = gameEngine.getNamesFromRoles(this._pred);
+						//this.toolTip = this._pred.toNaturalLanguageString(tempDictionary['primary'], tempDictionary['secondary'], "");
+						this.toolTip = this._pred.toNaturalLanguageString(this._char1, this._char2);
+					}
+				}
+				else
+				{
+					if(!this._pred)
+						this.toolTip = this._char1 + " is " + Status.getStatusNameByNumber(this._statID) + " " + this._char2;
+					if (this._pred){
+						//tempDictionary = new Dictionary()
+						//tempDictionary = gameEngine.getNamesFromRoles(this._pred);
+						//this.toolTip = this._pred.toNaturalLanguageString(tempDictionary['primary'], tempDictionary['secondary'], "");
+						this.toolTip = this._pred.toNaturalLanguageString(this._char1, this._char2);
+					}
+				}
+				
+				if (this._whyText)
+				{
+					this.toolTip += "\n\n" + this._whyText;
+				}
+				
+				
+				charIconLeft.source = resourceLibrary.portraits[this._char1.toLowerCase()];
+				charIconRight.source = resourceLibrary.portraits[this._char2.toLowerCase()];
+				
+				statusIcon.left = charIconWidth / 2;
+				charIconLeft.left = 0;
+				charIconRight.left = (statusIconWidth);
+				charIconLeft.top = (statusIconHeight - charIconHeight)/2;
+				charIconRight.top = (statusIconHeight - charIconHeight)/2;
+				charIconRight.scaleX = -1;
+				this.charIconLeft.visible = true;
+				this.charIconRight.visible = true;
+				this.visible = true;
+				
+				if (this._negated)
+				{
+					this.negatedGroup.visible = true;
+				}
+				else 
+				{
+					this.negatedGroup.visible = false;
+				}
+			}
+		}
+		
+		/**
+		 * Given a variety of parameters, creates a small picture that contains 
+		 * the relevant status in the background, with the relevant character(s) in the foreground
+		 * (one if undirected status, two if directed).
+		 * @param	statID The id number of the status
+		 * @param	char1 the NAME (in string form) of the first character (the "from" character if directed status, or the sole holder of the status if undirected)
+		 * @param	char2 the NAME (in string form) of the second character (the "to" character if directed status, empty string if undirected)
+		 * @param	negated A boolean -- if true, then some crosses should appear over the status (i.e. the status was removed).
+		 */
+		public function loadStatusImagesToIcon(statID:Number, char1:String = "", char2:String = "", negated:Boolean = false, whyText:String = "", pred:Predicate=null):void
+		{	
+			_statID = statID;
+			_char1 = char1;
+			_char2 = char2;
+			_negated = negated;
+			_whyText = whyText;
+			_pred = pred;
+			
+			_primed = true;
+			
+			this.invalidateProperties();
+			this.invalidateSize();
+			this.invalidateDisplayList();
+		}
+		
+		]]>
+	</fx:Script>
+		
+	
+</s:Group>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:WindowedApplication 
+  title="merapi screen capture"
+  xmlns:mx="http://www.adobe.com/2006/mxml" 
+  xmlns:merapiproject="http://merapiproject.net/2009"
+  xmlns:messages="merapi.examples.screencapture.messages.*"
+  xmlns:eis="eis.comm.*"
+  xmlns:s="library://ns.adobe.com/flex/spark"
+  applicationComplete="onCreationComplete()"
+  enterFrame="onEnterFrame()"
+  layout="absolute" horizontalCenter="0" 
+  verticalScrollPolicy="off"
+   width="1280" height="900" 
+  xmlns:handlers="merapi.examples.screencapture.handlers.*">
+	<!--
+	Screen Capture example was written by Rich Tretola
+	http://www.twitter.com/richtretola
+	http://blog.everythingflex.com
+	http://www.happytoad.com
+	-->
+	<!--<mx:states>
+		<mx:State name="withshots">
+			<mx:AddChild position="lastChild">
+				<mx:Tile id="tile" width="100%" horizontalCenter="0" horizontalGap="0" verticalGap="0"  y="61"/>
+			</mx:AddChild>
+			<mx:SetProperty name="height" value="150"/>
+			<mx:AddChild position="lastChild">
+				<mx:Label x="14" y="40" text="Click on thumb below for a preview"/>
+			</mx:AddChild>
+		</mx:State>
+	</mx:states>-->
+	
+	<mx:Style source="main.css" />
+		
+	<!-- ====  screenCaptureMessage : The message sent accross the bridge  ======================== -->
+	<!--<messages:ScreenCaptureMessage id="screenCaptureMessage" storagePath="C:\Documents and Settings\lark\My Documents\My Pictures\" />-->
+		<!--storagePath="{storageDirectory.nativePath + File.separator}" />-->
+
+	<!-- ====  screenCaptureHandler : The message handler for the ScreenCaptureMessage.TAKE_SCREEN_SHOT message type  == -->
+	<!--<handlers:ScreenCaptureHandler id="screenCaptureHandler" type="takeScreenShot" /> -->
+		<!--type="{ ScreenCaptureMessage.TAKE_SCREEN_SHOT }" /> -->
+	
+			
+	<eis:GameChoiceMessage id="gameChoiceMessage" type="gameChoice" />
+	<eis:ScriptHandler id="scriptHandler" />
+			
+	<mx:Script>
+  		<![CDATA[
+  			import mx.controls.Alert;
+  			import mx.controls.Image;  import com.util.SmoothImage;
+  			import merapi.messages.IMessage;
+  			import mx.rpc.events.ResultEvent;
+  			import merapi.messages.Message;
+			import merapi.Bridge;
+  			
+  			 import eis.GameEngine;
+			  
+		  private var gameEngine:GameEngine = new GameEngine();
+			  
+		  public function onCreationComplete():void {
+			  gameEngine.onCreationCompete();
+			  addElement(gameEngine);
+		  }
+		  
+		  public function onEnterFrame():void {
+			 gameEngine.onEnterFrame(); 
+		  }
+		  public function takeShot():void {
+			  trace("takeShot():");
+			  gameChoiceMessage.send();
+			 //screenCaptureMessage.send();
+			  
+		  }
+		  /*
+		  public function sendGameChoiceMessage():void {
+			  trace("sendGameChoiceMessage():");
+			  gameChoiceMessage.send();
+		  }
+		  
+		  public function sendScreenCaptureMessage():void {
+			  trace("sendScreenCaptureMessage():");
+			  trace(Bridge.CONNECTED);
+			  //screenCaptureMessage.type = "takeScreenShot";
+			  screenCaptureMessage.data = "<SCRIPT />";
+			  screenCaptureMessage.send();
+		  }*/
+		  ]]>
+  		
+	</mx:Script>
+	<!--<mx:Button click="sendGameChoiceMessage()" label="game choice" x="10" y="800"/>
+	<mx:Button click="sendScreenCaptureMessage()" label="screen cap message" x="10" y="850"/>
+	-->
+	
+</mx:WindowedApplication>

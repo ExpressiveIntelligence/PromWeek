@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 width="97"
+		 height="97"
+		 creationComplete="onCreationComplete()"
+		 styleName="classicPromWeek">
+		 
+		 <fx:Declarations>
+			<fx:Number id="dynamicFontSize">14</fx:Number>
+			<fx:Number id="letterCount">6</fx:Number>
+			<mx:Fade id="fadeOut" duration="300" alphaFrom="1.0" alphaTo="0.0" effectEnd="fadeOutDone(event)" />
+			<mx:Fade id="fadeIn" duration="300" alphaFrom="0.0" alphaTo="1.0" effectStart="fadeInStarted(event)" />
+		 </fx:Declarations>
+		 
+		<s:Group width="85%" height="20%">
+			<s:Rect id="NamePlate" height="100%" radiusX="5" radiusY="5">
+				<s:fill>
+					<s:SolidColor color="{getStyle('portraitNamePlate')}" alpha=".7"/>
+				</s:fill>
+			</s:Rect>
+			<s:HGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="middle" paddingLeft="5" paddingRight="5">
+				<s:RichText id="NameRichText" textAlign="center" width="100%" height="100%" fontSize="{dynamicFontSize}" fontWeight="bold" text="" styleName="basicFontStyle" />
+			</s:HGroup>
+		</s:Group>
+		
+	<fx:Script>
+		<![CDATA[
+import flash.events.Event;
+import CiF.Debug;		
+
+		private var gameEngine:GameEngine;
+		
+		override protected function createChildren():void {
+			super.createChildren();
+			gameEngine = GameEngine.getInstance();
+		}
+		
+		private function onCreationComplete():void {
+			mouseEnabled = false;
+			mouseChildren = false;
+		}
+		
+		public function fadeInStarted(e:Event):void
+		{
+			this.visible = true;
+		}
+		public function fadeOutDone(e:Event):void
+		{
+			this.visible = false;
+		}
+		
+		
+			public function figureWidth():void {
+				letterCount = NameRichText.text.length;
+				this.NameRichText.setStyle("fontSize", dynamicFontSize);
+				this.NameRichText.setStyle("textAlign", "center");
+				NamePlate.width = 100;
+				if (this.width < 60) {
+					NameRichText.top = NamePlate.y;
+					NamePlate.width = this.width * .9;
+					dynamicFontSize = 8;
+					this.NameRichText.setStyle("fontSize", dynamicFontSize);
+				}
+			}
+			
+			public function update():void {
+				if(gameEngine){
+					if(this.NameRichText.text != ""){
+						var charX:Number = gameEngine.worldGroup.avatars[this.NameRichText.text.toLowerCase()].clip.x;
+						var charY:Number = gameEngine.worldGroup.avatars[this.NameRichText.text.toLowerCase()].clip.y;
+						
+						this.x = charX; // - gameEngine.worldGroup.avatars[this.NameRichText.text.toLowerCase()].clip.width / 2;
+						this.y = charY - gameEngine.worldGroup.avatars[this.NameRichText.text.toLowerCase()].clip.height / 2;
+						
+						//this.y -= this.height / 2; // let's try this out...
+						
+						//I think this should help make it look a little less ugly when you zoom out.
+						var newNameplateLocBeforeTranslation:Point = new Point();
+						newNameplateLocBeforeTranslation.x = this.x
+						newNameplateLocBeforeTranslation.y = this.y;
+						var newNameplateLoc:Point = Utility.translatePoint(newNameplateLocBeforeTranslation, gameEngine.worldGroup, gameEngine.hudGroup);
+						
+						newNameplateLoc.x -= this.width / 2;
+						
+						
+						this.x = newNameplateLoc.x;
+						this.y =  newNameplateLoc.y;
+						this.left = newNameplateLoc.x;
+						this.top = newNameplateLoc.y;
+						
+					}
+				}
+			}
+			
+			/**
+			 * I just want to make the nameplate visible = true
+			 * because otherwise it starts to fade out but then will fade right back in!
+			 * @param	e
+			 */
+			/*
+			private function onRollOver():void {
+				Debug.debug(this, "I'm getting inside of CharacterNamepLate RollOver, yes?");
+				//this.visible = true;
+			}
+			*/
+			
+		]]>
+			
+	</fx:Script>
+		
+</s:Group>

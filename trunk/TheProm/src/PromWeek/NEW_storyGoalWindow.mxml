@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 preinitialize="onPreinitialize()"
+		 styleName="classicPromWeek"
+		 width="100%" height="100%"
+		 show="onShow(event)"> 
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+			 <fx:String id="storyLeadName">the character</fx:String>
+		 </fx:Declarations>
+		 
+		<s:Rect id="bgShape" width="100%" height="100%" radiusX="20" radiusY="20">
+			<s:stroke>
+				<s:SolidColorStroke color="{getStyle('backgroundStroke')}" weight="{getStyle('backgroundStrokeWeight')}"></s:SolidColorStroke>
+			</s:stroke>
+			<s:fill>
+				<s:SolidColor color="{getStyle('backgroundColor')}" alpha="0.9"></s:SolidColor>
+			</s:fill>
+		</s:Rect>
+		 <s:VGroup width="100%" height="100%" paddingTop="15" paddingBottom="15" paddingLeft="15" paddingRight="15">
+			 <s:VGroup id="goalTitleGroup" width="100%" height="20%">
+				 <s:RichText id="topLevelStoryGoalTitleText" color="0xffffff" text="{this.storyLeadName}'s Goals" width="100%" height="60%" verticalAlign="middle" textAlign="center" styleName="storyGoalTitleTextStyle" filters="{[new GlowFilter(0x000000,1.0,2.0,2.0,10)]}"/>
+				 <s:RichText width="100%" height="40%" fontSize="14" color="0xffffff" fontWeight="bold" verticalAlign="middle" textAlign="center" styleName="basicFontStyle" text="Complete all the tasks in a goal to shape {this.storyLeadName}'s prom night!" />
+			 </s:VGroup>
+			 <s:HGroup width="100%" height="80%" gap="0">
+				 <s:VGroup id="storySelectionButtonGroup" width="25%" height="100%" gap="0" />
+				 <s:Group width="75%" height="100%">
+					<s:Rect width="100%" height="100%" topRightRadiusX="20" topRightRadiusY="20" bottomRightRadiusX="20" bottomRightRadiusY="20">
+						<s:fill>
+							<s:SolidColor color="{getStyle('contentAreaColor')}" alpha="0.9"/>
+						</s:fill>
+					</s:Rect>
+					 <s:VGroup width="100%" height="100%" horizontalAlign="center">
+						<s:RichText id="storyGoalTitleText" width="100%" height="15%" fontSize="22" color="0xffffff" verticalAlign="middle" textAlign="center" styleName="basicFontStyle" />
+						<s:HGroup width="100%" height="20%" paddingLeft="25" paddingRight="25">
+							<s:RichText id="storyGoalDescriptionText" width="100%" height="100%" fontSize="14" color="0xffffff" verticalAlign="middle" styleName="basicFontStyle" />
+						</s:HGroup>
+						<s:HGroup width="100%" height="65%" paddingLeft="20" paddingRight="20" paddingTop="10">
+							<s:Scroller id="taskScroller" width="100%" height="100%"><!--horizontalScrollPolicy="off" verticalScrollPolicy="off"-->
+								<s:VGroup id="taskListGroup" width="100%" height="100%" gap="0" horizontalAlign="center" />
+							</s:Scroller>
+						</s:HGroup>
+					 </s:VGroup>
+				</s:Group>
+			 </s:HGroup>
+		 </s:VGroup>
+		 <s:Button id="closeButton" width="25" height="25" click="closeButtonClicked(event)" toolTip="Close Window" top="10" right="15" skinClass="PromWeek.skins.NEW_closeButtonSkin" />
+		 
+	<fx:Script>
+		<![CDATA[
+		import CiF.CiFSingleton;
+		import CiF.LineOfDialogue;
+		import CiF.Predicate;
+		import CiF.SocialGame;
+		import CiF.SocialGameContext;
+		import flash.events.Event;
+		import flash.events.MouseEvent;
+		import flash.geom.Point;
+		import flash.utils.Dictionary;
+		import mx.core.ScrollPolicy;
+		import PromWeek.assets.ResourceLibrary;
+		import flash.filters.GlowFilter;
+		import PromWeek.skins.NEW_backButtonSkin;
+		import PromWeek.skins.NEW_listScrollSkin;
+
+		private var rL:ResourceLibrary;
+		private var cif:CiFSingleton;
+		private var gameEngine:GameEngine;
+		private var dm:DifficultyManager;
+		private var jpm:JuicePointManager;
+		
+		public var goalSelectionButtons:Vector.<NEW_storyGoalSelectionButton>;
+		
+		public function onShow(e:Event):void
+		{
+			for each (var button:NEW_storyGoalSelectionButton in this.goalSelectionButtons)
+			{
+				button.skin.invalidateDisplayList();
+			}
+		}
+		
+		public function onCreationComplete():void 
+		{
+			cif = CiFSingleton.getInstance();
+			gameEngine = GameEngine.getInstance();
+			dm = DifficultyManager.getInstance();
+			jpm = JuicePointManager.getInstance();
+		
+			
+			taskScroller.setStyle("horizontalScrollPolicy", ScrollPolicy.OFF);
+            taskScroller.verticalScrollBar.setStyle("skinClass", NEW_listScrollSkin);
+		}
+		
+		private function onPreinitialize():void 
+		{
+			rL = ResourceLibrary.getInstance();
+		}
+		
+		public function closeButtonClicked(e:MouseEvent = null):void
+		{
+			this.visible = false;
+		}
+		
+		
+		public function populateStoryGoalWindow(story:Story):void
+		{
+			this.storyLeadName = LineOfDialogue.toInitialCap(story.storyLeadCharacter);
+			this.storySelectionButtonGroup.removeAllElements();
+			goalSelectionButtons = new Vector.<NEW_storyGoalSelectionButton>();
+			var selectedSet:Boolean = false;
+			for (var i:int = 0; i < story.todoList.length; i++ )
+			{
+				var todoItem:ToDoItem = story.todoList[i];
+				var goalSelectionButton:NEW_storyGoalSelectionButton = new NEW_storyGoalSelectionButton();
+				
+				if (i == 0)
+				{
+					goalSelectionButton.isTop = true;
+				}
+				
+				if (i == story.todoList.length - 1)
+				{
+					goalSelectionButton.isBottom = true;
+				}
+				
+				var numComplete:int = 0;
+				if (todoItem.predTruthValues != null)
+				{
+					for each (var bool:Boolean in todoItem.predTruthValues)
+					{
+						if (bool == true) numComplete++;
+					}
+				}
+				goalSelectionButton.storyGoalName = todoItem.name;
+				goalSelectionButton.progressText = numComplete + " / " + todoItem.condition.predicates.length;
+				if (numComplete == todoItem.condition.predicates.length)
+				{
+					goalSelectionButton.completed = true;
+				}
+				goalSelectionButton.addEventListener(MouseEvent.CLICK, goalSelectedButtonClicked);
+				goalSelectionButton.todoItem = todoItem;
+				goalSelectionButton.width = storySelectionButtonGroup.width;
+				goalSelectionButton.height = storySelectionButtonGroup.height / story.todoList.length;
+				goalSelectionButtons.push(goalSelectionButton);
+				storySelectionButtonGroup.addElement(goalSelectionButton);
+				if (!selectedSet)
+				{
+					goalSelectionButton.selected = true;
+					this.populateGoalInfo(goalSelectionButton.todoItem);
+					selectedSet = true;
+				}
+				goalSelectionButton.skin.invalidateDisplayList();
+			}
+		}
+		
+		private function goalSelectedButtonClicked(e:MouseEvent):void 
+		{
+			for each (var goalButton:NEW_storyGoalSelectionButton in this.goalSelectionButtons)
+			{
+				if (e.target == goalButton)
+				{
+					//this means we want to populate the right side
+					this.populateGoalInfo(goalButton.todoItem);
+					
+					goalButton.selected = true;
+				}
+				else
+				{
+					goalButton.selected = false;
+				}
+				goalButton.invalidateSkinState();
+				goalButton.skin.invalidateDisplayList();
+			}
+		}
+		
+		public function populateGoalInfo(todoItem:ToDoItem):void
+		{
+			this.storyGoalTitleText.text = todoItem.name;
+			
+			this.storyGoalDescriptionText.text = todoItem.goalDescription;
+			//this.storyGoalDescriptionText.text = "What would happen if the goody two shoes Naomi befriended the punk rocker Gunter?";
+			
+			this.taskListGroup.removeAllElements();
+			var index:int = -1;
+			for each (var taskName:String in todoItem.taskNaturalLanguageWords)
+			{
+				index++;
+				
+				var taskComp:PromWeek.NEW_goalTaskComponent = new PromWeek.NEW_goalTaskComponent();
+				taskComp.width = this.taskListGroup.width;
+				var truthValue:Boolean;
+				if (todoItem.predTruthValues != null && index < todoItem.predTruthValues.length)
+				{
+					truthValue = todoItem.predTruthValues[index];
+				}
+				else
+				{
+					truthValue = false;
+				}
+				
+
+				var pred:Predicate = todoItem.condition.predicates[index];
+				
+				var numTrueText:String = "";
+				if (pred.numTimesUniquelyTrueFlag)
+				{
+					var numTrue:Number = -1;
+					if (todoItem.predNumTimesTrue != null && index < todoItem.predNumTimesTrue.length)
+					{
+						numTrue = todoItem.predNumTimesTrue[index];
+					}
+					
+					if (numTrue >= 0)
+					{
+						numTrueText = " (Current: " + numTrue + ")";
+					}
+					
+					//if (pred.numTimesUniquelyTrue == numTrue) truthValue = true;
+				}
+				
+				taskName = taskName + numTrueText;
+				
+				taskComp.populateTask(taskName,truthValue);
+				this.taskListGroup.addElement(taskComp);
+			}
+		}
+		
+		
+		
+		public function updateStoryGoalInfo():void
+		{
+
+		}
+		
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>
+

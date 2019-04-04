@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 creationComplete="onCreationComplete()"
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 width="220" height="30">
+
+		 
+	 <fx:Metadata>
+	 </fx:Metadata>
+	 
+	 <fx:Declarations>
+		 <fx:String id="sgName"/>
+	 </fx:Declarations>
+		 
+    <s:states>
+    </s:states>
+		 
+	<s:HGroup width="100%" height="100%" gap="2" verticalAlign="middle">
+		<prom:NEW_socialExchangeButton id="socialExchangeButton" width="165" height="27" />
+		<s:Button id="infoButton" skinClass="PromWeek.skins.NEW_socialExchangeInfoButtonSkin" width="25" height="25" click="infoClickHandler(event)" />
+		<prom:NEW_socialExchangeResponseButton id="responseButton" skinClass="PromWeek.skins.NEW_socialExchangeResponseButtonSkin" width="25" height="25" click="responseClickHandler(event)" />
+	</s:HGroup>
+	
+	<fx:Script>
+		<![CDATA[
+			import flash.events.MouseEvent;
+		
+			
+			
+			public function onCreationComplete():void
+			{
+				
+			}
+			
+			public function infoClickHandler(e:MouseEvent):void
+			{				
+				GameEngine.getInstance().hudGroup.initiatorSelectedComponent.initiatorThoughtBubble.updateSocialExchangeInfoGroup(this.sgName);
+			}
+			
+			public function responseClickHandler(e:MouseEvent):void
+			{				
+				GameEngine.getInstance().hudGroup.updateSocialExchangeResponseThoughtBubble(this.sgName);
+			}
+
+		]]>
+
+	</fx:Script>
+	
+</s:Group>

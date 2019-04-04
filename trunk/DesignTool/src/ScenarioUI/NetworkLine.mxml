@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 creationComplete="onCreationComplete()"
+		 mouseEnabledWhereTransparent="false">
+
+	<fx:Metadata>
+	</fx:Metadata>
+		
+	<fx:Declarations>
+		
+
+	</fx:Declarations>
+	
+	<s:Path id="toPath">
+		<s:fill>
+			<s:LinearGradient id="toPathGradient" >
+				<s:entries>
+					<s:GradientEntry color="{fillColorTo.color}" ratio="0.0" alpha="1.0"/>
+					
+					<s:GradientEntry color="{fillColorTo.color}" ratio="{toWeightRatio}" alpha="{toAlpha}"/>
+					
+					<s:GradientEntry color="#ffffff" ratio="1.0" alpha="{toAlpha}"/>
+				</s:entries>
+			</s:LinearGradient>
+		</s:fill>
+		
+<!--		<s:stroke>
+			<s:LinearGradientStroke id="toStroke" weight="3.0" rotation="{toAngle}">
+				<s:entries>
+					<s:GradientEntry color="black" alpha="1.0" />
+					<s:GradientEntry color="black" alpha="{toAlpha}" />
+				</s:entries>
+			</s:LinearGradientStroke>
+		</s:stroke>-->
+		
+		<s:stroke>
+			<s:SolidColorStroke weight="3" color="{strokeColorTo.color}" />
+		</s:stroke>
+
+	</s:Path>
+	
+	<s:Path id="fromPath">
+		<s:fill>
+			<s:LinearGradient id="fromPathGradient" rotation="{fromAngle}">
+				<s:entries>
+					<s:GradientEntry color="{fillColorFrom.color}" ratio="0.0" alpha="1.0"/>
+					<s:GradientEntry color="{fillColorFrom.color}" ratio="{fromWeightRatio}" alpha="{fromAlpha}"/>
+					<s:GradientEntry color="#ffffff" ratio="1.0" alpha="{fromAlpha}"/>
+				</s:entries>
+			</s:LinearGradient>
+		</s:fill>
+		
+<!--		<s:stroke>
+			<s:LinearGradientStroke id="fromStroke" weight="3.0" rotation="{fromAngle}">
+				<s:entries>
+					<s:GradientEntry color="black" alpha="1.0" />
+					<s:GradientEntry color="black" alpha="{toAlpha}" />
+				</s:entries>
+			</s:LinearGradientStroke>
+		</s:stroke>-->
+		
+
+		<s:stroke>
+			<s:SolidColorStroke weight="3" color="{strokeColorFrom.color}" />
+		</s:stroke>
+
+	</s:Path>
+	
+	<s:RichText id="toValueText" fontWeight="bold" fontSize="18" />
+	<s:RichText id="fromValueText" fontWeight="bold" fontSize="18" />
+	
+	<fx:Script>
+		<![CDATA[
+		import CiF.Character;
+		import CiF.CiFSingleton;
+		import CiF.Debug;
+		import mx.graphics.SolidColor;
+		import mx.graphics.SolidColorStroke;
+		import CiF.SocialNetwork;
+		
+		
+
+		private var cif:CiFSingleton = CiFSingleton.getInstance();
+		
+		public var minLineHeight:Number = 5;
+		public var maxLineHeight:Number = 50;
+		
+		private var minNetworkValue:Number = SocialNetwork.minRange;
+		private var maxNetworkValue:Number = SocialNetwork.maxRange;
+		
+		public var fromChar:ScenarioUI.CharacterRepresentation;
+		public var toChar:ScenarioUI.CharacterRepresentation;
+		
+		public var type:int = SocialNetwork.BUDDY;
+		
+		public var minColorShowingRatio:Number = 0.2;
+		
+		[Bindable]
+		private var fillColorFrom:SolidColor = new SolidColor();
+		[Bindable]
+		private var strokeColorFrom:SolidColorStroke = new SolidColorStroke();
+		[Bindable]
+		private var fillColorTo:SolidColor = new SolidColor();
+		[Bindable]
+		private var strokeColorTo:SolidColorStroke = new SolidColorStroke();
+		[Bindable]
+		private var fromWeightRatio:Number;
+		[Bindable]
+		private var fromAlpha:Number;
+		[Bindable]
+		private var fromAngle:Number;
+		[Bindable]
+		private var toWeightRatio:Number;
+		[Bindable]
+		private var toAlpha:Number;
+		[Bindable]
+		private var toAngle:Number;
+		
+		
+		private var valueTo:int;
+		private var valueFrom:int;
+		
+		
+		
+		public function onCreationComplete():void
+		{
+			
+		}
+		
+		public function update():void
+		{
+			//Debug.debug(this, "update() updating line from " + fromChar.character.characterName + " to " + toChar.character.characterName);
+			//set the colors based on the type
+			switch (type) {
+				case SocialNetwork.BUDDY:
+					valueFrom = cif.buddyNetwork.getWeight(fromChar.character.networkID, toChar.character.networkID);
+					valueTo = cif.buddyNetwork.getWeight(toChar.character.networkID, fromChar.character.networkID);
+					fillColorFrom.color = 0x00FF00;
+					fillColorTo.color = 0x00FF00;
+					break;
+				case SocialNetwork.ROMANCE:
+					valueFrom = cif.romanceNetwork.getWeight(fromChar.character.networkID, toChar.character.networkID);
+					valueTo = cif.romanceNetwork.getWeight(toChar.character.networkID, fromChar.character.networkID);
+					fillColorFrom.color = 0xFF0000;
+					fillColorTo.color = 0xFF0000;
+					break;
+				case SocialNetwork.COOL:
+					valueFrom = cif.coolNetwork.getWeight(fromChar.character.networkID, toChar.character.networkID);
+					valueTo = cif.coolNetwork.getWeight(toChar.character.networkID, fromChar.character.networkID);
+					fillColorFrom.color = 0x0000FF;
+					fillColorTo.color = 0x0000FF;
+					break;
+			}
+			
+			setFromPathData();
+			setToPathData();
+		}
+		
+		public function setFromPathData():void
+		{
+			var dataString:String;
+			
+			var x1:Number, y1:Number, x2:Number, y2:Number;
+			x1 = fromChar.x + fromChar.width / 2;
+			y1 = fromChar.y + fromChar.height / 2;
+			
+			x2 = toChar.x + toChar.width / 2;
+			y2 = toChar.y + toChar.height / 2;
+			
+			var networkRange:Number = Math.abs(maxNetworkValue - minNetworkValue);
+			var lineHeightRange:Number = Math.abs(maxLineHeight - minLineHeight);
+			
+			var heightRatio:Number = (valueFrom - minNetworkValue) / networkRange;
+			
+			var lineHeight:Number = minLineHeight + lineHeightRange * heightRatio;
+			
+			var vecX:Number, vecY:Number;
+			vecX = x2 - x1;
+			vecY = y2 - y1;
+			var vecLength:Number = Math.sqrt(vecX * vecX + vecY * vecY);
+			
+			var normalX:Number = vecX / vecLength;
+			var normalY:Number = vecY / vecLength;
+			
+			var deltaX:Number = -normalY * lineHeight;
+			var deltaY:Number = normalX * lineHeight;
+			
+
+			fromAngle = Math.abs(Math.asin(vecY / vecLength) * 180 / Math.PI);
+			if (vecX > 0)
+			{
+				//char 1 on right
+				if (vecY > 0)
+				{
+					//char1 on bottom right
+					//trace("bottom right");
+				}
+				else
+				{
+					//char1 on top right
+					fromAngle = 360 - fromAngle;
+					//trace("top right");
+				}
+			}
+			else
+			{
+				if (vecY > 0)
+				{
+					//char1 on bottom left
+					fromAngle = 180 - fromAngle;
+					//trace("bottom left");
+				}
+				else
+				{
+					//char1 on top left
+					fromAngle += 180;
+					//trace("top left");
+				}
+			}
+			fromPathGradient.rotation = fromAngle;
+			
+
+			fromWeightRatio = minColorShowingRatio + heightRatio * (1.0 - minColorShowingRatio);
+			fromAlpha = heightRatio;
+			
+			dataString = "M " + x1 + " " + y1;
+			dataString += " L " + x2 + " " + y2;
+			dataString += " L " + (x2 + deltaX) + " " + (y2 + deltaY);
+			dataString += " L " + (x1 + deltaX) + " " + (y1 + deltaY);
+			dataString += " Z";
+			
+			fromPath.data = dataString;
+			//Debug.debug(this, "setFromPathData() " + dataString);
+			//trace("fromAngle: " + fromAngle);
+			//trace("vecX: "+vecX);
+			
+			
+			fromValueText.text = valueFrom.toString();
+			fromValueText.x = x1 + (x2 - x1)/2 + deltaX*1.2;
+			fromValueText.y = y1 + (y2 - y1)/2 + deltaY*1.2;
+		}
+			
+		public function setToPathData():void
+		{
+			var dataString:String;
+			
+			var x1:Number, y1:Number, x2:Number, y2:Number;
+			x1 = toChar.x + toChar.width / 2;
+			y1 = toChar.y + toChar.height / 2;
+			
+			x2 = fromChar.x + fromChar.width / 2;
+			y2 = fromChar.y + fromChar.height / 2;
+			
+			var networkRange:Number = Math.abs(maxNetworkValue - minNetworkValue);
+			var lineHeightRange:Number = Math.abs(maxLineHeight - minLineHeight);
+			
+			var heightRatio:Number = (valueTo - minNetworkValue) / networkRange;
+			
+			var lineHeight:Number = minLineHeight + lineHeightRange * heightRatio;
+			
+			var vecX:Number, vecY:Number;
+			vecX = x2 - x1;
+			vecY = y2 - y1;
+			var vecLength:Number = Math.sqrt(vecX * vecX + vecY * vecY);
+			
+			var normalX:Number = vecX / vecLength;
+			var normalY:Number = vecY / vecLength;
+			
+			var deltaX:Number = -normalY * lineHeight;
+			var deltaY:Number = normalX * lineHeight;
+			
+
+			toAngle = Math.abs(Math.asin(vecY / vecLength) * 180 / Math.PI);
+			if (vecX > 0)
+			{
+				//char 1 on right
+				if (vecY > 0)
+				{
+					//char1 on bottom right
+					//trace("bottom right");
+				}
+				else
+				{
+					//char1 on top right
+					toAngle = 360 - toAngle;
+					//trace("top right");
+				}
+			}
+			else
+			{
+				if (vecY > 0)
+				{
+					//char1 on bottom left
+					toAngle = 180 - toAngle;
+					//trace("bottom left");
+				}
+				else
+				{
+					//char1 on top left
+					toAngle += 180;
+					//trace("top left");
+				}
+			}
+			toPathGradient.rotation = toAngle;
+
+
+			//trace(toAngle);
+			
+			
+			toWeightRatio = minColorShowingRatio + heightRatio * (1.0 - minColorShowingRatio);
+			toAlpha = heightRatio;
+			
+			dataString = "M " + x1 + " " + y1;
+			dataString += " L " + x2 + " " + y2;
+			dataString += " L " + (x2 + deltaX) + " " + (y2 + deltaY);
+			dataString += " L " + (x1 + deltaX) + " " + (y1 + deltaY);
+			dataString += " Z";
+			
+			
+			toPath.data = dataString;
+			
+			//compute the offset:
+			
+			toValueText.text = valueTo.toString();
+			toValueText.x = x1 + (x2 - x1)/2 + deltaX*1.2;
+			toValueText.y = y1 + (y2 - y1)/2 + deltaY*1.2;
+			
+			//trace(deltaX + " " + deltaY);
+		}
+			
+		private function networkLineMouseOverHandler(e:MouseEvent):void 
+		{
+			//setElementIndex(this, gameEngine.worldGroup.networkGroup.numChildren - 1);
+		}
+		
+			
+		]]>
+	</fx:Script>
+		
+	
+</s:Group>

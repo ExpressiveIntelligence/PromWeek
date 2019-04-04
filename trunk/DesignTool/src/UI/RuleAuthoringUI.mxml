@@ -1,0 +1,577 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 contentBackgroundColor="#FFFFFF" 
+		 currentState="NoneSelected" 
+		 width="640" 
+		 height="640" 
+		 xmlns:UI="UI.*"
+		 xmlns:CiF="CiF.*"
+		 creationComplete="onCreationComplete()"
+		 >
+	<!-- TODO: Naked body animations for now. -->
+    <fx:Metadata>
+		[Event(name="ruleChanged", type="flash.events.Event")]
+	</fx:Metadata>
+	
+	<fx:Binding source="dte.predTypes" destination="this.predTypes" />
+	
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	
+	<s:states>
+		<s:State name="NoneSelected"/>
+	</s:states>
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		
+		<CiF:Rule id="rule"
+			name="@{ruleName.text}"
+		/>
+	</fx:Declarations>
+	<s:VGroup>
+		<s:HGroup verticalAlign="middle">
+			<s:Label text="Natural language rule name:" color="#ffffff"/>
+			<s:TextInput id="ruleName" width="475" focusIn="onNaturalLanguageRuleNameFocus()"/>
+		</s:HGroup>
+		<s:HGroup>
+			<s:VGroup>
+				<s:Label text="Predicate Type List" color="#ffffff"/>
+				<s:List id="predicateTypeList" width="105" height="175" contentBackgroundColor="#FFFFFF" dataProvider="{this.predTypes}"
+					doubleClick="addSelectedPredTypeToList(predicateTypeList.selectedItem)"
+					doubleClickEnabled="true"/>
+			</s:VGroup>
+			<s:VGroup>
+				<s:Button label="→" width="41" height="30" id="addPredicateBtn" click="addSelectedPredTypeToList(predicateTypeList.selectedItem)"/>
+				<s:Button label="-" width="41" height="30" id="removePredicateBtn" click="removeSelectedPredList(predicateList.selectedItem)" />
+			</s:VGroup>
+			<s:VGroup>
+				<s:Label text="PREDICATE LIST" color="#ffffff"/>
+				<s:List width="475" height="175" id="predicateList" 
+					click="clickOnPredicateList(predicateList.selectedItem)" 
+					dataProvider="{this.ruleStringDP()}" />
+				<s:HGroup>
+					<s:Button label="Check Total Score for Rule Across Microtheories" id="checkTotalScoreForRuleButton" click="checkTotalScoreForRuleClick(event)" />
+					<s:Button label="Check if Rule Already Exists" id="checkIfRuleAlreadyExistsButton" click="checkIfRuleAlreadyExistsClick(event)" />
+					<s:CheckBox id="includeMTDefCheckBox" label="Include MT Def" color="#ffffff" selected="false" />
+				</s:HGroup>
+			</s:VGroup>
+		</s:HGroup>
+		<mx:HRule width="640"/>
+		<s:HGroup>
+			<UI:PredicateEditor id="predicateEd" />
+			<s:Button label="Save Up" id="saveUpBtn" click="saveUpFn()"/>
+		</s:HGroup>
+	</s:VGroup>
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import flash.events.MouseEvent;
+			import mx.collections.ArrayCollection;
+			import CiF.*;
+			import mx.containers.TitleWindow;
+			import mx.controls.Label;
+			import mx.events.CloseEvent;
+			import spark.components.Button;
+			import spark.components.HGroup;
+			import spark.components.VGroup;
+			import spark.components.RichText;
+			import tool.DesignerToolEngine;
+			import flash.events.Event;
+			import flash.events.EventDispatcher;
+			import mx.managers.PopUpManager;
+			import mx.core.IFlexDisplayObject;
+			import mx.controls.NumericStepper;
+			import mx.controls.Alert;
+			
+//			public var rule:Rule = new Rule();
+			
+			private var cif:CiFSingleton;
+
+            protected var ruleEditorPopUp:TitleWindow;
+			public var steppers:Vector.<NumericStepper> = new Vector.<NumericStepper>();
+			public var totalField:RichText;
+			public var relevantRules:Vector.<InfluenceRule>;
+			public var relevantMicrotheories:Vector.<String>;
+			
+			public var predTypes:ArrayCollection; // list of available predicates
+			//public var predicateEdPredicatesList:ArrayCollection; //What fills in the right hand side with content
+			//public var predList:ArrayCollection = new ArrayCollection;
+			public var ruleStringDP:ArrayCollection;
+			
+			private var newPredicateAdded:Boolean = false;
+			//public var workingPreconditionRuleDP:ArrayCollection;
+			//public var preconditionAuthoringIndex:int;
+			
+			public var dte:DesignerToolEngine = DesignerToolEngine.getInstance();
+			
+			public function onCreationComplete():void {
+				//initialize properties
+				this.ruleStringDP = new ArrayCollection;
+				this.rule.name = "Anonymous Rule";
+				this.ruleName.textDisplay.text = "Anonymous Rule";
+				//set up data providers
+				//bindProperty(this, 'predTypes', dte, "predTypes");
+				
+				//predicateTypeList.dataProvider = this.predTypes;
+				
+				this.predicateTypeList.dataProvider = dte.generatePredListProvider();
+				this.predicateTypeList.executeBindings();
+				
+				//set up event handlers
+				this.addEventListener("ruleChanged", this.updateRuleStringDP);
+				
+				
+				this.addEventListener(MouseEvent.CLICK, reloadDataProviders);
+				
+				cif = CiFSingleton.getInstance();
+			}
+
+			public function reloadDataProviders(e:Event):void
+			{
+				this.predicateTypeList.dataProvider = dte.generatePredListProvider();
+				this.predicateTypeList.executeBindings();
+				
+				this.removeEventListener(MouseEvent.CLICK, reloadDataProviders);
+			}
+			
+			/**
+			 * The callback function for the addPredicateBtn's click event. It
+			 * adds a new predicate to the rule with default values of the type
+			 * selected in the predicateTypeList.
+			 * @param	val	predicateTypeList.selectedItem
+			 */
+			public function addSelectedPredTypeToList(val:Object):void {
+				//if (pred.type == -1) return;
+				
+				if (val) {
+					
+					var pred:Predicate = new Predicate();
+					pred.setByTypeDefault(Predicate.getTypeByName(val as String));
+					if (Predicate.getNameByType(pred.type).toLowerCase() == "type not declared") {
+						Alert.show("Oh oh!  The predicate you selected is broken!  Sorry!  Please choose a different one!", "The predicate you chose doesn't seem to exist!");
+						return;
+					}
+					this.rule.predicates.push(pred);
+					this.newPredicateAdded = true;
+
+					try{
+						predicateEd.currentState = Predicate.getNameByType(pred.type).toLowerCase();
+					}
+					catch (e:Error) {
+						
+						return;
+					}
+					predicateEd.predicate = pred.clone();
+					dispatchEvent(new Event("ruleChanged", true, true));
+				}
+			}
+			
+			public function removeSelectedPredList(value:Object):void {
+				if(value){
+					var i:int = predicateList.selectedIndex;
+					this.rule.predicates.splice(i, 1);
+					dispatchEvent(new Event("ruleChanged", true, true));
+				}
+			}
+			
+			public function checkIfRuleAlreadyExistsClick(event:MouseEvent):void
+			{
+				var ruleInEditor:Rule;
+				var theory:Microtheory;
+				var influenceRule:InfluenceRule;
+				var testInfluenceRule:Rule;
+				var pred:Predicate;
+				var sg:SocialGame;
+				
+				var matchingRules:Vector.<InfluenceRule> = new Vector.<InfluenceRule>();
+				var matchingRulesMicrotheories:Vector.<String> = new Vector.<String>();
+				var matchingRulesSocialGames:Vector.<String> = new Vector.<String>();
+				
+				ruleInEditor = rule.clone();
+				
+				if (includeMTDefCheckBox.selected && dte.workingMicrotheory)
+				{
+					Debug.debug(this, "checkIfRuleAlreadyExistsClick() Current Microtheory: " + dte.workingMicrotheory.name);
+					for each (pred in dte.workingMicrotheory.definition.predicates)
+					{
+						ruleInEditor.predicates.push(pred.clone());
+					}
+				}
+				
+				for each (theory in cif.microtheories)
+				{
+					for each (influenceRule in theory.initiatorIRS.influenceRules)
+					{
+						testInfluenceRule = influenceRule.clone();
+						for each (pred in theory.definition.predicates)
+						{
+							testInfluenceRule.predicates.push(pred);
+						}
+					
+						if (Rule.equalsWithoutWorryingAboutName(ruleInEditor, testInfluenceRule))
+						{
+							matchingRules.push(influenceRule);
+							matchingRulesMicrotheories.push(theory.name);
+							matchingRulesSocialGames.push("");
+						}
+					}
+				}
+				
+				for each (sg in cif.socialGamesLib)
+				{
+					for each (influenceRule in sg.initiatorIRS.influenceRules)
+					{
+						testInfluenceRule = influenceRule.clone();
+						
+						if (Rule.functionallyEquals(ruleInEditor, testInfluenceRule))
+						{
+							matchingRules.push(influenceRule);
+							matchingRulesMicrotheories.push("");
+							matchingRulesSocialGames.push(sg.name);
+						}
+					}
+				}
+				
+				//now that we have gone through all the rules in cif, print out the matchinf rules
+				var outputString:String = "";
+				for (var i:int = 0; i < matchingRules.length; i++)
+				{
+					outputString += "* ";
+					if (matchingRulesMicrotheories[i] != "")
+					{
+						outputString += matchingRulesMicrotheories[i] + ": ";
+					}
+					else
+					{
+						outputString += matchingRulesSocialGames[i] + ": ";
+					}
+
+					outputString += matchingRules[i].toString() + "\n";
+				}
+				
+				Alert.show(outputString, "Matching Rules                                                                                                                                            ");
+			}
+			
+			
+			public function checkTotalScoreForRuleClick(e:MouseEvent):void
+			{
+				
+				var i:int = 0;
+				var j:int = 0;
+				var k:int = 0;
+				var myCombinator:Combinator;
+				var predIndex:Array;
+				var testRule:Rule;
+				var testInfluenceRule:InfluenceRule;
+				var origTestInfluenceRule:InfluenceRule;
+				var ruleInEditor:Rule;
+				var theory:Microtheory;
+				var influenceRule:InfluenceRule;
+				
+				var outputString:String = "";
+				relevantRules = new Vector.<InfluenceRule>;
+				relevantMicrotheories = new Vector.<String>();
+				var totalScore:Number = 0;
+				
+				ruleInEditor = rule.clone();
+				
+				for each (var pred:Predicate in dte.workingMicrotheory.definition.predicates)
+				{
+					ruleInEditor.predicates.push(pred);
+				}
+						
+				
+				var indexArray:Array = new Array();
+				for (i = 0; i < ruleInEditor.predicates.length; i++ )
+				{
+					indexArray.push(i);
+				}
+				
+				for (j = 1; j <= ruleInEditor.predicates.length; j++ )
+				{
+					// create and initialize the Combinator class
+					myCombinator = new Combinator(indexArray, j);
+					 
+					// generate all combinations in a loop
+					while (myCombinator.hasMore()) 
+					{
+						predIndex = myCombinator.next();
+						//trace(myCombinator.next());
+						
+						testRule = new Rule();
+
+						for each (k in predIndex)
+						{
+							testRule.predicates.push(ruleInEditor.predicates[k]);
+						}
+						
+						for each (theory in cif.microtheories)
+						{	
+							for each (influenceRule in theory.initiatorIRS.influenceRules)
+							{
+								testInfluenceRule = influenceRule.clone() as InfluenceRule;
+								origTestInfluenceRule = influenceRule.clone() as InfluenceRule;
+								
+								//TODO: Decide whether this should be a for each intent (should become more obvious if we start using multiple intents in interesting ways)
+								testInfluenceRule.predicates.push(theory.definition.predicates[0]);
+								if (theory.definition.predicates.length > 1)
+								{
+									testInfluenceRule.predicates.push(theory.definition.predicates[1]);
+								}
+								
+								//trace("COMPARING: \n" + testRule.toString() + "\n" + testInfluenceRule.toString() + "\n");
+								
+								if (Rule.equalsWithoutWorryingAboutName(testRule, testInfluenceRule))
+								{
+									relevantRules.push(origTestInfluenceRule);
+									relevantMicrotheories.push(theory.name);
+									//totalScore += testInfluenceRule.weight;
+									totalScore += origTestInfluenceRule.weight;
+									//outputString += theory.name + ": " + origTestInfluenceRule.toString() + "\n";
+									outputString += theory.name + ": " + origTestInfluenceRule.toString() + " ***" + origTestInfluenceRule.name + "***\n";
+									//Debug.debug(this, "theory name: " + theory.name);
+								}
+							}
+						}
+					}
+				}
+				outputString += "TOTAL SCORE: " + totalScore.toString();
+				
+				//now build the pop up
+                ruleEditorPopUp = new TitleWindow();
+                ruleEditorPopUp.title = "Matching Rules for: " + rule.toString();
+				ruleEditorPopUp.showCloseButton = true;
+                ruleEditorPopUp.addEventListener(CloseEvent.CLOSE, ruleEditorPopUp_close);
+ 
+				var stepper:NumericStepper;
+				steppers = new Vector.<NumericStepper>();
+				var textField:RichText;
+				var hGroup:HGroup;
+				var vGroup:VGroup = new VGroup();
+				for (i = 0; i < relevantRules.length; i++ )
+				{
+					if (relevantMicrotheories[i] && relevantRules[i])
+					{
+						hGroup = new HGroup();
+						stepper = new NumericStepper();
+						stepper.maximum = 100;
+						stepper.minimum = -100;
+						stepper.value = relevantRules[i].weight;
+						steppers.push(stepper); //this should be index k
+						hGroup.addElement(stepper)
+						textField = new RichText();
+						textField.text = relevantMicrotheories[i] + ": " + relevantRules[i].toString();
+						hGroup.addElement(textField);
+						
+						vGroup.addElement(hGroup);
+					}
+					else
+					{
+						Debug.debug(this, "displaySubsetRules: Unexpected behavior!");
+					}
+					
+				}
+
+				hGroup = new HGroup();				
+				totalField = new RichText();
+				totalField.text = "TOTAL: " + totalScore;
+				hGroup.addElement(totalField);
+				vGroup.addElement(hGroup);
+				
+				hGroup = new HGroup();				
+				var updateTotalBtn:Button = new Button();
+				updateTotalBtn.label = "Update Total";
+				updateTotalBtn.addEventListener(MouseEvent.CLICK, ruleEditorPopUpUpdateTotalButton)
+				hGroup.addElement(updateTotalBtn)
+				
+				var saveBtn:Button = new Button();
+				saveBtn.label = "Save";
+				saveBtn.addEventListener(MouseEvent.CLICK, ruleEditorPopUpSaveButton)
+				hGroup.addElement(saveBtn)
+				vGroup.addElement(hGroup);
+				
+				ruleEditorPopUp.addElement(vGroup);
+				
+                PopUpManager.addPopUp(ruleEditorPopUp, this, true);
+                PopUpManager.centerPopUp(ruleEditorPopUp);
+
+				//Alert.show(outputString, "Matching Rules for: " + rule.toString());
+			}
+
+			/**
+			 * The cancel button that will not save changes
+			 * @param	evt
+			 */
+            protected function ruleEditorPopUp_close(evt:CloseEvent):void {
+                PopUpManager.removePopUp(evt.currentTarget as IFlexDisplayObject);
+            }
+			
+			private function ruleEditorPopUpUpdateTotalButton(evt:MouseEvent):void 
+			{
+				var total:int = 0;
+				for each (var stpr:NumericStepper in steppers)
+				{
+					total += stpr.value;
+				}
+				
+				totalField.text = "TOTAL: " + total;
+			}
+			
+			
+			/**
+			 * This will go through and replace influence weights of the relevant rules and
+			 * relevant microtheories (whose indexes are matching)
+			 * 
+			 * @param	evt
+			 */
+            protected function ruleEditorPopUpSaveButton(evt:MouseEvent):void {
+				//go through and save all of the 
+				var i:int;
+				var j:int;
+				var mtIndex:int;
+				for (i = 0; i < relevantRules.length; i++ )
+				{
+					mtIndex = cif.getMicrotheoryIndexByName(relevantMicrotheories[i]);
+					for (j = 0; j < cif.microtheories[mtIndex].initiatorIRS.influenceRules.length; j++ )
+					{
+						if (InfluenceRule.equals(relevantRules[i], cif.microtheories[mtIndex].initiatorIRS.influenceRules[j]))
+						{
+							cif.microtheories[mtIndex].initiatorIRS.influenceRules[j].weight = steppers[i].value;
+							if (dte.workingMicrotheory.name == relevantMicrotheories[i])
+							{
+								//this helps for display and maybe makes everythign work?
+								dte.workingMicrotheory.initiatorIRS.influenceRules[j].weight = steppers[i].value;
+							}
+						}
+					}
+				}
+				
+				//dte.generateMicrotheoryInitiatorIRSDP();
+				dispatchEvent(new Event("irsListUpdate", true, true));
+				
+                PopUpManager.removePopUp(ruleEditorPopUp as IFlexDisplayObject);//evt.currentTarget.parent as IFlexDisplayObject);
+            }
+			
+			
+			/**
+			 * The callback function generating a new data provider for the predicate list.
+			 * @param	e The incoming event.
+			 */
+			public function updateRuleStringDP(e:Event):void {
+				//Debug.debug(this, "updateStringDP(): generating rule string data provider." + this.rule);
+				var lastSelectedIndex:Number = predicateList.selectedIndex;
+				this.ruleStringDP.removeAll();
+				for each (var pred:Predicate in rule.predicates) {
+					this.ruleStringDP.addItem(pred.toString());
+				}
+				this.predicateList.dataProvider = this.ruleStringDP;
+				if (this.newPredicateAdded) {
+					this.predicateList.selectedIndex = this.ruleStringDP.length - 1;
+					this.newPredicateAdded = false;
+				}else {
+					this.predicateList.selectedIndex = lastSelectedIndex;
+				}
+			}
+			
+			/**
+			 * The predicateList's click callback function. It should switch
+			 * the view and update the current content of the components in 
+			 * the predicate editor.
+			 * 
+			 * @param	value The currently selected object of the predicateList.
+			 */
+			public function clickOnPredicateList(value:Object):void {
+				if (value) {
+					predicateEd.setCurrentState(Predicate.getNameByType(rule.predicates[predicateList.selectedIndex].type).toLowerCase());
+					predicateEd.predicate = rule.predicates[predicateList.selectedIndex].clone();
+					
+					
+					//predicateEd.isNumTimesUniquelyTrueCheckBox.selected = predicateEd.predicate.numTimesUniquelyTrueFlag;
+					
+					
+					//Debug.debug(this, "clickOnPredicateList() flag is set to "+predicateEd.predicate.numTimesUniquelyTrueFlag);
+					if (predicateEd.predicate.numTimesRoleSlot == "first")
+					{
+						predicateEd.numTimesUniquelyTrueFirstRole.selected = true;
+						predicateEd.predicate.numTimesRoleSlot = predicateEd.predicate.numTimesRoleSlot;
+					}
+					else if (predicateEd.predicate.numTimesRoleSlot == "second")
+					{
+						predicateEd.numTimesUniquelyTrueSecondRole.selected = true;
+						predicateEd.predicate.numTimesRoleSlot = predicateEd.predicate.numTimesRoleSlot;
+					}
+					else if (predicateEd.predicate.numTimesRoleSlot == "third")
+					{
+						predicateEd.numTimesUniquelyTrueThirdRole.selected = true;
+						predicateEd.predicate.numTimesRoleSlot = predicateEd.predicate.numTimesRoleSlot;
+					}
+					else if (predicateEd.predicate.numTimesRoleSlot == "both")
+					{
+						predicateEd.numTimesUniquelyTrueBothRole.selected = true;
+						predicateEd.predicate.numTimesRoleSlot = predicateEd.predicate.numTimesRoleSlot;
+					}
+					else
+					{
+						//default to first
+						predicateEd.numTimesUniquelyTrueFirstRole.selected = true;
+						predicateEd.predicate.numTimesRoleSlot = predicateEd.predicate.numTimesRoleSlot;						
+					}
+					//predicateEd.numTimesUniquelyTrueSecondRole.selected = false;
+					//predicateEd.numTimesUniquelyTrueThirdRole.selected = false;
+					//predicateEd.numTimesUniquelyTrueBothRole.selected = false;
+					
+					predicateEd.isIntent.selected = predicateEd.predicate.intent;
+					predicateEd.comparatorOnCreationComplete();
+					
+					predicateEd.isIntent.selected = predicateEd.predicate.intent;
+				}
+			}
+			
+			/**
+			 * The "saveUp" button's click event callback function. The
+			 * currently-selected item in the predicate list will be updated
+			 * with the current information found below in the predicate
+			 * editor.
+			 * 
+			 * TODO: fix the ckb and sfdb cases.
+			 */
+			public function saveUpFn():void {
+				//prevent the user from accidentally NOT filling out a num-times-uniquely-true slot.
+				if (predicateEd.predicate.numTimesUniquelyTrueFlag && predicateEd.predicate.numTimesRoleSlot == ""){
+					Alert.show("Oops!  You checked the 'num times uniquely true' box but didn't specify a role.  Either specify a role or uncheck the box, and try again!", "Num Times Uniquely True Error");
+				}
+				//I think this is good... I think this could become part of a suite of 'sanity tests' to make sure that the tool doesn't allow you to do anything stupid.
+				//But for now we don't seem to need it, so we will leave well enough alone.
+				//else if (predicateEd.predicate.primary == "" || predicateEd.predicate.secondary == "") {
+				//		Alert.show("Either your primary or your secondary rolls have been left unspecified?  Are you sure that is what you want? ", "Did you mean to do that?");
+				//}
+				else if (predicateList.selectedItem) {
+					rule.predicates[predicateList.selectedIndex] = predicateEd.predicate.clone();
+					
+					rule.sortPredicates();
+					
+					dispatchEvent(new Event("ruleChanged", true, true));
+				}
+
+			}
+			
+		/**
+		 * Callback function for the NaturalLanguageRuleName's focusIn() event.
+		 * Makes it so that the default text goes away when you one clicks on
+		 * the textbox.
+		 */
+		public function onNaturalLanguageRuleNameFocus():void {
+			if (this.ruleName.text == "Anonymous Rule") {
+				this.ruleName.text = "";
+				//dispatchEvent(new Event("ruleChanged", true, true));
+			}
+		}
+		]]>
+	</fx:Script>
+	
+</s:Group>

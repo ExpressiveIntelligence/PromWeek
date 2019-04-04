@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 styleName="classicPromWeek"
+		 width="100%" height="100%">
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+			<s:AnimateColor id="quickPlayColorEffect" targets="{[quickPlayBGRectColor]}"
+						colorFrom="{getStyle('backgroundColor')}" colorTo="0xffffff" repeatCount="2" repeatBehavior="reverse"/>
+			<mx:WipeRight id="wipeRight" duration="500" effectEnd="quickPlayWipeEnded(event)"/>
+			<s:Animate id="moveUp" 
+					   duration="750" 
+					   target="{quickPlayTextGroup}" >
+				<s:SimpleMotionPath valueFrom="100"
+									valueTo="0"
+									property="top" />
+			</s:Animate>
+		 </fx:Declarations>
+		 
+		 
+		<mx:Canvas id="quickPlayTextGroup" width="100%" height="60" visible="false" showEffect="{wipeRight}">
+			<s:Group width="100%" height="100%">
+				<s:Rect id="quickPlayBGRect" width="100%" height="100%">
+					<s:fill>
+						<mx:SolidColor id="quickPlayBGRectColor" color="{getStyle('backgroundColor')}" alpha="0.7"/>
+					</s:fill>
+				</s:Rect>
+			</s:Group>
+			<s:HGroup id="quickPlayTextGroupContents" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle"/>
+		</mx:Canvas>
+		 
+	<fx:Script>
+		<![CDATA[
+		import flash.events.TimerEvent;
+		import flash.utils.Timer;
+		import mx.events.EffectEvent;
+		import spark.components.HGroup;
+		import spark.components.VGroup;
+
+		public var moveTimer:Timer;
+		
+		public function populateQuickPlayInstructions(instructions:String):void
+		{
+			this.quickPlayTextGroupContents.removeAllElements();
+			this.quickPlayTextGroup.top = 100;
+			//this is the line that calls your generate hgroup thingy!
+			var groupToAdd:VGroup = VisibilityManager.getInstance().createGroupWithTextAndImages(instructions, "QuickPlayInstructionStyle", 50);
+			this.quickPlayTextGroupContents.addElement(groupToAdd);
+			this.quickPlayTextGroup.visible = false;
+			this.quickPlayTextGroup.visible = true;
+			this.visible = true;
+		}
+		
+		public function quickPlayWipeEnded(e:EffectEvent):void
+		{
+			quickPlayColorEffect.play();
+			this.moveTimer = new Timer(2000, 1);
+			this.moveTimer.start();
+			//this.moveTimer.addEventListener(TimerEvent.TIMER,moveTimerPulse);
+			this.moveTimer.addEventListener(TimerEvent.TIMER_COMPLETE,moveTimerComplete);
+		}
+		
+		//private function moveTimerPulse(e:TimerEvent):void
+		//{
+		//}
+		private function moveTimerComplete(e:TimerEvent):void
+		{
+			this.moveTimer = null;
+			moveUp.play();
+		}
+
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

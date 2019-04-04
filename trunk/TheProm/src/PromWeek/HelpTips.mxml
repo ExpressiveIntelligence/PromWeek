@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 initialize="helpTipsInitialize()"
+		 keyDown="onKeyDown(event)"
+		 width="400"
+		 height="200"
+		 styleName="classicPromWeek">
+	
+	<fx:Metadata>
+	</fx:Metadata>
+		
+	<fx:Declarations>
+	</fx:Declarations>
+	
+	<s:Rect id="Background" width="100%" height="100%">
+		<s:stroke>
+			<s:SolidColorStroke weight="{getStyle('backgroundStrokeWeight')}" color="{getStyle('backgroundStroke')}" caps="none" />
+		</s:stroke>
+		<s:fill>
+			<s:SolidColor color="{getStyle('backgroundColor')}" alpha="{getStyle('backgroundColorAlpha')}" />
+		</s:fill>
+	</s:Rect>
+	<s:VGroup width="100%" height="100%" paddingLeft="15" paddingRight="15" paddingTop="15" paddingBottom="15">
+		<s:HGroup width="100%" height="20%">
+			<s:Label x="10" y="10" id="topText" fontWeight="bold" fontSize="30" color="{getStyle('textColor')}" paddingBottom="0" textAlign="center">
+					<s:text>Did you know...</s:text>
+			</s:Label>
+			<mx:Spacer width="40%" />
+			<prom:PromWeekButton id="nextButton" width="75" label="More Tips" buttonDown="nextTip()"/>
+		</s:HGroup>
+		
+		<s:HGroup width="100%" height="65%" top="{this.height / 2}" paddingLeft="15" paddingRight="15">
+			<s:RichText id="theTip" minWidth="0" width="100%" fontSize="16" lineHeight="140%" color="{getStyle('textColor')}" />
+		</s:HGroup>
+		
+		<s:HGroup width="100%" height="15%">
+			<mx:CheckBox width="170" label="Do not show tips again." y="{this.height - 35}" x="{this.width / 4}" click="disableTips()"/>
+			<mx:Spacer width="20%" />
+			<prom:PromWeekButton id="closeButton" width="110" top="0"  label="Close Tips" buttonDown="closeWindow()"/>
+			<!--<prom:PromWeekButton id="previousButton" width="50" top="0" label="previous" buttonDown="previousTip()"/>-->
+		</s:HGroup>
+	</s:VGroup>
+	<fx:Script>
+		<![CDATA[
+		import CiF.Debug;
+		import flash.events.KeyboardEvent;
+		import PromWeek.assets.ResourceLibrary
+		import flash.utils.Dictionary;
+		
+		public var showTip:Boolean = false;
+		public var oncePerLevel:Boolean = true;
+		//public var tipText:Vector.<String> = new Vector.<String>();
+		public var tipText:Dictionary;
+		
+		public var currentTipIndex:String;
+		public var numTips:int;
+		private var gameEngine:PromWeek.GameEngine;
+		
+		public function helpTipsInitialize():void {
+			tipText = new Dictionary();
+			this.gameEngine = GameEngine.getInstance();
+			
+			
+			var tempHelpTip:HelpTip = new HelpTip();
+			tempHelpTip.thisIndex = "click-to-select-character";
+			tempHelpTip.nextTip = "play-games-to-get-new-games";
+			tempHelpTip.previousTip = "click-to-select-character";
+			tempHelpTip.theTip = "Click on a character to select them!  Click on a second to see what social games the first wants to play with them!";
+			tipText["click-to-select-character"] = tempHelpTip;
+			
+			tempHelpTip = new HelpTip();
+			tempHelpTip.thisIndex = "play-games-to-get-new-games";
+			tempHelpTip.nextTip = "social-game-button-color";
+			tempHelpTip.previousTip = "click-to-select-character";
+			tempHelpTip.theTip = "Don't see a social game you like?  Massage the social state into what you want by playing other social games, until the characters want to do what you want them to!";
+			tipText["play-games-to-get-new-games"] = tempHelpTip;
+			
+			tempHelpTip = new HelpTip();
+			tempHelpTip.thisIndex = "social-game-button-color";
+			tempHelpTip.nextTip = "to-do-button";
+			tempHelpTip.previousTip = "play-games-to-get-new-games";
+			tempHelpTip.theTip = "The color of the social game buttons can tell you a lot!  Green means friendship, pink means romance, and blue means coolness.";
+			tipText["social-game-button-color"] = tempHelpTip;
+			
+			tempHelpTip = new HelpTip();
+			tempHelpTip.thisIndex = "to-do-button";
+			tempHelpTip.nextTip = "social-game-button-symbol";
+			tempHelpTip.previousTip = "social-game-button-color";
+			tempHelpTip.theTip = "Click on the 'Goals' button to see some overarching goals for the current character's campaign. Satisfy different goals to unlock different prom night endings.";
+			tipText["to-do-button"] = tempHelpTip;
+			
+			tempHelpTip = new HelpTip();
+			tempHelpTip.thisIndex = "social-game-button-symbol";
+			tempHelpTip.nextTip = "goals-specifics";
+			tempHelpTip.previousTip = "to-do-button";
+			tempHelpTip.theTip = "The symbol after the name of the game indicates the intent!  /\\ means you want to raise the value, \\/ means the value should go down!";
+			tipText["social-game-button-symbol"] = tempHelpTip;
+			
+			tempHelpTip = new HelpTip();
+			tempHelpTip.thisIndex = "goals-specifics";
+			tempHelpTip.nextTip = "chirpbook";
+			tempHelpTip.previousTip = "social-game-button-symbol";
+			tempHelpTip.theTip = "Click on a goal in the goals menu to see what specific tasks it is composed of.";
+			tipText["goals-specifics"] = tempHelpTip;
+			
+			tempHelpTip = new HelpTip();
+			tempHelpTip.thisIndex = "chirpbook";
+			tempHelpTip.nextTip = "click-to-select-character";
+			tempHelpTip.previousTip = "monicacampaign-loser-tip";
+			tempHelpTip.theTip = "Feel like taking a break?  Try pushing the 'Notifications' button to find out what's on the kids' minds!  Its a fun diversion, and it just might provide insight into their innermost feelings.";
+			tipText["chirpbook"] = tempHelpTip;
+			
+			tempHelpTip = new HelpTip();
+			tempHelpTip.thisIndex = "opposites";
+			tempHelpTip.nextTip = "click-to-select-character";
+			tempHelpTip.previousTip = "chirpbook";
+			tempHelpTip.theTip = "If you think a responder will reject a game, try playing one with the opposite effect! It's like reverse psychology.";
+			tipText["opposites"] = tempHelpTip;
+			
+			
+			
+			//Figure out how many tips we have!
+			numTips = 0;
+			for each(var tip:HelpTip in tipText) {
+				numTips++;
+			}
+			
+			
+			//tipText["click-to-select-character"] = "Click on a character to select them!  Click on a second to see what social games the first wants to play with them!";
+			
+			//tipText["play-games-to-get-new-games"] = "Don't see a social game you like?  Massage the state into what you want by playing other social games, until the characters *want* to do what *you* want them to do!  Help them to help you!";
+			
+			//tipText["social-game-button-color"] = "The color of the social game buttons can tell you a lot!  Green means it is connected friendship, pink means romance, and blue means coolness!"
+			
+			//tipText["to-do-button"] = "Click on the 'Goals' Button in the upper left corner to see some overarching goals for the current character's campaign!  Satisfy unique combinations of goals and go for every ending!";
+			
+			//tipText["social-game-button-symbol"] = "The symbol after the name of the game indicates the intent!  /\\ means you want to raise the value, \\/ means the value should go down!";
+			
+			//tipText["goals-specifics"] = "Click on a goal in the goals menu to see what specific tasks it is composed of!";
+			
+			//tipText["monicacampaign-hated-tip"] = "Going for 'Monica is... Hated?' -- she's going to have to become a homewrecker!  Try to get her to start dating someone who is already in a relationship!";
+			
+			//tipText["monicacampaign-lover-tip"] = "Going for 'Monica is... A Lover?' --  she's going to have to date three different people... and date at least two of them at the same time!";
+			
+			//tipText["monicacampaign-loser-tip"] = "Going for 'Monica is... A Loser?' --  you're going to have to ensure that she doesn't have a single friend throughout the whole week! Sorry Monica...";
+			
+			//tipText["chirpbook"] = "Feel like taking a break?  Try pushing the 'ChirpBook' button to find out what's on the kids' minds!  Its a fun diversion, and it just might provide insight into their innermost feelings!"
+			
+			// tip number 0
+			//tipText.push("Click on a character to select them!  Click on a second to see what social games the first wants to play with them!"); 
+			
+			
+			// tip number 1
+			//tipText.push();
+			//#2
+			//tipText.push("The color of the social game buttons can tell you a lot!  Green means it is connected friendship, pink means romance, and blue means coolness!");
+			//#3
+			//tipText.push("The symbol after the name of the game indicates the intent!  /\\ means you want to raise the value, \\/ means the value should go down!");
+			//#4
+			//tipText.push("Click on the 'To-Do' Button to see some overarching goals for the current character's campaign!  Satisfy unique combinations of goals and go for every ending!");
+			//#5
+			//tipText.push("On the To-Do Screen you can mouse over a to-do item to see what specific tasks it is composed of!");
+			//#6
+			//tipText.push("Going for 'Monica is... Hated?' -- she's going to have to become a homewrecker!  Try to get her to start dating someone who is already in a relationship!");
+			//#7
+			//tipText.push("Going for 'Monica is... A Lover?' --  she's going to have to date three different people... and date at least two of them at the same time!");
+			//#8
+			//tipText.push("Going for 'Monica is... A Loser?' --  you're going to have to ensure that she doesn't have a single friend throughout the whole week! Sorry Monica...");
+			//#9
+			//tipText.push("Feel like taking a break?  Try pushing the 'SSU' button to find out what the kids these days are tweeting about!  Its a fun diversion, and it just might provide insight into their innermost feelings!")
+			
+		}
+		
+		public function onKeyDown(e:KeyboardEvent):void {
+			Debug.debug(this, "onKeyDown() e: " + e.toString());
+		}
+		
+		
+		public function chooseTip(tipIndex:String):void {
+			//if(tipIndex == -1){ // just pick one at random
+			//	this.currentTipIndex = Math.round(Math.random() * (tipText.length - 1));	
+			//}
+			//else {
+			//	this.currentTipIndex = tipIndex;
+			//}
+			
+			//Pick something at random if unspecified.
+			if (tipIndex == "") {
+				tipIndex = getRandomTipIndex();
+			}
+			
+			currentTipIndex = tipIndex;
+			theTip.text = tipText[this.currentTipIndex].theTip;
+			//PromWeek.GameEngine.getInstance().setFocus();
+		}
+		
+		public function nextTip():void {
+			//this.currentTipIndex++;
+			//if (this.currentTipIndex == tipText.length)
+			//{
+			//	this.currentTipIndex = 0;
+			//}
+			var nextIndex:String = tipText[this.currentTipIndex].nextTip;
+			theTip.text = tipText[nextIndex].theTip
+			currentTipIndex =  nextIndex;
+		}
+		
+		public function previousTip():void {
+			//this.currentTipIndex--;
+			//if (this.currentTipIndex <= 0)
+			//{
+			//	this.currentTipIndex = tipText.length - 1;
+			//}
+			var previousIndex:String = tipText[this.currentTipIndex].previousTip;
+			theTip.text = tipText[previousIndex].theTip
+			currentTipIndex =  previousIndex;
+			
+			//theTip.text = tipText[this.currentTipIndex];
+		}
+		
+		public function getRandomTipIndex():String {
+			Debug.debug(this, "chooseTip() picking something at random, because no index was specified");
+			var tipIndex:String;
+			var startPoint:Number = Math.random() * numTips;
+			startPoint = Math.floor(startPoint);
+			var index:int = 0;
+			var foundSomething:Boolean = false;
+			for each(var tempTip:HelpTip in tipText) {
+				
+				if (index == startPoint) {
+					tipIndex = tempTip.thisIndex;
+					foundSomething = true;
+				}
+				index++;
+			}
+			if (!foundSomething) {
+				//Just make it equal to the first one, it doesn't really matter.
+				tipIndex = "click-to-select-character";
+			}
+			return tipIndex;
+		}
+		
+		public function getTipStringFromIndex(index:String):String {
+			return tipText[index].theTip;
+		}
+		
+		public function closeWindow():void {
+			this.visible = false;
+			this.includeInLayout = false;
+		}
+		public function disableTips():void {
+			showTip = false;
+		}
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			/*if(gameEngine.classicPromColors) {
+				this.setStyle("styleName", "classicPromWeek");
+			}
+			else if(gameEngine.greenPromColors) {
+				this.setStyle("styleName", "greenColor");
+			}
+			else if(gameEngine.redPromColors) {
+				this.setStyle("styleName", "redColor");
+			}*/
+			this.invalidateProperties();
+		}
+		
+		]]>
+	</fx:Script>
+
+	
+</s:Group>

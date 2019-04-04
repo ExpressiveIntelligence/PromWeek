@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 initialize="UpdatesAreaInitialize()"
+		 width="175"
+		 height="585">
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+		 </fx:Declarations>
+		 
+		<s:VGroup width="100%" height="100%" maxHeight="590" verticalAlign="bottom">
+			<s:Group id="theGroup" x="{-this.width}" width="100%" height="75"/>
+		</s:VGroup>
+		
+	<fx:Script>
+		<![CDATA[
+		import CiF.Character;
+		import CiF.LineOfDialogue;
+		import CiF.Predicate;
+		import flash.events.MouseEvent;
+		import flash.geom.Vector3D;
+		import flash.sampler.NewObjectSample;
+		import flashx.textLayout.utils.CharacterUtil;
+		import PromWeek.AchievementPopUp;
+		import PromWeek.assets.ResourceLibrary;
+		import spark.components.SkinnableContainer;
+		public var popUpVector:Vector.<Object>;
+		public var gameEngine:PromWeek.GameEngine;
+
+		
+		public function onCreationComplete():void {
+			this.popUpVector = new Vector.<Object>();
+			gameEngine = PromWeek.GameEngine.getInstance();
+		}
+		
+		public function UpdatesAreaInitialize():void
+		{	
+			
+		}
+		
+		/**
+		 * Puts goals in the group to be displayed.
+		 */
+		public function createGoalProgressPopUp(todoItem:ToDoItem, toolTipString:String, good:Boolean, predChangeIndex:Number, primChar:Character = null, secondChar:Character = null,iconName:String=""):void 
+		{
+			var popUp:PromWeek.GoalUpdatedPopUp = new PromWeek.GoalUpdatedPopUp();
+			var notification:PromWeek.GoalUpdatedPopUp = new PromWeek.GoalUpdatedPopUp();
+			//popUp.setStyleName();
+			//notification.setStyleName();
+			
+			var pred:Predicate = todoItem.condition.predicates[predChangeIndex];
+			var primaryName:String = "";
+			var secondaryName:String = "";
+			if (LineOfDialogue.isCharName(pred.primary))
+			{
+				primaryName = pred.primary;
+			}
+			else
+			{
+				if (pred.primary == "initiator")
+				{
+					primaryName = gameEngine.currentStory.storyLeadCharacter;
+				}
+				else
+				{
+					if (primChar)
+					{
+						primaryName = primChar.characterName
+					}
+				}
+			}
+			if (LineOfDialogue.isCharName(pred.secondary))
+			{
+				secondaryName = pred.secondary;
+			}
+			else 
+			{
+				if (pred.secondary == "initiator")
+				{
+					secondaryName = gameEngine.currentStory.storyLeadCharacter;
+				}
+				else
+				{
+					if (secondChar)
+					{
+						secondaryName = secondChar.characterName;
+					}
+				}
+			}
+
+			toolTipString = pred.toNaturalLanguageString(primaryName, secondaryName);
+
+			
+			
+			notification.notificationGoal(todoItem.name, toolTipString, good, predChangeIndex, primChar, secondChar, iconName);
+			
+			popUp.showUpdatedGoal(todoItem.name, toolTipString, good, predChangeIndex, primChar, secondChar, iconName);
+			
+			if (VisibilityManager.getInstance().useOldInterface)
+			{
+				theGroup.addElement(popUp);
+				popUpVector.push(popUp);
+				gameEngine.hudGroup.ssuVisualizer.addGoalNotification(notification);
+			}
+			else
+			{
+				//do the other thing we wanna do...
+				if (good || iconName == "plusIcon")
+				{
+					var newGoalProgress:NEW_goalProgressNotification = new NEW_goalProgressNotification();
+					newGoalProgress.populate(todoItem.taskNaturalLanguageWords[predChangeIndex], todoItem.name, good, iconName);
+				
+					gameEngine.hudGroup.goalProgressGroup.goalProgressPopUps.push(newGoalProgress);
+				}
+			}
+		}
+		
+		/**
+		 * Puts autonomous actions in the group to be displayed
+		 */
+		public function createAutonomousPopUp(autonomousAction:AutonomousActionNotifier):void {
+			if (autonomousAction == null) return;
+			
+			if (autonomousAction.turnsRemaining == 0) return;
+			
+			var popUp:AutonomousActionPopUp = new PromWeek.AutonomousActionPopUp();
+			var notification:PromWeek.AutonomousActionPopUp = new PromWeek.AutonomousActionPopUp();
+			//popUp.setStyleName();
+			//notification.setStyleName();
+			
+			notification.autoActionNotification(autonomousAction);
+			gameEngine.hudGroup.ssuVisualizer.addAutoNotification(notification);
+			
+			popUp.autoActionUpdate(autonomousAction);
+			theGroup.addElement(popUp);
+			popUpVector.push(popUp);
+		}
+		
+		/**
+		 * Puts an SSU in the group to be displayed
+		 */
+		public function createSSUPopUp(char:String, entry:String):void {
+			var popUp:SSUUpdate = new PromWeek.SSUUpdate();
+			var notification:PromWeek.SSUUpdate = new PromWeek.SSUUpdate();
+			//popUp.setStyleName();
+			//notification.setStyleName();
+			
+			notification.notificationSSU(char, entry);
+			notification.height += 15;
+			gameEngine.hudGroup.ssuVisualizer.addSSUNotification(notification);
+			
+			popUp.showSSU(char, entry);
+			theGroup.addElement(popUp);
+			popUpVector.push(popUp);
+		}
+		
+		/**
+		 * Goes through the list to update each of the objects currently visible.
+		 * @param	time
+		 */
+		public function update(time:Number):void {
+			for (var i:int = 0; i < popUpVector.length; i++ ) {
+				var popUpUpdate:Object = this.popUpVector[i];
+				popUpUpdate.update(time);
+				
+				//TODO handle this when there is only one item in the popUpVector
+				if (popUpUpdate.timeToDeleteMe){
+					this.theGroup.removeElementAt(i);
+					this.popUpVector.splice(i, 1);
+				}
+			}
+		}
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			for each (var p:SkinnableContainer in this.popUpVector) {
+				p.styleName = PromWeek.GameEngine.getInstance().activeStyleName;
+				p.invalidateProperties();
+			}
+			
+			this.invalidateProperties();
+		}
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

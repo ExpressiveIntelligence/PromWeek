@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 preinitialize="onPreinitialize()"
+		 show="onShow()"
+		 styleName="classicPromWeek"
+		 width="100%"> 
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>	
+			 <fx:String id="pathData"></fx:String>
+			<mx:Fade id="fadeOut" duration="300" alphaFrom="1.0" alphaTo="0.0" effectEnd="fadeOutDone(event)" />
+			<mx:Fade id="fadeIn" duration="300" alphaFrom="0.0" alphaTo="1.0" effectStart="fadeInStarted(event)" />
+		 </fx:Declarations>
+		 
+		 
+    <s:Path id="bgPath" data="{this.pathData}" >
+        <!--<s:stroke>
+            <s:SolidColorStroke color="#000000" alpha="1" 
+                    weight="3" pixelHinting="true"/>
+        </s:stroke>-->
+        <s:fill>
+            <s:SolidColor color="#45A9FF" alpha="1"/>
+        </s:fill>
+    </s:Path>
+	
+	<s:Group width="100%" height="100%">
+		<prom:NEW_goalButton id="goalButton" click="goalButtonClicked(event)" width="150" height="100%" skinClass="PromWeek.skins.NEW_goalButtonSkin" />
+		<s:HGroup id="rightOfGoalsButtonGroup" x="150" width="{this.width - 150}" height="35">
+			<prom:NEW_timeLeftButton id="numTurnsLeftButton" width="35%" height="100%" click="timeLeftClicked(event)" toolTip="Click to end the level" />
+			<s:HGroup id="juiceGroup" width="45%" height="100%" verticalAlign="middle">
+				<s:HGroup width="31" height="31" verticalAlign="middle" horizontalAlign="right" paddingTop="5">
+					<util:SmoothImage id="juiceImage" height="100%" toolTip="Social Influence Points" />
+				</s:HGroup>
+				<s:HGroup width="90%" height="100%" verticalAlign="middle" horizontalAlign="left" paddingTop="3">
+					<s:HGroup id="juiceBarGroup" width="100%" height="100%" verticalAlign="middle">
+						<prom:JuiceBar id="juiceBar" width="220" height="75%"/><!--visible="false" hideEffect="{fadeOut}" showEffect="{fadeIn}"/>-->
+						<!--<s:Group width="100%" height="75%">
+							<s:Rect width="100%" height="100%">
+								<s:fill>
+									<mx:SolidColor color="0x0F0045"/>
+								</s:fill>
+							</s:Rect>
+						</s:Group>-->
+					</s:HGroup>
+				</s:HGroup>
+			</s:HGroup>
+			
+			<s:HGroup id="utilityButtonsGroup" width="20%" height="100%" horizontalAlign="right" paddingRight="15" paddingTop="2" paddingBottom="2">
+				<prom:ToggleableContainerButton id="fullScreenButton" height="100%" width="{soundButton.height}" boxPadding="0" roundness="3" click="toggleFullScreen(event)" toggleable="false" />
+				<prom:ToggleableContainerButton id="soundButton" height="100%" width="{soundButton.height}" boxPadding="0" roundness="3" click="gameEngine.hudGroup.soundMenuButtonClicked(event)" toggleable="true"/>
+				<prom:ToggleableContainerButton id="optionsButton" height="100%" width="{soundButton.height}" toggleable="false" boxPadding="0" roundness="3" click="gameEngine.hudGroup.optionsMenuButtonClicked(event)"/>
+			</s:HGroup>
+			
+		</s:HGroup>
+	</s:Group>
+		
+	
+	<s:Path id="pathBGStroke" data="{this.pathData}" >
+        <s:stroke>
+            <s:SolidColorStroke color="{getStyle('backgroundStroke')}" alpha="1" 
+                    weight="3" pixelHinting="true"/>
+        </s:stroke>
+    </s:Path>
+	
+	<fx:Script>
+		<![CDATA[
+		import CiF.CiFSingleton;
+		import CiF.Debug;
+		import CiF.LineOfDialogue;
+		import CiF.Predicate;
+		import com.util.SmoothImage;
+		import flash.display.StageDisplayState;
+		import flash.events.MouseEvent;
+		import flash.external.ExternalInterface;
+		import flash.filters.GlowFilter;
+		import flash.geom.Rectangle;
+		import mx.core.FlexGlobals;
+		import PromWeek.assets.ResourceLibrary;
+		import spark.components.Application;
+
+		private var rL:ResourceLibrary;
+		private var cif:CiFSingleton;
+		private var gameEngine:PromWeek.GameEngine;
+		
+		private function onPreinitialize():void 
+		{
+			rL = ResourceLibrary.getInstance();
+			gameEngine = PromWeek.GameEngine.getInstance();
+		}
+		
+		public function onCreationComplete():void 
+		{
+			cif = CiFSingleton.getInstance();
+			this.pathData = "M -5 -5 l " + (this.width + 10) + " 0 l 0 40 l " + ( -1 * ((this.width + 10) - 150)) + " 0 C 107 77 36 72 -4 52 l 0 -55"
+			
+			this.juiceImage.source = rL.uiIcons["lock"];
+			
+			this.juiceBar.add(10);
+
+			var img:SmoothImage = new SmoothImage();
+			img.width = this.optionsButton.height;
+			img.height = this.optionsButton.height;
+			img.source = rL.uiIcons["wrench"];
+			this.optionsButton.mainContainer.addElement(img);
+			
+			img = new SmoothImage();
+			img.width = this.soundButton.height;
+			img.height = this.soundButton.height;
+			img.source = rL.uiIcons["sound"];
+			this.soundButton.mainContainer.addElement(img);
+			
+			img = new SmoothImage();
+			img.width = this.fullScreenButton.height;
+			img.height = this.fullScreenButton.height;
+			img.source = rL.uiIcons["fullScreen"];
+			this.fullScreenButton.mainContainer.addElement(img);
+		}
+		
+		
+		public function changeVisibilityForQuickplay():void
+		{
+			this.bgPath.visible = false;
+			this.goalButton.visible = false;
+			this.numTurnsLeftButton.visible = false;
+			this.juiceGroup.visible = false;
+			this.pathBGStroke.visible = false;
+		}
+		
+		public function changeVisibilityForNotQuickplay():void
+		{
+			this.bgPath.visible = true;
+			this.goalButton.visible = true;
+			this.numTurnsLeftButton.visible = true;
+			this.juiceGroup.visible = true;			
+			this.pathBGStroke.visible = true;			
+		}
+		
+			public function toggleFullScreen(e:MouseEvent = null):void {
+				switch ( FlexGlobals.topLevelApplication.stage.displayState ) {
+					case StageDisplayState.FULL_SCREEN:
+						// switch to displayState = normal
+						FlexGlobals.topLevelApplication.stage.displayState = StageDisplayState.NORMAL;
+						break;
+					default:
+						// switch to displayState = full
+						//FlexGlobals.topLevelApplication.stage.fullScreenSourceRect = new Rectangle(0, 0, 760, 600);
+						FlexGlobals.topLevelApplication.stage.fullScreenSourceRect = new Rectangle(0, 0, 960, 600);
+						FlexGlobals.topLevelApplication.stage.displayState = StageDisplayState.FULL_SCREEN;
+						break;
+				}
+            }
+
+		
+		public function update(sgName:String):void
+		{
+			
+		}
+		
+		public function timeLeftClicked(e:MouseEvent = null):void
+		{
+			if (gameEngine.currentLevel.title == "Free Play!") return;
+			
+			gameEngine.hudGroup.inGameOptionMenu.visible = false;
+			
+			if (gameEngine.currentStory.isQuickPlay) {
+				//we don't want to let them skip the level if it is a quick play level -- maybe make it so that they
+				//are prompted to reset the game state.
+				gameEngine.hudGroup.resetStateButtonClicked(e);
+				
+			}
+			else{
+				//Debug.debug(this, "onClickLevelClock() clicked");
+				if (!gameEngine.currentLevel.endable)
+				{
+					gameEngine.hudGroup.skipLevelOptionMenu.visible = true;
+				}
+				else
+				{
+					gameEngine.hudGroup.skipToEndOfPromNight.visible = true;
+				}
+			}
+		}
+		
+		public function goalButtonClicked(e:MouseEvent=null,shouldTurnOn:Boolean=false):void 
+		{
+			if (this.goalButton.isFreeplay) return;
+			//if (!this.goalButtonHasBeenClicked)
+			//{
+				//this.goalButtonHasBeenClicked = true;
+			//}
+			
+			if (shouldTurnOn)
+			{
+				if (!this.gameEngine.hudGroup.storyGoalWindow.visible)
+				{
+					gameEngine.hudGroup.inGameOptionMenu.visible = false; // just because otherwise they would overlap with each other.
+					fadeIn.play([this.gameEngine.hudGroup.storyGoalWindow]);
+					gameEngine.hudGroup.storyGoalWindow.visible = true;
+				}
+			}
+			else
+			{
+				if (this.gameEngine.hudGroup.storyGoalWindow.visible)
+				{
+					fadeOut.play([this.gameEngine.hudGroup.storyGoalWindow]);
+					gameEngine.hudGroup.storyGoalWindow.visible = false;
+				}
+				else
+				{
+					gameEngine.hudGroup.inGameOptionMenu.visible = false; // just because otherwise they would overlap with each other.
+					gameEngine.hudGroup.storyGoalWindow.visible = true;
+					fadeIn.play([this.gameEngine.hudGroup.storyGoalWindow]);
+				}
+			}
+		}
+		
+		public function fadeInStarted(e:Event):void
+		{
+			gameEngine.hudGroup.newStoryGoalWindow.visible = true;
+		}
+		public function fadeOutDone(e:Event):void
+		{
+			gameEngine.hudGroup.newStoryGoalWindow.visible = false;
+			if (gameEngine.hudGroup.storyGoalWindow.hintComponent.filterTopLevel.visible)
+			{
+				gameEngine.hudGroup.storyGoalWindow.hintComponent.fadeOut.play([gameEngine.hudGroup.storyGoalWindow.hintComponent.hintSearchGroup]);
+			}
+		}
+		
+		
+		public function onShow():void {
+			this.numTurnsLeftButton.skin.invalidateDisplayList();
+		}
+		
+
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>
+

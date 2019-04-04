@@ -1,0 +1,46 @@
+<PromWeek>
+		<Story title="QP3" storyLeadCharacter="Zack" locked="false" toUnlock="0" isTutorial="false" isQuickPlay="true" numberOfQuickPlaySGAvailable="2" startState="quickPlayStartState3" nextChallengeName="QP5">
+			<Description>Teach that actions can fail.</Description>
+			<QuickPlayDescription>
+				<![CDATA[Have Zack ###ZACK### make a move on ###ROMANCE UP### Lil ###Lil###.]]>
+			</QuickPlayDescription>
+			<QuickPlayEndingDescription>
+				<![CDATA[Characters don't always respond how you want.]]>
+			</QuickPlayEndingDescription>
+			<ForcedSGs> <!-- Force a pair of characters to WANT to play a specific instantiation of a specific social game. -->
+				<ForcedSG initiator="Zack" responder="Lil" gameName="Woo" turnsIn="0" instantiationID="29" />
+			</ForcedSGs>
+			<ToDoList>
+				<ToDoItem name="Make a move">
+					<Condition>
+						<Rule>
+							<Predicate type="network" networkType="romance" first="Lil" second="Zack" comparator="greaterthan" value="35" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+						<taskNaturalLanguage words="Have Zack ###ZACK### try to date Lil ###Lil###."/>
+					</Condition>
+				</ToDoItem>
+				<ToDoItem name="Make a move">
+					<Condition>
+						<Rule>
+							<Predicate type="network" networkType="romance" first="Lil" second="Zack" comparator="lessthan" value="30" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+						<taskNaturalLanguage words="Find out whether ###ZACK### has a chance with ###LIL###."/>
+					</Condition>
+				</ToDoItem>
+			</ToDoList>
+			<Levels>
+				<Level title="LEVEL 3" timeLimit="1" cameraZoom="1" useDefinedCameraPosition="false" cameraX="800" cameraY="1400" endable="false" isTutorial="false" tutorialScript="">
+					<Description>Have Zack start dating Lil.</Description>
+					<Setting>classroom</Setting>
+					<Cast>
+						<CharacterName>Zack</CharacterName>
+						<CharacterName>Lil</CharacterName>
+					</Cast>
+					<GoalRules>
+					</GoalRules>
+				</Level>
+			</Levels>
+			<Endings>
+			</Endings>
+		</Story>
+</PromWeek>

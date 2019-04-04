@@ -1,0 +1,52 @@
+<PromWeek>
+		<Story title="QP4" storyLeadCharacter="Lil" locked="false" toUnlock="0" isTutorial="false" isQuickPlay="true" numberOfQuickPlaySGAvailable="3" startState="quickPlayStartState4" nextChallengeName="QP5">
+			<Description>Introduce more than 2 characters, free will.</Description>
+			<QuickPlayDescription>
+				<![CDATA[Start a new friendship.]]> <!--  (Hint: not everyone wants to be friends.) -->
+			</QuickPlayDescription>
+			<QuickPlayEndingDescription>
+				<![CDATA[You can direct any character.]]>
+			</QuickPlayEndingDescription>
+			<ForcedSGs> <!-- Force a pair of characters to WANT to play a specific instantiation of a specific social game. -->
+				<ForcedSG initiator="Kate" responder="Edward" gameName="Make Plans" turnsIn="0" instantiationID="-1" />
+				<ForcedSG initiator="Lil" responder="Edward" gameName="Make Plans" turnsIn="0" instantiationID="-1" />
+				<ForcedSG initiator="Edward" responder="Lil" gameName="Make Plans" turnsIn="0" instantiationID="-1" />
+				<ForcedSG initiator="Kate" responder="Edward" gameName="Make Plans" turnsIn="1" instantiationID="-1" />
+				<ForcedSG initiator="Lil" responder="Edward" gameName="Make Plans" turnsIn="1" instantiationID="-1" />
+				<ForcedSG initiator="Edward" responder="Lil" gameName="Make Plans" turnsIn="1" instantiationID="-1" />
+			</ForcedSGs>
+			<ToDoList>
+				<ToDoItem name="Start a new friendship.">
+					<Condition>
+						<Rule>
+							<Predicate type="relationship" first="Kate" second="Edward" relationship="friends" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+						<taskNaturalLanguage words="Start a new friendship."/>
+					</Condition>
+				</ToDoItem>
+				<ToDoItem name="Start a new friendship.">
+					<Condition>
+						<Rule>
+							<Predicate type="relationship" first="Lil" second="Edward" relationship="friends" negated="false" intent="false" isSFDB="false" window="0" numTimesUniquelyTrueFlag="false" numTimesUniquelyTrue="0" numTimesRoleSlot=""/>
+						</Rule>
+						<taskNaturalLanguage words="Start a new friendship."/>
+					</Condition>
+				</ToDoItem>
+			</ToDoList>
+			<Levels>
+				<Level title="LEVEL 4" timeLimit="2" cameraZoom="1" useDefinedCameraPosition="false" cameraX="800" cameraY="1400" endable="false" isTutorial="false" tutorialScript="">
+					<Description>Start a new friendship.</Description>
+					<Setting>parkinglot</Setting>
+					<Cast>
+						<CharacterName>Lil</CharacterName>
+						<CharacterName>Kate</CharacterName>
+						<CharacterName>Edward</CharacterName>
+					</Cast>
+					<GoalRules>
+					</GoalRules>
+				</Level>
+			</Levels>
+			<Endings>
+			</Endings>
+		</Story>
+</PromWeek>

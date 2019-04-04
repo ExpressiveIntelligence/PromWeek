@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 initialize="onInitialize()"
+		 click="onClickLevelTimer(event);"
+		 width="40"
+		 height="40">
+		 
+		
+		<fx:Declarations>
+			<fx:Number id="goalInProgressColor">0xffffff</fx:Number>
+			<fx:Number id="goalAchievedColor">0xffffff</fx:Number>
+			<fx:Number id="mainColor">0xffffff</fx:Number>
+			<fx:Number id="maxTime">1000</fx:Number>
+			<fx:Number id="timeRemaining">1000</fx:Number>
+			<fx:Number id="clockLineLengthRatio">0.85</fx:Number>
+		</fx:Declarations>
+		
+		<s:RichText id="timeRemainingText" text="{this.timeRemaining}" fontSize="24" fontWeight="bold" width="100%" color="{this.mainColor}">
+		</s:RichText>
+		
+		<fx:Script>
+			<![CDATA[
+			import flash.events.Event;
+			import flash.events.MouseEvent;
+			import mx.graphics.SolidColorStroke;
+			import mx.graphics.Stroke;
+			import spark.primitives.Ellipse;
+			import flashx.textLayout.formats.TextAlign;
+			import spark.primitives.Line;
+			
+			private var timerBorder:Ellipse;
+			
+			private var needToRender:Boolean = false;
+			
+			
+			
+			public function onCreationComplete():void {
+				this.timerBorder = new Ellipse();
+				this.timerBorder.stroke = new SolidColorStroke(this.mainColor);
+				this.timerBorder.stroke.weight = 3;
+				this.timerBorder.height = this.height;
+				this.timerBorder.width = this.width;
+				
+				
+				//construct the clock lines (corresponding to the numbers on a clock)
+				for (var i:int = 0; i < 12; ++i) {
+					var l:Line = new Line();
+					if (i % 3 == 0) {
+						l.stroke = new Stroke(0xFFFFFF, 3);
+					}else {
+						l.stroke = new Stroke(0xFFFFFF, 1);
+					}
+					//center it + the diameter {*optional scaling} * trig factor
+					l.xFrom = this.width / 2.0 + this.width / 2.0 * Math.cos(i * Math.PI / 6); // PI*2 / 12
+					l.xTo= this.width / 2.0 + this.width / 2.0 * clockLineLengthRatio * Math.cos(i * Math.PI / 6); 
+					l.yFrom = this.height / 2.0 + this.height / 2.0 * Math.sin(i * Math.PI / 6); 
+					l.yTo = this.height / 2.0 + this.height / 2.0 * clockLineLengthRatio * Math.sin(i * Math.PI / 6);
+					this.addElement(l);
+					//Utility.log(this, "onCreationComplete() l.xFrom=" + l.xFrom + " l.xTo=" + l.xTo + " l.yFrom=" + l.yFrom + " l.yTo=" + l.yTo);
+				}
+				
+				//this.addElement(timerBorder);
+				
+				this.timeRemainingText.x = 0;
+				this.timeRemainingText.y = this.height / 4.0;
+				
+				//this.timeRemainingText.verticalCenter = this.height / 2.0;
+				//this.timeRemainingText.horizontalCenter = this.width / 2.0;
+
+				//this.timeRemainingText.verticalCenter = this.verticalCenter;
+				//this.timeRemainingText.horizontalCenter = this.horizontalCenter;
+
+				this.timeRemainingText.setStyle("textAlign", TextAlign.CENTER);
+				this.needToRender = false;
+				
+				//f69805 - lowlight
+				//f7f671
+			}
+			
+			/**
+			 * Sets the current time remaining on the level timer. If the time
+			 * to set is different than the time already in the timer, the clock
+			 * is re-rendered. If the time remaining is greater than the max
+			 * time of the timer, the time remaining is set to the max time. If
+			 * the incoming time is less than 0, the time remaining is set to 0.
+			 * @param	t
+			 */
+			public function setTimeRemaining(t:Number):void {
+				if (t == this.timeRemaining) return;
+				
+				if (t < 0)
+					this.timeRemaining = 0;
+				else if (t >= this.maxTime) 
+					this.timeRemaining = this.maxTime;
+				else
+					this.timeRemaining = t;
+				
+				//render();
+			}
+			
+			
+			public function render():void {
+				this.timeRemainingText.text = this.timeRemaining as String;
+			}
+			
+			public function setGoalAchieved(b:Boolean):void {
+				if (b) {
+					this.mainColor = this.goalAchievedColor;
+					if(this.timerBorder) {
+						this.timerBorder.stroke = new SolidColorStroke(this.mainColor);
+						this.timerBorder.stroke.weight = 5;
+					}
+				}else {
+					this.mainColor = this.goalInProgressColor;
+					if(this.timerBorder) {
+						this.timerBorder.stroke = new SolidColorStroke(this.mainColor);
+						this.timerBorder.stroke.weight = 5;
+					}
+				}
+			}
+			
+			public function onInitialize():void {
+				
+			}
+			
+			public function onClickLevelTimer(event:MouseEvent):void {
+				
+			}
+			
+			
+			
+			]]>
+		</fx:Script>
+		 
+</s:Group>

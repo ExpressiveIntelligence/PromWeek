@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 preinitialize="onPreinitialize()"
+		 styleName="classicPromWeek"
+		 width="100%" height="100%">
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+					
+		 </fx:Declarations>
+		
+		<s:VGroup width="100%" height="100%" horizontalAlign="center">
+			<mx:Spacer width="100%" height="4%" />
+			<s:Group id="titleTextGroup" width="100%" height="16%">
+				<s:Rect width="100%" height="100%">
+					<s:fill>
+						<s:SolidColor color="#45A9FF" alpha="0.7"/>
+					</s:fill>
+				</s:Rect>
+				<s:Label id="goalProgressTitleText"
+							 color="#ffffff"
+							 text="Story Goal Progress Made!"
+							 verticalAlign="middle" 
+							 textAlign="center"
+							 width="100%"
+							 height="100%"
+							 filters="{[new GlowFilter(0x000000,1.0,2.0,2.0,10)]}"
+							 styleName="goalProgressTitleTextStyle" />
+			</s:Group>
+			<s:VGroup width="80%" height="80%" horizontalAlign="center" paddingTop="50" paddingBottom="20">
+				<s:Scroller id="taskScroller" height="100%" horizontalScrollPolicy="off" >
+					<s:VGroup id="goalPopUpGroup" height="100%" horizontalAlign="center"/>
+				</s:Scroller>
+			</s:VGroup>
+		</s:VGroup>
+		 
+		<s:HGroup id="fireworksGroup" width="100%" height="100%" mouseEnabled="false" mouseChildren="false" mouseEnabledWhereTransparent="false"/>
+		<prom:PromWeekButton id="continueButton" click="continueClicked(event)"  width="75"  height="40" scaleX="2" scaleY="2" right="20" bottom="20" label="Continue" />
+		
+	<fx:Script>
+		<![CDATA[
+		import CiF.CiFSingleton;
+		import CiF.GameScore;
+		import CiF.LineOfDialogue;
+		import flash.events.MouseEvent;
+		import mx.controls.RichTextEditor;
+		import PromWeek.assets.ResourceLibrary;
+		import flash.filters.GlowFilter;
+		import PromWeek.assets.ResourceLibrary;
+		import PromWeek.skins.NEW_listScrollSkin;
+		import spark.components.HGroup;
+		
+		import flash.filters.BlurFilter;
+		import flash.filters.ColorMatrixFilter;
+		import flash.geom.Rectangle;
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import mx.core.UIComponent;
+		import org.flintparticles.twoD.renderers.BitmapRenderer;
+		import PromWeek.assets.ResourceLibrary;
+		import spark.components.Group;
+		import spark.components.RichText;
+		import mx.flash.UIMovieClip;
+		import spark.components.VGroup;
+
+		
+		private var rL:ResourceLibrary;
+		private var cif:CiFSingleton;
+		private var dm:DifficultyManager;
+		public var gameEngine:GameEngine;
+		
+		public var goalProgressPopUps:Vector.<NEW_goalProgressNotification>;
+		
+		public function onCreationComplete():void 
+		{					
+			taskScroller.verticalScrollBar.setStyle("skinClass", NEW_listScrollSkin);
+		}
+		
+		private function onPreinitialize():void 
+		{
+			rL = ResourceLibrary.getInstance();
+			cif = CiFSingleton.getInstance();
+			dm = DifficultyManager.getInstance();
+			gameEngine = PromWeek.GameEngine.getInstance();
+		}
+		
+		public function startBigFireworks():void
+		{
+			
+			this.fireworksGroup.removeAllElements();
+			
+			var uiComp:UIComponent = new UIComponent();
+			uiComp.width = this.width;
+			uiComp.height = this.height;
+			
+			var emitter:NEW_firework = new NEW_firework();
+			var renderer:BitmapRenderer = new BitmapRenderer( new Rectangle( 0, 0, this.width, this.height) );
+			renderer.addFilter( new BlurFilter( 2, 2, 1 ) );
+			renderer.addFilter( new ColorMatrixFilter( [ 1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0.95,0 ] ) );
+			renderer.addEmitter( emitter );
+			emitter.x = fireworksGroup.width/4;
+			emitter.y = this.titleTextGroup.y + this.titleTextGroup.height/2;
+			emitter.start();			
+			uiComp.addChild(renderer);
+			renderer.mouseEnabled = false;
+			renderer.mouseChildren = false;
+			
+			emitter = new NEW_firework();
+			renderer = new BitmapRenderer( new Rectangle( 0, 0, this.width, this.height) );
+			renderer.addFilter( new BlurFilter( 2, 2, 1 ) );
+			renderer.addFilter( new ColorMatrixFilter( [ 1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0.95,0 ] ) );
+			renderer.addEmitter( emitter );
+			emitter.x = 3 * fireworksGroup.width/4;
+			emitter.y = this.titleTextGroup.y + this.titleTextGroup.height/2;
+			emitter.start();			
+			uiComp.addChild(renderer);
+			renderer.mouseEnabled = false;
+			
+			this.fireworksGroup.addElement(uiComp);
+			
+			this.fireworksGroup.mouseEnabled = false;
+			this.fireworksGroup.mouseChildren = false;
+			//this.fireworksGroup.mouseEnabledWhereTransparent = false;
+			
+			uiComp.mouseEnabled = false;
+			uiComp.mouseChildren = false;
+			//uiComp.mouseEnabledWhereTransparent = false;
+		}
+		
+		public function refreshGoalPopUps():void 
+		{
+			goalPopUpGroup.removeAllElements();
+			
+			var i:int;
+			var setWidth:Boolean = false;
+			for (i = 0; i < this.goalProgressPopUps.length; i++)
+			{
+				//this.goalProgressPopUps[i].x += this.goalProgressPopUps[i].width / 2;
+				if (!setWidth)
+				{
+					setWidth = true;
+					this.goalPopUpGroup.width = this.goalProgressPopUps[i].width;
+				}
+				this.goalPopUpGroup.addElement(this.goalProgressPopUps[i]);
+			}
+			
+			if (i > 0)
+			{
+				if (gameEngine.currentStory.isQuickPlay)
+				{
+					if (gameEngine.currentStory.nextChallengeName == "NONE")
+					{
+						this.continueButton.label = "Done!";
+					}
+					else
+					{
+						this.continueButton.label = "Next Challenge";
+					}
+					this.goalProgressTitleText.text = "Level Complete!";
+				}
+				else
+				{
+					this.continueButton.label = "Continue";
+					this.goalProgressTitleText.text = "Story Goal Progress!";
+				}
+				
+				//this means we had something to report!
+				this.visible = true;
+
+				this.startBigFireworks();
+			}
+			else
+			{
+				this.visible = false;
+			}
+		}
+		
+		public function continueClicked(e:MouseEvent = null):void
+		{
+			this.fireworksGroup.removeAllElements();
+
+			if (gameEngine.currentStory.isQuickPlay)
+			{
+				gameEngine.hudGroup.nextQuickPlayButtonClicked();
+				this.visible = false;
+			}
+			else
+			{			
+				this.gameEngine.hudGroup.megaUI.clear();
+				PromWeek.GameEngine.getInstance().onClickInResultsState();
+				this.visible = false;
+			}
+		}
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

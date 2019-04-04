@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+               xmlns:s="library://ns.adobe.com/flex/spark" 
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+			   creationComplete="onCreationComplete()"
+			   width="100%"
+			   height="100%">
+	<fx:Declarations>
+		<fx:Number id="iconDim">20</fx:Number>
+		<fx:Number id="padding">5</fx:Number>
+	</fx:Declarations>
+	
+	<prom:ToggleableContainerButton id="relSummaryButton" width="100%" height="100%" toggleable="false" boxPadding="{this.padding}" roundness="5" click="relSummaryButtonClicked(event)" />
+	
+	<fx:Script>
+		<![CDATA[
+		import CiF.Character;
+		import CiF.CiFSingleton;
+		import CiF.RelationshipNetwork;
+		import flash.events.MouseEvent;
+		import mx.controls.Image;  import com.util.SmoothImage;
+		import PromWeek.assets.ResourceLibrary;
+		import spark.components.HGroup;
+		
+		public var gameEngine:PromWeek.GameEngine;
+		public var cif:CiFSingleton;
+		public var resourceLibrary:ResourceLibrary;
+		
+		public var currentPrimaryCharacter:Character;
+		public var currentSecondaryCharacter:Character;
+		
+		public function onCreationComplete():void 
+		{
+			
+		}
+		
+		
+		public function updateRelationshipButtons():void
+		{
+			gameEngine = PromWeek.GameEngine.getInstance();
+			cif = CiFSingleton.getInstance();
+			resourceLibrary = ResourceLibrary.getInstance();
+			
+			this.relSummaryButton.mainContainer.removeAllElements();
+			
+			this.currentPrimaryCharacter = cif.cast.getCharByName(gameEngine.primaryAvatarSelection);
+			this.currentSecondaryCharacter = cif.cast.getCharByName(gameEngine.secondaryAvatarSelection);
+			
+			//Bail out if for some reason we call this when we dnot' have characters selected
+			if (this.currentPrimaryCharacter && this.currentSecondaryCharacter)
+			{
+				this.relSummaryButton.toolTip = currentPrimaryCharacter.characterName + "'s relationships with " + currentSecondaryCharacter.characterName;
+			}
+			else
+			{
+				return;
+			}
+			
+			var hGroup:HGroup = new HGroup();
+			hGroup.width = this.relSummaryButton.mainContainer.width;
+			hGroup.height = this.relSummaryButton.mainContainer.height;
+
+			var friendsIcon:SmoothImage = new SmoothImage();
+			friendsIcon.width = this.iconDim;
+			friendsIcon.height = this.iconDim;
+			var datingIcon:SmoothImage = new SmoothImage();
+			datingIcon.width = this.iconDim;
+			datingIcon.height = this.iconDim;
+			var enemiesIcon:SmoothImage = new SmoothImage();
+			enemiesIcon.width = this.iconDim;
+			enemiesIcon.height = this.iconDim;
+			
+			
+			var hasRelationship:Boolean;
+			//friends
+			hasRelationship = cif.relationshipNetwork.getRelationship(RelationshipNetwork.FRIENDS, this.currentPrimaryCharacter, this.currentSecondaryCharacter);
+			if (hasRelationship)
+			{
+				friendsIcon.source = resourceLibrary.relationshipIcons["friends"];
+			}
+			else
+			{
+				friendsIcon.source = resourceLibrary.relationshipIcons["notFriends"];
+			}
+			
+			//dating
+			hasRelationship = cif.relationshipNetwork.getRelationship(RelationshipNetwork.DATING, this.currentPrimaryCharacter, this.currentSecondaryCharacter);
+			if (hasRelationship)
+			{
+				datingIcon.source = resourceLibrary.relationshipIcons["dating"];
+			}
+			else
+			{
+				datingIcon.source = resourceLibrary.relationshipIcons["notDating"];
+			}
+			
+			//enemies
+			hasRelationship = cif.relationshipNetwork.getRelationship(RelationshipNetwork.ENEMIES, this.currentPrimaryCharacter, this.currentSecondaryCharacter);
+			if (hasRelationship)
+			{
+				enemiesIcon.source = resourceLibrary.relationshipIcons["enemies"];
+			}
+			else
+			{
+				enemiesIcon.source = resourceLibrary.relationshipIcons["notEnemies"];
+			}
+			
+			
+			hGroup.addElement(friendsIcon);
+			hGroup.addElement(datingIcon);
+			hGroup.addElement(enemiesIcon);
+			
+			this.relSummaryButton.mainContainer.addElement(hGroup);
+
+		}
+		
+		public function relSummaryButtonClicked(e:MouseEvent = null):void
+		{
+			if (!this.gameEngine.hudGroup.megaUI.megaUIExpanded)
+			{
+				this.gameEngine.hudGroup.megaUI.expandMegaUI();
+			}
+			this.gameEngine.hudGroup.megaUI.setToRelationshipState();
+		}
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			this.relSummaryButton.setStyleName();
+			this.invalidateProperties();
+		}
+		
+		]]>
+	</fx:Script>
+	
+</s:Group>

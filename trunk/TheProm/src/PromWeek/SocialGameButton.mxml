@@ -1,0 +1,2131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnableContainer
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/mx" 
+	xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+	creationComplete="onCreationComplete()"
+	styleName="classicPromWeek"
+	skinClass="PromWeek.skins.SocialGameButtonSkin">	
+	
+	<fx:Declarations>
+		<fx:String id="label" />
+		<fx:String id="gameName"/>
+		<fx:Boolean id="showRelationshipIcon">false</fx:Boolean>
+		<fx:Boolean id="showNegated">false</fx:Boolean>
+		<fx:Number id="relationshipTypeChanged" />
+		<fx:int id="intentCategory" />
+		<fx:int id="intentType" />
+		<fx:Boolean id="gameManuallySet">false</fx:Boolean>
+		<fx:String id="setGameName"></fx:String>
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+		
+		import CiF.Effect;
+		import CiF.SocialGameContext;
+		import CiF.SFDBLabel;
+		import CiF.RelationshipNetwork;
+		import CiF.Status;
+		import CiF.TriggerContext;
+		import CiF.Trigger
+		import CiF.BuddyNetwork;
+		import CiF.Character;
+		import CiF.CiFSingleton;
+		import CiF.Debug;
+		import CiF.SocialGame
+		import CiF.SocialGamesLib
+		import CiF.Instantiation;
+		import CiF.Predicate;
+		import CiF.RelationshipNetwork;
+		import CiF.Rule;
+		import CiF.SocialFactsDB;
+		import CiF.SocialGameContext;
+		import CiF.SocialNetwork;
+		import com.greensock.plugins.VisiblePlugin;
+		import flash.events.Event;
+		import flash.events.KeyboardEvent;
+		import flash.ui.Keyboard;
+		import flash.utils.Dictionary;
+		import PromWeek.GameEngine;
+		import com.greensock.data.BlurFilterVars;
+		import mx.collections.ArrayCollection;
+		import PromWeek.assets.ResourceLibrary;
+		
+		import spark.components.Button;
+		import flash.events.MouseEvent;
+	
+
+		private var gameEngine:GameEngine;
+		private var cif:CiFSingleton;
+		private var jpm:JuicePointManager;
+		private var dm:DifficultyManager;
+
+		
+		public var isEndingButton:Boolean = false;
+		private var shiftKeyPressed:Boolean = false;
+		
+		public static const INVALID_INTENT:int = -1;
+		public static const BUDDY:int = 0;
+		public static const ROMANCE:int = 1;
+		public static const COOL:int = 2;
+		
+		public static const NO_RELATIONSHIP_CHANGE:int = 0;
+		public static const FRIENDS_CHANGE:int = 1;
+		public static const DATING_CHANGE:int = 2;
+		public static const ENEMIES_CHANGE:int = 3;
+		public static const NOT_FRIENDS_CHANGE:int = 4;
+		public static const NOT_DATING_CHANGE:int = 5;
+		public static const NOT_ENEMIES_CHANGE:int = 6;
+		
+		public static const ENDING:int = 7;
+		
+		//Temporary variables used for creating hypothetical futures in Forecast.
+		public static var tempAcceptEffect:Effect = new Effect();
+		public static var tempRejectEffect:Effect = new Effect();
+		public static var tempSFDBLabel:SFDBLabel = new SFDBLabel();
+		public static var tempSocialGameContext:SocialGameContext = new SocialGameContext();
+		public static var tempSocialGame:SocialGame = new SocialGame();
+		public static var tempPredicate:Predicate = new Predicate();
+		
+		//public var textField:RichText;
+		public var isSelected:Boolean = false;
+		
+		public var shouldGlow:Boolean = false;
+		public var networkChangeType:int = -1;
+		
+		public function onCreationComplete():void
+		{
+			//this.width = 100;
+			//this.height = 100;
+			
+			//this.setStyle("lineBreak", 'explicit');
+			//this.setStyle("multiline", true);
+			
+			gameEngine = GameEngine.getInstance();
+			cif = CiFSingleton.getInstance();
+			jpm = JuicePointManager.getInstance();
+			dm = DifficultyManager.getInstance();
+			this.isSelected = false;
+			/**
+		 * Here are all the events that this button will be throwing!
+		 * 	buttonPressed - the center button is pressed
+		 *  iPressed - the top left button is pressed
+		 *  rPressed - the top middle button is pressed
+		 *  forecastPressed - the top right button is pressed
+		 *  outcomePressed - the bottom left button is pressed
+		 *  setoutcomePressed - the bottom right button is pressed
+		*/
+
+			//this.addEventListener("iPressed", iPressedHandler);
+			//this.addEventListener("buttonPressed", clickNoShiftHandler)
+			this.addEventListener(MouseEvent.CLICK, clickNoShiftHandler)
+			this.addEventListener("buttonPressedShift", clickShiftHandler)
+			this.addEventListener("extraBtnPressed", iPressedHandler)
+			
+		}
+		
+		private function clickNoShiftHandler(e:Event):void {
+			this.shiftKeyPressed = false
+			clickHandler()
+		}
+		
+		private function clickShiftHandler(e:Event):void {
+			this.shiftKeyPressed = true
+			clickHandler()
+		}
+		
+		private function iPressedHandler(e:Event): void 
+		{
+			this.playTheGame();
+			
+			//gameEngine.hudGroup.megaUI.loadSGInfo(this.gameName);
+		}
+
+		/**
+		 * Sets the gameEngine up to play a social game, tells avatars who they are looking at, positions them and changes the gameEngine's state
+		 * Ryan: I moved the usage of this to be ONLY on the SGBS::middleRowGroup using event handlers!
+		 * @param	e
+		 */
+		private function clickHandler():void
+		{			
+			//var avatarsToFollow:ArrayCollection;
+			if (!this.isEndingButton)
+			{
+				if (gameEngine.currentlySelectedSG == this.gameName 
+					&& gameEngine.currentlySelectedInitiator == gameEngine.primaryAvatarSelection
+					&& gameEngine.currentlySelectedResponder == gameEngine.secondaryAvatarSelection)
+				{
+					/*
+					if (this.shiftKeyPressed) {
+						//They were holding down the shift key, activate secret code!
+						if (gameEngine.useJuicePoints) Debug.debug(this, "changing things up.");
+							//if (!jpm.activateOppositeResponderReaction())
+							//return; // activateOppositeResponderReaction handles everything! If it was false, then we failed.
+						else
+							gameEngine.negateResponderScore = true;
+					}
+					*/
+					this.playTheGame();
+				}
+				else
+				{
+					//in this case we just want to populate the thing. Like if we pressed the I box!
+					//Debug.debug(this, "all the information we need:");
+					//Debug.debug(this, "gameEngineCurrentlySelectedInitiator: " + gameEngine.currentlySelectedInitiator + " gameEngine primary avatar: " + gameEngine.primaryAvatarSelection);
+					//Debug.debug(this, "gameEnginecurrently selected responder: " + gameEngine.currentlySelectedResponder + " gameEngine secondary avatar selection: " + gameEngine.secondaryAvatarSelection);
+					//Debug.debug(this, "gameEngine currently selected SG: " + gameEngine.currentlySelectedSG + " this.gameName: " + this.gameName);
+					
+					//Make this button selected, and every other button not selected!
+					for each(var b:SocialGameButton in gameEngine.hudGroup.socialGameButtonRing.socialGameButtons) {
+						//if(b != this) {
+							b.isSelected = false;
+							b.shouldGlow = false
+						//}
+					}
+					
+					this.isSelected = true;
+					this.shouldGlow = true;
+					
+					for each(b in gameEngine.hudGroup.socialGameButtonRing.socialGameButtons) 
+					{
+						b.skin.invalidateProperties();
+					}
+					
+					gameEngine.currentlySelectedSG = this.gameName 
+					gameEngine.currentlySelectedInitiator = gameEngine.primaryAvatarSelection;
+					gameEngine.currentlySelectedResponder = gameEngine.secondaryAvatarSelection;
+					//this.skin.invalidateProperties();
+					
+					//also, populate the megaUI!
+					this.gameEngine.hudGroup.megaUI.sgInfo.loadSGInfo(this.gameName);
+					if (this.gameEngine.hudGroup.megaUI.megaUIExpanded)
+					{
+						this.gameEngine.hudGroup.megaUI.setToSocialGameInfo();
+					}
+					gameEngine.hudGroup.megaUI.socialGameButtonGroup.visible = true;
+					gameEngine.hudGroup.megaUI.singleCharacterToggleButtonsGroup.visible = false;
+					gameEngine.hudGroup.megaUI.setButtonsToAppropriateEnabledState();
+				}
+
+			}
+			else
+			{
+				for each (var ending:Ending in gameEngine.currentStory.endings)
+				{
+					//if (ending.name == e.target.label)
+					//{
+					// this was removed. If it hasn't been added already, we must make an "EndingButton" component!
+						gameEngine.endingToPerform = ending;
+					//}
+				}
+				
+				
+				gameEngine.initiatorName = gameEngine.endingToPerform.firstName.toLowerCase();
+				gameEngine.responderName = gameEngine.endingToPerform.actualSecondThirdPair["responder"];
+				
+				gameEngine.endingToPerform.instantiations[0];
+				
+				gameEngine.worldGroup.avatars[gameEngine.initiatorName].lookingAtTarget = gameEngine.responderName;
+				gameEngine.worldGroup.avatars[gameEngine.responderName].lookingAtTarget = gameEngine.initiatorName;
+				
+				
+				//avatarsToFollow = new ArrayCollection;//Vector.<Avatar> = new Vector.<Avatar>();
+				//avatarsToFollow.addItem(gameEngine.worldGroup.avatars[gameEngine.initiatorName]);
+				//avatarsToFollow.addItem(gameEngine.worldGroup.avatars[gameEngine.responderName]);
+				//gameEngine.camera.frameAvatars(avatarsToFollow);
+				
+				gameEngine.currentState = "Performance";
+			}
+		}
+		
+		
+		public function playTheGame():void
+		{	
+			gameEngine.socialGameToPerform = this.gameName;
+			
+			gameEngine.initiatorName = gameEngine.primaryAvatarSelection;
+			gameEngine.responderName = gameEngine.secondaryAvatarSelection;
+			
+			gameEngine.worldGroup.avatars[gameEngine.initiatorName].lookingAtTarget = gameEngine.responderName.toLowerCase();
+			gameEngine.worldGroup.avatars[gameEngine.responderName].lookingAtTarget = gameEngine.initiatorName.toLowerCase();
+			
+			gameEngine.hudGroup.socialGameButtonRing.visible = false;
+			gameEngine.hudGroup.megaUI.visible = false;
+			gameEngine.hudGroup.updatesGroup.visible = false;
+			
+			gameEngine.currentState = "Performance";
+		}
+		
+		public function updateStateBasedOnGameName(gameNameToSet:String):void 
+		{
+			var primaryChar:Character;
+			var secondaryChar:Character;
+			var sgc:SocialGameContext;
+			var changeRule:Rule;
+			
+			this.gameName = (this.gameManuallySet)?this.setGameName:gameNameToSet;
+			this.intentCategory = this.getIntentCategory();
+			
+			this.intentType = CiFSingleton.getInstance().socialGamesLib.getByName(this.gameName).intents[0].predicates[0].getIntentType();
+			
+			if (this.getRelationshipChange() != NO_RELATIONSHIP_CHANGE) 
+			{
+				this.showRelationshipIcon = true;
+				switch (this.getRelationshipChange()) 
+				{
+					case NOT_FRIENDS_CHANGE:
+					case NOT_DATING_CHANGE:
+					case NOT_ENEMIES_CHANGE:
+						this.showNegated = true;
+						break;
+					default:
+						this.showNegated = false;
+				}
+				switch (this.getRelationshipChange()) 
+				{
+					case NOT_FRIENDS_CHANGE:
+					case FRIENDS_CHANGE:
+						this.relationshipTypeChanged = RelationshipNetwork.FRIENDS;
+						break;
+					case NOT_DATING_CHANGE:
+					case DATING_CHANGE:
+						this.relationshipTypeChanged = RelationshipNetwork.DATING;
+						break;
+					case NOT_ENEMIES_CHANGE:
+					case ENEMIES_CHANGE:
+						this.relationshipTypeChanged = RelationshipNetwork.ENEMIES;
+						break;
+				}
+			}
+			else 
+			{
+				this.showRelationshipIcon = false;
+			}
+			
+			
+			if (intentType == Predicate.INTENT_BUDDY_DOWN || 
+					intentType == Predicate.INTENT_BUDDY_UP ||
+					intentType == Predicate.INTENT_COOL_DOWN||
+					intentType == Predicate.INTENT_COOL_UP ||
+					intentType == Predicate.INTENT_ROMANCE_DOWN ||
+					intentType == Predicate.INTENT_ROMANCE_UP)
+			{
+				this.networkChangeType = intentType;
+			}
+			else
+			{
+				this.networkChangeType = -1;
+			}
+			
+			
+			
+			
+			//see if the effect taken by social game play involves a story sequence.
+			// if so, add an * to the label
+			
+			primaryChar = cif.cast.getCharByName(gameEngine.primaryAvatarSelection);
+			secondaryChar = cif.cast.getCharByName(gameEngine.secondaryAvatarSelection);
+			if (primaryChar.characterName == "Buzz" && secondaryChar.characterName == "Nicholas" && this.gameName == "Reminisce") {
+				Debug.debug(this, "state to be in for debugging");
+			}
+			
+			
+			
+			
+			var castToUse:Vector.<Character>;
+			/*
+			if (gameEngine.currentStory.storyLeadCharacter == "Zack" || gameEngine.currentStory.storyLeadCharacter == "Chloe")
+			{
+				castToUse = gameEngine.currentLevel.cast;
+			}
+			else
+			{
+				castToUse = cif.cast.characters;
+			}
+			*/
+			castToUse = cif.cast.characters;
+			sgc = cif.playGame(cif.socialGamesLib.getByName(this.gameName), primaryChar, secondaryChar, null, castToUse, gameEngine.currentLevel.cast, false, dm.getVolitionThreshold("responder"), dm.getResponderBoostFromDictionary(gameEngine.primaryAvatarSelection.toLowerCase() , gameEngine.secondaryAvatarSelection.toLowerCase(), gameName));
+			var isStorySequence:Boolean = false;
+			for each (var pred:Predicate in sgc.getChange().predicates) {
+				if (Predicate.SFDBLABEL == pred.type) {
+					if (pred.sfdbLabel >= SocialFactsDB.FIRST_STORY_SEQUENCE) {
+						isStorySequence = true;
+					}
+				}
+			}
+
+			
+			//this.label = (isStorySequence)?this.gameName + "*":this.gameName;
+			this.label = this.gameName;
+			
+			if (this.intentType == Predicate.INTENT_ROMANCE_DOWN || this.intentType == Predicate.INTENT_BUDDY_DOWN || this.intentType == Predicate.INTENT_COOL_DOWN)
+			{
+				//this.label += "   \\/";
+			}
+			else if (this.intentType == Predicate.INTENT_ROMANCE_UP || this.intentType == Predicate.INTENT_BUDDY_UP || this.intentType == Predicate.INTENT_COOL_UP)
+			{
+				//this.label += "   /\\";
+			}
+	
+			
+			//this.toolTip = "GIANT INFO DUMP"; //zero it out!
+			/*
+			this.toolTip = ""; // we STILL have to zero it out, even if we don't want giant info dump there.
+			if(!gameEngine.useJuicePoints || (gameEngine.useJuicePoints && jpm.isHintUnlocked(sgc.initiator, sgc.responder, this.gameName, jpm.HINT_SG_OUTCOME))){
+				if (gameEngine.toolTipShowsAcceptReject) {
+					//this.toolTip += "\nSCORES:\n";
+					//this.toolTip += "--initiator score: " + sgc.initiatorScore + "\n";
+					//this.toolTip += "--responder score: " + sgc.responderScore;
+					//if (sgc.responderScore < 0 ) this.toolTip += "(reject)"; else this.toolTip += " (accept)";
+				}
+				if (gameEngine.toolTipShowEffectChangePredicates) {
+					var primaryName:String;
+					var secondaryName:String;
+					var thirdName:String;
+					
+					this.toolTip += "\nEFFECT CHANGES:\n";
+					for each (pred in sgc.getChange().predicates) {
+						if (pred.primary  == "initiator") primaryName = sgc.initiator;
+						else if (pred.primary == "responder") primaryName = sgc.responder;
+						else if (pred.primary == "other") primaryName = sgc.other;
+						if (pred.secondary  == "initiator") secondaryName = sgc.initiator;
+						else if (pred.secondary == "responder") secondaryName = sgc.responder;
+						else if (pred.secondary == "other") secondaryName = sgc.other;
+						if (pred.tertiary  == "initiator") thirdName = sgc.initiator;
+						else if (pred.tertiary == "responder") thirdName = sgc.responder;
+						else if (pred.tertiary == "other") thirdName = sgc.other;
+						this.toolTip += "--" + pred.toNaturalLanguageString(primaryName, secondaryName) + "\n";
+					}
+					
+				}
+			}
+			else if(gameEngine.useJuicePoints) {
+				this.toolTip += "USE JUICE POINTS TO UNLOCK SOCIAL GAME OUTCOME";
+			}
+			if (gameEngine.toolTipShowMotives) {
+				this.toolTip += "\nMOTIVES\n";
+				this.toolTip += "\nINITIATOR (" + gameEngine.getIntensityOfDesireToDoWhatTheCharacterDid("initiator", sgc) + ")\n";
+				var motiveDictionaryVector:Vector.<Dictionary> = new Vector.<Dictionary>();
+				motiveDictionaryVector = gameEngine.getInitiatorMotives(sgc, true,
+					cif.getPredicateRelevance(SocialGamesLib.getInstance().getByName(sgc.gameName), 
+					cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder), 
+					cif.cast.getCharByName(sgc.other), "initiator", gameEngine.currentLevel.cast), 
+					sgc.initiator, sgc.responder);
+					
+				for each(var d:Dictionary in motiveDictionaryVector) {
+					this.toolTip += d["percent"] + "% " + d["motive"] + "\n";
+				}
+					
+				if(!gameEngine.useJuicePoints || (gameEngine.useJuicePoints && jpm.isHintUnlocked(sgc.initiator, sgc.responder, this.gameName, jpm.HINT_RESPONDER_MOTIVE))){
+					this.toolTip += "\nRESPONDER (" + gameEngine.getIntensityOfDesireToDoWhatTheCharacterDid("responder", sgc) + ")\n";
+					if (cif.socialGamesLib.getByName(sgc.gameName).getEffectByID(sgc.effectID).isAccept)
+					{
+						motiveDictionaryVector = gameEngine.getResponderMotives(sgc, true,
+								cif.getPredicateRelevance(SocialGamesLib.getInstance().getByName(sgc.gameName), 
+								cif.cast.getCharByName(sgc.initiator), 
+								cif.cast.getCharByName(sgc.responder), 
+								cif.cast.getCharByName(sgc.other), 
+								"responder", 
+								gameEngine.currentLevel.cast, "accept"), 
+									sgc.initiator, 
+									sgc.responder);
+									
+						for each(d in motiveDictionaryVector) {
+							this.toolTip += d["percent"] + "% " + d["motive"] + "\n";
+						}
+					}
+					else
+					{
+						motiveDictionaryVector = gameEngine.getResponderMotives(sgc, true,
+						cif.getPredicateRelevance(SocialGamesLib.getInstance().getByName(sgc.gameName), 
+							cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder), 
+							cif.cast.getCharByName(sgc.other), "responder", gameEngine.currentLevel.cast, "reject"), 
+								sgc.initiator, sgc.responder);
+								
+						for each(d in motiveDictionaryVector) {
+							this.toolTip += d["percent"] + "% " + d["motive"] + "\n";
+						}
+					}
+				}
+				else if (gameEngine.useJuicePoints) {
+					this.toolTip += "USE JUICEPOINTS TO UNLOCK RESPONDER MOTIVES!";
+				}
+			}
+			if (gameEngine.toolTipShowForecast) {
+				this.toolTip += "\FORECAST\n";
+				//what is Forecast.
+				//Forecast is looking at what triggers will happen based
+				//on the theoretical new state of the game.
+				//to start with, lets see how triggers are sort of computed now...
+				//Add all triggers that fired at this time to the sfdbEntry social change record for triggers
+				//I think this right here is the chunk of code that we care about.
+				
+				tempAcceptEffect = new Effect();
+				tempRejectEffect = new Effect();
+				tempSFDBLabel = new SFDBLabel();
+				tempSocialGameContext = new SocialGameContext();
+				tempSocialGame = new SocialGame();
+				tempPredicate = new Predicate();
+				
+				
+				switch(cif.socialGamesLib.getByName(this.gameName).intents[0].predicates[0].getIntentType()) {
+					case Predicate.INTENT_BUDDY_UP:
+						Debug.debug(this, "intent buddy up!");
+						forecastIntentBuddyUp(sgc);
+						break;
+					case Predicate.INTENT_BUDDY_DOWN:
+						Debug.debug(this, "intent buddy down!");
+						forecastIntentBuddyDown(sgc);
+						break;
+					case Predicate.INTENT_ROMANCE_UP:
+						Debug.debug(this, "intent romance up!");
+						forecastIntentRomanceUp(sgc);
+						break;
+					case Predicate.INTENT_ROMANCE_DOWN:
+						Debug.debug(this, "intent romance down!");
+						forecastIntentRomanceDown(sgc);
+						break;
+					case Predicate.INTENT_COOL_UP:
+						Debug.debug(this, "intent cool up!");
+						forecastIntentCoolUp(sgc);
+						break;
+					case Predicate.INTENT_COOL_DOWN:
+						Debug.debug(this, "intent cool down!");
+						forecastIntentCoolDown(sgc);
+						break;
+					case Predicate.INTENT_FRIENDS:
+						Debug.debug(this, "intent start friends!");
+						forecastIntentFriends(sgc);
+						break;
+					case Predicate.INTENT_END_FRIENDS:
+						Debug.debug(this, "intent end friends!");
+						forecastIntentStopFriends(sgc);
+						break;
+					case Predicate.INTENT_DATING:
+						Debug.debug(this, "intent start dating (my CRAZY thing) cif time is: " + cif.time );
+						forecastIntentDating(sgc);
+						break;
+					case Predicate.INTENT_END_DATING:
+						Debug.debug(this, "intent stop dating!");
+						forecastIntentStopDating(sgc);
+						break;
+					case Predicate.INTENT_ENEMIES:
+						Debug.debug(this, "intent start enemies!");
+						forecastIntentEnemies(sgc);
+						break;
+					case Predicate.INTENT_END_ENEMIES:
+						Debug.debug(this, "intent stop enemies!");
+						forecastIntentStopEnemies(sgc);
+						break;
+					default:
+						Debug.debug(this, "unrecognized intent!");
+						break;
+				}
+				*/
+				
+				/*
+					var triggerContexts2:Vector.<TriggerContext> = cif.sfdb.getTriggerContextsAtTime(cif.time - 1);
+					for each (triggerContext in triggerContexts2)
+					{
+						for each (pred in triggerContext.getChange().predicates)
+						{
+							var triggerSocialChange1:SocialChange = new PromWeek.SocialChange();
+							triggerSocialChange1.populateFromTriggerContext(triggerContext, pred);
+							triggerSocialChange1.groupID = SocialChange.currentGroup;
+							sfdbEntryUI.triggerChangeRecord.socialChanges.push(triggerSocialChange1);
+							sfdbEntryUI.triggerChangeRecord.setIndexToEnd();
+							sfdbEntryUI.triggerChangeRecord.nextOne();
+						}
+					}
+					*/
+			//}
+		}
+		
+		/**
+		 * Checks the intent of the social game associated with this social game button
+		 * and places it into one of three color classes.
+		 * 
+		 * @return BUDDY, ROMANCE, COOL, or INVALID_ITENT if intent is not recognized. 
+		 */
+		public function getIntentCategory():int {
+			if (this.isEndingButton) { // don't want to find intents to ending buttons!  They don't have 'em!
+				return ENDING;
+			}
+			var intentPred:Predicate = CiFSingleton.getInstance().socialGamesLib.getByName(this.gameName).intents[0].predicates[0];
+			if(Predicate.NETWORK == intentPred.type ) {
+				switch (intentPred.networkType) {
+					case SocialNetwork.BUDDY:
+						return BUDDY;
+					case SocialNetwork.ROMANCE:
+						return ROMANCE;
+					case SocialNetwork.COOL:
+						return COOL;
+				}
+			}else if (Predicate.RELATIONSHIP == intentPred.type) {
+				switch (intentPred.relationship) {
+					case RelationshipNetwork.FRIENDS:
+					case RelationshipNetwork.ENEMIES:
+						return BUDDY;
+					case RelationshipNetwork.DATING:
+						return ROMANCE;
+				}
+			}
+			return INVALID_INTENT;
+		}
+		
+		public function getRelationshipChange():int {
+			var intentPred:Predicate = CiFSingleton.getInstance().socialGamesLib.getByName(this.gameName).intents[0].predicates[0];
+			if (Predicate.RELATIONSHIP == intentPred.type) {
+				switch (intentPred.relationship) {
+					case RelationshipNetwork.FRIENDS:
+						return (intentPred.negated)?NOT_FRIENDS_CHANGE:FRIENDS_CHANGE;
+					case RelationshipNetwork.ENEMIES:
+						return (intentPred.negated)?NOT_ENEMIES_CHANGE:ENEMIES_CHANGE;
+					case RelationshipNetwork.DATING:
+						return (intentPred.negated)?NOT_DATING_CHANGE:DATING_CHANGE;
+				}
+			}
+			return NO_RELATIONSHIP_CHANGE;
+		}
+		
+		/**
+		 * I definitely do NOT think this is where we want the function to live
+		 But the idea here is to make it so that we simply GET a list of triggers.  We don't valuate them or anything.
+		 We just want the list of triggers that WOULD evaluate, given the current social state.
+		 (where the 'current' social state is going to be tampered with, so that we see a theoreitical future.
+		 */
+		 public static function runForecastTriggers(cast:Vector.<Character> = null):String {
+			var cif:CiFSingleton = CiFSingleton.getInstance();
+			var potentialCharacters:Vector.<Character> = (cast)?cast:cif.cast.characters;
+			var returnString:String = "";
+			
+			var forecastPredicates:Vector.<Predicate> = new Vector.<Predicate>();
+			var forecastFirstRoles:Vector.<Character> = new Vector.<Character>();
+			var forecastSecondRoles:Vector.<Character> = new Vector.<Character>();
+			var forecastThirdRoles:Vector.<Character> = new Vector.<Character>();
+			
+			var firstChar:Character;
+			var secondChar:Character;
+			var thirdChar:Character;
+			var trigger:Trigger;
+			
+			var changePred:Predicate;
+			
+			var towardChar:Character;
+			var fromChar:Character;
+			
+			//Debug.debug(this, "runTriggers() about to run triggers.");
+			//Debug.debug(this, "runTriggers() number of triggers is " + this.triggers.length);
+			
+			var triggersToApply:Vector.<Trigger> = new Vector.<Trigger>();
+			var firstRoles:Vector.<Character> = new Vector.<Character>();
+			var secondRoles:Vector.<Character> = new Vector.<Character>();
+			var thirdRoles:Vector.<Character> = new Vector.<Character>();
+			
+			//run each trigger on every duple of characters or triple where needed by the trigger.
+			for each (trigger in cif.sfdb.triggers) {
+				if (trigger.useAllChars)
+				{
+					potentialCharacters = cif.cast.characters;
+				}
+				else
+				{
+					potentialCharacters = (cast)?cast:cif.cast.characters;
+				}
+				
+				for each (firstChar in potentialCharacters) {
+					if(!trigger.requiresOnlyOneCharacter()){
+						for each(secondChar in potentialCharacters) {
+							//don't evaluate a trigger with the same character in both roles
+							if(firstChar.characterName != secondChar.characterName) {
+								//run the trigger for each character triple if a third character is needed by the trigger.
+								if (trigger.requiresThirdCharacter()) 
+								{
+									//Debug.debug(this, "runTriggers() trigger for 3 characters is being evaluated: " + firstChar.characterName + " " + secondChar.characterName + " with third to be determined"  );
+									for each(thirdChar in potentialCharacters) 
+									{
+										//make sure that each role has a unique character
+										//aleady checked that the first two characters were unique so check for third
+										if (thirdChar != firstChar && thirdChar != secondChar) 
+										{
+											
+											if (firstChar.characterName.toLowerCase() == "zack" && secondChar.characterName.toLowerCase() == "chloe" && thirdChar.characterName.toLowerCase() == "monica" && trigger.id == 4) {
+												//Debug.debug(this, "first is zack, second is monica, third is chloe trigger is monica is not being called a homewrecker");
+											}
+											
+											
+
+											
+											//if (trigger.referenceAsNaturalLanguage == "If someone is romantic to your date more than once, you are angry at them" && firstChar.characterName == "Zack" && secondChar.characterName == "Simon" && thirdChar.characterName == "Monica")
+											//{
+												//Debug.debug(this,"BREAK!");
+											//}
+											
+											if (trigger.evaluateCondition(firstChar, secondChar, thirdChar)) 
+											{
+												triggersToApply.push(trigger);
+												firstRoles.push(firstChar);
+												secondRoles.push(secondChar);
+												thirdRoles.push(thirdChar);
+												
+											}
+										}
+									}
+								}
+								else 
+								{
+									
+									if (firstChar.characterName.toLowerCase() == "cassandra" && trigger.id == 11) {
+										//Debug.debug(this, "OK, here we are in the case where we are considering whether to make cassandra a bully or not");
+									}
+									
+									if (trigger.evaluateCondition(firstChar, secondChar)) 
+									{	
+										triggersToApply.push(trigger);
+										firstRoles.push(firstChar);
+										secondRoles.push(secondChar);
+										thirdRoles.push(null);
+									}
+								}
+							}
+						}
+					}
+					else { // only one character involved.
+						if (trigger.evaluateCondition(firstChar)) 
+							{	
+								triggersToApply.push(trigger);
+								firstRoles.push(firstChar);
+								secondRoles.push(null);
+								thirdRoles.push(null);
+							}
+					}
+				}
+			}
+			
+			//now that we have collected all the the triggers and characters involved, valuate them all
+			
+			// aPredHasValuated will be used to keep track of whether or not a triggerContext should be created
+			// because it may be the case that the status was already the case, and thus a trigger context should not be created
+			var aPredHasValuated:Boolean;
+			for (var i:int = 0; i < triggersToApply.length; i++ )
+			{
+				//Debug.debug(this, "what is triggersToApply.length?: " + triggersToApply.length + " i is: " + i);
+				//Debug.debug(this, "looking at this trigger: " + triggersToApply[i]);
+				trigger = triggersToApply[i];
+				firstChar = firstRoles[i];
+				secondChar = secondRoles[i];
+				thirdChar = thirdRoles[i];
+				
+				
+				aPredHasValuated = false;				
+				// go through each change predicate and treat status that are already the case different than those that aren't
+				//this is all part of making sure that we don't contantly display "cheating" every turn while someone is dating two characters
+				for each (changePred in trigger.change.predicates)
+				{
+					//Debug.debug(this, cif.time + ": Trigger Change Pred: " + changePred.toString()+ " first: " + firstChar.characterName + " second: " + secondChar.characterName + " third: " + thirdChar.characterName);
+					
+					//figure out who the predicate should be applied to
+					var primaryValue:String = changePred.getPrimaryValue();
+					switch (primaryValue)
+					{
+						case "initiator":
+							fromChar = firstChar;
+							break;
+						case "responder":
+							fromChar = secondChar;
+							break;
+						case "other":
+							fromChar = thirdChar;
+							break;
+						default:
+							fromChar = cif.cast.getCharByName(primaryValue);
+					}
+					
+					if (changePred.type == Predicate.STATUS)
+					{
+						towardChar = null;
+						if (changePred.status >= Status.FIRST_DIRECTED_STATUS)
+						{
+							//figure out who the status should be direct towards
+							var secondaryValue:String = changePred.getSecondaryValue();
+							switch (secondaryValue)
+							{
+								case "initiator":
+									towardChar = firstChar;
+									break;
+								case "responder":
+									towardChar = secondChar;
+									break;
+								case "other":
+									towardChar = thirdChar;
+									break;
+								default:
+									towardChar = cif.cast.getCharByName(secondaryValue);
+							}
+						}
+
+						
+						if (fromChar.getStatus(changePred.status,towardChar))
+						{
+							//if we are here, then we know that the fromChar has the status
+							if (changePred.negated)
+							{
+								//this deals with removing status, which warrants a new trigger context
+								aPredHasValuated = true;
+								//changePred.valuation(firstChar, secondChar, thirdChar);
+							}
+							else
+							{
+								//this is the case where rather than apply the status, we only reset its remaining duration. This is the
+								//case that we do not want to create a new trigger context for.
+								//Debug.debug(this, "Reset the duration of: " + Status.getStatusNameByNumber(changePred.status) + " for " + firstChar.characterName + " at time " + cif.time+ " first: " + firstChar.characterName + " second: " + secondChar.characterName + " third: " + thirdChar.characterName);
+								//fromChar.getStatus(changePred.status, towardChar).remainingDuration = Status.DEFAULT_INITIAL_DURATION;
+							}
+						}
+						else if (!changePred.negated)
+						{
+							//this is the "normal case" where we simple apply the change predicate
+							aPredHasValuated = true;
+							//Debug.debug(this, cif.time + ": Normal Valuation: " + changePred.toString() + " first: " + firstChar.characterName + " second: " + secondChar.characterName + " third: " + thirdChar.characterName);
+							//changePred.valuation(firstChar, secondChar, thirdChar);														
+						}
+						else
+						{
+							//Debug.debug(this, cif.time + ": Nothing Done with this: " + changePred.toString()+ " first: " + firstChar.characterName + " second: " + secondChar.characterName + " third: " + thirdChar.characterName);
+						}
+					}
+					else
+					{
+						//this is the normal, non-status case
+						aPredHasValuated = true;
+						//Debug.debug(this, cif.time + ": Normal Valuation: " + changePred.toString()+ " first: " + firstChar.characterName + " second: " + secondChar.characterName + " third: " + thirdChar.characterName);
+						//changePred.valuation(firstChar, secondChar, thirdChar);
+					}
+					
+					
+					if (aPredHasValuated) { // we care about this predicate, I think.
+						var secondName:String = "";
+						var thirdName:String = "";
+						if (towardChar) secondName = towardChar.characterName
+						if (thirdChar) thirdName = thirdChar.characterName;
+						///Debug.debug(this, "here we go: " + changePred.toNaturalLanguageString(fromChar.characterName, secondName, thirdChar.characterName));
+						returnString += changePred.toNaturalLanguageString(fromChar.characterName, secondName, thirdName);
+						if (changePred.toNaturalLanguageString(fromChar.characterName, secondName, thirdName).toLowerCase() == "lil is feeling embarrassed."  ) {
+							//Debug.debug(this, "this seems weird to me, but maybe not as weird as the Bully one.");
+						}
+						if (changePred.toNaturalLanguageString(fromChar.characterName, secondName, thirdName).toLowerCase() == "nicholas is considered a bully."  ) {
+							//Debug.debug(this, "this is the bully one and it is super weird");
+						}
+						returnString += "\n";
+					}	
+				}
+			}
+			return returnString;
+		}
+
+		//Creates a hypothetical situation where the init and respond start dating.
+		public static function forecastIntentDating(sgc:SocialGameContext):Dictionary {		
+			var hadToAddRelationship:Boolean = false; // some triggers NEED for the actual state to be changed -- this marker lets us change it back.
+			var acceptForecast:String = "";
+			var rejectForecast:String = "";
+			var returnDictionary:Dictionary = new Dictionary();
+			var cif:CiFSingleton = CiFSingleton.getInstance();
+			var gameEngine:GameEngine = GameEngine.getInstance();
+			var dm:DifficultyManager = DifficultyManager.getInstance();
+			
+			
+			//ACCEPT CASE
+			
+			//If the Intent is dating and it was accepted, it is likely that it is a 'romantic' act.
+			tempSFDBLabel.type = "romantic";
+			tempSFDBLabel.from =   sgc.initiator;
+			tempSFDBLabel.to = sgc.responder;
+			
+			//Set up the predicate change we care about! (the initiator and the responder are now dating!)
+			tempPredicate.relationship = RelationshipNetwork.DATING;
+			tempPredicate.primary = "initiator";
+			tempPredicate.secondary = "responder";
+			tempPredicate.negated = false;
+			tempPredicate.isSFDB = false;
+			tempPredicate.type = Predicate.RELATIONSHIP;
+			
+			//Our new Social Game needs an intent type I guess.  I don't care.
+			var tempIntent:Predicate = new Predicate();
+			tempIntent.relationship = Predicate.INTENT_DATING; // I don't care
+			tempIntent.type = Predicate.RELATIONSHIP; // I don't care
+			var tempRule:Rule = new Rule();
+			tempRule.predicates.push(tempIntent);
+		
+			//At the bare minimum, our dumb temp social game needs an accept and a reject version -- either way, there is only one change we care about.
+			tempAcceptEffect.change.predicates.push(tempPredicate.clone());
+			tempAcceptEffect.isAccept = false;
+			tempRejectEffect.change.predicates.push(tempPredicate.clone());
+			tempRejectEffect.isAccept = true;
+	
+			//OK, lets add everything that we've got into our temp social game!
+			tempSocialGame.addEffect(tempAcceptEffect);
+			tempSocialGame.addEffect(tempRejectEffect);
+			tempSocialGame.intents.push(tempRule);
+			tempSocialGame.name = "FORECAST";// we DO CARE -- very important that it is called this!
+			
+			//UGH, we are actually adding this to the library. I hate it, but we've gotta do it or it won't work.
+			cif.socialGamesLib.addGame(tempSocialGame);
+			
+			//PLAY THE FAKE GAME!  What we'll get is a social game context that points to the initiator and responder
+			//that we care about, as well as the appropriate effect change (e.g. init and respond are now dating in the dating case).
+			tempSocialGameContext = cif.playGame(tempSocialGame, cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder), null, null, gameEngine.currentLevel.cast, false, dm.getVolitionThreshold("responder"));
+
+			//Do we have to add a new relationship?  if so, add it, then set a note to remind us to take it away again later.
+			if(!cif.relationshipNetwork.getRelationship(RelationshipNetwork.DATING, cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder))){
+				cif.relationshipNetwork.setRelationship(RelationshipNetwork.DATING, cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder));
+				hadToAddRelationship = true;
+			}
+			
+			//Take that shiny new SGC that we got, and add our explicit label that we defined earlier to it.
+			tempSocialGameContext.SFDBLabels.push(tempSFDBLabel);
+			tempSocialGameContext.time = cif.time;
+						
+			//Actually add the context to the SFDB
+			cif.sfdb.addContext(tempSocialGameContext);
+			
+			//ACTUALLY RUN THE TRIGGERS/FILL IN THE TOOL TIP
+			//acceptForecast += "IF THIS GOES THE WAY I WANT IT...\n";
+			acceptForecast += sgc.initiator + " and " + sgc.responder  + " will be dating!\n";
+			acceptForecast += runForecastTriggers(); // prints out what I care about.
+			
+			//Clean out the crap that we added!
+			cif.sfdb.contexts.splice(0, 1); // delete the dumb thing I just added to the sfdb?
+			cif.socialGamesLib.removeGame(tempSocialGame); // delete the dumb thing I just added from here too.
+			
+			//We only want to remove this if we had to add it! Otherwise don't delete it!!!!
+			if (hadToAddRelationship) {
+				cif.relationshipNetwork.removeRelationship(RelationshipNetwork.DATING, cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder))
+			}
+			
+			
+			//REJECT CASE
+			
+			//Clean everything out.
+			tempSocialGameContext = new SocialGameContext();
+			tempAcceptEffect = new Effect();
+			tempRejectEffect = new Effect();
+			tempSFDBLabel = new SFDBLabel();
+			tempSocialGameContext = new SocialGameContext();
+			tempSocialGame = new SocialGame();
+			tempPredicate = new Predicate();
+			
+			//Set up the SFDB Label with what is likely to happen if the intent is rejected.
+			tempSFDBLabel.type = "failed romance";
+			tempSFDBLabel.from =   sgc.initiator;
+			tempSFDBLabel.to = sgc.responder;
+			
+			//For Reject Intent Start relationship games, I don't think we need to worry about anything besides the failed romance label.
+			tempSocialGameContext.SFDBLabels.push(tempSFDBLabel);
+			tempSocialGameContext.time = cif.time;
+			cif.sfdb.addContext(tempSocialGameContext);
+			
+			//Actually Fill in the tool tip
+			//rejectForecast += "IF I CRASH AND BURN\n";
+			rejectForecast += sgc.responder + " will probably like " + sgc.initiator  + " a little less...\n";
+			rejectForecast += runForecastTriggers(); // prints out what I care about.
+			
+			//Clean up After Ourselves
+			cif.sfdb.contexts.splice(0, 1); // delete the dumb thing I just added?
+			returnDictionary["accept"] = acceptForecast;
+			returnDictionary["reject"] = rejectForecast;
+			return returnDictionary;
+		}
+		
+		//Creates a hypothetical situation where the init and respond become friends.
+		public static function forecastIntentFriends(sgc:SocialGameContext):Dictionary {		
+			var hadToAddRelationship:Boolean = false; // some triggers NEED for the actual state to be changed -- this marker lets us change it back.
+			var acceptForecast:String = "";
+			var rejectForecast:String = "";
+			var returnDictionary:Dictionary = new Dictionary();
+			var cif:CiFSingleton = CiFSingleton.getInstance();
+			var gameEngine:GameEngine = GameEngine.getInstance();
+			var dm:DifficultyManager = DifficultyManager.getInstance();
+			//ACCEPT CASE
+			
+			//If the Intent is friends and it was accepted, it is likely that it is a 'nice' act.
+			tempSFDBLabel.type = "nice";
+			tempSFDBLabel.from =   sgc.initiator;
+			tempSFDBLabel.to = sgc.responder;
+			
+			//Set up the predicate change we care about! (the initiator and the responder are now friends!)
+			tempPredicate.relationship = RelationshipNetwork.FRIENDS;
+			tempPredicate.primary = "initiator";
+			tempPredicate.secondary = "responder";
+			tempPredicate.negated = false;
+			tempPredicate.isSFDB = false;
+			tempPredicate.type = Predicate.RELATIONSHIP;
+			
+			//Our new Social Game needs an intent type I guess.  I don't care.
+			var tempIntent:Predicate = new Predicate();
+			tempIntent.relationship = Predicate.INTENT_FRIENDS; // I don't care
+			tempIntent.type = Predicate.RELATIONSHIP; // I don't care
+			var tempRule:Rule = new Rule();
+			tempRule.predicates.push(tempIntent);
+		
+			//At the bare minimum, our dumb temp social game needs an accept and a reject version -- either way, there is only one change we care about.
+			tempAcceptEffect.change.predicates.push(tempPredicate.clone());
+			tempAcceptEffect.isAccept = false;
+			tempRejectEffect.change.predicates.push(tempPredicate.clone());
+			tempRejectEffect.isAccept = true;
+	
+			//OK, lets add everything that we've got into our temp social game!
+			tempSocialGame.addEffect(tempAcceptEffect);
+			tempSocialGame.addEffect(tempRejectEffect);
+			tempSocialGame.intents.push(tempRule);
+			tempSocialGame.name = "FORECAST";// we DO CARE -- very important that it is called this!
+			
+			//UGH, we are actually adding this to the library. I hate it, but we've gotta do it or it won't work.
+			cif.socialGamesLib.addGame(tempSocialGame);
+			
+			//PLAY THE FAKE GAME!  What we'll get is a social game context that points to the initiator and responder
+			//that we care about, as well as the appropriate effect change (e.g. init and respond are now dating in the dating case).
+			tempSocialGameContext = cif.playGame(tempSocialGame, cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder), null, null, gameEngine.currentLevel.cast, false, dm.getVolitionThreshold("responder"));
+
+			//Do we have to add a new relationship?  if so, add it, then set a note to remind us to take it away again later.
+			if(!cif.relationshipNetwork.getRelationship(RelationshipNetwork.FRIENDS, cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder))){
+				cif.relationshipNetwork.setRelationship(RelationshipNetwork.FRIENDS, cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder));
+				hadToAddRelationship = true;
+			}
+			
+			//Take that shiny new SGC that we got, and add our explicit label that we defined earlier to it.
+			tempSocialGameContext.SFDBLabels.push(tempSFDBLabel);
+			tempSocialGameContext.time = cif.time;
+						
+			//Actually add the context to the SFDB
+			cif.sfdb.addContext(tempSocialGameContext);
+			
+			//ACTUALLY RUN THE TRIGGERS/FILL IN THE TOOL TIP
+			//acceptForecast += "IF THIS GOES THE WAY I WANT IT...\n";
+			acceptForecast += sgc.initiator + " and " + sgc.responder  + " will be friends!\n";
+			acceptForecast += runForecastTriggers(); // prints out what I care about.
+			
+			//Clean out the crap that we added!
+			cif.sfdb.contexts.splice(0, 1); // delete the dumb thing I just added to the sfdb?
+			cif.socialGamesLib.removeGame(tempSocialGame); // delete the dumb thing I just added from here too.
+			
+			//We only want to remove this if we had to add it! Otherwise don't delete it!!!!
+			if (hadToAddRelationship) {
+				cif.relationshipNetwork.removeRelationship(RelationshipNetwork.FRIENDS, cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder))
+			}
+			
+			
+			//REJECT CASE
+			
+			//Clean everything out.
+			tempSocialGameContext = new SocialGameContext();
+			tempAcceptEffect = new Effect();
+			tempRejectEffect = new Effect();
+			tempSFDBLabel = new SFDBLabel();
+			tempSocialGameContext = new SocialGameContext();
+			tempSocialGame = new SocialGame();
+			tempPredicate = new Predicate();
+			
+			//Set up the SFDB Label with what is likely to happen if the intent is rejected.
+			tempSFDBLabel.type = "lame";
+			tempSFDBLabel.from =   sgc.initiator;
+			tempSFDBLabel.to = sgc.responder;
+			
+			//For Reject Intent Start relationship games, I think the SFDB label is the only thing we care about.
+			tempSocialGameContext.SFDBLabels.push(tempSFDBLabel);
+			tempSocialGameContext.time = cif.time;
+			cif.sfdb.addContext(tempSocialGameContext);
+			
+			//Actually Fill in the tool tip
+			//rejectForecast += "IF I CRASH AND BURN\n";
+			rejectForecast += sgc.responder + " will probably be even less likely to be friends with " + sgc.initiator  + ".\n";
+			rejectForecast += runForecastTriggers(); // prints out what I care about.
+			
+			//Clean up After Ourselves
+			cif.sfdb.contexts.splice(0, 1); // delete the dumb thing I just added?
+			
+			returnDictionary["accept"] = acceptForecast;
+			returnDictionary["reject"] = rejectForecast;
+			return returnDictionary;
+		}
+		
+		//Creates a hypothetical situation where the init and respond become enemies.
+		public static function forecastIntentEnemies(sgc:SocialGameContext):Dictionary {		
+			var hadToAddRelationship:Boolean = false; // some triggers NEED for the actual state to be changed -- this marker lets us change it back.
+			var acceptForecast:String = "";
+			var rejectForecast:String = "";
+			var returnDictionary:Dictionary = new Dictionary();
+			var cif:CiFSingleton = CiFSingleton.getInstance();
+			var gameEngine:GameEngine = GameEngine.getInstance();
+			var dm:DifficultyManager = DifficultyManager.getInstance();
+			//ACCEPT CASE
+			
+			//If the Intent is friends and it was accepted, it is likely that it is a 'mean' act.
+			tempSFDBLabel.type = "mean";
+			tempSFDBLabel.from =   sgc.initiator;
+			tempSFDBLabel.to = sgc.responder;
+			
+			//Set up the predicate change we care about! (the initiator and the responder are now friends!)
+			tempPredicate.relationship = RelationshipNetwork.ENEMIES;
+			tempPredicate.primary = "initiator";
+			tempPredicate.secondary = "responder";
+			tempPredicate.negated = false;
+			tempPredicate.isSFDB = false;
+			tempPredicate.type = Predicate.RELATIONSHIP;
+			
+			//Our new Social Game needs an intent type I guess.  I don't care.
+			var tempIntent:Predicate = new Predicate();
+			tempIntent.relationship = Predicate.INTENT_ENEMIES; // I don't care
+			tempIntent.type = Predicate.RELATIONSHIP; // I don't care
+			var tempRule:Rule = new Rule();
+			tempRule.predicates.push(tempIntent);
+		
+			//At the bare minimum, our dumb temp social game needs an accept and a reject version -- either way, there is only one change we care about.
+			tempAcceptEffect.change.predicates.push(tempPredicate.clone());
+			tempAcceptEffect.isAccept = false;
+			tempRejectEffect.change.predicates.push(tempPredicate.clone());
+			tempRejectEffect.isAccept = true;
+	
+			//OK, lets add everything that we've got into our temp social game!
+			tempSocialGame.addEffect(tempAcceptEffect);
+			tempSocialGame.addEffect(tempRejectEffect);
+			tempSocialGame.intents.push(tempRule);
+			tempSocialGame.name = "FORECAST";// we DO CARE -- very important that it is called this!
+			
+			//UGH, we are actually adding this to the library. I hate it, but we've gotta do it or it won't work.
+			cif.socialGamesLib.addGame(tempSocialGame);
+			
+			//PLAY THE FAKE GAME!  What we'll get is a social game context that points to the initiator and responder
+			//that we care about, as well as the appropriate effect change (e.g. init and respond are now dating in the dating case).
+			tempSocialGameContext = cif.playGame(tempSocialGame, cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder), null, null, gameEngine.currentLevel.cast, false, dm.getVolitionThreshold("responder"));
+
+			//Do we have to add a new relationship?  if so, add it, then set a note to remind us to take it away again later.
+			if(!cif.relationshipNetwork.getRelationship(RelationshipNetwork.ENEMIES, cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder))){
+				cif.relationshipNetwork.setRelationship(RelationshipNetwork.ENEMIES, cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder));
+				hadToAddRelationship = true;
+			}
+			
+			//Take that shiny new SGC that we got, and add our explicit label that we defined earlier to it.
+			tempSocialGameContext.SFDBLabels.push(tempSFDBLabel);
+			tempSocialGameContext.time = cif.time;
+						
+			//Actually add the context to the SFDB
+			cif.sfdb.addContext(tempSocialGameContext);
+			
+			//ACTUALLY RUN THE TRIGGERS/FILL IN THE TOOL TIP
+			//acceptForecast += "IF THIS GOES THE WAY I WANT IT...\n";
+			acceptForecast += sgc.initiator + " and " + sgc.responder  + " will be enemies!\n";
+			acceptForecast += runForecastTriggers(); // prints out what I care about.
+			
+			//Clean out the crap that we added!
+			cif.sfdb.contexts.splice(0, 1); // delete the dumb thing I just added to the sfdb?
+			cif.socialGamesLib.removeGame(tempSocialGame); // delete the dumb thing I just added from here too.
+			
+			//We only want to remove this if we had to add it! Otherwise don't delete it!!!!
+			if (hadToAddRelationship) {
+				cif.relationshipNetwork.removeRelationship(RelationshipNetwork.FRIENDS, cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder))
+			}
+			
+			
+			//REJECT CASE
+			
+			//Clean everything out.
+			tempSocialGameContext = new SocialGameContext();
+			tempAcceptEffect = new Effect();
+			tempRejectEffect = new Effect();
+			tempSFDBLabel = new SFDBLabel();
+			tempSocialGameContext = new SocialGameContext();
+			tempSocialGame = new SocialGame();
+			tempPredicate = new Predicate();
+			
+			//Set up the SFDB Label with what is likely to happen if the intent is rejected.
+			tempSFDBLabel.type = "lame";
+			tempSFDBLabel.from =   sgc.initiator;
+			tempSFDBLabel.to = sgc.responder;
+			
+			//For Reject Intent Start relationship games, I think the SFDB label is the only thing we care about.
+			tempSocialGameContext.SFDBLabels.push(tempSFDBLabel);
+			tempSocialGameContext.time = cif.time;
+			cif.sfdb.addContext(tempSocialGameContext);
+			
+			//Actually Fill in the tool tip
+			//rejectForecast += "IF I CRASH AND BURN\n";
+			rejectForecast+= sgc.responder + " will probably make " + sgc.initiator  + " even more upset.\n";
+			rejectForecast += runForecastTriggers(); // prints out what I care about.
+			
+			//Clean up After Ourselves
+			cif.sfdb.contexts.splice(0, 1); // delete the dumb thing I just added?
+			returnDictionary["accept"] = acceptForecast;
+			returnDictionary["reject"] = rejectForecast;
+			return returnDictionary;
+		}
+		
+		//The intent is for two people to stop dating.
+		public static function forecastIntentStopDating(sgc:SocialGameContext):Dictionary {		
+			var hadToRemoveRelationship:Boolean = false; // some triggers NEED for the actual state to be changed -- this marker lets us change it back.
+			var acceptForecast:String = "";
+			var rejectForecast:String = "";
+			var returnDictionary:Dictionary = new Dictionary();
+			var cif:CiFSingleton = CiFSingleton.getInstance();
+			var gameEngine:GameEngine = GameEngine.getInstance();
+			var dm:DifficultyManager = DifficultyManager.getInstance();
+			//ACCEPT CASE
+			
+			//If the Intent is dating and it was accepted, it is likely that it is a 'rude' act.
+			tempSFDBLabel.type = "rude";
+			tempSFDBLabel.from =   sgc.initiator;
+			tempSFDBLabel.to = sgc.responder;
+			
+			//Set up the predicate change we care about! (the initiator and the responder are no longer dating!)
+			tempPredicate.relationship = RelationshipNetwork.DATING;
+			tempPredicate.primary = "initiator";
+			tempPredicate.secondary = "responder";
+			tempPredicate.negated = true;
+			tempPredicate.isSFDB = false;
+			tempPredicate.type = Predicate.RELATIONSHIP;
+			
+			//Our new Social Game needs an intent type I guess.  I don't care.
+			var tempIntent:Predicate = new Predicate();
+			tempIntent.relationship = Predicate.INTENT_END_DATING; // I don't care
+			tempIntent.type = Predicate.RELATIONSHIP; // I don't care
+			var tempRule:Rule = new Rule();
+			tempRule.predicates.push(tempIntent);
+		
+			//At the bare minimum, our dumb temp social game needs an accept and a reject version -- either way, there is only one change we care about.
+			tempAcceptEffect.change.predicates.push(tempPredicate.clone());
+			tempAcceptEffect.isAccept = false;
+			tempRejectEffect.change.predicates.push(tempPredicate.clone());
+			tempRejectEffect.isAccept = true;
+	
+			//OK, lets add everything that we've got into our temp social game!
+			tempSocialGame.addEffect(tempAcceptEffect);
+			tempSocialGame.addEffect(tempRejectEffect);
+			tempSocialGame.intents.push(tempRule);
+			tempSocialGame.name = "FORECAST";// we DO CARE -- very important that it is called this!
+			
+			//UGH, we are actually adding this to the library. I hate it, but we've gotta do it or it won't work.
+			cif.socialGamesLib.addGame(tempSocialGame);
+			
+			//PLAY THE FAKE GAME!  What we'll get is a social game context that points to the initiator and responder
+			//that we care about, as well as the appropriate effect change (e.g. init and respond are now dating in the dating case).
+			tempSocialGameContext = cif.playGame(tempSocialGame, cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder), null, null, gameEngine.currentLevel.cast, false, dm.getVolitionThreshold("responder"));
+
+			//Do we have to remove the relationship?  if so, add it, then set a note to remind us to take it away again later.
+			if(cif.relationshipNetwork.getRelationship(RelationshipNetwork.DATING, cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder))){
+				cif.relationshipNetwork.removeRelationship(RelationshipNetwork.DATING, cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder));
+				hadToRemoveRelationship = true;
+			}
+			
+			//Take that shiny new SGC that we got, and add our explicit label that we defined earlier to it.
+			tempSocialGameContext.SFDBLabels.push(tempSFDBLabel);
+			tempSocialGameContext.time = cif.time;
+						
+			//Actually add the context to the SFDB
+			cif.sfdb.addContext(tempSocialGameContext);
+			
+			//ACTUALLY RUN THE TRIGGERS/FILL IN THE TOOL TIP
+			//acceptForecast += "IF THIS GOES THE WAY I WANT IT...\n";
+			acceptForecast += sgc.initiator + " and " + sgc.responder  + " will stop dating!\n";
+			acceptForecast += runForecastTriggers(); // prints out what I care about.
+			
+			//Clean out the crap that we added!
+			cif.sfdb.contexts.splice(0, 1); // delete the dumb thing I just added to the sfdb?
+			cif.socialGamesLib.removeGame(tempSocialGame); // delete the dumb thing I just added from here too.
+			
+			//We only want to remove this if we had to add it! Otherwise don't delete it!!!!
+			if (hadToRemoveRelationship) {
+				cif.relationshipNetwork.setRelationship(RelationshipNetwork.DATING, cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder))
+			}
+			
+			
+			//REJECT CASE
+			
+			//Clean everything out.
+			tempSocialGameContext = new SocialGameContext();
+			tempAcceptEffect = new Effect();
+			tempRejectEffect = new Effect();
+			tempSFDBLabel = new SFDBLabel();
+			tempSocialGameContext = new SocialGameContext();
+			tempSocialGame = new SocialGame();
+			tempPredicate = new Predicate();
+			
+			//Set up the SFDB Label with what is likely to happen if the intent is rejected.
+			tempSFDBLabel.type = "misunderstood";
+			tempSFDBLabel.from =   sgc.initiator;
+			tempSFDBLabel.to = sgc.responder;
+			
+			//For Reject Intent STOP relationship games, I don't think we need to worry about anything besides the failed romance label.
+			tempSocialGameContext.SFDBLabels.push(tempSFDBLabel);
+			tempSocialGameContext.time = cif.time;
+			cif.sfdb.addContext(tempSocialGameContext);
+			
+			//Actually Fill in the tool tip
+			//rejectForecast += "IF I CRASH AND BURN\n";
+			rejectForecast += sgc.responder + " and " + sgc.initiator  + " will still be together.\n";
+			rejectForecast += runForecastTriggers(); // prints out what I care about.
+			
+			//Clean up After Ourselves
+			cif.sfdb.contexts.splice(0, 1); // delete the dumb thing I just added?
+			
+			returnDictionary["accept"] = acceptForecast;
+			returnDictionary["reject"] = rejectForecast;
+			return returnDictionary
+		}
+		
+		//Intent Stop Friends
+		public static function forecastIntentStopFriends(sgc:SocialGameContext):Dictionary {		
+			var hadToRemoveRelationship:Boolean = false; // some triggers NEED for the actual state to be changed -- this marker lets us change it back.
+			var acceptForecast:String = "";
+			var rejectForecast:String = "";
+			var returnDictionary:Dictionary = new Dictionary();
+			var cif:CiFSingleton = CiFSingleton.getInstance();
+			var gameEngine:GameEngine = GameEngine.getInstance();
+			var dm:DifficultyManager = DifficultyManager.getInstance();
+			//ACCEPT CASE
+			
+			//If the Intent is dating and it was accepted, it is likely that it is a 'rude' act.
+			tempSFDBLabel.type = "mean";
+			tempSFDBLabel.from =   sgc.initiator;
+			tempSFDBLabel.to = sgc.responder;
+			
+			//Set up the predicate change we care about! (the initiator and the responder are no longer dating!)
+			tempPredicate.relationship = RelationshipNetwork.FRIENDS;
+			tempPredicate.primary = "initiator";
+			tempPredicate.secondary = "responder";
+			tempPredicate.negated = true;
+			tempPredicate.isSFDB = false;
+			tempPredicate.type = Predicate.RELATIONSHIP;
+			
+			//Our new Social Game needs an intent type I guess.  I don't care.
+			var tempIntent:Predicate = new Predicate();
+			tempIntent.relationship = Predicate.INTENT_END_FRIENDS; // I don't care
+			tempIntent.type = Predicate.RELATIONSHIP; // I don't care
+			var tempRule:Rule = new Rule();
+			tempRule.predicates.push(tempIntent);
+		
+			//At the bare minimum, our dumb temp social game needs an accept and a reject version -- either way, there is only one change we care about.
+			tempAcceptEffect.change.predicates.push(tempPredicate.clone());
+			tempAcceptEffect.isAccept = false;
+			tempRejectEffect.change.predicates.push(tempPredicate.clone());
+			tempRejectEffect.isAccept = true;
+	
+			//OK, lets add everything that we've got into our temp social game!
+			tempSocialGame.addEffect(tempAcceptEffect);
+			tempSocialGame.addEffect(tempRejectEffect);
+			tempSocialGame.intents.push(tempRule);
+			tempSocialGame.name = "FORECAST";// we DO CARE -- very important that it is called this!
+			
+			//UGH, we are actually adding this to the library. I hate it, but we've gotta do it or it won't work.
+			cif.socialGamesLib.addGame(tempSocialGame);
+			
+			//PLAY THE FAKE GAME!  What we'll get is a social game context that points to the initiator and responder
+			//that we care about, as well as the appropriate effect change (e.g. init and respond are now dating in the dating case).
+			tempSocialGameContext = cif.playGame(tempSocialGame, cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder), null, null, gameEngine.currentLevel.cast, false, dm.getVolitionThreshold("responder"));
+
+			//Do we have to remove the relationship?  if so, add it, then set a note to remind us to take it away again later.
+			if(cif.relationshipNetwork.getRelationship(RelationshipNetwork.FRIENDS, cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder))){
+				cif.relationshipNetwork.removeRelationship(RelationshipNetwork.FRIENDS, cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder));
+				hadToRemoveRelationship = true;
+			}
+			
+			//Take that shiny new SGC that we got, and add our explicit label that we defined earlier to it.
+			tempSocialGameContext.SFDBLabels.push(tempSFDBLabel);
+			tempSocialGameContext.time = cif.time;
+						
+			//Actually add the context to the SFDB
+			cif.sfdb.addContext(tempSocialGameContext);
+			
+			//ACTUALLY RUN THE TRIGGERS/FILL IN THE TOOL TIP
+			//acceptForecast += "IF THIS GOES THE WAY I WANT IT...\n";
+			acceptForecast += sgc.initiator + " and " + sgc.responder  + " will stop being friends!\n";
+			acceptForecast += runForecastTriggers(); // prints out what I care about.
+			
+			//Clean out the crap that we added!
+			cif.sfdb.contexts.splice(0, 1); // delete the dumb thing I just added to the sfdb?
+			cif.socialGamesLib.removeGame(tempSocialGame); // delete the dumb thing I just added from here too.
+			
+			//We only want to remove this if we had to add it! Otherwise don't delete it!!!!
+			if (hadToRemoveRelationship) {
+				cif.relationshipNetwork.setRelationship(RelationshipNetwork.FRIENDS, cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder))
+			}
+			
+			
+			//REJECT CASE
+			
+			//Clean everything out.
+			tempSocialGameContext = new SocialGameContext();
+			tempAcceptEffect = new Effect();
+			tempRejectEffect = new Effect();
+			tempSFDBLabel = new SFDBLabel();
+			tempSocialGameContext = new SocialGameContext();
+			tempSocialGame = new SocialGame();
+			tempPredicate = new Predicate();
+			
+			//Set up the SFDB Label with what is likely to happen if the intent is rejected.
+			tempSFDBLabel.type = "misunderstood";
+			tempSFDBLabel.from =   sgc.initiator;
+			tempSFDBLabel.to = sgc.responder;
+			
+			//For Reject Intent STOP relationship games, I don't think we need to worry about anything besides the failed romance label.
+			tempSocialGameContext.SFDBLabels.push(tempSFDBLabel);
+			tempSocialGameContext.time = cif.time;
+			cif.sfdb.addContext(tempSocialGameContext);
+			
+			//Actually Fill in the tool tip
+			//rejectForecast += "IF I CRASH AND BURN\n";
+			rejectForecast += sgc.responder + " and " + sgc.initiator  + " will still be friends.\n";
+			rejectForecast += runForecastTriggers(); // prints out what I care about.
+			
+			//Clean up After Ourselves
+			cif.sfdb.contexts.splice(0, 1); // delete the dumb thing I just added?
+			
+			returnDictionary["accept"] = acceptForecast;
+			returnDictionary["reject"] = rejectForecast;
+			return returnDictionary
+		}
+		
+		//Intent Stop Friends
+		public static function forecastIntentStopEnemies(sgc:SocialGameContext):Dictionary {		
+			var hadToRemoveRelationship:Boolean = false; // some triggers NEED for the actual state to be changed -- this marker lets us change it back.
+			var acceptForecast:String = "";
+			var rejectForecast:String = "";
+			var returnDictionary:Dictionary = new Dictionary();
+			var cif:CiFSingleton = CiFSingleton.getInstance();
+			var gameEngine:GameEngine = GameEngine.getInstance();
+			var dm:DifficultyManager = DifficultyManager.getInstance();
+			//ACCEPT CASE
+			
+			//If the Intent is stop enemies and it was accepted, it is likely that it is a 'nice' act.
+			tempSFDBLabel.type = "nice";
+			tempSFDBLabel.from =   sgc.initiator;
+			tempSFDBLabel.to = sgc.responder;
+			
+			//Set up the predicate change we care about! (the initiator and the responder are no longer dating!)
+			tempPredicate.relationship = RelationshipNetwork.ENEMIES;
+			tempPredicate.primary = "initiator";
+			tempPredicate.secondary = "responder";
+			tempPredicate.negated = true;
+			tempPredicate.isSFDB = false;
+			tempPredicate.type = Predicate.RELATIONSHIP;
+			
+			//Our new Social Game needs an intent type I guess.  I don't care.
+			var tempIntent:Predicate = new Predicate();
+			tempIntent.relationship = Predicate.INTENT_END_ENEMIES; // I don't care
+			tempIntent.type = Predicate.RELATIONSHIP; // I don't care
+			var tempRule:Rule = new Rule();
+			tempRule.predicates.push(tempIntent);
+		
+			//At the bare minimum, our dumb temp social game needs an accept and a reject version -- either way, there is only one change we care about.
+			tempAcceptEffect.change.predicates.push(tempPredicate.clone());
+			tempAcceptEffect.isAccept = false;
+			tempRejectEffect.change.predicates.push(tempPredicate.clone());
+			tempRejectEffect.isAccept = true;
+	
+			//OK, lets add everything that we've got into our temp social game!
+			tempSocialGame.addEffect(tempAcceptEffect);
+			tempSocialGame.addEffect(tempRejectEffect);
+			tempSocialGame.intents.push(tempRule);
+			tempSocialGame.name = "FORECAST";// we DO CARE -- very important that it is called this!
+			
+			//UGH, we are actually adding this to the library. I hate it, but we've gotta do it or it won't work.
+			cif.socialGamesLib.addGame(tempSocialGame);
+			
+			//PLAY THE FAKE GAME!  What we'll get is a social game context that points to the initiator and responder
+			//that we care about, as well as the appropriate effect change (e.g. init and respond are now dating in the dating case).
+			tempSocialGameContext = cif.playGame(tempSocialGame, cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder), null, null, gameEngine.currentLevel.cast, false, dm.getVolitionThreshold("responder"));
+
+			//Do we have to remove the relationship?  if so, add it, then set a note to remind us to take it away again later.
+			if(cif.relationshipNetwork.getRelationship(RelationshipNetwork.FRIENDS, cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder))){
+				cif.relationshipNetwork.removeRelationship(RelationshipNetwork.FRIENDS, cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder));
+				hadToRemoveRelationship = true;
+			}
+			
+			//Take that shiny new SGC that we got, and add our explicit label that we defined earlier to it.
+			tempSocialGameContext.SFDBLabels.push(tempSFDBLabel);
+			tempSocialGameContext.time = cif.time;
+						
+			//Actually add the context to the SFDB
+			cif.sfdb.addContext(tempSocialGameContext);
+			
+			//ACTUALLY RUN THE TRIGGERS/FILL IN THE TOOL TIP
+			//acceptForecast += "IF THIS GOES THE WAY I WANT IT...\n";
+			acceptForecast += sgc.initiator + " and " + sgc.responder  + " will stop being enemies!\n";
+			acceptForecast += runForecastTriggers(); // prints out what I care about.
+			
+			//Clean out the crap that we added!
+			cif.sfdb.contexts.splice(0, 1); // delete the dumb thing I just added to the sfdb?
+			cif.socialGamesLib.removeGame(tempSocialGame); // delete the dumb thing I just added from here too.
+			
+			//We only want to remove this if we had to add it! Otherwise don't delete it!!!!
+			if (hadToRemoveRelationship) {
+				cif.relationshipNetwork.setRelationship(RelationshipNetwork.FRIENDS, cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder))
+			}
+			
+			
+			//REJECT CASE
+			
+			//Clean everything out.
+			tempSocialGameContext = new SocialGameContext();
+			tempAcceptEffect = new Effect();
+			tempRejectEffect = new Effect();
+			tempSFDBLabel = new SFDBLabel();
+			tempSocialGameContext = new SocialGameContext();
+			tempSocialGame = new SocialGame();
+			tempPredicate = new Predicate();
+			
+			//Set up the SFDB Label with what is likely to happen if the intent is rejected.
+			tempSFDBLabel.type = "embarrassing";
+			tempSFDBLabel.from =   sgc.initiator;
+			tempSFDBLabel.to = sgc.responder;
+			
+			//For Reject Intent STOP relationship games, I don't think we need to worry about anything besides the failed romance label.
+			tempSocialGameContext.SFDBLabels.push(tempSFDBLabel);
+			tempSocialGameContext.time = cif.time;
+			cif.sfdb.addContext(tempSocialGameContext);
+			
+			//Actually Fill in the tool tip
+			//rejectForecast += "IF I CRASH AND BURN\n";
+			rejectForecast += sgc.responder + " and " + sgc.initiator  + " will still be enemies.\n";
+			rejectForecast += runForecastTriggers(); // prints out what I care about.
+			
+			//Clean up After Ourselves
+			cif.sfdb.contexts.splice(0, 1); // delete the dumb thing I just added?
+			returnDictionary["accept"] = acceptForecast;
+			returnDictionary["reject"] = rejectForecast;
+			return returnDictionary;
+		}
+		
+		//Creates a hypothetical situation where the init has done buddy up with responder
+		public static function forecastIntentBuddyUp(sgc:SocialGameContext):Dictionary {		
+			var acceptForecast:String = "";
+			var rejectForecast:String = "";
+			var returnDictionary:Dictionary = new Dictionary();
+			var cif:CiFSingleton = CiFSingleton.getInstance();
+			var gameEngine:GameEngine = GameEngine.getInstance();
+			var dm:DifficultyManager = DifficultyManager.getInstance();
+			//ACCEPT CASE
+			
+			//If the Intent is buddy up and it was accepted, it is likely that it is a 'nice' act.
+			tempSFDBLabel.type = "nice";
+			tempSFDBLabel.from =  sgc.initiator;
+			tempSFDBLabel.to = sgc.responder;
+			
+			//Set up the predicate change we care about! (the initiator and the responder are now friends!)
+			//tempPredicate.relationship = RelationshipNetwork.ENEMIES;
+			tempPredicate.networkType = SocialNetwork.BUDDY;
+			tempPredicate.primary = "initiator";
+			tempPredicate.secondary = "responder";
+			tempPredicate.negated = false;
+			tempPredicate.isSFDB = false;
+			tempPredicate.type = Predicate.NETWORK;
+			tempPredicate.networkValue = 20; // I guess we need this for network predicates.
+			
+			//Our new Social Game needs an intent type I guess.  I don't care.
+			var tempIntent:Predicate = new Predicate();
+			tempIntent.relationship = Predicate.INTENT_BUDDY_UP; // I don't care
+			tempIntent.type = Predicate.NETWORK; // I don't care
+			var tempRule:Rule = new Rule();
+			tempRule.predicates.push(tempIntent);
+		
+			//At the bare minimum, our dumb temp social game needs an accept and a reject version -- either way, there is only one change we care about.
+			tempAcceptEffect.change.predicates.push(tempPredicate.clone());
+			tempAcceptEffect.isAccept = false;
+			tempRejectEffect.change.predicates.push(tempPredicate.clone());
+			tempRejectEffect.isAccept = true;
+	
+			//OK, lets add everything that we've got into our temp social game!
+			tempSocialGame.addEffect(tempAcceptEffect);
+			tempSocialGame.addEffect(tempRejectEffect);
+			tempSocialGame.intents.push(tempRule);
+			tempSocialGame.name = "FORECAST";// we DO CARE -- very important that it is called this!
+			
+			//UGH, we are actually adding this to the library. I hate it, but we've gotta do it or it won't work.
+			cif.socialGamesLib.addGame(tempSocialGame);
+			
+			//PLAY THE FAKE GAME!  What we'll get is a social game context that points to the initiator and responder
+			//that we care about, as well as the appropriate effect change (e.g. init and respond are now dating in the dating case).
+			tempSocialGameContext = cif.playGame(tempSocialGame, cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder), null, null, gameEngine.currentLevel.cast, false, dm.getVolitionThreshold("responder"));
+			
+			//Take that shiny new SGC that we got, and add our explicit label that we defined earlier to it.
+			tempSocialGameContext.SFDBLabels.push(tempSFDBLabel);
+			tempSocialGameContext.time = cif.time;
+						
+			//Actually add the context to the SFDB
+			cif.sfdb.addContext(tempSocialGameContext);
+			
+			//ACTUALLY RUN THE TRIGGERS/FILL IN THE TOOL TIP
+			//acceptForecast += "IF THIS GOES THE WAY I WANT IT...\n";
+			acceptForecast += sgc.responder + " will like " + sgc.initiator  + " more!\n";
+			acceptForecast += runForecastTriggers(); // prints out what I care about.
+			
+			//Clean out the crap that we added!
+			cif.sfdb.contexts.splice(0, 1); // delete the dumb thing I just added to the sfdb?
+			cif.socialGamesLib.removeGame(tempSocialGame); // delete the dumb thing I just added from here too.
+			
+			//REJECT CASE
+			
+			//Clean everything out.
+			tempSocialGameContext = new SocialGameContext();
+			tempAcceptEffect = new Effect();
+			tempRejectEffect = new Effect();
+			tempSFDBLabel = new SFDBLabel();
+			tempSocialGameContext = new SocialGameContext();
+			tempSocialGame = new SocialGame();
+			tempPredicate = new Predicate();
+			
+			//Set up the SFDB Label with what is likely to happen if the intent is rejected.
+			tempSFDBLabel.type = "lame";
+			tempSFDBLabel.from =   sgc.initiator;
+			tempSFDBLabel.to = sgc.responder;
+			
+			//For Reject Intent Start relationship games, I think the SFDB label is the only thing we care about.
+			tempSocialGameContext.SFDBLabels.push(tempSFDBLabel);
+			tempSocialGameContext.time = cif.time;
+			cif.sfdb.addContext(tempSocialGameContext);
+			
+			//Actually Fill in the tool tip
+			//rejectForecast += "IF I CRASH AND BURN\n";
+			rejectForecast += sgc.responder + " will probably like " + sgc.initiator  + " a little less.\n";
+			rejectForecast += runForecastTriggers(); // prints out what I care about.
+			
+			//Clean up After Ourselves
+			cif.sfdb.contexts.splice(0, 1); // delete the dumb thing I just added?
+			returnDictionary["accept"] = acceptForecast;
+			returnDictionary["reject"] = rejectForecast;
+			return returnDictionary;
+		}
+		
+		//Creates a hypothetical situation where the init has done romance up with responder
+		public static function forecastIntentRomanceUp(sgc:SocialGameContext):Dictionary {		
+			var acceptForecast:String = "";
+			var rejectForecast:String = "";
+			var returnDictionary:Dictionary = new Dictionary();
+			var cif:CiFSingleton = CiFSingleton.getInstance();
+			var gameEngine:GameEngine = GameEngine.getInstance();
+			var dm:DifficultyManager = DifficultyManager.getInstance();
+			//ACCEPT CASE
+			
+			//If the Intent is buddy up and it was accepted, it is likely that it is a 'nice' act.
+			tempSFDBLabel.type = "romantic";
+			tempSFDBLabel.from =   sgc.initiator;
+			tempSFDBLabel.to = sgc.responder;
+			
+			//Set up the predicate change we care about! (the initiator and the responder are now friends!)
+			//tempPredicate.relationship = RelationshipNetwork.ENEMIES;
+			tempPredicate.networkType = SocialNetwork.ROMANCE;
+			tempPredicate.primary = "initiator";
+			tempPredicate.secondary = "responder";
+			tempPredicate.negated = false;
+			tempPredicate.isSFDB = false;
+			tempPredicate.type = Predicate.NETWORK;
+			tempPredicate.networkValue = 20; // I guess we need this for network predicates.
+			
+			//Our new Social Game needs an intent type I guess.  I don't care.
+			var tempIntent:Predicate = new Predicate();
+			tempIntent.relationship = Predicate.INTENT_ROMANCE_UP; // I don't care
+			tempIntent.type = Predicate.NETWORK; // I don't care
+			var tempRule:Rule = new Rule();
+			tempRule.predicates.push(tempIntent);
+		
+			//At the bare minimum, our dumb temp social game needs an accept and a reject version -- either way, there is only one change we care about.
+			tempAcceptEffect.change.predicates.push(tempPredicate.clone());
+			tempAcceptEffect.isAccept = false;
+			tempRejectEffect.change.predicates.push(tempPredicate.clone());
+			tempRejectEffect.isAccept = true;
+	
+			//OK, lets add everything that we've got into our temp social game!
+			tempSocialGame.addEffect(tempAcceptEffect);
+			tempSocialGame.addEffect(tempRejectEffect);
+			tempSocialGame.intents.push(tempRule);
+			tempSocialGame.name = "FORECAST";// we DO CARE -- very important that it is called this!
+			
+			//UGH, we are actually adding this to the library. I hate it, but we've gotta do it or it won't work.
+			cif.socialGamesLib.addGame(tempSocialGame);
+			
+			//PLAY THE FAKE GAME!  What we'll get is a social game context that points to the initiator and responder
+			//that we care about, as well as the appropriate effect change (e.g. init and respond are now dating in the dating case).
+			tempSocialGameContext = cif.playGame(tempSocialGame, cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder), null, null, gameEngine.currentLevel.cast, false, dm.getVolitionThreshold("responder"));
+			
+			//Take that shiny new SGC that we got, and add our explicit label that we defined earlier to it.
+			tempSocialGameContext.SFDBLabels.push(tempSFDBLabel);
+			tempSocialGameContext.time = cif.time;
+						
+			//Actually add the context to the SFDB
+			cif.sfdb.addContext(tempSocialGameContext);
+			
+			//ACTUALLY RUN THE TRIGGERS/FILL IN THE TOOL TIP
+			//acceptForecast += "IF THIS GOES THE WAY I WANT IT...\n";
+			acceptForecast += sgc.responder + " will like " + sgc.initiator  + " more!\n";
+			acceptForecast += runForecastTriggers(); // prints out what I care about.
+			
+			//Clean out the crap that we added!
+			cif.sfdb.contexts.splice(0, 1); // delete the dumb thing I just added to the sfdb?
+			cif.socialGamesLib.removeGame(tempSocialGame); // delete the dumb thing I just added from here too.
+			
+			//REJECT CASE
+			
+			//Clean everything out.
+			tempSocialGameContext = new SocialGameContext();
+			tempAcceptEffect = new Effect();
+			tempRejectEffect = new Effect();
+			tempSFDBLabel = new SFDBLabel();
+			tempSocialGameContext = new SocialGameContext();
+			tempSocialGame = new SocialGame();
+			tempPredicate = new Predicate();
+			
+			//Set up the SFDB Label with what is likely to happen if the intent is rejected.
+			tempSFDBLabel.type = "failed romance";
+			tempSFDBLabel.from =   sgc.initiator;
+			tempSFDBLabel.to = sgc.responder;
+			
+			//For Reject Intent Start relationship games, I think the SFDB label is the only thing we care about.
+			tempSocialGameContext.SFDBLabels.push(tempSFDBLabel);
+			tempSocialGameContext.time = cif.time;
+			cif.sfdb.addContext(tempSocialGameContext);
+			
+			//Actually Fill in the tool tip
+			//rejectForecast += "IF I CRASH AND BURN\n";
+			rejectForecast += sgc.responder + " will probably like " + sgc.initiator  + " a little less.\n";
+			rejectForecast += runForecastTriggers(); // prints out what I care about.
+			
+			//Clean up After Ourselves
+			cif.sfdb.contexts.splice(0, 1); // delete the dumb thing I just added?
+			
+			returnDictionary["accept"] = acceptForecast;
+			returnDictionary["reject"] = rejectForecast;
+			return returnDictionary
+		}
+		
+		//Creates a hypothetical situation where the init has done romance up with responder
+		public static function forecastIntentCoolUp(sgc:SocialGameContext):Dictionary {		
+			var acceptForecast:String = "";
+			var rejectForecast:String = "";
+			var returnDictionary:Dictionary = new Dictionary();
+			var cif:CiFSingleton = CiFSingleton.getInstance();
+			var gameEngine:GameEngine = GameEngine.getInstance();
+			var dm:DifficultyManager = DifficultyManager.getInstance();
+			//ACCEPT CASE
+			
+			//If the Intent is buddy up and it was accepted, it is likely that it is a 'nice' act.
+			tempSFDBLabel.type = "cool";
+			tempSFDBLabel.from =   sgc.initiator;
+			tempSFDBLabel.to = sgc.responder;
+			
+			//Set up the predicate change we care about! (the initiator and the responder are now friends!)
+			//tempPredicate.relationship = RelationshipNetwork.ENEMIES;
+			tempPredicate.networkType = SocialNetwork.COOL;
+			tempPredicate.primary = "initiator";
+			tempPredicate.secondary = "responder";
+			tempPredicate.negated = false;
+			tempPredicate.isSFDB = false;
+			tempPredicate.type = Predicate.NETWORK;
+			tempPredicate.networkValue = 20; // I guess we need this for network predicates.
+			
+			//Our new Social Game needs an intent type I guess.  I don't care.
+			var tempIntent:Predicate = new Predicate();
+			tempIntent.relationship = Predicate.INTENT_COOL_UP; // I don't care
+			tempIntent.type = Predicate.NETWORK; // I don't care
+			var tempRule:Rule = new Rule();
+			tempRule.predicates.push(tempIntent);
+		
+			//At the bare minimum, our dumb temp social game needs an accept and a reject version -- either way, there is only one change we care about.
+			tempAcceptEffect.change.predicates.push(tempPredicate.clone());
+			tempAcceptEffect.isAccept = false;
+			tempRejectEffect.change.predicates.push(tempPredicate.clone());
+			tempRejectEffect.isAccept = true;
+	
+			//OK, lets add everything that we've got into our temp social game!
+			tempSocialGame.addEffect(tempAcceptEffect);
+			tempSocialGame.addEffect(tempRejectEffect);
+			tempSocialGame.intents.push(tempRule);
+			tempSocialGame.name = "FORECAST";// we DO CARE -- very important that it is called this!
+			
+			//UGH, we are actually adding this to the library. I hate it, but we've gotta do it or it won't work.
+			cif.socialGamesLib.addGame(tempSocialGame);
+			
+			//PLAY THE FAKE GAME!  What we'll get is a social game context that points to the initiator and responder
+			//that we care about, as well as the appropriate effect change (e.g. init and respond are now dating in the dating case).
+			tempSocialGameContext = cif.playGame(tempSocialGame, cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder), null, null, gameEngine.currentLevel.cast, false, dm.getVolitionThreshold("responder"));
+			
+			//Take that shiny new SGC that we got, and add our explicit label that we defined earlier to it.
+			tempSocialGameContext.SFDBLabels.push(tempSFDBLabel);
+			tempSocialGameContext.time = cif.time;
+						
+			//Actually add the context to the SFDB
+			cif.sfdb.addContext(tempSocialGameContext);
+			
+			//ACTUALLY RUN THE TRIGGERS/FILL IN THE TOOL TIP
+			//acceptForecast += "IF THIS GOES THE WAY I WANT IT...\n";
+			acceptForecast += sgc.responder + " will think " + sgc.initiator  + " is cooler!\n";
+			acceptForecast += runForecastTriggers(); // prints out what I care about.
+			
+			//Clean out the crap that we added!
+			cif.sfdb.contexts.splice(0, 1); // delete the dumb thing I just added to the sfdb?
+			cif.socialGamesLib.removeGame(tempSocialGame); // delete the dumb thing I just added from here too.
+			
+			//REJECT CASE
+			
+			//Clean everything out.
+			tempSocialGameContext = new SocialGameContext();
+			tempAcceptEffect = new Effect();
+			tempRejectEffect = new Effect();
+			tempSFDBLabel = new SFDBLabel();
+			tempSocialGameContext = new SocialGameContext();
+			tempSocialGame = new SocialGame();
+			tempPredicate = new Predicate();
+			
+			//Set up the SFDB Label with what is likely to happen if the intent is rejected.
+			tempSFDBLabel.type = "lame";
+			tempSFDBLabel.from =   sgc.initiator;
+			tempSFDBLabel.to = sgc.responder;
+			
+			//For Reject Intent Start relationship games, I think the SFDB label is the only thing we care about.
+			tempSocialGameContext.SFDBLabels.push(tempSFDBLabel);
+			tempSocialGameContext.time = cif.time;
+			cif.sfdb.addContext(tempSocialGameContext);
+			
+			//Actually Fill in the tool tip
+			//rejectForecast += "IF I CRASH AND BURN\n";
+			rejectForecast += sgc.responder + " will probably think " + sgc.initiator  + " is a little less cool.\n";
+			rejectForecast += runForecastTriggers(); // prints out what I care about.
+			
+			//Clean up After Ourselves
+			cif.sfdb.contexts.splice(0, 1); // delete the dumb thing I just added?
+			returnDictionary["accept"] = acceptForecast;
+			returnDictionary["reject"] = rejectForecast;
+			return returnDictionary;
+		}
+		
+		//Creates a hypothetical situation where the init has done buddy down with responder
+		public static function forecastIntentBuddyDown(sgc:SocialGameContext):Dictionary {		
+			var acceptForecast:String = "";
+			var rejectForecast:String = "";
+			var returnDictionary:Dictionary = new Dictionary();
+			var cif:CiFSingleton = CiFSingleton.getInstance();
+			var gameEngine:GameEngine = GameEngine.getInstance();
+			var dm:DifficultyManager = DifficultyManager.getInstance();
+			//ACCEPT CASE
+			
+			//If the Intent is buddy up and it was accepted, it is likely that it is a 'nice' act.
+			tempSFDBLabel.type = "mean";
+			tempSFDBLabel.from =   sgc.initiator;
+			tempSFDBLabel.to = sgc.responder;
+			
+			//Set up the predicate change we care about!
+			//tempPredicate.relationship = RelationshipNetwork.ENEMIES;
+			tempPredicate.networkType = SocialNetwork.BUDDY;
+			tempPredicate.primary = "initiator";
+			tempPredicate.secondary = "responder";
+			tempPredicate.negated = false;
+			tempPredicate.isSFDB = false;
+			tempPredicate.type = Predicate.NETWORK;
+			tempPredicate.networkValue = -20; // I guess we need this for network predicates.
+			
+			//Our new Social Game needs an intent type I guess.  I don't care.
+			var tempIntent:Predicate = new Predicate();
+			tempIntent.relationship = Predicate.INTENT_BUDDY_DOWN; // I don't care
+			tempIntent.type = Predicate.NETWORK; // I don't care
+			var tempRule:Rule = new Rule();
+			tempRule.predicates.push(tempIntent);
+		
+			//At the bare minimum, our dumb temp social game needs an accept and a reject version -- either way, there is only one change we care about.
+			tempAcceptEffect.change.predicates.push(tempPredicate.clone());
+			tempAcceptEffect.isAccept = false;
+			tempRejectEffect.change.predicates.push(tempPredicate.clone());
+			tempRejectEffect.isAccept = true;
+	
+			//OK, lets add everything that we've got into our temp social game!
+			tempSocialGame.addEffect(tempAcceptEffect);
+			tempSocialGame.addEffect(tempRejectEffect);
+			tempSocialGame.intents.push(tempRule);
+			tempSocialGame.name = "FORECAST";// we DO CARE -- very important that it is called this!
+			
+			//UGH, we are actually adding this to the library. I hate it, but we've gotta do it or it won't work.
+			cif.socialGamesLib.addGame(tempSocialGame);
+			
+			//PLAY THE FAKE GAME!  What we'll get is a social game context that points to the initiator and responder
+			//that we care about, as well as the appropriate effect change (e.g. init and respond are now dating in the dating case).
+			tempSocialGameContext = cif.playGame(tempSocialGame, cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder), null, null, gameEngine.currentLevel.cast, false, dm.getVolitionThreshold("responder"));
+			
+			//Take that shiny new SGC that we got, and add our explicit label that we defined earlier to it.
+			tempSocialGameContext.SFDBLabels.push(tempSFDBLabel);
+			tempSocialGameContext.time = cif.time;
+						
+			//Actually add the context to the SFDB
+			cif.sfdb.addContext(tempSocialGameContext);
+			
+			//ACTUALLY RUN THE TRIGGERS/FILL IN THE TOOL TIP
+			//acceptForecast += "IF THIS GOES THE WAY I WANT IT...\n";
+			acceptForecast += sgc.responder + " will think " + sgc.initiator  + " is a worse buddy!\n";
+			acceptForecast += runForecastTriggers(); // prints out what I care about.
+			
+			//Clean out the crap that we added!
+			cif.sfdb.contexts.splice(0, 1); // delete the dumb thing I just added to the sfdb?
+			cif.socialGamesLib.removeGame(tempSocialGame); // delete the dumb thing I just added from here too.
+			
+			//REJECT CASE
+			
+			//Clean everything out.
+			tempSocialGameContext = new SocialGameContext();
+			tempAcceptEffect = new Effect();
+			tempRejectEffect = new Effect();
+			tempSFDBLabel = new SFDBLabel();
+			tempSocialGameContext = new SocialGameContext();
+			tempSocialGame = new SocialGame();
+			tempPredicate = new Predicate();
+			
+			//Set up the SFDB Label with what is likely to happen if the intent is rejected.
+			tempSFDBLabel.type = "lame";
+			tempSFDBLabel.from =   sgc.initiator;
+			tempSFDBLabel.to = sgc.responder;
+			
+			//For Reject Intent Start relationship games, I think the SFDB label is the only thing we care about.
+			tempSocialGameContext.SFDBLabels.push(tempSFDBLabel);
+			tempSocialGameContext.time = cif.time;
+			cif.sfdb.addContext(tempSocialGameContext);
+			
+			//Actually Fill in the tool tip
+			//rejectForecast += "IF I CRASH AND BURN\n";
+			rejectForecast += sgc.responder + " might think that " + sgc.initiator  + " is still a good buddy.\n";
+			rejectForecast += runForecastTriggers(); // prints out what I care about.
+			
+			//Clean up After Ourselves
+			cif.sfdb.contexts.splice(0, 1); // delete the dumb thing I just added?
+			returnDictionary["accept"] = acceptForecast;
+			returnDictionary["reject"] = rejectForecast;
+			return returnDictionary
+		}
+		
+		//Creates a hypothetical situation where the init has done romance down with responder
+		public static function forecastIntentRomanceDown(sgc:SocialGameContext):Dictionary {		
+			var acceptForecast:String = "";
+			var rejectForecast:String = "";
+			var returnDictionary:Dictionary = new Dictionary();
+			var cif:CiFSingleton = CiFSingleton.getInstance();
+			var gameEngine:GameEngine = GameEngine.getInstance();
+			var dm:DifficultyManager = DifficultyManager.getInstance();
+			//ACCEPT CASE
+			
+			//If the Intent is romance down and it was accepted, it was likely to be a rude act.
+			tempSFDBLabel.type = "rude";
+			tempSFDBLabel.from =   sgc.initiator;
+			tempSFDBLabel.to = sgc.responder;
+			
+			//Set up the predicate change we care about!
+			//tempPredicate.relationship = RelationshipNetwork.ENEMIES;
+			tempPredicate.networkType = SocialNetwork.ROMANCE;
+			tempPredicate.primary = "initiator";
+			tempPredicate.secondary = "responder";
+			tempPredicate.negated = false;
+			tempPredicate.isSFDB = false;
+			tempPredicate.type = Predicate.NETWORK;
+			tempPredicate.networkValue = -20; // I guess we need this for network predicates.
+			
+			//Our new Social Game needs an intent type I guess.  I don't care.
+			var tempIntent:Predicate = new Predicate();
+			tempIntent.relationship = Predicate.INTENT_ROMANCE_DOWN; // I don't care
+			tempIntent.type = Predicate.NETWORK; // I don't care
+			var tempRule:Rule = new Rule();
+			tempRule.predicates.push(tempIntent);
+		
+			//At the bare minimum, our dumb temp social game needs an accept and a reject version -- either way, there is only one change we care about.
+			tempAcceptEffect.change.predicates.push(tempPredicate.clone());
+			tempAcceptEffect.isAccept = false;
+			tempRejectEffect.change.predicates.push(tempPredicate.clone());
+			tempRejectEffect.isAccept = true;
+	
+			//OK, lets add everything that we've got into our temp social game!
+			tempSocialGame.addEffect(tempAcceptEffect);
+			tempSocialGame.addEffect(tempRejectEffect);
+			tempSocialGame.intents.push(tempRule);
+			tempSocialGame.name = "FORECAST";// we DO CARE -- very important that it is called this!
+			
+			//UGH, we are actually adding this to the library. I hate it, but we've gotta do it or it won't work.
+			cif.socialGamesLib.addGame(tempSocialGame);
+			
+			//PLAY THE FAKE GAME!  What we'll get is a social game context that points to the initiator and responder
+			//that we care about, as well as the appropriate effect change (e.g. init and respond are now dating in the dating case).
+			tempSocialGameContext = cif.playGame(tempSocialGame, cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder), null, null, gameEngine.currentLevel.cast, false, dm.getVolitionThreshold("responder"));
+			
+			//Take that shiny new SGC that we got, and add our explicit label that we defined earlier to it.
+			tempSocialGameContext.SFDBLabels.push(tempSFDBLabel);
+			tempSocialGameContext.time = cif.time;
+						
+			//Actually add the context to the SFDB
+			cif.sfdb.addContext(tempSocialGameContext);
+			
+			//ACTUALLY RUN THE TRIGGERS/FILL IN THE TOOL TIP
+			//acceptForecast += "IF THIS GOES THE WAY I WANT IT...\n";
+			acceptForecast += sgc.responder + " will be less romantically interested in " + sgc.initiator  + "!\n";
+			acceptForecast += runForecastTriggers(); // prints out what I care about.
+			
+			//Clean out the crap that we added!
+			cif.sfdb.contexts.splice(0, 1); // delete the dumb thing I just added to the sfdb?
+			cif.socialGamesLib.removeGame(tempSocialGame); // delete the dumb thing I just added from here too.
+			
+			//REJECT CASE
+			
+			//Clean everything out.
+			tempSocialGameContext = new SocialGameContext();
+			tempAcceptEffect = new Effect();
+			tempRejectEffect = new Effect();
+			tempSFDBLabel = new SFDBLabel();
+			tempSocialGameContext = new SocialGameContext();
+			tempSocialGame = new SocialGame();
+			tempPredicate = new Predicate();
+			
+			//Set up the SFDB Label with what is likely to happen if the intent is rejected.
+			tempSFDBLabel.type = "misunderstood";
+			tempSFDBLabel.from =   sgc.responder;
+			tempSFDBLabel.to = sgc.initiator;
+			
+			//For Reject Intent Start relationship games, I think the SFDB label is the only thing we care about.
+			tempSocialGameContext.SFDBLabels.push(tempSFDBLabel);
+			tempSocialGameContext.time = cif.time;
+			cif.sfdb.addContext(tempSocialGameContext);
+			
+			//Actually Fill in the tool tip
+			//rejectForecast += "IF I CRASH AND BURN\n";
+			rejectForecast += sgc.responder + " might think that " + sgc.initiator  + " is as attractive as ever.\n";
+			rejectForecast += runForecastTriggers(); // prints out what I care about.
+			
+			//Clean up After Ourselves
+			cif.sfdb.contexts.splice(0, 1); // delete the dumb thing I just added?
+			returnDictionary["accept"] = acceptForecast;
+			returnDictionary["reject"] = rejectForecast;
+			return returnDictionary;
+		}
+		
+		//Creates a hypothetical situation where the init has done cool down with responder
+		public static function forecastIntentCoolDown(sgc:SocialGameContext):Dictionary {		
+			var acceptForecast:String = "";
+			var rejectForecast:String = "";
+			var returnDictionary:Dictionary = new Dictionary();
+			var cif:CiFSingleton = CiFSingleton.getInstance();
+			var gameEngine:GameEngine = GameEngine.getInstance();
+			var dm:DifficultyManager = DifficultyManager.getInstance();
+			//ACCEPT CASE
+			
+			//If the Intent is cool down and it was accepted, it was likely to be a lame act.
+			tempSFDBLabel.type = "lame";
+			tempSFDBLabel.from =   sgc.initiator;
+			tempSFDBLabel.to = sgc.responder;
+			
+			//Set up the predicate change we care about!
+			//tempPredicate.relationship = RelationshipNetwork.ENEMIES;
+			tempPredicate.networkType = SocialNetwork.COOL;
+			tempPredicate.primary = "initiator";
+			tempPredicate.secondary = "responder";
+			tempPredicate.negated = false;
+			tempPredicate.isSFDB = false;
+			tempPredicate.type = Predicate.NETWORK;
+			tempPredicate.networkValue = -20; // I guess we need this for network predicates.
+			
+			//Our new Social Game needs an intent type I guess.  I don't care.
+			var tempIntent:Predicate = new Predicate();
+			tempIntent.relationship = Predicate.INTENT_COOL_DOWN; // I don't care
+			tempIntent.type = Predicate.NETWORK; // I don't care
+			var tempRule:Rule = new Rule();
+			tempRule.predicates.push(tempIntent);
+		
+			//At the bare minimum, our dumb temp social game needs an accept and a reject version -- either way, there is only one change we care about.
+			tempAcceptEffect.change.predicates.push(tempPredicate.clone());
+			tempAcceptEffect.isAccept = false;
+			tempRejectEffect.change.predicates.push(tempPredicate.clone());
+			tempRejectEffect.isAccept = true;
+	
+			//OK, lets add everything that we've got into our temp social game!
+			tempSocialGame.addEffect(tempAcceptEffect);
+			tempSocialGame.addEffect(tempRejectEffect);
+			tempSocialGame.intents.push(tempRule);
+			tempSocialGame.name = "FORECAST";// we DO CARE -- very important that it is called this!
+			
+			//UGH, we are actually adding this to the library. I hate it, but we've gotta do it or it won't work.
+			cif.socialGamesLib.addGame(tempSocialGame);
+			
+			//PLAY THE FAKE GAME!  What we'll get is a social game context that points to the initiator and responder
+			//that we care about, as well as the appropriate effect change (e.g. init and respond are now dating in the dating case).
+			tempSocialGameContext = cif.playGame(tempSocialGame, cif.cast.getCharByName(sgc.initiator), cif.cast.getCharByName(sgc.responder), null, null, gameEngine.currentLevel.cast, false, dm.getVolitionThreshold("responder"));
+			
+			//Take that shiny new SGC that we got, and add our explicit label that we defined earlier to it.
+			tempSocialGameContext.SFDBLabels.push(tempSFDBLabel);
+			tempSocialGameContext.time = cif.time;
+						
+			//Actually add the context to the SFDB
+			cif.sfdb.addContext(tempSocialGameContext);
+			
+			//ACTUALLY RUN THE TRIGGERS/FILL IN THE TOOL TIP
+			//acceptForecast += "IF THIS GOES THE WAY I WANT IT...\n";
+			acceptForecast += sgc.responder + " will think " + sgc.initiator  + " is less cool!\n";
+			acceptForecast += runForecastTriggers(); // prints out what I care about.
+			
+			//Clean out the crap that we added!
+			cif.sfdb.contexts.splice(0, 1); // delete the dumb thing I just added to the sfdb?
+			cif.socialGamesLib.removeGame(tempSocialGame); // delete the dumb thing I just added from here too.
+			
+			//REJECT CASE
+			
+			//Clean everything out.
+			tempSocialGameContext = new SocialGameContext();
+			tempAcceptEffect = new Effect();
+			tempRejectEffect = new Effect();
+			tempSFDBLabel = new SFDBLabel();
+			tempSocialGameContext = new SocialGameContext();
+			tempSocialGame = new SocialGame();
+			tempPredicate = new Predicate();
+			
+			//Set up the SFDB Label with what is likely to happen if the intent is rejected.
+			tempSFDBLabel.type = "funny";
+			tempSFDBLabel.from =   sgc.responder;
+			tempSFDBLabel.to = sgc.initiator;
+			
+			//For Reject Intent Start relationship games, I think the SFDB label is the only thing we care about.
+			tempSocialGameContext.SFDBLabels.push(tempSFDBLabel);
+			tempSocialGameContext.time = cif.time;
+			cif.sfdb.addContext(tempSocialGameContext);
+			
+			//Actually Fill in the tool tip
+			//rejectForecast += "IF I CRASH AND BURN\n";
+			rejectForecast += sgc.responder + " might think that " + sgc.initiator  + " is even a little bit cooler.\n";
+			rejectForecast += runForecastTriggers(); // prints out what I care about.
+			
+			//Clean up After Ourselves
+			cif.sfdb.contexts.splice(0, 1); // delete the dumb thing I just added?
+			returnDictionary["accept"] = acceptForecast;
+			returnDictionary["reject"] = rejectForecast;
+			return returnDictionary;
+		}
+		
+		
+		
+	//cruft that doesn't seem to work but I am too scared to get rid of it for now!
+	//cif.time++; //eeeeeeeeeeeek feel awful doing this.
+	//cif.relationshipNetwork.setRelationship(RelationshipNetwork.DATING, cif.cast.getCharByName("zack"), cif.cast.getCharByName("edward"));
+/*	
+	tempPredicate.relationship = RelationshipNetwork.DATING;
+	tempPredicate.primary = "initiator";
+	tempPredicate.secondary = "responder";
+	//tempPredicate.type = RelationshipNetwork.getRelationshipNumberByName
+	tempPredicate.negated = false;
+	tempPredicate.isSFDB = false;
+	
+	var tempIntent:Predicate = new Predicate();
+	tempIntent.relationship = Predicate.INTENT_DATING; // I don't care
+	tempIntent.type = Predicate.RELATIONSHIP; // I don't care
+	
+	var tempRule:Rule = new Rule();
+	tempRule.predicates.push(tempIntent);
+	
+	tempEffect.change.predicates.push(tempPredicate);
+	tempEffect.isAccept = false;
+	
+	tempSocialGame.addEffect(tempEffect);
+	tempSocialGame.intents.push(tempRule);
+	tempSocialGame.name = "Ask on a Date";// don't care?
+	tempSocialGameContext = cif.playGame(tempSocialGame, cif.cast.getCharByName("zack"), cif.cast.getCharByName("edward"), null, null, gameEngine.currentLevel.cast);
+	*/
+		
+	]]>
+	</fx:Script>
+</s:SkinnableContainer>

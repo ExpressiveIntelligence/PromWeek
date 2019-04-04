@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:prom="PromWeek.*" xmlns:util="com.util.*"
+		 creationComplete="onCreationComplete()"
+		 initialize="initializeAchievements()"
+		 width="240"
+		 height="75"
+		 styleName="classicPromWeek">
+		 
+		 <fx:Metadata>
+		 </fx:Metadata>
+		 
+		 <fx:Declarations>
+		 </fx:Declarations>
+		 
+		<s:Group id="AchievementWindow" width="100%" height="100%">
+			<s:Rect width="100%" height="100%">
+					<s:stroke>
+						<s:SolidColorStroke weight="{getStyle('windowStrokeWeight')}" color="{getStyle('backgroundStroke')}" />
+					</s:stroke>
+					<s:fill>
+						<s:SolidColor color="{getStyle('backgroundColor')}" alpha="1.0"/>
+					</s:fill>
+			</s:Rect>
+			<s:HGroup  width="100%" height="100%">
+				<s:VGroup width="75">
+					<s:Group id="AchievementGroup" x="50" y="20" width="60" height="50">
+						<util:SmoothImage id="AchievementImage" width="{AchievementGroup.width}" height="{AchievementGroup.height}"/>
+					</s:Group>
+					<s:Group id="portraitName">
+						<s:Rect width="100%" height="25" x="10">
+							<s:fill>
+								<mx:SolidColor color="{getStyle('windowNamePlate')}" alpha="0.01"/>
+							</s:fill>
+						</s:Rect>
+					</s:Group>
+				</s:VGroup>
+				<s:Group id="feedLine" width="100%" height="100%">
+					<s:RichText id="AchievementName" color="{getStyle('textColor')}" y="{AchievementWindow.height/2}" width="100%" paddingRight="5" />
+				</s:Group>
+			</s:HGroup>
+			<s:Group id="removeIconGroup" x="110" y="0" width="15" height="15" click="xClickedOn()" toolTip="Close Window" mouseDown="xClickedOn()">
+				<s:Rect x="{removeIconGroup.x}" y="{removeIconGroup.y}" width="15" height="15">
+					<s:stroke>
+						<s:SolidColorStroke color="black" alpha="1.0" />
+					</s:stroke>
+					<s:fill>
+						<s:SolidColor color="white" alpha="0.8" />
+					</s:fill>
+				</s:Rect>
+				<s:Line id="line1" xFrom="{removeIconGroup.x}" yFrom="{removeIconGroup.y}" xTo="{removeIconGroup.x + 15}" yTo="{removeIconGroup.y + 15}" >
+					<s:stroke>
+						<s:SolidColorStroke color="black" alpha="1.0" weight="2" />
+					</s:stroke>
+				</s:Line>
+				<s:Line id="line2" xFrom="{removeIconGroup.x}" yFrom="{removeIconGroup.y + 15}" xTo="{removeIconGroup.x + 15}" yTo="{removeIconGroup.y}" >
+					<s:stroke>
+						<s:SolidColorStroke color="black" weight="2"/>
+					</s:stroke>
+				</s:Line>		
+			</s:Group>
+		</s:Group>
+		
+	<fx:Script>
+		<![CDATA[
+		import flash.events.Event;
+		import flash.events.TimerEvent;
+		import flash.utils.getTimer;
+		import flash.utils.Timer;
+		import PromWeek.assets.ResourceLibrary;
+		import PromWeek.assets.SoundLibrary;
+		import flash.media.Sound;
+		import flash.media.SoundChannel;
+		
+		
+		private var resourceLib:PromWeek.assets.ResourceLibrary = PromWeek.assets.ResourceLibrary.getInstance();
+		private var soundLibrary:SoundLibrary = SoundLibrary.getInstance();
+		private var gameEngine:PromWeek.GameEngine = PromWeek.GameEngine.getInstance();
+		
+		private var beginFading:Boolean;
+		private var fadingOut:Boolean;
+		private var mouseIsOver:Boolean;
+		private var timeLength:Number;
+		private var startTime:Number;
+		public var deltaAlpha:Number = 0;
+		public var alphaSpeed:Number = 1.0;
+		
+		public var timeToDeleteMe:Boolean = false;
+		
+		public function onCreationComplete():void {
+		}
+		public function initializeAchievements():void {
+			
+		}
+		
+		//Closes the box when the x is clicked on.
+		public function xClickedOn():void {
+			this.visible = false;
+		}
+		
+		/**
+		 * The function that shows the achievement that is given to it. Right now it is based on when the button is pressed, but
+		 * when the logic is there it will be when the achievement is completed this function will be called with that achievement.
+		 * Sets the pop up to true, and grabs the achivement to get its title, picture, and tooltip. Will then start the rest of the logic.
+		 * @param	achieve
+		 */
+		public function showAchievement(achieve:Achievement):void {
+			this.alpha = .05;
+			this.visible = true;
+			AchievementWindow.toolTip = achieve.toolTip;
+			AchievementImage.source = achieve.picture;
+			AchievementName.text = achieve.name;
+			var youGotAchievement:Sound = new soundLibrary.maleUtterances["happy"]() as Sound;
+			youGotAchievement.play();
+			timeLength = 3000;
+			fadeIn();
+			beginFading = true;
+			startTime =  getTimer();
+			this.addEventListener("mouseOver", stopFade);
+			this.addEventListener("mouseOut", startFade);
+		}
+		
+		
+		/**
+		 * This function and increase alpha is just used for fade in. Probably the more effecient way to do it, but I couldn't find out how to do
+		 * it for fade out.
+		 */
+		public function fadeIn():void{
+			var timer:Timer = new Timer(25, 20);
+			timer.addEventListener(TimerEvent.TIMER, increaseAlpha);
+			timer.start();
+		}
+		public function increaseAlpha(e:Event):void {
+			this.alpha += 0.05;
+		}
+		
+		/**
+		 * Sets a boolean that will stop the fadeout from occuring, the logic of which is inside in update.
+		 * Will stop fading and set the alpha to 1.
+		 * @param	event
+		 */
+		public function stopFade(e:Event):void {
+			this.mouseIsOver = true;
+		}
+		
+		/**
+		 * This will cancel the mouseOver logic so it can begin fading but it will fade
+		 * out quicker every time it mouses out.
+		 * @param	event
+		 */
+		public function startFade(e:Event):void {
+			this.mouseIsOver = false;
+			this.beginFading = true;
+			this.startTime = getTimer();
+			this.timeLength -= 1000;
+		}
+		
+		/**
+		 * This update logic for the achievement pop up screen. Makes it so it will fade out after so much time, with other if statements to
+		 * handle other different logics.
+		 * @param	elapsedTime
+		 */
+		public function update(elapsedTime:Number):void {
+			//This takes the current time minus the time it started living and checked if it has been long enough to start fading out.
+			if ((((getTimer() - this.startTime) > timeLength) && beginFading)){
+				this.fadingOut = true;
+				beginFading = false;
+				this.deltaAlpha = 1;
+			}
+			
+			//The logic to keep it visible and not fading out when the mouse is over it.
+			if (mouseIsOver) {
+				this.alpha = 1.0;
+				this.fadingOut = false;
+			}
+			
+			//Making it fade out when it is suppose to.
+			if (fadingOut){
+				this.deltaAlpha -= (elapsedTime / 1000.0) * alphaSpeed;
+				this.alpha = deltaAlpha;
+				//Debug.debug(this,"fading out: "+this.alpha);
+			}
+			
+				
+			//go away once you've faded enough
+			if (this.fadingOut && this.alpha < .05){ 
+				this.fadingOut = false;
+				this.visible = false;
+				this.removeEventListener("mouseOver", stopFade);
+				this.removeEventListener("mouseOut", startFade);
+				this.timeToDeleteMe = true;
+			}
+		}
+		
+		/**
+		 * Sets the style according to what boolean is true in game engine. This is called in gameEngine with all other components that change
+		 * their style at the same time.
+		 */
+		public function setStyleName():void {
+			this.setStyle("styleName", PromWeek.GameEngine.getInstance().activeStyleName);
+			/*if(gameEngine.classicPromColors) {
+				this.setStyle("styleName", "classicPromWeek");
+			}
+			else if(gameEngine.greenPromColors) {
+				this.setStyle("styleName", "greenColor");
+			}
+			else if(gameEngine.redPromColors) {
+				this.setStyle("styleName", "redColor");
+			}*/
+			this.invalidateProperties();
+		}
+		
+		]]>
+			
+	</fx:Script>
+	
+
+</s:Group>

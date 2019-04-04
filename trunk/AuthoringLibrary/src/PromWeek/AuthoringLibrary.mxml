@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+               xmlns:s="library://ns.adobe.com/flex/spark" 
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+			   initialize="onInitialize()">
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<fx:XML id="Annoy" source="../../../CiFStates/Games/Annoy.xml" />
+		<fx:XML id="AskOut" source="../../../CiFStates/Games/AskOut.xml" />
+		<fx:XML id="BackMeUp" source="../../../CiFStates/Games/BackMeUp.xml" />
+		<fx:XML id="Backstab" source="../../../CiFStates/Games/Backstab.xml" />
+		<fx:XML id="Bicker" source="../../../CiFStates/Games/Bicker.xml" />
+		<fx:XML id="BlowOffPlans" source="../../../CiFStates/Games/BlowOffPlans.xml" />
+		<fx:XML id="Brag" source="../../../CiFStates/Games/Brag.xml" />
+		<fx:XML id="BrashRemark" source="../../../CiFStates/Games/BrashRemark.xml" />
+		<fx:XML id="BrokeMyHeart" source="../../../CiFStates/Games/BrokeMyHeart.xml" />
+		<fx:XML id="BrutalBreakUp" source="../../../CiFStates/Games/BrutalBreakUp.xml" />
+		<fx:XML id="Bully" source="../../../CiFStates/Games/Bully.xml" />
+		<fx:XML id="Concede" source="../../../CiFStates/Games/Concede.xml" />
+		<fx:XML id="ConfideIn" source="../../../CiFStates/Games/ConfideIn.xml" />
+		<fx:XML id="DeclareWar" source="../../../CiFStates/Games/DeclareWar.xml" />
+		<fx:XML id="EmbarassSelf" source="../../../CiFStates/Games/EmbarassSelf.xml" />
+		<fx:XML id="Flirt" source="../../../CiFStates/Games/Flirt.xml" />
+		<fx:XML id="GiveAdvice" source="../../../CiFStates/Games/GiveAdvice.xml" />
+		<fx:XML id="HumbleSelf" source="../../../CiFStates/Games/HumbleSelf.xml" />
+		<fx:XML id="Idolize" source="../../../CiFStates/Games/Idolize.xml" />
+		<fx:XML id="Insult" source="../../../CiFStates/Games/Insult.xml" />
+		<fx:XML id="InsultFriendOf" source="../../../CiFStates/Games/InsultFriendOf.xml" />
+		<fx:XML id="ItsOver" source="../../../CiFStates/Games/ItsOver.xml" />
+		<fx:XML id="LeaveMeAlone" source="../../../CiFStates/Games/LeaveMeAlone.xml" />
+		<fx:XML id="LetsBeFriends" source="../../../CiFStates/Games/LetsBeFriends.xml" />
+		<fx:XML id="MakePlans" source="../../../CiFStates/Games/MakePlans.xml" />
+		<fx:XML id="MakeUp" source="../../../CiFStates/Games/MakeUp.xml" />
+		<fx:XML id="OpenUp" source="../../../CiFStates/Games/OpenUp.xml" />
+		<fx:XML id="PhysicalFlirt" source="../../../CiFStates/Games/PhysicalFlirt.xml" />
+		<fx:XML id="PickUpLine" source="../../../CiFStates/Games/PickUpLine.xml" />
+		<fx:XML id="Reminisce" source="../../../CiFStates/Games/Reminisce.xml" />
+		<fx:XML id="ShareInterest" source="../../../CiFStates/Games/ShareInterest.xml" />
+		<fx:XML id="ShootDown" source="../../../CiFStates/Games/ShootDown.xml" />
+		<fx:XML id="ShowOff" source="../../../CiFStates/Games/ShowOff.xml" />
+		<fx:XML id="SpreadRumours" source="../../../CiFStates/Games/SpreadRumours.xml" />
+		<fx:XML id="TxtBreakUp" source="../../../CiFStates/Games/TxtBreakUp.xml" />
+		<fx:XML id="TurnOff" source="../../../CiFStates/Games/TurnOff.xml" />
+		<fx:XML id="WeirdOut" source="../../../CiFStates/Games/WeirdOut.xml" />
+		<fx:XML id="Woo" source="../../../CiFStates/Games/Woo.xml" />
+		<fx:XML id="WooEnemy" source="../../../CiFStates/Games/WooEnemy.xml" />
+	
+		<fx:XML id="SocialStatusUpdateGame" source="../../../CiFStates/Games/SocialStatusUpdateGame.xml" />
+		<fx:XML id="SocialStatusUpdateGameNotInLevel" source="../../../CiFStates/Games/SocialStatusUpdateGameNotInLevel.xml" />
+		<fx:XML id="StoryTriggerGame" source="../../../CiFStates/Games/StoryTriggerGame.xml" />
+		<fx:XML id="TriggerGame" source="../../../CiFStates/Games/TriggerGame.xml" />		
+		<fx:XML id="TriggerGameAllChars" source="../../../CiFStates/Games/TriggerGameAllChars.xml" />		
+		<fx:XML id="Microtheories" source="../../../CiFStates/Games/Microtheories.xml" />
+		
+		<fx:XML id="ChloeStory" source="../../../CiFStates/Stories/ChloeT1.xml" />
+		<fx:XML id="ZackStory" source="../../../CiFStates/Stories/ZackT1.xml" />
+		<fx:XML id="DougStory" source="../../../CiFStates/Stories/Doug.xml" />
+		<fx:XML id="EdwardStory" source="../../../CiFStates/Stories/Edward.xml" />
+		<!--<fx:XML id="GettingReadyForPromStory" source="../../../CiFStates/Stories/GettingReadyForProm.xml" />-->
+		<fx:XML id="LilStory" source="../../../CiFStates/Stories/Lil.xml" />
+		<fx:XML id="MonicaStory" source="../../../CiFStates/Stories/Monica.xml" />
+		<fx:XML id="SimonStory" source="../../../CiFStates/Stories/Simon.xml" />
+		<fx:XML id="KateStory" source="../../../CiFStates/Stories/Kate.xml" />
+		<fx:XML id="NaomiStory" source="../../../CiFStates/Stories/Naomi.xml" />
+		<fx:XML id="OswaldStory" source="../../../CiFStates/Stories/Oswald.xml" />
+		<fx:XML id="FacadeStory" source="../../../CiFStates/Stories/facade.xml" />
+		
+		<!-- 'QuickPlay' tutorials --> <!-- ALSO NEED TO ADD DOWN BELOW! -->
+		<fx:XML id="QP1" source="../../../CiFStates/Stories/QuickPlayStories/QP1.xml" /> <!-- First Quick Play -->
+		<fx:XML id="QP2" source="../../../CiFStates/Stories/QuickPlayStories/QP2.xml" /> <!-- Second Quick Play etc. -->
+		<fx:XML id="QP3" source="../../../CiFStates/Stories/QuickPlayStories/QP3.xml" /> 
+		<!--<fx:XML id="QP4" source="../../../CiFStates/Stories/QuickPlayStories/QP4.xml" /> -->
+		<fx:XML id="QP5" source="../../../CiFStates/Stories/QuickPlayStories/QP5.xml" /> 
+		<fx:XML id="QP6" source="../../../CiFStates/Stories/QuickPlayStories/QP6.xml" /> 
+		<fx:XML id="QP7" source="../../../CiFStates/Stories/QuickPlayStories/QP7.xml" /> 
+		
+		<!--Tutorials --> <!-- ALSO NEED TO ADD DOWN BELOW, AND ABOVE! -->
+
+		<fx:XML id="newTutorial1part1" source="../../../TutorialScripts/newTutorial1-1.xml" /> <!-- Chloe -->
+		<fx:XML id="newTutorial1part2" source="../../../TutorialScripts/newTutorial1-2.xml" /> 
+		
+		<fx:XML id="newTutorial2part1" source="../../../TutorialScripts/newTutorial2-1.xml" /> <!-- Doug -->
+		<fx:XML id="newTutorial2part2" source="../../../TutorialScripts/newTutorial2-2.xml" />
+		
+		<fx:XML id="DougTutorialThu" source="../../../TutorialScripts/DougTutorialThu.xml" />
+		<fx:XML id="DougTutorialFri" source="../../../TutorialScripts/DougTutorialFri.xml" />
+		
+		<fx:XML id="LilTutorialMon" source="../../../TutorialScripts/LilTutorialMon.xml" />
+		<fx:XML id="LilTutorialTue" source="../../../TutorialScripts/LilTutorialTue.xml" />
+		<fx:XML id="LilTutorialWed" source="../../../TutorialScripts/LilTutorialWed.xml" />
+		<fx:XML id="LilTutorialThu" source="../../../TutorialScripts/LilTutorialThu.xml" />
+		<fx:XML id="LilTutorialFri" source="../../../TutorialScripts/LilTutorialFri.xml" />
+		
+		<fx:XML id="SimonTutorialWed" source="../../../TutorialScripts/SimonTutorialWed.xml" />
+		<fx:XML id="SimonTutorialThu" source="../../../TutorialScripts/SimonTutorialThu.xml" />
+		<fx:XML id="SimonTutorialFri" source="../../../TutorialScripts/SimonTutorialFri.xml" />
+		
+		<fx:XML id="MonicaTutorialTue" source="../../../TutorialScripts/MonicaTutorialTue.xml" />
+		<fx:XML id="MonicaTutorialWed" source="../../../TutorialScripts/MonicaTutorialWed.xml" />
+		<fx:XML id="MonicaTutorialThu" source="../../../TutorialScripts/MonicaTutorialThu.xml" />
+		<fx:XML id="MonicaTutorialFri" source="../../../TutorialScripts/MonicaTutorialFri.xml" />
+		
+		<fx:XML id="EdwardTutorialTue" source="../../../TutorialScripts/EdwardTutorialTue.xml" />
+		<fx:XML id="EdwardTutorialWed" source="../../../TutorialScripts/EdwardTutorialWed.xml" />
+		<fx:XML id="EdwardTutorialThu" source="../../../TutorialScripts/EdwardTutorialThu.xml" />
+		<fx:XML id="EdwardTutorialFri" source="../../../TutorialScripts/EdwardTutorialFri.xml" />
+		
+		<fx:XML id="KateTutorialTue" source="../../../TutorialScripts/KateTutorialTue.xml" />
+		<fx:XML id="KateTutorialWed" source="../../../TutorialScripts/KateTutorialWed.xml" />
+		<fx:XML id="KateTutorialThu" source="../../../TutorialScripts/KateTutorialThu.xml" />
+		<fx:XML id="KateTutorialFri" source="../../../TutorialScripts/KateTutorialFri.xml" />
+		
+		<fx:XML id="OswaldTutorialWed" source="../../../TutorialScripts/OswaldTutorialWed.xml" />
+		<fx:XML id="OswaldTutorialThu" source="../../../TutorialScripts/OswaldTutorialThu.xml" />
+		<fx:XML id="OswaldTutorialFri" source="../../../TutorialScripts/OswaldTutorialFri.xml" />
+		
+		<fx:XML id="NaomiTutorialWed" source="../../../TutorialScripts/NaomiTutorialWed.xml" />
+		<fx:XML id="NaomiTutorialThu" source="../../../TutorialScripts/NaomiTutorialThu.xml" />
+		<fx:XML id="NaomiTutorialFri" source="../../../TutorialScripts/NaomiTutorialFri.xml" />
+		
+		<fx:XML id="FacadeTutorial" source="../../../TutorialScripts/FacadeTutorial.xml" />
+		
+		<!-- Special CiF start states for tutorials. NOTE: This is no longer used!! All levels use regular main state. -->
+		<!-- Umm, I believe the above comment is out of date. I think we DO have special start states still -->
+		<fx:XML id="tutorialCifStateXML" source="../../../CiFStates/PromWeekCharactersTUTORIAL.xml" />
+		<fx:XML id="facadeState" source="../../../CiFStates/facadeState.xml" />
+		<fx:XML id="QuickPlayStartState1" source="../../../CiFStates/QuickPlayStartState1.xml" />
+		<fx:XML id="QuickPlayStartState2" source="../../../CiFStates/QuickPlayStartState2.xml" />
+		<fx:XML id="QuickPlayStartState3" source="../../../CiFStates/QuickPlayStartState3.xml" />
+		<!--<fx:XML id="QuickPlayStartState4" source="../../../CiFStates/QuickPlayStartState4.xml" />-->
+		<fx:XML id="QuickPlayStartState5" source="../../../CiFStates/QuickPlayStartState5.xml" />
+		<fx:XML id="QuickPlayStartState6" source="../../../CiFStates/QuickPlayStartState6.xml" />
+		<fx:XML id="QuickPlayStartState7" source="../../../CiFStates/QuickPlayStartState7.xml" />
+		
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+		import flash.utils.Dictionary;
+		
+		public var games:Dictionary
+		public var stories:Dictionary
+		public var tutorials:Dictionary;
+		public var cifStartStates:Dictionary;
+		public var quickPlayStories:Dictionary;
+		
+		public function onInitialize():void {
+			
+		}
+		
+		public function loadXMLGames():void {
+			games = new Dictionary()
+			
+			games["Annoy"] = XML(Annoy);
+			games["AskOut"] = XML(AskOut);
+			games["BackMeUp"] = XML(BackMeUp);
+			games["Backstab"] = XML(Backstab);
+			games["Bicker"] = XML(Bicker);
+			games["BlowOffPlans"] = XML(BlowOffPlans);
+			games["Brag"] = XML(Brag);
+			games["BrashRemark"] = XML(BrashRemark);
+			games["BrokeMyHeart"] = XML(BrokeMyHeart);
+			games["BrutalBreakUp"] = XML(BrutalBreakUp);
+			games["Bully"] = XML(Bully);
+			games["Concede"] = XML(Concede);
+			games["ConfideIn"] = XML(ConfideIn);
+			games["DeclareWar"] = XML(DeclareWar);
+			games["EmbarassSelf"] = new XML(EmbarassSelf);
+			games["Flirt"] = XML(Flirt);
+			games["GiveAdvice"] = XML(GiveAdvice);
+			games["HumbleSelf"] = XML(HumbleSelf);
+			games["Idolize"] = XML(Idolize);
+			games["Insult"] = XML(Insult);
+			games["InsultFriendOf"] = XML(InsultFriendOf);
+			games["ItsOver"] = XML(ItsOver);
+			games["LeaveMeAlone"] = XML(LeaveMeAlone);
+			games["LetsBeFriends"] = XML(LetsBeFriends);
+			games["TxtBreakUp"] = new XML(TxtBreakUp);
+			games["MakePlans"] = XML(MakePlans);
+			games["MakeUp"] = XML(MakeUp);
+			games["OpenUp"] = XML(OpenUp);
+			games["PhysicalFlirt"] = XML(PhysicalFlirt);
+			games["PickUpLine"] = XML(PickUpLine);
+			games["Reminisce"] = XML(Reminisce);
+			games["ShareInterest"] = XML(ShareInterest);
+			games["ShootDown"] = XML(ShootDown);
+			games["ShowOff"] = XML(ShowOff);
+			games["SpreadRumours"] = XML(SpreadRumours);
+			games["TurnOff"] = XML(TurnOff);
+			games["WeirdOut"] = XML(WeirdOut);
+			games["Woo"] = XML(Woo);
+			games["WooEnemy"] = XML(WooEnemy);
+			
+			games["SocialStatusUpdateGame"] = XML(SocialStatusUpdateGame);
+			games["SocialStatusUpdateGameNotInLevel"] = XML(SocialStatusUpdateGameNotInLevel);
+			games["StoryTriggerGame"] = XML(StoryTriggerGame);
+			games["TriggerGame"] = XML(TriggerGame);
+			games["TriggerGameAllChars"] = XML(TriggerGameAllChars);
+			games["Microtheories"] = XML(Microtheories);
+		}
+		
+		public function loadXMLStories():void {
+			this.stories = new Dictionary()
+			this.stories["Chloe"] = XML(ChloeStory);
+			this.stories["Zack"] = XML(ZackStory);
+			this.stories["Doug"] = XML(DougStory);
+			this.stories["Edward"] = XML(EdwardStory);
+			//this.stories["GettingReadyForProm"] = XML(GettingReadyForPromStory);
+			this.stories["Lil"] = XML(LilStory);
+			this.stories["Monica"] = XML(MonicaStory);
+			this.stories["Simon"] = XML(SimonStory);
+			this.stories["Kate"] = XML(KateStory);
+			this.stories["Oswald"] = XML(NaomiStory);
+			this.stories["Naomi"] = XML(OswaldStory);
+			this.stories["Facade"] = XML(FacadeStory);
+		}
+		
+		public function loadTutorials():void {
+			this.tutorials = new Dictionary();
+			this.tutorials["newTutorial1part1"] = XML(newTutorial1part1);
+			this.tutorials["newTutorial1part2"] = XML(newTutorial1part2);
+			this.tutorials["newTutorial2part1"] = XML(newTutorial2part1);
+			this.tutorials["newTutorial2part2"] = XML(newTutorial2part2);
+			this.tutorials["DougTutorialThu"] = XML(DougTutorialThu);
+			this.tutorials["DougTutorialFri"] = XML(DougTutorialFri);
+			this.tutorials["LilTutorialMon"] = XML(LilTutorialMon);
+			this.tutorials["LilTutorialTue"] = XML(LilTutorialTue);
+			this.tutorials["LilTutorialWed"] = XML(LilTutorialWed);
+			this.tutorials["LilTutorialThu"] = XML(LilTutorialThu);
+			this.tutorials["LilTutorialFri"] = XML(LilTutorialFri);
+			this.tutorials["SimonTutorialWed"] = XML(SimonTutorialWed);
+			this.tutorials["SimonTutorialThu"] = XML(SimonTutorialThu);
+			this.tutorials["SimonTutorialFri"] = XML(SimonTutorialFri);
+			this.tutorials["MonicaTutorialTue"] = XML(MonicaTutorialTue);
+			this.tutorials["MonicaTutorialWed"] = XML(MonicaTutorialWed);
+			this.tutorials["MonicaTutorialThu"] = XML(MonicaTutorialThu);
+			this.tutorials["MonicaTutorialFri"] = XML(MonicaTutorialFri); 
+			
+			this.tutorials["EdwardTutorialTue"] = XML(EdwardTutorialTue);
+			this.tutorials["EdwardTutorialWed"] = XML(EdwardTutorialWed);
+			this.tutorials["EdwardTutorialThu"] = XML(EdwardTutorialThu);
+			this.tutorials["EdwardTutorialFri"] = XML(EdwardTutorialFri);
+			
+			this.tutorials["KateTutorialTue"] = XML(KateTutorialTue);
+			this.tutorials["KateTutorialWed"] = XML(KateTutorialWed);
+			this.tutorials["KateTutorialThu"] = XML(KateTutorialThu);
+			this.tutorials["KateTutorialFri"] = XML(KateTutorialFri);
+			
+			this.tutorials["OswaldTutorialWed"] = XML(OswaldTutorialWed);
+			this.tutorials["OswaldTutorialThu"] = XML(OswaldTutorialThu);
+			this.tutorials["OswaldTutorialFri"] = XML(OswaldTutorialFri);
+			
+			this.tutorials["NaomiTutorialWed"] = XML(NaomiTutorialWed);
+			this.tutorials["NaomiTutorialThu"] = XML(NaomiTutorialThu);
+			this.tutorials["NaomiTutorialFri"] = XML(NaomiTutorialFri);
+			
+			this.tutorials["FacadeTutorial"] = XML(FacadeTutorial);
+		}
+		
+		public function loadCifStates():void {
+			this.cifStartStates = new Dictionary();
+			this.cifStartStates["tutorialCifStateXML"] = XML(tutorialCifStateXML);
+			this.cifStartStates["facadeState"] = XML(facadeState);
+			this.cifStartStates["quickPlayStartState1"] = XML(QuickPlayStartState1);
+			this.cifStartStates["quickPlayStartState2"] = XML(QuickPlayStartState2);
+			this.cifStartStates["quickPlayStartState3"] = XML(QuickPlayStartState3);
+			//this.cifStartStates["quickPlayStartState4"] = XML(QuickPlayStartState4);
+			this.cifStartStates["quickPlayStartState5"] = XML(QuickPlayStartState5);
+			this.cifStartStates["quickPlayStartState6"] = XML(QuickPlayStartState6);
+			this.cifStartStates["quickPlayStartState7"] = XML(QuickPlayStartState7);
+		}
+		
+		public function loadQuickPlayStories():void {
+			this.quickPlayStories = new Dictionary();
+			this.quickPlayStories["QP1"] = XML(QP1);
+			this.quickPlayStories["QP2"] = XML(QP2);
+			this.quickPlayStories["QP3"] = XML(QP3);
+			//this.quickPlayStories["QP4"] = XML(QP4);
+			this.quickPlayStories["QP5"] = XML(QP5);
+			this.quickPlayStories["QP6"] = XML(QP6);
+			this.quickPlayStories["QP7"] = XML(QP7);
+		}
+		
+		]]>
+	</fx:Script>
+	
+</s:Group>
